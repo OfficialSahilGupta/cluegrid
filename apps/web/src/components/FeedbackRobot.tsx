@@ -7,19 +7,33 @@ export function FeedbackRobot() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description.trim()) return;
 
-    // Simulate submission saving to localStorage history
-    const feedbackList = JSON.parse(localStorage.getItem("cluegrid_feedback") || "[]");
-    feedbackList.push({
-      category,
-      description,
-      email,
-      timestamp: new Date().toISOString(),
-    });
-    localStorage.setItem("cluegrid_feedback", JSON.stringify(feedbackList));
+    try {
+      const res = await fetch("/api/user/feedback", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ category, description, email }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to send feedback to server");
+      }
+    } catch (err) {
+      console.error("Error sending feedback to server:", err);
+      // Fallback: save to localStorage if server is down or unreachable
+      const feedbackList = JSON.parse(localStorage.getItem("cluegrid_feedback") || "[]");
+      feedbackList.push({
+        category,
+        description,
+        email,
+        timestamp: new Date().toISOString(),
+      });
+      localStorage.setItem("cluegrid_feedback", JSON.stringify(feedbackList));
+    }
 
     setSubmitted(true);
     setTimeout(() => {

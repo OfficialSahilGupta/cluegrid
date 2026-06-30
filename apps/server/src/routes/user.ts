@@ -301,4 +301,32 @@ router.delete("/admin/cities/:id", verifyAdmin, async (req, res) => {
   }
 });
 
+// Submit user feedback (Public)
+router.post("/feedback", async (req, res) => {
+  try {
+    const { category, description, email } = req.body;
+    if (!description || !description.trim()) {
+      res.status(400).json({ success: false, error: "Description is required" });
+      return;
+    }
+    await db.query(
+      "INSERT INTO feedback (category, description, email) VALUES ($1, $2, $3)",
+      [category || "bug", description.trim(), email || null]
+    );
+    res.json({ success: true, message: "Feedback submitted successfully" });
+  } catch (e: any) {
+    res.status(500).json({ success: false, error: e.message || "Failed to submit feedback" });
+  }
+});
+
+// Get all user feedback (Admin only)
+router.get("/admin/feedback", verifyAdmin, async (req, res) => {
+  try {
+    const result = await db.query("SELECT * FROM feedback ORDER BY created_at DESC");
+    res.json({ success: true, feedback: result.rows });
+  } catch (e: any) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
 export default router;

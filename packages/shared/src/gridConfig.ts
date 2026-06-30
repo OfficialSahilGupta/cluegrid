@@ -69,6 +69,9 @@ export interface RoomSettings {
   afkTimeoutMinutes: number;
   timerMode?: "off" | "fast" | "long" | "custom";
   timerSeconds?: number;
+  spymasterTimerSeconds?: number;
+  firstClueExtraSeconds?: number;
+  operativeTimerSeconds?: number;
   roomLocked?: boolean;
   timerAction?: "auto" | "manual";
 }

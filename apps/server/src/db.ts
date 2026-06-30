@@ -104,6 +104,16 @@ export async function initializeSchema() {
         ended_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS feedback (
+        id SERIAL PRIMARY KEY,
+        category VARCHAR(50) NOT NULL,
+        description TEXT NOT NULL,
+        email VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
     console.log("[postgres] tables initialized successfully");
   } catch (err) {
     console.error("[postgres] error initializing tables:", err);

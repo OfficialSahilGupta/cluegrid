@@ -16,6 +16,9 @@ export function initializeFirebaseAdmin() {
   try {
     if (serviceAccountJson) {
       const credentials = JSON.parse(serviceAccountJson);
+      if (credentials.private_key) {
+        credentials.private_key = credentials.private_key.replace(/\\n/g, "\n");
+      }
       initializeApp({
         credential: cert(credentials),
         projectId: projectId || credentials.project_id,
@@ -68,9 +71,9 @@ export async function verifyFirebaseToken(token: string): Promise<DecodedFirebas
       if (payloadBase64) {
         const payloadJson = Buffer.from(payloadBase64, "base64").toString("utf8");
         const payload = JSON.parse(payloadJson);
-        if (payload && payload.uid) {
+        if (payload && (payload.uid || payload.sub)) {
           return {
-            uid: payload.uid,
+            uid: payload.uid || payload.sub,
             email: payload.email,
             name: payload.name || payload.username || "Mock Firebase User",
           };

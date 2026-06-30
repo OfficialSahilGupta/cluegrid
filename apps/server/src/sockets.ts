@@ -1101,6 +1101,9 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
           settings.eliminationRule !== undefined ||
           settings.timerMode !== undefined ||
           settings.timerSeconds !== undefined ||
+          settings.spymasterTimerSeconds !== undefined ||
+          settings.firstClueExtraSeconds !== undefined ||
+          settings.operativeTimerSeconds !== undefined ||
           settings.timerAction !== undefined;
 
         if (isModifyingHostOnly && !isCallerHost) {
@@ -1119,6 +1122,15 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
         }
         if (settings.timerSeconds !== undefined) {
           room.settings.timerSeconds = settings.timerSeconds;
+        }
+        if (settings.spymasterTimerSeconds !== undefined) {
+          room.settings.spymasterTimerSeconds = settings.spymasterTimerSeconds;
+        }
+        if (settings.firstClueExtraSeconds !== undefined) {
+          room.settings.firstClueExtraSeconds = settings.firstClueExtraSeconds;
+        }
+        if (settings.operativeTimerSeconds !== undefined) {
+          room.settings.operativeTimerSeconds = settings.operativeTimerSeconds;
         }
         if (settings.roomLocked !== undefined) {
           room.settings.roomLocked = settings.roomLocked;
