@@ -137,9 +137,10 @@ async function main(): Promise<void> {
     console.warn("[postgres] could not connect on startup");
   }
 
-  httpServer.listen(config.port, () => {
+  const host = process.env.HOST || "0.0.0.0";
+  httpServer.listen(config.port, host, () => {
     console.log(
-      `[server] ClueGrid server running at http://localhost:${config.port} (${config.nodeEnv})`
+      `[server] ClueGrid server running at http://${host}:${config.port} (${config.nodeEnv})`
     );
   });
 }
