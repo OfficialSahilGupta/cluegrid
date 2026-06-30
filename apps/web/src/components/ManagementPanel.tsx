@@ -7,7 +7,7 @@ interface City {
   name: string;
 }
 
-export function AdminPanel() {
+export function ManagementPanel() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [cities, setCities] = useState<City[]>([]);

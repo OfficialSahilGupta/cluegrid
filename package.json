@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=apps/web\" \"npm run dev --workspace=apps/server\"",
-    "build": "npm run build --workspaces --if-present",
+    "build": "npm run build --workspace=packages/shared --workspace=packages/wordpacks --workspace=packages/i18n && npm run build --workspaces --if-present",
     "lint": "eslint . --ext .ts,.tsx",
     "type-check": "tsc --build",
     "ci": "npm run type-check && npm run lint && npm run build"

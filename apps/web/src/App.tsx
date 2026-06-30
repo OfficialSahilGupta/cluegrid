@@ -5,7 +5,7 @@ import { GameBoard } from "./components/GameBoard";
 import { useAuth } from "./context/AuthContext";
 import { RulesPage } from "./components/RulesPage";
 import { ChangelogPage } from "./components/ChangelogPage";
-import { AdminPanel } from "./components/AdminPanel";
+import { ManagementPanel } from "./components/ManagementPanel";
 import { AuthModal } from "./components/AuthModal";
 import { ProfileSettingsModal } from "./components/ProfileSettingsModal";
 import { useTranslation } from "react-i18next";
@@ -840,7 +840,7 @@ export default function App() {
         ) : currentView === "changelog" ? (
           <ChangelogPage />
         ) : currentView === "admin" ? (
-          <AdminPanel />
+          <ManagementPanel />
         ) : currentView === "support" ? (
           <SupportPage />
         ) : !room ? (
