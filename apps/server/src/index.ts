@@ -10,6 +10,7 @@ import { redis } from "./redis.js";
 import { authConfig } from "./auth.js";
 import { checkDbConnection, initializeSchema } from "./db.js";
 import userRouter from "./routes/user.js";
+import { initializeFirebaseAdmin } from "./firebaseAdmin.js";
 
 // ─── Express app ─────────────────────────────────────────────────────────────
 
@@ -116,6 +117,9 @@ registerSocketHandlers(io);
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
+  // Initialize Firebase Admin SDK
+  initializeFirebaseAdmin();
+
   // Eagerly connect Redis so health-check reflects reality quickly.
   try {
     await redis.connect();

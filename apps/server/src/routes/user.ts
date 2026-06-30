@@ -2,32 +2,87 @@ import express from "express";
 import { getSession } from "@auth/express";
 import { authConfig } from "../auth.js";
 import { db } from "../db.js";
+import { verifyFirebaseToken } from "../firebaseAdmin.js";
 
 const router = express.Router();
+
+async function resolveAuthenticatedUser(req: express.Request): Promise<string | null> {
+  // 1. Check for Bearer token in Authorization header
+  const authHeader = req.headers["authorization"];
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    try {
+      const firebaseUser = await verifyFirebaseToken(token);
+      if (firebaseUser && firebaseUser.uid) {
+        // Query user by firebase_uid
+        const uidRes = await db.query("SELECT id FROM users WHERE firebase_uid = $1", [firebaseUser.uid]);
+        if (uidRes.rows.length > 0) {
+          return String(uidRes.rows[0].id);
+        }
+
+        // If not found by firebase_uid, try finding by email to link accounts
+        const email = firebaseUser.email?.trim().toLowerCase();
+        if (email) {
+          const emailRes = await db.query("SELECT id FROM users WHERE email = $1", [email]);
+          if (emailRes.rows.length > 0) {
+            const existingId = emailRes.rows[0].id;
+            // Link the account
+            await db.query("UPDATE users SET firebase_uid = $1 WHERE id = $2", [firebaseUser.uid, existingId]);
+            return String(existingId);
+          }
+        }
+
+        // If still not found, create a new user profile
+        const username = firebaseUser.name || (email ? email.split("@")[0] : "Agent");
+        const insertRes = await db.query(
+          "INSERT INTO users (email, username, avatar, firebase_uid) VALUES ($1, $2, $3, $4) RETURNING id",
+          [email || `${firebaseUser.uid}@firebase.local`, username, "🕵️‍♂️", firebaseUser.uid]
+        );
+        const newId = insertRes.rows[0].id;
+
+        // Initialize user stats
+        await db.query(
+          "INSERT INTO user_stats (user_id, games_played, games_won, total_guesses, correct_guesses) VALUES ($1, 0, 0, 0, 0)",
+          [newId]
+        );
+
+        return String(newId);
+      }
+    } catch (err) {
+      console.error("[auth] Firebase token verification failed:", err);
+      return null;
+    }
+  }
+
+  // 2. Fall back to Session or Mock cookie / Mock header
+  let userId: string | null = null;
+  try {
+    const session = await getSession(req, authConfig);
+    if (session?.user) {
+      userId = (session.user as any).id;
+    }
+  } catch (e) {
+    // ignore auth.js parsing error in mock environments
+  }
+
+  if (!userId) {
+    const headerVal = req.headers["x-mock-user-id"];
+    const cookieVal = req.headers.cookie
+      ?.split(";")
+      .find((c) => c.trim().startsWith("mock_user_id="))
+      ?.split("=")[1];
+    userId = (headerVal || cookieVal || null) as string | null;
+  }
+
+  return userId;
+}
 
 /**
  * Fetch profile data, user stats, and match history
  */
 router.get("/profile", async (req, res) => {
   try {
-    let userId: string | null = null;
-    try {
-      const session = await getSession(req, authConfig);
-      if (session?.user) {
-        userId = (session.user as any).id;
-      }
-    } catch (e) {
-      // ignore auth.js parsing error in mock environments
-    }
-
-    if (!userId) {
-      const headerVal = req.headers["x-mock-user-id"];
-      const cookieVal = req.headers.cookie
-        ?.split(";")
-        .find((c) => c.trim().startsWith("mock_user_id="))
-        ?.split("=")[1];
-      userId = (headerVal || cookieVal || null) as string | null;
-    }
+    const userId = await resolveAuthenticatedUser(req);
 
     if (!userId) {
       res.status(401).json({ success: false, error: "Unauthorized" });
@@ -91,24 +146,7 @@ router.get("/profile", async (req, res) => {
  */
 router.post("/settings", async (req, res) => {
   try {
-    let userId: string | null = null;
-    try {
-      const session = await getSession(req, authConfig);
-      if (session?.user) {
-        userId = (session.user as any).id;
-      }
-    } catch (e) {
-      // ignore auth.js parsing error in mock environments
-    }
-
-    if (!userId) {
-      const headerVal = req.headers["x-mock-user-id"];
-      const cookieVal = req.headers.cookie
-        ?.split(";")
-        .find((c) => c.trim().startsWith("mock_user_id="))
-        ?.split("=")[1];
-      userId = (headerVal || cookieVal || null) as string | null;
-    }
+    const userId = await resolveAuthenticatedUser(req);
 
     if (!userId) {
       res.status(401).json({ success: false, error: "Unauthorized" });
@@ -209,27 +247,12 @@ router.post("/mock-login", async (req, res) => {
 });
 
 async function verifyAdmin(req: express.Request, res: express.Response, next: express.NextFunction) {
-  let userId: string | null = null;
   try {
-    const session = await getSession(req, authConfig);
-    if (session?.user) {
-      userId = (session.user as any).id;
+    const userId = await resolveAuthenticatedUser(req);
+    if (!userId) {
+      res.status(401).json({ success: false, error: "Unauthorized" });
+      return;
     }
-  } catch (e) {
-    // ignore
-  }
-
-  if (!userId) {
-    const headerVal = req.headers["x-mock-user-id"];
-    userId = (headerVal || null) as string | null;
-  }
-
-  if (!userId) {
-    res.status(401).json({ success: false, error: "Unauthorized" });
-    return;
-  }
-
-  try {
     const userRes = await db.query("SELECT is_admin FROM users WHERE id = $1", [userId]);
     if (userRes.rows.length === 0 || !userRes.rows[0].is_admin) {
       res.status(403).json({ success: false, error: "Forbidden: Admins only" });

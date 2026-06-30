@@ -13,6 +13,7 @@
   "dependencies": {
     "@cluegrid/i18n": "*",
     "@cluegrid/shared": "*",
+    "firebase": "^12.15.0",
     "i18next": "^26.3.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

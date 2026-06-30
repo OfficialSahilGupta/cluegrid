@@ -38,14 +38,20 @@ export async function initializeSchema() {
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
+        password_hash VARCHAR(255) DEFAULT 'firebase_auth',
         username VARCHAR(255) NOT NULL,
         avatar VARCHAR(255) DEFAULT '🕵️‍♂️',
         is_admin BOOLEAN DEFAULT FALSE,
         is_supporter BOOLEAN DEFAULT FALSE,
+        firebase_uid VARCHAR(255) UNIQUE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    await client.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS firebase_uid VARCHAR(255) UNIQUE;
+    `);
+
 
     await client.query(`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
