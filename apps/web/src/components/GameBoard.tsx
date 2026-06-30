@@ -1022,15 +1022,15 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
                   {t("settings.timerMode", "Turn Timer Mode")}
                 </label>
-                <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                   <button
                     type="button"
                     disabled={!isHost}
                     onClick={() => isHost && setIsTimerModeDropdownOpen(!isTimerModeDropdownOpen)}
                     style={{
-                      width: "100%",
-                      maxWidth: "240px",
-                      padding: "10px 14px",
+                      width: "fit-content",
+                      minWidth: "160px",
+                      padding: "7px 12px",
                       borderRadius: "var(--radius-sm)",
                       border: "1px solid var(--border-default)",
                       background: "var(--bg-surface-raised)",
@@ -1048,38 +1048,124 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   >
                     <span>
                       {room.settings.timerMode === "off" || !room.settings.timerMode ? t("settings.timerOff", "Off") :
-                       room.settings.timerMode === "fast" ? t("settings.timerFast", "Fast") :
-                       room.settings.timerMode === "long" ? t("settings.timerLong", "Long") : t("settings.timerCustom", "Custom")}
+                       room.settings.timerMode === "fast" ? t("settings.timerFast", "Fast (90s / 60s)") :
+                       room.settings.timerMode === "long" ? t("settings.timerLong", "Long (180s / 120s)") : t("settings.timerCustom", "Custom")}
                     </span>
                     <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>
                       {isTimerModeDropdownOpen ? "▲" : "▼"}
                     </span>
                   </button>
-                  {room.settings.timerMode === "custom" && (
-                    <input
-                      type="number"
-                      disabled={!isHost}
-                      placeholder={t("settings.timerCustom")}
-                      value={room.settings.timerSeconds || 120}
-                      onChange={(e) => {
-                        if (socket && isHost) {
-                          socket.emit("update_settings", {
-                            roomCode: room.roomCode,
-                            settings: { timerSeconds: Number(e.target.value) },
-                          });
-                        }
-                      }}
-                      style={{
-                        width: "90px",
-                        padding: "9px 10px",
-                        borderRadius: "var(--radius-sm)",
-                        border: "1px solid var(--border-default)",
-                        background: "var(--bg-surface-raised)",
-                        color: "var(--text-primary)",
-                        fontSize: "0.85rem",
-                        outline: "none",
-                      }}
-                    />
+                  {(room.settings.timerMode && room.settings.timerMode !== "off") && (
+                    <div style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3, 1fr)",
+                      gap: "6px",
+                      width: "100%",
+                      maxWidth: "380px",
+                    }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                        <label style={{ fontSize: "0.68rem", color: "var(--color-text)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {t("settings.spymasterTimer", "Spymaster (s)")}
+                        </label>
+                        <input
+                          type="number"
+                          disabled={room.settings.timerMode !== "custom" || !isHost}
+                          value={
+                            room.settings.timerMode === "fast" ? 90 :
+                            room.settings.timerMode === "long" ? 180 :
+                            (room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90)
+                          }
+                          onChange={(e) => {
+                            if (socket && isHost && room.settings.timerMode === "custom") {
+                              socket.emit("update_settings", {
+                                roomCode: room.roomCode,
+                                settings: { spymasterTimerSeconds: Number(e.target.value) },
+                              });
+                            }
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "6px 8px",
+                            borderRadius: "var(--radius-sm)",
+                            border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                            background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
+                            color: "var(--color-text)",
+                            fontSize: "0.82rem",
+                            outline: "none",
+                            textAlign: "center",
+                            opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                        <label style={{ fontSize: "0.68rem", color: "var(--color-text)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {t("settings.firstClueExtra", "1st Clue Extra (s)")}
+                        </label>
+                        <input
+                          type="number"
+                          disabled={room.settings.timerMode !== "custom" || !isHost}
+                          value={
+                            room.settings.timerMode === "fast" ? 60 :
+                            room.settings.timerMode === "long" ? 120 :
+                            (room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60)
+                          }
+                          onChange={(e) => {
+                            if (socket && isHost && room.settings.timerMode === "custom") {
+                              socket.emit("update_settings", {
+                                roomCode: room.roomCode,
+                                settings: { firstClueExtraSeconds: Number(e.target.value) },
+                              });
+                            }
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "6px 8px",
+                            borderRadius: "var(--radius-sm)",
+                            border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                            background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
+                            color: "var(--color-text)",
+                            fontSize: "0.82rem",
+                            outline: "none",
+                            textAlign: "center",
+                            opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                        <label style={{ fontSize: "0.68rem", color: "var(--color-text)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {t("settings.operativeTimer", "Operative (s)")}
+                        </label>
+                        <input
+                          type="number"
+                          disabled={room.settings.timerMode !== "custom" || !isHost}
+                          value={
+                            room.settings.timerMode === "fast" ? 60 :
+                            room.settings.timerMode === "long" ? 120 :
+                            (room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60)
+                          }
+                          onChange={(e) => {
+                            if (socket && isHost && room.settings.timerMode === "custom") {
+                              socket.emit("update_settings", {
+                                roomCode: room.roomCode,
+                                settings: { operativeTimerSeconds: Number(e.target.value) },
+                              });
+                            }
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "6px 8px",
+                            borderRadius: "var(--radius-sm)",
+                            border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                            background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
+                            color: "var(--color-text)",
+                            fontSize: "0.82rem",
+                            outline: "none",
+                            textAlign: "center",
+                            opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
+                          }}
+                        />
+                      </div>
+                    </div>
                   )}
                 </div>
 
@@ -1116,17 +1202,25 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     >
                       {[
                         { value: "off", label: t("settings.timerOff", "Off") },
-                        { value: "fast", label: t("settings.timerFast", "Fast") },
-                        { value: "long", label: t("settings.timerLong", "Long") },
+                        { value: "fast", label: t("settings.timerFast", "Fast (90s / 60s)") },
+                        { value: "long", label: t("settings.timerLong", "Long (180s / 120s)") },
                         { value: "custom", label: t("settings.timerCustom", "Custom") },
                       ].map((opt) => (
                         <div
                           key={opt.value}
                           onClick={() => {
                             if (socket && isHost) {
+                              let extraSettings = {};
+                              if (opt.value === "fast") {
+                                extraSettings = { spymasterTimerSeconds: 90, firstClueExtraSeconds: 60, operativeTimerSeconds: 60 };
+                              } else if (opt.value === "long") {
+                                extraSettings = { spymasterTimerSeconds: 180, firstClueExtraSeconds: 120, operativeTimerSeconds: 120 };
+                              } else if (opt.value === "off") {
+                                extraSettings = { spymasterTimerSeconds: 0, firstClueExtraSeconds: 0, operativeTimerSeconds: 0 };
+                              }
                               socket.emit("update_settings", {
                                 roomCode: room.roomCode,
-                                settings: { timerMode: opt.value },
+                                settings: { timerMode: opt.value, ...extraSettings },
                               });
                             }
                             setIsTimerModeDropdownOpen(false);
@@ -1189,7 +1283,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "320px" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                 <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
                   {t("settings.timerAction", "Timer Expiration Action")}
@@ -1215,7 +1309,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         }}
                         style={{
                           width: "100%",
-                          maxWidth: "240px",
                           padding: "10px 14px",
                           borderRadius: "var(--radius-sm)",
                           border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
@@ -1250,7 +1343,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       }}
                       style={{
                         width: "100%",
-                        maxWidth: "240px",
                         padding: "10px 14px",
                         borderRadius: "var(--radius-sm)",
                         background: "transparent",
@@ -1284,7 +1376,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       }}
                       style={{
                         width: "100%",
-                        maxWidth: "240px",
                         padding: "10px 14px",
                         borderRadius: "var(--radius-sm)",
                         background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
@@ -2012,13 +2103,37 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     } else {
       const mode = room.settings.timerMode || "off";
       if (mode === "off") return;
-      if (mode === "fast") limit = 60;
-      if (mode === "long") limit = 180;
-      if (mode === "custom") limit = room.settings.timerSeconds || 120;
+
+      let spyTime = 90;
+      let opTime = 60;
+      let extraTime = 60;
+
+      if (mode === "fast") {
+        spyTime = 90;
+        opTime = 60;
+        extraTime = 60;
+      } else if (mode === "long") {
+        spyTime = 180;
+        opTime = 120;
+        extraTime = 120;
+      } else if (mode === "custom") {
+        spyTime = room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90;
+        extraTime = room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60;
+        opTime = room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60;
+      }
+
+      if (room.turnState.phase === "giving_clue") {
+        limit = spyTime;
+        if (room.turnState.turnNumber === 1) {
+          limit += extraTime;
+        }
+      } else {
+        limit = opTime;
+      }
     }
 
     setTimerCount(limit);
-  }, [room.turnState, room.phase, room.gameMode, room.settings.timerMode, room.settings.timerSeconds]);
+  }, [room.turnState?.turnNumber, room.turnState?.phase, room.phase, room.gameMode, room.settings.timerMode, room.settings.spymasterTimerSeconds, room.settings.firstClueExtraSeconds, room.settings.operativeTimerSeconds]);
 
   // Turn timer countdown loop
   useEffect(() => {
@@ -2033,9 +2148,33 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       const mode = room.settings.timerMode || "off";
       if (mode !== "off") {
         enabled = true;
-        if (mode === "fast") limit = 60;
-        if (mode === "long") limit = 180;
-        if (mode === "custom") limit = room.settings.timerSeconds || 120;
+
+        let spyTime = 90;
+        let opTime = 60;
+        let extraTime = 60;
+
+        if (mode === "fast") {
+          spyTime = 90;
+          opTime = 60;
+          extraTime = 60;
+        } else if (mode === "long") {
+          spyTime = 180;
+          opTime = 120;
+          extraTime = 120;
+        } else if (mode === "custom") {
+          spyTime = room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90;
+          extraTime = room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60;
+          opTime = room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60;
+        }
+
+        if (room.turnState.phase === "giving_clue") {
+          limit = spyTime;
+          if (room.turnState.turnNumber === 1) {
+            limit += extraTime;
+          }
+        } else {
+          limit = opTime;
+        }
       }
     }
 
@@ -2081,7 +2220,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [room.gameMode, room.phase, room.turnState, socket, localPlayer, room.roomCode, playerId, room.settings.timerMode, room.settings.timerSeconds, room.settings.timerAction]);
+  }, [room.gameMode, room.phase, room.turnState, socket, localPlayer, room.roomCode, playerId, room.settings.timerMode, room.settings.spymasterTimerSeconds, room.settings.firstClueExtraSeconds, room.settings.operativeTimerSeconds, room.settings.timerAction]);
 
 
 
