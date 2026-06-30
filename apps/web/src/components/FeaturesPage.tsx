@@ -149,6 +149,20 @@ export function FeaturesPage() {
             Track your match performance, overall win rates, games played, and supporter level achievements easily.
           </p>
         </div>
+
+        {/* Feature 10 */}
+        <div style={{ background: "var(--bg-surface-raised)", border: "1px solid var(--border-subtle)", padding: "18px", borderRadius: "var(--radius-md)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
+            <span style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)" }}>Security</span>
+            <span style={{ fontSize: "0.75rem", background: "rgba(214, 207, 194, 0.08)", color: "var(--text-secondary)", padding: "3px 8px", borderRadius: "4px", fontWeight: 600 }}>Standard</span>
+          </div>
+          <h4 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: "1.05rem", color: "var(--text-primary)", marginBottom: "6px" }}>
+            Anti-Spy Action Logging
+          </h4>
+          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: 1.5 }}>
+            If an Operative secretly or intuitively attempts to join the Spymasters, they&apos;ll be caught and recorded in the game log.
+          </p>
+        </div>
       </div>
     </div>
   );

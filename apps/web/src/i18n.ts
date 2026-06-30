@@ -16,13 +16,13 @@ export const RTL_LOCALES = new Set(["ar", "ar-LB", "he", "fa"]);
  */
 export const SUPPORTED_LOCALES: { code: string; name: string; flag: string }[] = [
   { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "ne", name: "नेपाली", flag: "🇳🇵" },
-  { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
   { code: "de", name: "Deutsch", flag: "🇩🇪" },
   { code: "ar", name: "العربية", flag: "🇸🇦" },
   { code: "pt-BR", name: "Português (Brasil)", flag: "🇧🇷" },
   { code: "fr", name: "Français", flag: "🇫🇷" },
   { code: "tr", name: "Türkçe", flag: "🇹🇷" },
+  { code: "ne", name: "नेपाली", flag: "🇳🇵" },
+  { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
   { code: "ja", name: "日本語", flag: "🇯🇵" },
   { code: "cs", name: "Čeština", flag: "🇨🇿" },
   { code: "it", name: "Italiano", flag: "🇮🇹" },

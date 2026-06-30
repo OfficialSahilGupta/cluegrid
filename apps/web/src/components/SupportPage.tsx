@@ -1,58 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext.js";
-import { AuthModal } from "./AuthModal.js";
 
 export function SupportPage() {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (window.location.hash.includes("supporter-success")) {
       setSuccess(true);
     }
   }, []);
-
-  const handleCheckout = async (type: "subscription" | "one_time") => {
-    if (!user) {
-      setAuthOpen(true);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      const userId = localStorage.getItem("cluegrid_user_id");
-      if (userId) {
-        headers["x-mock-user-id"] = userId;
-      }
-
-      const res = await fetch("/api/payment/checkout", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ type, userId: user.id }),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to create Stripe checkout session");
-      }
-
-      const data = await res.json();
-      if (data.success && data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error(data.error || "Failed to create checkout");
-      }
-    } catch (err: any) {
-      setError(err.message || "An error occurred. Please try again.");
-      setLoading(false);
-    }
-  };
 
   return (
     <div
@@ -93,23 +48,6 @@ export function SupportPage() {
         </div>
       )}
 
-      {error && (
-        <div
-          style={{
-            background: "rgba(239, 68, 68, 0.12)",
-            border: "1px solid rgb(239, 68, 68)",
-            borderRadius: "var(--radius-md)",
-            padding: "16px",
-            color: "var(--team-1)",
-            fontWeight: 600,
-            marginBottom: "24px",
-            fontSize: "0.95rem",
-          }}
-        >
-          {error}
-        </div>
-      )}
-
       <div
         style={{
           display: "flex",
@@ -134,7 +72,7 @@ export function SupportPage() {
             A dedicated Member badge displayed next to your avatar in lobbies, game rooms, and chat.
           </li>
           <li style={{ marginBottom: "6px" }}>
-            Special name mention inside the website's credits index.
+            Special name mention inside the website&apos;s credits index.
           </li>
           <li style={{ marginBottom: "6px" }}>
             Add and customize a custom bio description on your player profile card.
@@ -145,39 +83,72 @@ export function SupportPage() {
         </ul>
       </div>
 
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <button
-          onClick={() => handleCheckout("subscription")}
-          disabled={loading}
+      <div
+        style={{
+          background: "var(--accent-bg-subtle)",
+          border: "1px solid var(--accent)",
+          borderRadius: "var(--radius-md)",
+          padding: "24px 32px",
+          textAlign: "center",
+          maxWidth: "500px",
+          margin: "0 auto",
+          boxShadow: "0 8px 32px rgba(232, 163, 61, 0.08)",
+          animation: "float-pulse 3s ease-in-out infinite",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: "16px" }}>
+          <div
+            style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "50%",
+              background: "rgba(232, 163, 61, 0.15)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 0 15px rgba(232, 163, 61, 0.3)",
+            }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--accent)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </div>
+        </div>
+        <h4
           style={{
-            padding: "16px 32px",
-            borderRadius: "var(--radius-md)",
-            border: "none",
-            background: "var(--accent)",
-            color: "var(--accent-text-on)",
+            fontFamily: "var(--font-display)",
+            fontSize: "1.2rem",
             fontWeight: 700,
-            cursor: "pointer",
-            fontSize: "1rem",
-            transition: "all 0.15s ease",
-            boxShadow: "0 4px 15px rgba(232, 163, 61, 0.2)",
+            margin: "0 0 8px 0",
+            color: "var(--accent-text-on-subtle)",
           }}
-          onMouseOver={(e) => e.currentTarget.style.background = "var(--accent-hover)"}
-          onMouseOut={(e) => e.currentTarget.style.background = "var(--accent)"}
         >
-          {loading ? "Loading..." : "Support $3 / month (Valid for 30 days)"}
-        </button>
+          Supporter Options Coming Soon!
+        </h4>
+        <p
+          style={{
+            color: "var(--text-secondary)",
+            fontSize: "0.95rem",
+            lineHeight: 1.5,
+            margin: 0,
+          }}
+        >
+          We are currently working on integrating secure payment options (like Stripe Checkout) to enable Supporter subscriptions. Once ready, you&apos;ll be able to support ClueGrid and instantly unlock exclusive member perks.
+        </p>
       </div>
 
       <p style={{ marginTop: "24px", fontSize: "0.8rem", color: "var(--text-muted)" }}>
-        Payments are processed securely via Stripe Checkout. You can cancel subscriptions at any time.
+        Thank you for playing and supporting the development of ClueGrid!
       </p>
-
-      {authOpen && (
-        <AuthModal
-          onClose={() => setAuthOpen(false)}
-          upsellMessage="Guests must log in to unlock Supporter badges across matches!"
-        />
-      )}
     </div>
   );
 }

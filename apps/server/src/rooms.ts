@@ -10,12 +10,37 @@ const roomsStore = new Map<string, RoomState>();
  * Generate a random 6-character room code of uppercase letters
  */
 function generateRoomCode(): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  const adjectives = [
+    "creepy", "blessing", "funny", "clever", "silent", "gentle", "brave", "swift", "cozy",
+    "sleepy", "happy", "wild", "bright", "calm", "daring", "eager", "fancy", "grand", "jolly",
+    "lively", "mighty", "noble", "proud", "quick", "rusty", "shiny", "witty", "zealous", "candid",
+    "dapper", "earnest", "frosty", "golden", "hardy", "iron", "keen", "lucid", "nimble", "quiet",
+    "bold", "magic", "shadow", "cosmic", "solar", "lunar", "stellar", "quantum"
+  ];
+  const animals = [
+    "cat", "anaconda", "dog", "fox", "bear", "lion", "tiger", "wolf", "deer", "owl",
+    "eagle", "hawk", "rabbit", "panda", "koala", "otter", "badger", "falcon", "panther", "jaguar",
+    "leopard", "dolphin", "whale", "seal", "penguin", "shark", "turtle", "sloth", "llama", "alpaca",
+    "lemur", "ferret", "hedgehog", "squirrel", "beaver", "moose", "elk", "bison", "platypus",
+    "cobra", "python", "viper", "cheetah", "cougar", "lynx", "orca", "octopus", "squid", "lobster"
+  ];
+
+  let attempts = 0;
+  while (attempts < 100) {
+    const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+    const anim = animals[Math.floor(Math.random() * animals.length)];
+    const code = `${adj}-${anim}`;
+    if (!roomsStore.has(code)) {
+      return code;
+    }
+    attempts++;
   }
-  return code;
+
+  // Fallback to random suffix if we collide heavily
+  const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+  const anim = animals[Math.floor(Math.random() * animals.length)];
+  const num = Math.floor(Math.random() * 900) + 100;
+  return `${adj}-${anim}-${num}`;
 }
 
 async function getRandomCities(count: number): Promise<string[]> {
@@ -90,7 +115,7 @@ export async function createRoom(
     settings: {
       eliminationRule: "continue",
       afkTimeoutMinutes: 5,
-      timerMode: "off",
+      timerMode: "fast",
       timerSeconds: 120,
       spymasterTimerSeconds: 90,
       firstClueExtraSeconds: 60,
@@ -113,5 +138,6 @@ export async function createRoom(
  * Retrieve room by room code
  */
 export function getRoom(roomCode: string): RoomState | undefined {
-  return roomsStore.get(roomCode.toUpperCase());
+  if (!roomCode) return undefined;
+  return roomsStore.get(roomCode.toLowerCase());
 }

@@ -19,6 +19,90 @@ const socketToPlayerMap = new Map<string, { roomCode: string; playerId: string }
 // Map of Player ID -> Last reaction timestamp (ms)
 const lastReactionMap = new Map<string, number>();
 
+// Map of Room Code -> Timeout for server-side automatic turn shifting
+const roomTimeouts = new Map<string, NodeJS.Timeout>();
+
+function clearRoomTimer(roomCode: string) {
+  const existing = roomTimeouts.get(roomCode);
+  if (existing) {
+    clearTimeout(existing);
+    roomTimeouts.delete(roomCode);
+  }
+}
+
+function startRoomTimer(room: RoomState, io: SocketIOServer) {
+  clearRoomTimer(room.roomCode);
+
+  if (room.phase !== "playing" || !room.turnState) return;
+
+  const isCoop = room.gameMode === "coop";
+  const timerMode = room.settings.timerMode || "off";
+  const timerAction = room.settings.timerAction || "auto";
+
+  const isTimerActive = isCoop || (timerMode !== "off");
+  if (!isTimerActive) return;
+
+  if (timerAction === "manual" && !isCoop) return;
+
+  let limit = 120;
+  if (!isCoop) {
+    let spyTime = 90;
+    let opTime = 60;
+    let extraTime = 60;
+
+    if (timerMode === "fast") {
+      spyTime = 90;
+      opTime = 60;
+      extraTime = 60;
+    } else if (timerMode === "long") {
+      spyTime = 180;
+      opTime = 120;
+      extraTime = 120;
+    } else if (timerMode === "custom") {
+      spyTime = room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90;
+      extraTime = room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60;
+      opTime = room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60;
+    }
+
+    limit = room.turnState.phase === "giving_clue" ? spyTime : opTime;
+    if (room.turnState.phase === "giving_clue" && room.turnState.turnNumber === 1) {
+      limit += extraTime;
+    }
+  }
+
+  const timeoutId = setTimeout(() => {
+    handleServerTimerExpiry(room.roomCode, io);
+  }, limit * 1000);
+
+  roomTimeouts.set(room.roomCode, timeoutId);
+}
+
+function handleServerTimerExpiry(roomCode: string, io: SocketIOServer) {
+  const room = getRoom(roomCode);
+  if (!room || room.phase !== "playing" || !room.turnState) return;
+
+  addGameLogEntry(
+    io,
+    roomCode,
+    "turn_transition",
+    null,
+    `Timer expired! ${room.turnState.phase === "giving_clue" ? "Spymaster" : "Operatives"} ran out of time.`
+  );
+
+  if (room.turnState.phase === "giving_clue") {
+    room.turnState.clueWord = "pass";
+    room.turnState.clueCount = 0;
+    room.turnState.guessesUsed = 0;
+    room.turnState.guessesAllowed = 1;
+    room.turnState.phase = "guessing";
+    advanceTurn(room, io);
+  } else if (room.turnState.phase === "guessing") {
+    advanceTurn(room, io);
+  }
+
+  broadcastRoomState(room, io);
+}
+
 /**
  * Update Socket.IO room subscriptions based on player's team and role
  */
@@ -190,6 +274,7 @@ export function broadcastRoomState(room: RoomState, io: SocketIOServer) {
 }
 
 function endGame(room: RoomState, winner: TeamIdentifier | null, io: SocketIOServer) {
+  clearRoomTimer(room.roomCode);
   room.phase = "ended";
   room.winner = winner;
   room.endedAt = new Date().toISOString();
@@ -279,6 +364,7 @@ function advanceTurn(room: RoomState, io: SocketIOServer) {
     room.turnState.guessesUsed = 0;
     room.turnState.guessesAllowed = null;
     room.turnState.turnNumber++;
+    room.turnState.phaseStartedAt = Date.now();
 
     const activeTeamName = room.teams[nextTeam]?.name || nextTeam.toUpperCase();
     addGameLogEntry(
@@ -289,6 +375,7 @@ function advanceTurn(room: RoomState, io: SocketIOServer) {
       `New cooperative turn started. Active Spymaster Team: ${activeTeamName}. Tokens used: ${room.coopMistakesMade}/${room.coopMistakesAllowed}`,
       { activeTeam: nextTeam, teamName: activeTeamName }
     );
+    startRoomTimer(room, io);
     return;
   }
 
@@ -308,6 +395,7 @@ function advanceTurn(room: RoomState, io: SocketIOServer) {
       room.turnState.guessesUsed = 0;
       room.turnState.guessesAllowed = null;
       room.turnState.turnNumber++;
+      room.turnState.phaseStartedAt = Date.now();
 
       const teamName = room.teams[candidateTeam]?.name || (candidateTeam.charAt(0).toUpperCase() + candidateTeam.slice(1) + " Team");
       addGameLogEntry(
@@ -318,6 +406,7 @@ function advanceTurn(room: RoomState, io: SocketIOServer) {
         `Turn transitioned to ${teamName}.`,
         { activeTeam: candidateTeam, teamName }
       );
+      startRoomTimer(room, io);
       return;
     }
     loops++;
@@ -480,6 +569,12 @@ export function registerSocketHandlers(io: SocketIOServer) {
           const nextRole = role !== undefined ? role : player.role;
 
           if (nextRole === "spymaster" && nextTeam) {
+            const hasSpymaster = room.players.some((p) => p.team === nextTeam && p.role === "spymaster" && p.id !== player.id);
+            if (hasSpymaster) {
+              socket.emit("error_msg", `There is already a Spymaster on the ${nextTeam} team.`);
+              return;
+            }
+
             // Log ONLY if an operative is switching to be a spy (spymaster) during live play
             if (room.phase === "playing" && player.role === "operative") {
               const teamLabel = nextTeam.charAt(0).toUpperCase() + nextTeam.slice(1);
@@ -541,6 +636,7 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
     guessesUsed: 0,
     guessesAllowed: null,
     turnNumber: 1,
+    phaseStartedAt: Date.now(),
   };
 
   // Reset card board for a new fresh start
@@ -576,6 +672,7 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
   // Explicitly notify all clients in the room to trigger start/reset animations
   io.to(room.roomCode).emit("game_started");
 
+  startRoomTimer(room, io);
   broadcastRoomState(room, io);
 }
 
@@ -621,6 +718,8 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
     socket.on("reset_to_lobby", ({ roomCode }) => {
       const room = getRoom(roomCode);
       if (!room) return;
+
+      clearRoomTimer(room.roomCode);
 
       const mapping = socketToPlayerMap.get(socket.id);
       if (!mapping) {
@@ -712,6 +811,8 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
       room.turnState.clueCount = effectiveClueCount;
       room.turnState.guessesUsed = 0;
       room.turnState.guessesAllowed = (effectiveClueCount === 0 || effectiveClueCount === -1) ? Infinity : effectiveClueCount + 1;
+      room.turnState.phaseStartedAt = Date.now();
+      startRoomTimer(room, io);
 
       if (player.team) {
         addGameLogEntry(
@@ -1060,9 +1161,54 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
           return;
         }
       } else {
-        if (!isManualTimer && (player.team !== room.turnState.activeTeam || player.role !== "operative")) {
-          socket.emit("error_msg", "Only active Operatives can end the turn.");
-          return;
+        const isOpponent = player.team !== room.turnState.activeTeam;
+        if (isOpponent) {
+          if (!isManualTimer) {
+            socket.emit("error_msg", "Only active Operatives on the playing team can end the turn.");
+            return;
+          }
+          const mode = room.settings.timerMode || "off";
+          if (mode === "off") {
+            socket.emit("error_msg", "Cannot end turn: timer is turned off.");
+            return;
+          }
+
+          let spyTime = 90;
+          let opTime = 60;
+          let extraTime = 60;
+
+          if (mode === "fast") {
+            spyTime = 90;
+            opTime = 60;
+            extraTime = 60;
+          } else if (mode === "long") {
+            spyTime = 180;
+            opTime = 120;
+            extraTime = 120;
+          } else if (mode === "custom") {
+            spyTime = room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90;
+            extraTime = room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60;
+            opTime = room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60;
+          }
+
+          let limit = room.turnState.phase === "giving_clue" ? spyTime : opTime;
+          if (room.turnState.phase === "giving_clue" && room.turnState.turnNumber === 1) {
+            limit += extraTime;
+          }
+
+          const elapsed = (Date.now() - (room.turnState.phaseStartedAt || Date.now())) / 1000;
+          if (elapsed < limit) {
+            socket.emit("error_msg", "Cannot end turn before opponent's time runs out.");
+            return;
+          }
+        } else {
+          const isSpymasterAutoEnd = player.role === "spymaster" && room.turnState.phase === "giving_clue" && !isManualTimer;
+          const isOperativeGuessEnd = player.role === "operative" && room.turnState.phase === "guessing";
+
+          if (!isSpymasterAutoEnd && !isOperativeGuessEnd) {
+            socket.emit("error_msg", "Only active Operatives can end the turn.");
+            return;
+          }
         }
       }
 
@@ -1146,6 +1292,7 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
         }
       }
 
+      startRoomTimer(room, io);
       broadcastRoomState(room, io);
     });
 

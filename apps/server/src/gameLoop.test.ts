@@ -51,6 +51,14 @@ class MockIOServer {
     }
   }
 
+  to(room: string) {
+    return {
+      emit: (event: string, ...args: any[]) => {
+        // mock emit to room
+      }
+    };
+  }
+
   simulateConnection(socket: MockSocket) {
     this.sockets.sockets.set(socket.id, socket);
     this.connectionCallbacks.forEach((cb) => cb(socket));
@@ -251,6 +259,30 @@ async function runGameLoopTests() {
   // 6. Test Assassin / Elimination rule
   // Reset game so we can test assassin cards
   socketPlayer1.simulateReceive("start_game", { roomCode: room.roomCode });
+
+  // Re-assign players to teams/roles after reset (as start_game resets players to spectators)
+  socketPlayer1.simulateReceive("join_room", {
+    roomCode: room.roomCode,
+    playerId: "p1",
+    displayName: "Player 1",
+    team: "red",
+    role: "spymaster",
+  });
+  socketPlayer2.simulateReceive("join_room", {
+    roomCode: room.roomCode,
+    playerId: "p2",
+    displayName: "Player 2",
+    team: "red",
+    role: "operative",
+  });
+  socketPlayer3.simulateReceive("join_room", {
+    roomCode: room.roomCode,
+    playerId: "p3",
+    displayName: "Player 3",
+    team: "blue",
+    role: "spymaster",
+  });
+
   // Set default settings
   socketPlayer1.simulateReceive("update_settings", {
     roomCode: room.roomCode,

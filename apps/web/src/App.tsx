@@ -21,13 +21,13 @@ const AVATARS = ["🦊", "🦉", "🦁", "🐼", "🤖", "🎮", "👤", "🎩"]
 
 const ALL_LANGUAGES = [
   { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "ne", name: "नेपाली", flag: "🇳🇵" },
-  { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
   { code: "de", name: "Deutsch", flag: "🇩🇪" },
   { code: "ar", name: "العربية", flag: "🇸🇦" },
   { code: "pt-BR", name: "Português (Brasil)", flag: "🇧🇷" },
   { code: "fr", name: "Français", flag: "🇫🇷" },
   { code: "tr", name: "Türkçe", flag: "🇹🇷" },
+  { code: "ne", name: "नेपाली", flag: "🇳🇵" },
+  { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
   { code: "ja", name: "日本語", flag: "🇯🇵" },
   { code: "cs", name: "Čeština", flag: "🇨🇿" },
   { code: "it", name: "Italiano", flag: "🇮🇹" },
@@ -161,6 +161,20 @@ export default function App() {
   // Navigation View: lobby, rules, changelog, admin, support
   const [currentView, setCurrentView] = useState<"lobby" | "rules" | "features" | "changelog" | "admin" | "support">("lobby");
 
+  // ─── Lightweight Audio Helpers (no external deps) ────────────────────────
+  const _mkCtx = () => {
+    const AC = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AC) return null;
+    const ctx = new AC();
+    if (ctx.state === "suspended") ctx.resume();
+    return ctx;
+  };
+  const playNavAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const o = ctx.createOscillator(), g = ctx.createGain(), n = ctx.currentTime; o.type = "sine"; o.frequency.setValueAtTime(880, n); o.frequency.exponentialRampToValueAtTime(1320, n + 0.04); g.gain.setValueAtTime(0.32, n); g.gain.exponentialRampToValueAtTime(0.001, n + 0.13); o.connect(g); g.connect(ctx.destination); o.start(n); o.stop(n + 0.14); } catch { /* ignore */ } };
+  const playModeAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; [[440, 0], [660, 0.07]].forEach(([f, d]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "triangle"; o.frequency.setValueAtTime(f, n + d); g.gain.setValueAtTime(0.55, n + d); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.15); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.18); }); } catch { /* ignore */ } };
+  const playTeamCountAudio = (count: number) => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; const s = [261.63, 329.63, 392.00, 523.25]; for (let i = 0; i < count && i < s.length; i++) { const d = i * 0.07, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.setValueAtTime(s[i]!, n + d); g.gain.setValueAtTime(0.65, n + d); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.2); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.22); } } catch { /* ignore */ } };
+  const playLangAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; [1046.5, 1318.5, 1567.98].forEach((f, i) => { const d = i * 0.05, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.setValueAtTime(f, n + d); g.gain.setValueAtTime(0, n + d); g.gain.linearRampToValueAtTime(0.42, n + d + 0.02); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.35); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.38); }); } catch { /* ignore */ } };
+  // ─────────────────────────────────────────────────────────────────────────
+
   // Gameplay Word Pack Language Selected by Host
   const [gameplayLang, setGameplayLang] = useState<string>("en");
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
@@ -222,11 +236,23 @@ export default function App() {
     };
   }, []);
 
-  // Fetch room data if URL contains code hash
+  // Fetch room data if URL contains code path or hash
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    const roomCode = window.location.hash.replace("#", "").toUpperCase();
-    if (roomCode.length === 6) {
+    const pathParts = window.location.pathname.split("/");
+    const roomIndex = pathParts.indexOf("room");
+    let roomCode = "";
+
+    if (roomIndex !== -1 && pathParts.length > roomIndex + 1) {
+      const targetPart = pathParts[roomIndex + 1];
+      if (targetPart) {
+        roomCode = targetPart.trim();
+      }
+    } else {
+      roomCode = window.location.hash.replace("#", "").trim();
+    }
+
+    if (roomCode) {
       loadRoom(roomCode);
     }
   }, []);
@@ -292,7 +318,7 @@ export default function App() {
 
   const handleUpdateRefresh = () => {
     setShowUpdatePopup(false);
-    window.location.hash = "";
+    window.history.pushState(null, "", "/");
     setRoom(null);
     window.location.reload();
   };
@@ -308,7 +334,13 @@ export default function App() {
       .then((res) => {
         if (res.success && res.room) {
           setRoom(res.room);
-          window.location.hash = code;
+          const targetPath = `/room/${res.room.roomCode}`;
+          if (window.location.pathname !== targetPath) {
+            window.history.pushState(null, "", targetPath);
+          }
+          if (window.location.hash) {
+            window.location.hash = "";
+          }
         } else {
           setError(res.error || "Room not found");
           if (res.error === "Room not found") {
@@ -368,7 +400,7 @@ export default function App() {
       setSocket(null);
     }
     setRoom(null);
-    window.location.hash = "";
+    window.history.pushState(null, "", "/");
   };
 
   const handleSaveProfile = (e: React.FormEvent) => {
@@ -486,27 +518,25 @@ export default function App() {
         {/* Central navigation links — hidden on mobile via CSS class */}
         <div className="nav-center-links" style={{ display: "flex", gap: "20px", alignItems: "center" }}>
           <button
-            onClick={() => {
-              setCurrentView("lobby");
-            }}
+            onClick={() => { playNavAudio(); setCurrentView("lobby"); }}
             className={`nav-link ${currentView === "lobby" ? "active" : ""}`}
           >
             {t("nav.play")}
           </button>
           <button
-            onClick={() => setCurrentView("rules")}
+            onClick={() => { playNavAudio(); setCurrentView("rules"); }}
             className={`nav-link ${currentView === "rules" ? "active" : ""}`}
           >
             {t("nav.rules")}
           </button>
           <button
-            onClick={() => setCurrentView("features")}
+            onClick={() => { playNavAudio(); setCurrentView("features"); }}
             className={`nav-link ${currentView === "features" ? "active" : ""}`}
           >
             Features
           </button>
           <button
-            onClick={() => setCurrentView("changelog")}
+            onClick={() => { playNavAudio(); setCurrentView("changelog"); }}
             className={`nav-link ${currentView === "changelog" ? "active" : ""}`}
           >
             {t("nav.changelog")}
@@ -877,7 +907,7 @@ export default function App() {
                 </label>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
                   <button
-                    onClick={() => setGameMode("classic")}
+                    onClick={() => { playModeAudio(); setGameMode("classic"); }}
                     style={{
                       padding: "12px",
                       borderRadius: "var(--radius-md)",
@@ -894,6 +924,7 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => {
+                      playModeAudio();
                       setGameMode("coop");
                       setSelectedTeams(2);
                     }}
@@ -930,7 +961,7 @@ export default function App() {
                   {[2, 3, 4].map((num) => (
                     <button
                       key={num}
-                      onClick={() => setSelectedTeams(num)}
+                      onClick={() => { playTeamCountAudio(num); setSelectedTeams(num); }}
                       disabled={gameMode === "coop"}
                       style={{
                         padding: "12px",
@@ -1025,6 +1056,7 @@ export default function App() {
                         <div
                           key={lang.code}
                           onClick={() => {
+                            playLangAudio();
                             setGameplayLang(lang.code);
                             setIsLangDropdownOpen(false);
                           }}

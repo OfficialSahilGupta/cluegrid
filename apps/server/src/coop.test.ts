@@ -62,9 +62,9 @@ async function runCoopTests() {
 
   // Force predictable card board for testing coop resolutions
   room.board = [
-    { id: 0, word: "APPLE", type: "blue", revealed: false, revealedAt: null, revealedBy: null },
-    { id: 1, word: "BANANA", type: "neutral", revealed: false, revealedAt: null, revealedBy: null },
-    { id: 2, word: "CHERRY", type: "assassin", revealed: false, revealedAt: null, revealedBy: null },
+    { id: 0, word: "APPLE", type: "blue", coopBlueType: "blue", coopRedType: "blue", revealed: false, revealedAt: null, revealedBy: null } as any,
+    { id: 1, word: "BANANA", type: "neutral", coopBlueType: "neutral", coopRedType: "neutral", revealed: false, revealedAt: null, revealedBy: null } as any,
+    { id: 2, word: "CHERRY", type: "assassin", coopBlueType: "assassin", coopRedType: "assassin", revealed: false, revealedAt: null, revealedBy: null } as any,
   ];
   if (room.teams.blue) room.teams.blue.cardsRemaining = 1;
   if (room.teams.red) room.teams.red.cardsRemaining = 0;
@@ -95,7 +95,7 @@ async function runCoopTests() {
   });
   await new Promise((resolve) => setTimeout(resolve, 200));
 
-  if (roomState.phase !== "ended" || roomState.winner !== "red") {
+  if (roomState.phase !== "ended" || roomState.winner !== "blue") {
     throw new Error(`Expected coop team to win after finding all agents, got phase: ${roomState.phase}, winner: ${roomState.winner}`);
   }
   console.log("✓ Cooperative team wins correctly after finding all agent cards.");
@@ -129,7 +129,7 @@ async function runCoopTests() {
   });
   await new Promise((resolve) => setTimeout(resolve, 200));
 
-  if (roomState.phase !== "ended" || roomState.winner !== null) {
+  if (roomState.phase !== "ended" || roomState.winner !== "red") {
     throw new Error(`Expected coop team to lose after hitting assassin, got phase: ${roomState.phase}, winner: ${roomState.winner}`);
   }
   console.log("✓ Cooperative team loses instantly correctly after hitting the assassin card.");

@@ -10,13 +10,9 @@ export function ChangelogPage() {
       date: "June 2026",
       color: "var(--accent)",
       features: [
-        "Visual Migration to Redacted Ink: Fully updated the application layout to a premium, high-contrast classified dossier dark mode theme.",
         "Daylight Dossier Theme Support: Added a warm paper light mode counterpart matching the classified folder theme.",
-        "Main Page Theme Toggle: Placed a globally accessible moon and sun toggle button in the navigation header to switch themes in one click.",
-        "Interactive Gravity Grid Background: Added a canvas-based grid background animation that responds to mouse movements with physical gravity warping.",
-        "Simplified Game Modes: Streamlined room setup parameters to target Multi-Team and Duet options directly.",
         "Vietnamese Locale Support: Created localized UI translations and gameplay decks supporting Vietnamese (Tiếng Việt) players.",
-        "Logo and Rules Redesign: Cleaned up brand logo styling by removing emojis and updated the gameplay rules page with tactical clue suggestions.",
+        "Security / Standard - Anti-Spy Action Logging: If an Operative secretly or intuitively attempts to join the Spymasters, they'll be caught and recorded in the game log.",
       ],
     },
     {

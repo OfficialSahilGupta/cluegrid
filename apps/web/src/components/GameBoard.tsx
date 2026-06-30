@@ -12,13 +12,13 @@ import { renderAvatar } from "../utils/avatar";
 
 const ALL_LANGUAGES = [
   { code: "en", name: "English", flag: "🇬🇧" },
-  { code: "ne", name: "नेपाली", flag: "🇳🇵" },
-  { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
   { code: "de", name: "Deutsch", flag: "🇩🇪" },
   { code: "ar", name: "العربية", flag: "🇸🇦" },
   { code: "pt-BR", name: "Português (Brasil)", flag: "🇧🇷" },
   { code: "fr", name: "Français", flag: "🇫🇷" },
   { code: "tr", name: "Türkçe", flag: "🇹🇷" },
+  { code: "ne", name: "नेपाली", flag: "🇳🇵" },
+  { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
   { code: "ja", name: "日本語", flag: "🇯🇵" },
   { code: "cs", name: "Čeština", flag: "🇨🇿" },
   { code: "it", name: "Italiano", flag: "🇮🇹" },
@@ -124,7 +124,7 @@ function playBeep(frequency = 440, type: OscillatorType = "sine") {
     const gainNode = audioCtx.createGain();
     osc.type = type;
     osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
     osc.connect(gainNode);
     gainNode.connect(audioCtx.destination);
     osc.start();
@@ -140,7 +140,7 @@ function playReactionSound(emoji: string) {
     if (!AudioContextClass) return;
     const audioCtx = new AudioContextClass();
 
-    const playTone = (freq: number, duration: number, delay: number, type: OscillatorType = "sine", gainVal = 0.08) => {
+    const playTone = (freq: number, duration: number, delay: number, type: OscillatorType = "sine", gainVal = 0.5) => {
       setTimeout(() => {
         try {
           const osc = audioCtx.createOscillator();
@@ -178,12 +178,12 @@ function playReactionSound(emoji: string) {
       playTone(293.66, 0.35, 120, "sine"); // D4
     } else if (emoji === "💀") {
       // Detuned low spooky beating wave chord
-      playTone(220.00, 0.40, 0, "sawtooth", 0.04); // A3
-      playTone(223.00, 0.40, 0, "sawtooth", 0.04);
+      playTone(220.00, 0.40, 0, "sawtooth", 0.3); // A3
+      playTone(223.00, 0.40, 0, "sawtooth", 0.3);
     } else if (emoji === "👏") {
       // Double claps
-      playTone(880.00, 0.06, 0, "triangle", 0.1); // A5
-      playTone(880.00, 0.06, 120, "triangle", 0.1);
+      playTone(880.00, 0.06, 0, "triangle", 0.6); // A5
+      playTone(880.00, 0.06, 120, "triangle", 0.6);
     }
   } catch (e) {
     // ignore
@@ -319,7 +319,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             const freq = 400 + (delayMs / 8);
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
             
-            gainNode.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(1.0, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
             
             osc.connect(gainNode);
@@ -370,65 +370,410 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     };
   }, [room.phase, room.board]);
 
-  const playClueSelectionSound = () => {
+  const playReliefSound = () => {
     if (!soundEnabled) return;
     try {
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioContextClass) return;
       const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+
+      // Frequencies for a beautiful, rich, warm C Major 9 chord (C3, G3, E4, B4, D5)
+      const freqs = [130.81, 196.00, 329.63, 493.88, 587.33];
+      const duration = 3.5; // 3.5 seconds
+
+      freqs.forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, now);
+        osc.detune.setValueAtTime(idx * 3 - 6, now);
+
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(0.2, now + 0.6);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        osc.start(now);
+        osc.stop(now + duration);
+      });
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  // ─── Rich Audio Library ────────────────────────────────────────────────────
+
+  /** Bright ascending 3-note pop — for joining a team/role slot (different from card-click) */
+  const playRoleTapSound = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      // Three ascending notes: E5 → G5 → B5, each 60ms apart
+      [[659.25, 0], [783.99, 0.06], [987.77, 0.12]].forEach(([freq, delay]) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + delay);
+        gain.gain.setValueAtTime(0, now + delay);
+        gain.gain.linearRampToValueAtTime(0.85, now + delay + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.18);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now + delay); osc.stop(now + delay + 0.2);
+      });
+    } catch { /* ignore */ }
+  };
+
+  /** Low ominous warning drone — for Reset Game / Return to Lobby */
+  const playWarningSound = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      // Heavy sub-bass thud
+      const bass = audioCtx.createOscillator();
+      const bassGain = audioCtx.createGain();
+      bass.type = 'sine';
+      bass.frequency.setValueAtTime(80, now);
+      bass.frequency.exponentialRampToValueAtTime(40, now + 0.6);
+      bassGain.gain.setValueAtTime(1.0, now);
+      bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      bass.connect(bassGain); bassGain.connect(audioCtx.destination);
+      bass.start(now); bass.stop(now + 0.6);
+      // Minor chord sting: A2 + E♭3 (tritone — unsettling)
+      [[110, 0.05], [155.56, 0.08]].forEach(([freq, delay]) => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now + delay);
+        g.gain.setValueAtTime(0.55, now + delay);
+        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.7);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(now + delay); osc.stop(now + delay + 0.75);
+      });
+    } catch { /* ignore */ }
+  };
+
+  /** Airy, light navigation click — navbar links */
+  const playNavClick = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(1320, now + 0.04);
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.14);
+    } catch { /* ignore */ }
+  };
+
+  /** Two-note toggle pop — game mode (Multi-team / Duet) */
+  const playModeToggle = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      [[440, 0], [660, 0.07]].forEach(([freq, delay]) => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + delay);
+        g.gain.setValueAtTime(0.6, now + delay);
+        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.15);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(now + delay); osc.stop(now + delay + 0.18);
+      });
+    } catch { /* ignore */ }
+  };
+
+  /** Rising numeric tone per team count — 2 teams=2 tones, 3=3, 4=4 */
+  const playTeamCountSelect = (count: number) => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      const scale = [261.63, 329.63, 392.00, 523.25]; // C4 E4 G4 C5
+      for (let i = 0; i < count && i < scale.length; i++) {
+        const delay = i * 0.07;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(scale[i]!, now + delay);
+        g.gain.setValueAtTime(0.7, now + delay);
+        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.2);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(now + delay); osc.stop(now + delay + 0.22);
+      }
+    } catch { /* ignore */ }
+  };
+
+  /** Soft globe shimmer — language selection */
+  const playLangSelect = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      // Shimmering high tones
+      [1046.5, 1318.5, 1567.98].forEach((freq, i) => {
+        const delay = i * 0.05;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + delay);
+        g.gain.setValueAtTime(0, now + delay);
+        g.gain.linearRampToValueAtTime(0.45, now + delay + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.35);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(now + delay); osc.stop(now + delay + 0.38);
+      });
+    } catch { /* ignore */ }
+  };
+
+  /** Calm ethereal wind chime — feedback */
+  const playFeedbackSound = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      [523.25, 659.25, 783.99].forEach((freq, i) => {
+        const delay = i * 0.12;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + delay);
+        g.gain.setValueAtTime(0, now + delay);
+        g.gain.linearRampToValueAtTime(0.3, now + delay + 0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.8);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(now + delay); osc.stop(now + delay + 0.85);
+      });
+    } catch { /* ignore */ }
+  };
+
+  /** Clean mechanical toggle — timer action / timer mode / AFK / preferences */
+  const playSettingsToggle = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(400, now);
+      osc.frequency.exponentialRampToValueAtTime(200, now + 0.04);
+      g.gain.setValueAtTime(0.3, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      osc.connect(g); g.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.07);
+    } catch { /* ignore */ }
+  };
+
+  /** Deep ominous chord — assassin rule selection */
+  const playAssassinRuleSelect = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      // Minor 2nd cluster for tension
+      [130.81, 138.59, 155.56].forEach((freq, i) => {
+        const delay = i * 0.04;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now + delay);
+        g.gain.setValueAtTime(0.5, now + delay);
+        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.55);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(now + delay); osc.stop(now + delay + 0.6);
+      });
+    } catch { /* ignore */ }
+  };
+
+  /** Crystalline glass ding — lookup meaning / peek */
+  const playGlassDing = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(2093, now); // C7 — crystal bell range
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(0.75, now + 0.008);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+      osc.connect(g); g.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 1.25);
+    } catch { /* ignore */ }
+  };
+
+  /** Triumphant two-tone announcement — turn shift to new team */
+  const playTurnShiftChime = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+      // G4 → C5 — a clean herald interval
+      [[392.00, 0], [523.25, 0.14]].forEach(([freq, delay]) => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now + delay);
+        g.gain.setValueAtTime(0, now + delay);
+        g.gain.linearRampToValueAtTime(0.9, now + delay + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.45);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(now + delay); osc.stop(now + delay + 0.5);
+      });
+    } catch { /* ignore */ }
+  };
+
+  // ──────────────────────────────────────────────────────────────────────────
+
+  const playPremiumRichClick = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+
+      // Transient oscillator (sharp snap)
+      const snapOsc = audioCtx.createOscillator();
+      const snapGain = audioCtx.createGain();
+      snapOsc.type = "triangle";
+      snapOsc.frequency.setValueAtTime(1200, now);
+      snapOsc.frequency.exponentialRampToValueAtTime(300, now + 0.02);
+      snapGain.gain.setValueAtTime(0.8, now);
+      snapGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+      snapOsc.connect(snapGain);
+      snapGain.connect(audioCtx.destination);
+      snapOsc.start(now);
+      snapOsc.stop(now + 0.02);
+
+      // Resonant body oscillator (warm woody/metallic resonance)
+      const bodyOsc = audioCtx.createOscillator();
+      const bodyGain = audioCtx.createGain();
+      bodyOsc.type = "sine";
+      bodyOsc.frequency.setValueAtTime(440, now);
+      bodyOsc.frequency.exponentialRampToValueAtTime(150, now + 0.08);
+      bodyGain.gain.setValueAtTime(0.7, now);
+      bodyGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      bodyOsc.connect(bodyGain);
+      bodyGain.connect(audioCtx.destination);
+      bodyOsc.start(now);
+      bodyOsc.stop(now + 0.08);
+    } catch (e) {
+      // ignore
+    }
+  };
+
+
+  const playClueSelectionSound = () => {
+    playPremiumRichClick();
+  };
+
+  const playHapticClick = (gainVal = 0.12) => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+
       const osc = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
-
+      
       osc.type = "sine";
-      osc.frequency.setValueAtTime(1400, audioCtx.currentTime); // high-pitched professional tick
-      osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 0.04);
+      osc.frequency.setValueAtTime(150, now);
+      osc.frequency.exponentialRampToValueAtTime(60, now + 0.05);
 
-      gainNode.gain.setValueAtTime(0.04, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+      gainNode.gain.setValueAtTime(gainVal, now);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
 
       osc.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.04);
-    } catch {
+      
+      osc.start(now);
+      osc.stop(now + 0.05);
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  const playOperativeAlertSound = () => {
+    if (!soundEnabled) return;
+    try {
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContextClass) return;
+      const audioCtx = new AudioContextClass();
+      const now = audioCtx.currentTime;
+
+      // A futuristic, bright dual-chime arpeggio (C5 -> E5 -> G5 -> C6) with high clarity
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, idx) => {
+        const delay = idx * 0.08; // fast cascade
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator(); // layer with a perfect fifth above for richness
+        const gainNode = audioCtx.createGain();
+
+        osc1.type = "sine";
+        osc1.frequency.setValueAtTime(freq, now + delay);
+        
+        osc2.type = "triangle"; // triangle gives warm harmonic body
+        osc2.frequency.setValueAtTime(freq * 1.5, now + delay); // perfect 5th
+
+        gainNode.gain.setValueAtTime(0, now + delay);
+        gainNode.gain.linearRampToValueAtTime(0.8, now + delay + 0.02); // Full volume rise
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.35);
+
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc1.start(now + delay);
+        osc1.stop(now + delay + 0.35);
+        osc2.start(now + delay);
+        osc2.stop(now + delay + 0.35);
+      });
+    } catch (e) {
       // ignore
     }
   };
 
   const playClueSentSound = () => {
-    if (!soundEnabled) return;
-    try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContextClass) return;
-      const audioCtx = new AudioContextClass();
-
-      const playTone = (freq: number, duration: number, delay: number, type: OscillatorType = "sine", gainVal = 0.08) => {
-        setTimeout(() => {
-          try {
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            
-            gainNode.gain.setValueAtTime(gainVal, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-          } catch {
-            // ignore
-          }
-        }, delay);
-      };
-
-      // Professional radar ping sound
-      playTone(587.33, 0.18, 0, "sine", 0.08);   // D5
-      playTone(880.00, 0.35, 120, "sine", 0.06); // A5
-    } catch {
-      // ignore
-    }
+    playOperativeAlertSound();
   };
 
   const playCardFlipSound = (cardType: string) => {
@@ -438,7 +783,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       if (!AudioContextClass) return;
       const audioCtx = new AudioContextClass();
 
-      const playTone = (freq: number, duration: number, delay: number, type: OscillatorType = "sine", gainVal = 0.08) => {
+      const playTone = (freq: number, duration: number, delay: number, type: OscillatorType = "sine", gainVal = 0.5) => {
         setTimeout(() => {
           try {
             const osc = audioCtx.createOscillator();
@@ -463,27 +808,27 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
       if (cardType === "assassin") {
         // Deep low base drone for tragic weight
-        playTone(73.42, 2.2, 0, "sine", 0.12);     // D2 low base
+        playTone(73.42, 2.2, 0, "sine", 0.6);     // D2 low base
         
         // Melancholic, sorrowful minor key melody (D-minor to diminished 5th resolving to sad lingering E)
-        playTone(293.66, 0.45, 0, "triangle", 0.08);    // D4
-        playTone(349.23, 0.45, 350, "triangle", 0.08);  // F4
-        playTone(440.00, 0.45, 700, "triangle", 0.08);  // A4
-        playTone(415.30, 0.50, 1050, "triangle", 0.08); // G#4 (tragic dissonant shift)
-        playTone(349.23, 0.50, 1450, "triangle", 0.08); // F4
-        playTone(329.63, 0.90, 1850, "triangle", 0.08); // E4 (lingering sad resolution)
+        playTone(293.66, 0.45, 0, "triangle", 0.5);    // D4
+        playTone(349.23, 0.45, 350, "triangle", 0.5);  // F4
+        playTone(440.00, 0.45, 700, "triangle", 0.5);  // A4
+        playTone(415.30, 0.50, 1050, "triangle", 0.5); // G#4 (tragic dissonant shift)
+        playTone(349.23, 0.50, 1450, "triangle", 0.5); // F4
+        playTone(329.63, 0.90, 1850, "triangle", 0.5); // E4 (lingering sad resolution)
       } else if (cardType === "neutral") {
         // 2. White/neutral card flipped: Soft neutral double beep
-        playTone(329.63, 0.08, 0, "sine", 0.06); // E4
-        playTone(329.63, 0.08, 100, "sine", 0.06); // E4
+        playTone(329.63, 0.08, 0, "sine", 0.4); // E4
+        playTone(329.63, 0.08, 100, "sine", 0.4); // E4
       } else if (myTeam && cardType === myTeam) {
         // 1. Our own team card flipped: Joyful major chime
-        playTone(523.25, 0.15, 0, "sine", 0.08); // C5
-        playTone(783.99, 0.25, 100, "sine", 0.08); // G5
+        playTone(523.25, 0.15, 0, "sine", 0.5); // C5
+        playTone(783.99, 0.25, 100, "sine", 0.5); // G5
       } else {
         // Opponent card flipped: A clean, bouncy warning beep (professional double-tone rise)
-        playTone(392.00, 0.10, 0, "sine", 0.06);   // G4
-        playTone(587.33, 0.18, 80, "sine", 0.06);  // D5
+        playTone(392.00, 0.10, 0, "sine", 0.4);   // G4
+        playTone(587.33, 0.18, 80, "sine", 0.4);  // D5
       }
     } catch (e) {
       // ignore
@@ -497,7 +842,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       if (!AudioContextClass) return;
       const audioCtx = new AudioContextClass();
 
-      const playTone = (freq: number, duration: number, delay: number, type: OscillatorType = "sine", gainVal = 0.08) => {
+      const playTone = (freq: number, duration: number, delay: number, type: OscillatorType = "sine", gainVal = 0.5) => {
         setTimeout(() => {
           try {
             const osc = audioCtx.createOscillator();
@@ -519,24 +864,24 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       };
 
       // Super Triumphant 8-bit / Cinematic Chiptune Fanfare!
-      playTone(261.63, 0.15, 0, "triangle", 0.10);   // C4
-      playTone(329.63, 0.15, 80, "triangle", 0.10);  // E4
-      playTone(392.00, 0.15, 160, "triangle", 0.10); // G4
-      playTone(523.25, 0.15, 240, "triangle", 0.10); // C5
-      playTone(659.25, 0.15, 320, "triangle", 0.10); // E5
-      playTone(783.99, 0.15, 400, "triangle", 0.10); // G5
-      playTone(1046.50, 0.20, 480, "triangle", 0.10); // C6
+      playTone(261.63, 0.15, 0, "triangle", 0.60);   // C4
+      playTone(329.63, 0.15, 80, "triangle", 0.60);  // E4
+      playTone(392.00, 0.15, 160, "triangle", 0.60); // G4
+      playTone(523.25, 0.15, 240, "triangle", 0.60); // C5
+      playTone(659.25, 0.15, 320, "triangle", 0.60); // E5
+      playTone(783.99, 0.15, 400, "triangle", 0.60); // G5
+      playTone(1046.50, 0.20, 480, "triangle", 0.60); // C6
       
-      playTone(1174.66, 0.10, 560, "sine", 0.08); // D6
-      playTone(1318.51, 0.10, 620, "sine", 0.08); // E6
-      playTone(1567.98, 0.30, 680, "sine", 0.08); // G6
+      playTone(1174.66, 0.10, 560, "sine", 0.50); // D6
+      playTone(1318.51, 0.10, 620, "sine", 0.50); // E6
+      playTone(1567.98, 0.30, 680, "sine", 0.50); // G6
       
       const chordDelay = 780;
-      playTone(523.25, 1.5, chordDelay, "sine", 0.08);   // C5
-      playTone(659.25, 1.5, chordDelay, "sine", 0.08);   // E5
-      playTone(783.99, 1.5, chordDelay, "sine", 0.08);   // G5
-      playTone(1046.50, 1.5, chordDelay, "triangle", 0.05); // C6 (crisp chord edge)
-      playTone(1318.51, 1.5, chordDelay, "triangle", 0.05); // E6 (crisp chord edge)
+      playTone(523.25, 1.5, chordDelay, "sine", 0.50);   // C5
+      playTone(659.25, 1.5, chordDelay, "sine", 0.50);   // E5
+      playTone(783.99, 1.5, chordDelay, "sine", 0.50);   // G5
+      playTone(1046.50, 1.5, chordDelay, "triangle", 0.40); // C6 (crisp chord edge)
+      playTone(1318.51, 1.5, chordDelay, "triangle", 0.40); // E6 (crisp chord edge)
     } catch {
       // ignore
     }
@@ -603,14 +948,14 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       room.board.forEach((card) => {
         const prevCard = prevBoardRef.current.find((c) => c.id === card.id);
         if (card.revealed && prevCard && !prevCard.revealed) {
-          // Play flip sound
+          // Play flip sound with full volume
           playCardFlipSound(card.type);
           
-          // Trigger flip animation class
+          // Trigger flip animation class (matches 2s animation duration)
           setRecentlyFlippedCardIds((prev) => [...prev, card.id]);
           setTimeout(() => {
             setRecentlyFlippedCardIds((prev) => prev.filter((id) => id !== card.id));
-          }, 600);
+          }, 2000);
 
           if (card.type === "assassin") {
             setAssassinRevealedId(card.id);
@@ -658,6 +1003,48 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     }
     prevWinnerRef.current = room.winner || null;
   }, [room.winner, soundEnabled]);
+
+  // Listen for turn/phase transitions to play the relief sound for active Spymasters
+  useEffect(() => {
+    if (room.phase === "playing" && room.turnState) {
+      const prevTurnState = prevTurnStateRef.current;
+      const isTeamShift = prevTurnState && prevTurnState.activeTeam !== room.turnState.activeTeam;
+      const isNewGivingCluePhase = room.turnState.phase === "giving_clue" && (!prevTurnState || prevTurnState.phase !== "giving_clue" || isTeamShift);
+
+      if (isNewGivingCluePhase) {
+        // Play turn-shift chime for everyone whenever the active team changes
+        if (isTeamShift || !prevTurnState) {
+          playTurnShiftChime();
+        }
+
+        const isActiveSpymaster =
+          localPlayer?.team === room.turnState.activeTeam &&
+          localPlayer?.role === "spymaster";
+
+        if (isActiveSpymaster) {
+          playReliefSound();
+        }
+      }
+    }
+  }, [room.turnState?.activeTeam, room.turnState?.phase, room.phase, localPlayer?.team, localPlayer?.role]);
+
+  // Global event listener to attach haptic click feedback to all buttons
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target) return;
+      
+      const button = target.closest("button") || target.closest('[role="button"]');
+      if (button) {
+        playHapticClick();
+      }
+    };
+
+    window.addEventListener("click", handleGlobalClick, { capture: true });
+    return () => {
+      window.removeEventListener("click", handleGlobalClick, { capture: true });
+    };
+  }, [soundEnabled]);
 
   const [isTimerModeDropdownOpen, setIsTimerModeDropdownOpen] = useState(false);
 
@@ -1026,7 +1413,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   <button
                     type="button"
                     disabled={!isHost}
-                    onClick={() => isHost && setIsTimerModeDropdownOpen(!isTimerModeDropdownOpen)}
+                    onClick={() => { if (isHost) { playSettingsToggle(); setIsTimerModeDropdownOpen(!isTimerModeDropdownOpen); } }}
                     style={{
                       width: "fit-content",
                       minWidth: "160px",
@@ -1059,12 +1446,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     <div style={{
                       display: "grid",
                       gridTemplateColumns: "repeat(3, 1fr)",
-                      gap: "6px",
+                      gap: "12px",
                       width: "100%",
-                      maxWidth: "380px",
+                      maxWidth: "440px",
+                      marginTop: "12px",
                     }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                        <label style={{ fontSize: "0.68rem", color: "var(--color-text)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
                           {t("settings.spymasterTimer", "Spymaster (s)")}
                         </label>
                         <input
@@ -1097,8 +1485,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           }}
                         />
                       </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                        <label style={{ fontSize: "0.68rem", color: "var(--color-text)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
                           {t("settings.firstClueExtra", "1st Clue Extra (s)")}
                         </label>
                         <input
@@ -1131,8 +1519,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           }}
                         />
                       </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                        <label style={{ fontSize: "0.68rem", color: "var(--color-text)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
                           {t("settings.operativeTimer", "Operative (s)")}
                         </label>
                         <input
@@ -1223,6 +1611,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                 settings: { timerMode: opt.value, ...extraSettings },
                               });
                             }
+                            playSettingsToggle();
                             setIsTimerModeDropdownOpen(false);
                           }}
                           style={{
@@ -1288,7 +1677,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
                   {t("settings.timerAction", "Timer Expiration Action")}
                 </label>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
                   {[
                     { value: "auto", label: t("settings.timerActionAuto", "Automatic Turn Shift") },
                     { value: "manual", label: t("settings.timerActionManual", "Manual End Turn") },
@@ -1300,6 +1689,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         type="button"
                         disabled={!isHost}
                         onClick={() => {
+                          playSettingsToggle();
                           if (socket && isHost) {
                             socket.emit("update_settings", {
                               roomCode: room.roomCode,
@@ -1308,17 +1698,16 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           }
                         }}
                         style={{
-                          width: "100%",
-                          padding: "10px 14px",
+                          padding: "10px 8px",
                           borderRadius: "var(--radius-sm)",
                           border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
                           background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
                           color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
                           fontFamily: "var(--font-display)",
                           fontWeight: 700,
-                          fontSize: "0.85rem",
+                          fontSize: "0.82rem",
                           cursor: isHost ? "pointer" : "not-allowed",
-                          textAlign: "left",
+                          textAlign: "center",
                           transition: "all 0.15s ease",
                           boxShadow: isSelected ? "0 0 8px rgba(232,163,61,0.3)" : "none",
                         }}
@@ -1329,77 +1718,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   })}
                 </div>
               </div>
-
-              {room.phase === "lobby" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
-                    {t("settings.lobbyControls", "Lobby Controls")}
-                  </label>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <button
-                      disabled={!isHost}
-                      onClick={() => {
-                        if (socket && isHost) socket.emit("randomize_teams", { roomCode: room.roomCode });
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        borderRadius: "var(--radius-sm)",
-                        background: "transparent",
-                        border: "1px solid var(--border-default)",
-                        color: "var(--text-primary)",
-                        fontWeight: 700,
-                        cursor: isHost ? "pointer" : "not-allowed",
-                        fontFamily: "var(--font-display)",
-                        fontSize: "0.85rem",
-                        textAlign: "left",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseOver={(e) => {
-                        if (isHost) e.currentTarget.style.background = "var(--border-subtle)";
-                      }}
-                      onMouseOut={(e) => {
-                        if (isHost) e.currentTarget.style.background = "transparent";
-                      }}
-                    >
-                      {t("settings.randomize", "Randomize Teams")}
-                    </button>
-                    <button
-                      disabled={!isHost}
-                      onClick={() => {
-                        if (socket && isHost) {
-                          socket.emit("update_settings", {
-                            roomCode: room.roomCode,
-                            settings: { roomLocked: !room.settings.roomLocked },
-                          });
-                        }
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        borderRadius: "var(--radius-sm)",
-                        background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
-                        border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
-                        color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
-                        fontWeight: 700,
-                        cursor: isHost ? "pointer" : "not-allowed",
-                        fontFamily: "var(--font-display)",
-                        fontSize: "0.85rem",
-                        textAlign: "left",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseOver={(e) => {
-                        if (isHost) e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
-                      }}
-                      onMouseOut={(e) => {
-                        if (isHost) e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
-                      }}
-                    >
-                      {room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -1424,6 +1742,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       key={mins}
                       type="button"
                       onClick={() => {
+                        playSettingsToggle();
                         if (socket) {
                           socket.emit("update_settings", {
                             roomCode: room.roomCode,
@@ -1462,7 +1781,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     <input
                       type="checkbox"
                       checked={soundEnabled}
-                      onChange={(e) => setSoundEnabled(e.target.checked)}
+                      onChange={(e) => { setSoundEnabled(e.target.checked); playSettingsToggle(); }}
                       style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
                     />
                     <div
@@ -1498,7 +1817,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     <input
                       type="checkbox"
                       checked={lightMode}
-                      onChange={(e) => setLightMode(e.target.checked)}
+                      onChange={(e) => { setLightMode(e.target.checked); playSettingsToggle(); }}
                       style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
                     />
                     <div
@@ -2132,49 +2451,25 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       }
     }
 
-    setTimerCount(limit);
-  }, [room.turnState?.turnNumber, room.turnState?.phase, room.phase, room.gameMode, room.settings.timerMode, room.settings.spymasterTimerSeconds, room.settings.firstClueExtraSeconds, room.settings.operativeTimerSeconds]);
+    if (room.turnState?.phaseStartedAt) {
+      const elapsed = Math.floor((Date.now() - room.turnState.phaseStartedAt) / 1000);
+      setTimerCount(Math.max(0, limit - elapsed));
+    } else {
+      setTimerCount(limit);
+    }
+  }, [room.turnState?.turnNumber, room.turnState?.phase, room.phase, room.gameMode, room.settings.timerMode, room.settings.spymasterTimerSeconds, room.settings.firstClueExtraSeconds, room.settings.operativeTimerSeconds, room.turnState?.phaseStartedAt]);
 
   // Turn timer countdown loop
   useEffect(() => {
     if (room.phase !== "playing" || !room.turnState) return;
 
     let enabled = false;
-    let limit = 120;
     if (room.gameMode === "coop") {
       enabled = true;
-      limit = 120;
     } else {
       const mode = room.settings.timerMode || "off";
       if (mode !== "off") {
         enabled = true;
-
-        let spyTime = 90;
-        let opTime = 60;
-        let extraTime = 60;
-
-        if (mode === "fast") {
-          spyTime = 90;
-          opTime = 60;
-          extraTime = 60;
-        } else if (mode === "long") {
-          spyTime = 180;
-          opTime = 120;
-          extraTime = 120;
-        } else if (mode === "custom") {
-          spyTime = room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90;
-          extraTime = room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60;
-          opTime = room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60;
-        }
-
-        if (room.turnState.phase === "giving_clue") {
-          limit = spyTime;
-          if (room.turnState.turnNumber === 1) {
-            limit += extraTime;
-          }
-        } else {
-          limit = opTime;
-        }
       }
     }
 
@@ -2184,7 +2479,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       setTimerCount((prev) => {
         const isManual = room.settings.timerAction === "manual";
         if (isManual) {
-          return prev - 1;
+          return Math.max(0, prev - 1);
         }
 
         if (prev <= 1) {
@@ -2207,20 +2502,18 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             room.turnState?.phase === "giving_clue";
 
           if (socket) {
-            if (isActiveOp) {
+            if (isActiveOp || isActiveSpy) {
               socket.emit("end_turn", { roomCode: room.roomCode, playerId });
-            } else if (isActiveSpy) {
-              socket.emit("give_clue", { roomCode: room.roomCode, playerId, word: "pass", count: 0 });
             }
           }
-          return limit;
+          return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [room.gameMode, room.phase, room.turnState, socket, localPlayer, room.roomCode, playerId, room.settings.timerMode, room.settings.spymasterTimerSeconds, room.settings.firstClueExtraSeconds, room.settings.operativeTimerSeconds, room.settings.timerAction]);
+  }, [room.gameMode, room.phase, room.turnState, socket, localPlayer, room.roomCode, playerId, room.settings.timerAction]);
 
 
 
@@ -2435,6 +2728,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     targetPlayerId?: string,
     force = false
   ) => {
+    playRoleTapSound();
+
     if (!force && role === "spymaster" && team) {
       const targetId = targetPlayerId || playerId;
       const existingSpy = room.players.find(
@@ -2462,6 +2757,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   };
 
   const handleStartGame = () => {
+    playHapticClick(1.0);
+
     if (room.phase === "playing") {
       setGlobalConfirm({
         title: "Reset Game?",
@@ -2484,6 +2781,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   };
 
   const handleReturnToLobby = () => {
+    playWarningSound();
     const msg = room.phase === "playing"
       ? "Warning! Returning to the lobby will end the currently running game. Do you want to abort the match?"
       : "Return all players to the lobby to prepare for a new match? Action cannot be undone.";
@@ -2627,6 +2925,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   };
 
   const handleUpdateEliminationRule = (rule: "game_end" | "continue") => {
+    playAssassinRuleSelect();
     if (socket) {
       socket.emit("update_settings", {
         roomCode: room.roomCode,
@@ -3286,7 +3585,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         osc.type = "sawtooth";
         osc.frequency.setValueAtTime(300, now);
         osc.frequency.exponentialRampToValueAtTime(120, now + 0.6);
-        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.setValueAtTime(0.6, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
         osc.start(now);
         osc.stop(now + 0.6);
@@ -3294,7 +3593,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         osc.type = "triangle";
         osc.frequency.setValueAtTime(220, now);
         osc.frequency.exponentialRampToValueAtTime(880, now + 0.4);
-        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.setValueAtTime(0.6, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
         osc.start(now);
         osc.stop(now + 0.4);
@@ -3302,7 +3601,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         osc.type = "sine";
         osc.frequency.setValueAtTime(180, now);
         osc.frequency.setValueAtTime(90, now + 0.15);
-        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.setValueAtTime(0.7, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
         osc.start(now);
         osc.stop(now + 0.8);
@@ -3312,9 +3611,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
         osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
         osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.setValueAtTime(0.12, now + 0.1);
-        gain.gain.setValueAtTime(0.12, now + 0.2);
+        gain.gain.setValueAtTime(0.6, now);
+        gain.gain.setValueAtTime(0.6, now + 0.1);
+        gain.gain.setValueAtTime(0.6, now + 0.2);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
         osc.start(now);
         osc.stop(now + 0.6);
@@ -3322,8 +3621,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         osc.type = "triangle";
         osc.frequency.setValueAtTime(600, now);
         osc.frequency.setValueAtTime(500, now + 0.08);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.setValueAtTime(0.15, now + 0.08);
+        gain.gain.setValueAtTime(0.7, now);
+        gain.gain.setValueAtTime(0.7, now + 0.08);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
         osc.start(now);
         osc.stop(now + 0.2);
@@ -3331,9 +3630,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         osc.type = "sine";
         osc.frequency.setValueAtTime(80, now);
         osc.frequency.setValueAtTime(70, now + 0.12);
-        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.setValueAtTime(0.8, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.10);
-        gain.gain.setValueAtTime(0.3, now + 0.12);
+        gain.gain.setValueAtTime(0.8, now + 0.12);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
         osc.start(now);
         osc.stop(now + 0.25);
@@ -3376,7 +3675,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           }
         }
         .card-flipped-active {
-          animation: card-flip 0.5s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+          animation: card-flip 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
         @keyframes screen-shake {
           0%, 100% { transform: translate(0, 0) rotate(0deg); }
@@ -3623,6 +3922,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
           <button
             onClick={() => {
+              playGlassDing();
               if (!user) {
                 setGatedFeature("Meaning Lookup");
               } else {
@@ -3645,7 +3945,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           </button>
           {room.gameMode !== "coop" && (isSpymaster || isSpectator || isGameEnded) && (
             <button
-              onClick={() => setPeekKey(!peekKey)}
+              onClick={() => { playGlassDing(); setPeekKey(!peekKey); }}
               style={{
                 padding: "10px 16px",
                 borderRadius: "var(--radius-md)",
@@ -3926,7 +4226,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       {room.gameMode !== "coop" &&
                         localPlayer &&
                         localPlayer.team !== room.turnState.activeTeam &&
-                        room.settings.timerAction === "manual" && (
+                        room.settings.timerAction === "manual" &&
+                        timerCount <= 0 && (
                           <button
                             onClick={handleEndTurn}
                             style={{
@@ -4221,6 +4522,40 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       </div>
                     );
                   })}
+                  {/* Turn Timer Countdown — only show when timer is active */}
+                  {room.phase === "playing" && (room.settings.timerMode && room.settings.timerMode !== "off") && (
+                    <div
+                      className={
+                        timerCount <= 5  ? "timer-danger-fast"
+                        : timerCount <= 10 ? "timer-danger-medium"
+                        : timerCount <= 20 ? "timer-danger-slow"
+                        : ""
+                      }
+                      style={{
+                        background: "var(--color-surface)",
+                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
+                        padding: "12px 24px",
+                        borderRadius: "var(--radius-md)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        transition: "border-color 0.5s ease",
+                      }}
+                    >
+                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
+                        {t("turn.timerLabel")}:{" "}
+                        <span style={{
+                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
+                          fontVariantNumeric: "tabular-nums",
+                          minWidth: "2.5ch",
+                          display: "inline-block",
+                          transition: "color 0.4s ease",
+                        }}>
+                          {timerCount}s
+                        </span>
+                      </span>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -5215,6 +5550,83 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} />
 
 
+
+          {room.phase === "playing" && isHost && (
+            <div
+              style={{
+                background: "var(--color-surface)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
+              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
+                Host Controls
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <button
+                  onClick={() => {
+                    if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "transparent",
+                    border: "1px solid var(--border-default)",
+                    color: "var(--text-primary)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = "var(--border-subtle)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  {t("settings.randomize", "Randomize Teams")}
+                </button>
+                <button
+                  onClick={() => {
+                    if (socket) {
+                      socket.emit("update_settings", {
+                        roomCode: room.roomCode,
+                        settings: { roomLocked: !room.settings.roomLocked },
+                      });
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
+                    border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
+                    color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
+                  }}
+                >
+                  {room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* In lobby both are in the main column; in play phase show Room Players in sidebar */}
           {room.phase !== "lobby" && renderGroupedPlayersCard()}

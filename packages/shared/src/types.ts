@@ -97,6 +97,8 @@ export interface TurnState {
   guessesAllowed: number | null;
   /** Turn number within the current game, starting at 1. */
   turnNumber: number;
+  /** Timestamp in ms when the current phase started. */
+  phaseStartedAt?: number;
 }
 
 /**
