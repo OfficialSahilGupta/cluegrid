@@ -91,8 +91,8 @@ function GlowOrbs() {
           position: "fixed",
           top: "-20%",
           left: "-10%",
-          width: "700px",
-          height: "700px",
+          width: "min(700px, 100vw)",
+          height: "min(700px, 100vw)",
           borderRadius: "50%",
           background:
             "radial-gradient(circle, var(--glow-1) 0%, transparent 70%)",
@@ -106,8 +106,8 @@ function GlowOrbs() {
           position: "fixed",
           bottom: "-20%",
           right: "-10%",
-          width: "700px",
-          height: "700px",
+          width: "min(700px, 100vw)",
+          height: "min(700px, 100vw)",
           borderRadius: "50%",
           background:
             "radial-gradient(circle, var(--glow-2) 0%, transparent 70%)",
@@ -140,6 +140,7 @@ export default function App() {
   const [authOpen, setAuthOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const [globalConfirm, setGlobalConfirm] = useState<{
     title: string;
@@ -433,6 +434,11 @@ export default function App() {
         .nav-link.active {
           color: var(--accent);
         }
+        @keyframes mobile-slide-down {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .mobile-nav-slide { animation: mobile-slide-down 0.22s cubic-bezier(0.16,1,0.3,1) both; }
       `}</style>
 
       <GravityGrid lightMode={lightMode} />
@@ -477,8 +483,8 @@ export default function App() {
           <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1.25rem", letterSpacing: "0.05em", color: "var(--accent)" }}>ClueGrid</span>
         </div>
 
-        {/* Central navigation links */}
-        <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+        {/* Central navigation links — hidden on mobile via CSS class */}
+        <div className="nav-center-links" style={{ display: "flex", gap: "20px", alignItems: "center" }}>
           <button
             onClick={() => {
               setCurrentView("lobby");
@@ -517,36 +523,40 @@ export default function App() {
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <LanguageSwitcher />
-          <button
-            onClick={() => setCurrentView("support")}
-            style={{
-              background: currentView === "support" ? "var(--accent)" : "rgba(232, 163, 61, 0.12)",
-              border: "1px solid var(--accent)",
-              color: currentView === "support" ? "var(--accent-text-on)" : "var(--accent)",
-              padding: "6px 14px",
-              borderRadius: "20px",
-              cursor: "pointer",
-              fontFamily: "var(--font-display)",
-              fontWeight: 700,
-              fontSize: "0.85rem",
-              transition: "all 0.2s ease",
-            }}
-            onMouseOver={(e) => {
-              if (currentView !== "support") {
-                e.currentTarget.style.background = "var(--accent)";
-                e.currentTarget.style.color = "var(--accent-text-on)";
-              }
-            }}
-            onMouseOut={(e) => {
-              if (currentView !== "support") {
-                e.currentTarget.style.background = "rgba(232, 163, 61, 0.12)";
-                e.currentTarget.style.color = "var(--accent)";
-              }
-            }}
-          >
-            Become a Member
-          </button>
+          {/* Hide language switcher on mobile — surfaced in mobile menu */}
+          <div className="nav-lang-wrapper"><LanguageSwitcher /></div>
+          {/* Hide 'Become a Member' on mobile — surfaced in mobile menu */}
+          <div className="nav-member-wrapper">
+            <button
+              onClick={() => setCurrentView("support")}
+              style={{
+                background: currentView === "support" ? "var(--accent)" : "rgba(232, 163, 61, 0.12)",
+                border: "1px solid var(--accent)",
+                color: currentView === "support" ? "var(--accent-text-on)" : "var(--accent)",
+                padding: "6px 14px",
+                borderRadius: "20px",
+                cursor: "pointer",
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: "0.85rem",
+                transition: "all 0.2s ease",
+              }}
+              onMouseOver={(e) => {
+                if (currentView !== "support") {
+                  e.currentTarget.style.background = "var(--accent)";
+                  e.currentTarget.style.color = "var(--accent-text-on)";
+                }
+              }}
+              onMouseOut={(e) => {
+                if (currentView !== "support") {
+                  e.currentTarget.style.background = "rgba(232, 163, 61, 0.12)";
+                  e.currentTarget.style.color = "var(--accent)";
+                }
+              }}
+            >
+              Become a Member
+            </button>
+          </div>
           <button
             onClick={() => setLightMode(!lightMode)}
             style={{
@@ -689,8 +699,122 @@ export default function App() {
               {t("nav.login")}
             </button>
           )}
+          {/* Hamburger — visible only on mobile via CSS class */}
+          <button
+            className="nav-hamburger"
+            aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMobileNavOpen(!mobileNavOpen)}
+          >
+            {mobileNavOpen ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            )}
+          </button>
         </div>
       </header>
+
+      {/* ─── Mobile Navigation Overlay ─────────────────────────────── */}
+      {mobileNavOpen && (
+        <div
+          className="mobile-nav-slide"
+          style={{
+            position: "fixed",
+            top: "64px",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "var(--bg-page)",
+            borderTop: "1px solid var(--border-subtle)",
+            zIndex: 9997,
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+          }}
+        >
+          {/* Nav Links */}
+          {([
+            { label: t("nav.play"), view: "lobby" },
+            { label: t("nav.rules"), view: "rules" },
+            { label: "Features", view: "features" },
+            { label: t("nav.changelog"), view: "changelog" },
+            ...(user?.isAdmin ? [{ label: t("nav.admin"), view: "admin" }] : []),
+          ] as { label: string; view: typeof currentView }[]).map(({ label, view }) => (
+            <button
+              key={view}
+              onClick={() => { setCurrentView(view); setMobileNavOpen(false); }}
+              style={{
+                padding: "18px 24px",
+                background: currentView === view ? "var(--accent-bg-subtle)" : "none",
+                border: "none",
+                borderBottom: "1px solid var(--border-subtle)",
+                color: currentView === view ? "var(--accent)" : "var(--text-primary)",
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: "1.05rem",
+                textAlign: "left",
+                cursor: "pointer",
+                transition: "background 0.15s",
+              }}
+            >
+              {label}
+            </button>
+          ))}
+
+          {/* Language Switcher */}
+          <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border-subtle)" }}>
+            <LanguageSwitcher />
+          </div>
+
+          {/* Become a Member */}
+          <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border-subtle)" }}>
+            <button
+              onClick={() => { setCurrentView("support"); setMobileNavOpen(false); }}
+              style={{
+                width: "100%",
+                padding: "13px",
+                background: "var(--accent)",
+                border: "none",
+                color: "var(--accent-text-on)",
+                borderRadius: "var(--radius-md)",
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: "1rem",
+                cursor: "pointer",
+              }}
+            >
+              Become a Member
+            </button>
+          </div>
+
+          {/* Login if not signed in */}
+          {!user && (
+            <div style={{ padding: "16px 24px" }}>
+              <button
+                onClick={() => { setAuthOpen(true); setMobileNavOpen(false); }}
+                style={{
+                  width: "100%",
+                  padding: "13px",
+                  background: "none",
+                  border: "1px solid var(--border-default)",
+                  color: "var(--text-primary)",
+                  borderRadius: "var(--radius-md)",
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 700,
+                  fontSize: "1rem",
+                  cursor: "pointer",
+                }}
+              >
+                {t("nav.login")}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       <main
         style={{
@@ -701,7 +825,7 @@ export default function App() {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "100px 20px 40px 20px",
+          padding: "clamp(80px, 12vw, 100px) clamp(12px, 4vw, 20px) 40px",
           textAlign: "center",
           gap: "32px",
           width: "100%",
@@ -730,10 +854,10 @@ export default function App() {
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",
                 borderRadius: "var(--radius-lg)",
-                padding: "32px",
+                padding: "clamp(18px, 5vw, 32px)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "24px",
+                gap: "20px",
                 textAlign: "left",
               }}
             >
@@ -986,7 +1110,7 @@ export default function App() {
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",
                 borderRadius: "var(--radius-lg)",
-                padding: "32px",
+                padding: "clamp(18px, 5vw, 32px)",
                 display: "flex",
                 flexDirection: "column",
                 gap: "20px",
@@ -1040,7 +1164,7 @@ export default function App() {
                 <label style={{ display: "block", fontWeight: 600, marginBottom: "12px", fontSize: "0.95rem" }}>
                   {t("game.chooseAvatar")}
                 </label>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "8px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(48px, 1fr))", gap: "8px" }}>
                   {AVATARS.map((emoji) => (
                     <button
                       key={emoji}

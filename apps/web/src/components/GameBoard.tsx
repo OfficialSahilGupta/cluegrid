@@ -2771,10 +2771,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         className="scale-up"
         style={{
           position: "fixed",
-          right: "24px",
+          right: "clamp(12px, 3vw, 24px)",
           bottom: "92px",
-          width: "380px",
-          height: "520px",
+          width: "min(380px, calc(100vw - 32px))",
+          height: "min(520px, calc(100vh - 140px))",
           background: "var(--bg-surface-raised)",
           border: "1px solid var(--border-default)",
           borderRadius: "var(--radius-lg)",
@@ -3344,7 +3344,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   };
 
   return (
-    <div className={`fade-in ${isAssassinShake ? "assassin-shake-active" : ""}`} style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", padding: "0 10px" }}>
+    <div className={`fade-in ${isAssassinShake ? "assassin-shake-active" : ""}`} style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", padding: "0 clamp(8px, 3vw, 20px)" }}>
       <style>{`
         @keyframes emoji-float-up {
           0% {
@@ -3619,7 +3619,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
           <button
             onClick={() => {
               if (!user) {
@@ -4769,7 +4769,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         </div>
 
         {/* Right Side: Players & Scoped Room Chat */}
-        <div style={{ flex: "1 1 320px", display: "flex", flexDirection: "column", gap: "24px", minWidth: "300px" }}>
+        <div style={{ flex: "1 1 300px", display: "flex", flexDirection: "column", gap: "24px", minWidth: "260px" }}>
           {/* User Profile Card / Statistics */}
           {/* User Profile Circular Widget */}
           <div

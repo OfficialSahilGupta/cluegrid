@@ -181,3 +181,46 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); line-height: 1.2; }
   50% { transform: translateY(-5px); opacity: 1; }
   100% { transform: translateY(0); opacity: 0.9; }
 }
+
+/* ─── Mobile Responsive Utilities ───────────────────────────────────── */
+
+/* Desktop-default states for nav classes */
+.nav-center-links   { display: flex; }
+.nav-lang-wrapper   { display: flex; align-items: center; }
+.nav-member-wrapper { display: flex; align-items: center; }
+
+/* Hamburger button – hidden on desktop */
+.nav-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--text-primary);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+  flex-shrink: 0;
+}
+.nav-hamburger:hover { background: var(--border-subtle); }
+
+/* Mobile menu slide-down animation */
+@keyframes mobile-menu-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mobile-menu-animate { animation: mobile-menu-in 0.2s ease both; }
+
+/* ── ≤768px breakpoint (tablets & phones) ───────────────────────── */
+@media (max-width: 768px) {
+  .nav-center-links   { display: none !important; }
+  .nav-lang-wrapper   { display: none !important; }
+  .nav-member-wrapper { display: none !important; }
+  .nav-hamburger      { display: flex !important; }
+}
+
+/* ── ≤480px breakpoint (small phones) ───────────────────────────── */
+@media (max-width: 480px) {
+  body { font-size: 15px; }
+}
