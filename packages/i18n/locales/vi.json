@@ -6,6 +6,7 @@
       "play": "Chơi",
       "rules": "Luật chơi",
       "changelog": "Nhật ký thay đổi",
+      "about": "About",
       "admin": "Quản trị",
       "login": "Đăng nhập / Đăng ký",
       "logout": "Đăng xuất",
@@ -13,8 +14,8 @@
     },
     "game": {
       "title": "ClueGrid",
-      "tagline": "Giải mã lưới từ. Đánh bại kẻ địch.",
-      "subtitle": "Trò chơi suy đoán từ nhiều người chơi. Tạo phòng để bắt đầu.",
+      "tagline": "Decode the grid. Outfox the enemy.",
+      "subtitle": "Multiplayer word-deduction game. Create a lobby to start.",
       "startGame": "Bắt đầu trò chơi",
       "joinRoom": "Vào phòng",
       "createRoom": "Tạo phòng",
@@ -23,22 +24,22 @@
       "notReady": "Chưa sẵn sàng",
       "copyCode": "Sao chép mã phòng",
       "codeCopied": "Đã sao chép!",
-      "teamCount": "Số lượng đội",
-      "displayName": "Tên hiển thị",
-      "chooseAvatar": "Chọn ảnh đại diện",
-      "gameMode": "Chế độ chơi",
-      "classic": "Nhiều đội cổ điển",
-      "coop": "Hợp tác / Song ca",
-      "roomCode": "Mã phòng",
-      "or": "hoặc",
-      "enterCode": "Nhập mã phòng"
+      "teamCount": "Number of Teams",
+      "displayName": "Display Name",
+      "chooseAvatar": "Choose Avatar",
+      "gameMode": "Game Mode",
+      "classic": "Multi-Team",
+      "coop": "Duet",
+      "roomCode": "Room Code",
+      "or": "or",
+      "enterCode": "Enter room code"
     },
     "roles": {
       "spymaster": "Gián điệp trưởng",
       "operative": "Điệp viên",
       "chooseRole": "Chọn vai trò",
-      "joinAs": "Tham gia với tư cách {{role}}",
-      "maxOne": "Gián điệp trưởng (Tối đa 1)"
+      "joinAs": "Join as {{role}}",
+      "maxOne": "Spymaster (Max 1)"
     },
     "teams": {
       "red": "Đỏ",
@@ -55,142 +56,153 @@
       "guess": "Đoán từ",
       "endTurn": "Kết thúc lượt",
       "unlimited": "∞",
-      "activeTurn": "Lượt của {{team}}",
-      "givingClue": "{{spymaster}} đang đưa ra gợi ý…",
-      "clueGiven": "Gợi ý: {{word}} ({{count}})",
-      "timerLabel": "Thời gian",
-      "turnsRemaining": "Số lượt còn lại",
-      "mistakesLeft": "Số lỗi còn lại"
+      "activeTurn": "{{team}}'s turn",
+      "givingClue": "{{spymaster}} is giving a clue…",
+      "clueGiven": "Clue: {{word}} ({{count}})",
+      "timerLabel": "Timer",
+      "turnsRemaining": "Turns remaining",
+      "mistakesLeft": "Mistakes left"
     },
     "result": {
-      "youWin": "🎉 Đội {{team}} thắng!",
-      "youLose": "💀 Đội {{team}} thua",
-      "assassinHit": "Sát thủ lộ diện — Đội {{team}} thua!",
-      "coopWin": "🎉 Chiến thắng hợp tác! Tất cả điệp viên đã được tìm thấy!",
-      "coopLose": "💀 Hợp tác thất bại!",
-      "playAgain": "Chơi lại",
-      "backToLobby": "Quay lại phòng chờ"
+      "youWin": "🎉 {{team}} Team Wins!",
+      "youLose": "💀 {{team}} Team Loses",
+      "assassinHit": "Assassin revealed — {{team}} loses!",
+      "coopWin": "🎉 Co-op Victory! All agents found!",
+      "coopLose": "💀 Co-op Defeat!",
+      "playAgain": "Play Again",
+      "backToLobby": "Back to Lobby"
     },
     "chat": {
-      "placeholder": "Nhập tin nhắn…",
-      "send": "Gửi",
-      "systemJoined": "{{name}} đã tham gia phòng.",
-      "systemLeft": "{{name}} đã rời phòng.",
-      "systemRevealed": "{{team}} đã lật mở {{word}} ({{type}}).",
-      "operativeChat": "Kênh chat Điệp viên",
-      "spymasterChat": "Kênh chat Gián điệp trưởng"
+      "placeholder": "Type a message…",
+      "send": "Send",
+      "systemJoined": "{{name}} joined the room.",
+      "systemLeft": "{{name}} left the room.",
+      "systemRevealed": "{{team}} revealed {{word}} ({{type}}).",
+      "operativeChat": "Operative Chat",
+      "spymasterChat": "Spymaster Chat"
     },
     "errors": {
-      "roomNotFound": "Không tìm thấy phòng.",
-      "roomFull": "Phòng này đã đầy (tối đa 8 người chơi).",
-      "nameTaken": "Tên hiển thị đó đã được sử dụng.",
-      "invalidClue": "Từ gợi ý phải là một từ đơn và không chứa khoảng trắng.",
-      "notYourTurn": "Không phải lượt của bạn.",
-      "cardAlreadyRevealed": "Thẻ đó đã được lật mở.",
-      "gameNotStarted": "Trò chơi chưa bắt đầu.",
-      "generic": "Đã xảy ra lỗi. Vui lòng thử lại."
+      "roomNotFound": "Room not found.",
+      "roomFull": "This room is full (max 8 players).",
+      "nameTaken": "That display name is already taken.",
+      "invalidClue": "Clue must be a single word with no spaces.",
+      "notYourTurn": "It is not your turn.",
+      "cardAlreadyRevealed": "That card has already been revealed.",
+      "gameNotStarted": "The game has not started yet.",
+      "generic": "Something went wrong. Please try again."
     },
     "lobby": {
-      "waiting": "Đang chờ người chơi…",
-      "playersReady": "{{ready}} / {{total}} người chơi sẵn sàng",
-      "needSpymasters": "Mỗi đội cần một Gián điệp trưởng trước khi trò chơi có thể bắt đầu.",
-      "minPlayers": "Cần ít nhất 4 người chơi (2 người mỗi đội)."
+      "waiting": "Waiting for players…",
+      "playersReady": "{{ready}} / {{total}} players ready",
+      "needSpymasters": "Each team needs a Spymaster before the game can start.",
+      "minPlayers": "Need at least 4 players (2 per team)."
     },
     "settings": {
       "gameSettings": "Cài đặt trò chơi",
-      "assassinRule": "Luật thẻ Sát thủ",
-      "teamEliminated": "Đội bị loại, Tiếp tục (Mặc định)",
-      "gameEnds": "Trò chơi kết thúc ngay lập tức",
-      "afkTimeout": "Thời gian tự động ngắt kết nối khi treo máy",
-      "minutes": "Phút",
-      "minute": "Phút",
-      "timerMode": "Chế độ hẹn giờ lượt chơi",
-      "timerOff": "Tắt",
-      "timerFast": "Nhanh (60 giây)",
-      "timerLong": "Lâu (180 giây)",
-      "timerCustom": "Tùy chỉnh giây",
-      "preferences": "Tùy chọn (Chỉ máy này)",
-      "sound": "Hiệu ứng âm thanh",
-      "lightMode": "Chế độ sáng",
-      "hostActions": "Hành động của Chủ phòng",
-      "randomize": "Xáo trộn đội ngẫu nhiên"
+      "assassinRule": "Assassin Card Rule",
+      "teamEliminated": "Team Eliminated, Continue (Default)",
+      "gameEnds": "Game Ends Immediately",
+      "afkTimeout": "AFK Inactivity Timeout",
+      "minutes": "Minutes",
+      "minute": "Minute",
+      "timerMode": "Turn Timer Mode",
+      "timerOff": "Off",
+      "timerFast": "Fast (60s)",
+      "timerLong": "Long (180s)",
+      "timerCustom": "Custom seconds",
+      "preferences": "Preferences (Local Only)",
+      "sound": "Sound Effects",
+      "lightMode": "Light Mode",
+      "hostActions": "Host Actions",
+      "randomize": "Randomize Teams"
     },
     "presence": {
-      "active": "Hoạt động",
-      "brb": "Sẽ quay lại ngay",
-      "afk": "Treo máy",
+      "active": "Active",
+      "brb": "BRB",
+      "afk": "AFK",
       "sleep": ".zZ",
-      "focus": "Tập trung",
-      "busy": "Bận"
+      "focus": "Focus",
+      "busy": "Busy"
     },
     "log": {
-      "gameLog": "Nhật ký trò chơi",
-      "export": "Xuất nhật ký",
-      "chat": "Trò chuyện",
-      "board": "Bảng chơi"
+      "gameLog": "Game Log",
+      "export": "Export Log",
+      "chat": "Chat",
+      "board": "Board"
     },
     "auth": {
-      "loginTitle": "Đăng nhập vào ClueGrid",
-      "signupTitle": "Tạo tài khoản",
+      "loginTitle": "Log In to ClueGrid",
+      "signupTitle": "Create Account",
       "email": "Email",
-      "password": "Mật khẩu",
-      "username": "Tên người dùng",
-      "loginBtn": "Đăng nhập",
-      "signupBtn": "Đăng ký",
-      "switchToSignup": "Chưa có tài khoản? Đăng ký",
-      "switchToLogin": "Đã có tài khoản? Đăng nhập",
-      "orContinueWith": "hoặc tiếp tục bằng",
-      "guestNote": "Đang chơi với tư cách khách — một số tính năng sẽ bị khóa."
+      "password": "Password",
+      "username": "Username",
+      "loginBtn": "Log In",
+      "signupBtn": "Sign Up",
+      "switchToSignup": "Need an account? Sign Up",
+      "switchToLogin": "Already have an account? Log In",
+      "orContinueWith": "or continue with",
+      "guestNote": "Playing as guest — some features are locked."
     },
     "profile": {
       "title": "Cài đặt tài khoản",
-      "changeUsername": "Tên người dùng",
-      "chooseAvatar": "Chọn ảnh đại diện",
-      "premiumAvatars": "Ảnh đại diện cao cấp",
-      "save": "Lưu thay đổi",
-      "cancel": "Hủy"
+      "changeUsername": "Username",
+      "chooseAvatar": "Choose Avatar",
+      "premiumAvatars": "Premium Avatars",
+      "save": "Save Changes",
+      "cancel": "Cancel"
     },
     "music": {
-      "title": "Trình phát nhạc",
-      "onlyYou": "Chỉ bạn mới có thể nghe thấy",
+      "title": "Music Player",
+      "onlyYou": "Only you can hear this",
       "youtube": "YouTube",
       "spotify": "Spotify",
-      "pasteLinkYT": "Dán URL YouTube…",
-      "pasteLinkSP": "Dán URL Spotify…",
-      "play": "Phát",
-      "loginRequired": "Đăng nhập để sử dụng trình phát nhạc"
+      "pasteLinkYT": "Paste YouTube URL…",
+      "pasteLinkSP": "Paste Spotify URL…",
+      "play": "Chơi",
+      "loginRequired": "Log in to use the music player"
     },
     "rules": {
-      "title": "Luật chơi & Các biến thể",
-      "subtitle": "Tìm hiểu cách chơi Codenames cổ điển và khám phá các chế độ chơi hợp tác và nhiều đội tùy chỉnh của ClueGrid.",
-      "classicTitle": "Luật chơi cổ điển",
-      "multiTeamTitle": "Biến thể nhiều đội ClueGrid",
-      "coopTitle": "Chế độ Hợp tác / Song ca"
+      "title": "Game Rules & Variants",
+      "subtitle": "Learn how to play classic Codenames and explore ClueGrid's custom cooperative and multi-team modes.",
+      "classicTitle": "Classic Rules",
+      "multiTeamTitle": "ClueGrid Multi-Team Variant",
+      "coopTitle": "Duet / Cooperative Mode"
     },
     "news": {
-      "title": "Nhật ký thay đổi & Tin tức sản phẩm",
-      "subtitle": "Cập nhật các tính năng mới nhất, cập nhật công cụ và các bản phát hành trên ClueGrid."
+      "title": "Changelog & Product News",
+      "subtitle": "Stay up to date with the latest features, engine updates, and releases on ClueGrid."
+    },
+    "about": {
+      "title": "About ClueGrid",
+      "subtitle": "A real-time, distributed word-deduction grid system. Explore the technical specifications and structural architecture of the ClueGrid application.",
+      "missionTitle": "System Purpose",
+      "missionText": "ClueGrid is engineered to deliver high-fidelity, real-time tabletop board simulations in a distributed web environment. Utilizing a synchronized state engine, the platform enables multi-user collaboration and competitive execution across varied grid configurations and localized game variants.",
+      "howTitle": "System Architecture & Flow",
+      "techTitle": "Technical Architecture",
+      "techDesc": "Engineered with modern full-stack web technologies to ensure zero-lag gameplay, complete state safety, and a highly responsive design:",
+      "footerTitle": "ClueGrid Project Development",
+      "footerText": "ClueGrid is maintained as a modular repository, integrating real-time action logging, custom timers, and audio synthesis. Please refer to the Changelog section for release logs, visual overhaul details, and performance optimizations."
     },
     "admin": {
-      "title": "Bảng quản trị thành phố",
-      "subtitle": "Thêm và xóa các thành phố khỏi danh sách tên được gán tự động cho các đội trong quá trình thiết lập phòng.",
-      "addCity": "Thêm thành phố",
-      "adding": "Đang thêm...",
-      "placeholder": "Nhập tên thành phố (ví dụ: Kyoto)…",
-      "delete": "Xóa",
-      "noCities": "Không có thành phố nào trong danh sách. Hãy thêm một thành phố phía trên!",
-      "accessDenied": "Truy cập bị từ chối",
-      "adminOnly": "Trang này chỉ giới hạn cho các quản trị viên."
+      "title": "Admin Cities Dashboard",
+      "subtitle": "Add and remove cities from the curated name pool automatically assigned to teams during room setup.",
+      "addCity": "Add City",
+      "adding": "Adding...",
+      "placeholder": "Enter city name (e.g. Kyoto)…",
+      "delete": "Delete",
+      "noCities": "No cities in pool. Add one above!",
+      "accessDenied": "Access Denied",
+      "adminOnly": "This page is restricted to administrators."
     },
     "gated": {
-      "title": "Tính năng bị khóa",
-      "message": "Đăng nhập hoặc tạo tài khoản để mở khóa tính năng này.",
+      "title": "Feature Locked",
+      "message": "Log in or create an account to unlock this feature.",
       "loginBtn": "Đăng nhập / Đăng ký",
-      "dismiss": "Để sau"
+      "dismiss": "Maybe Later"
     },
     "language": {
-      "label": "Ngôn ngữ",
-      "switchTo": "Chuyển đổi ngôn ngữ"
+      "label": "Language",
+      "switchTo": "Switch language"
     }
   }
 }

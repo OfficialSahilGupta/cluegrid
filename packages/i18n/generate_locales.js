@@ -74,7 +74,7 @@ function cloneAndTranslate(obj, langCode) {
 
 const translations = {
   hi: {
-    "Play": "खेलें", "Rules": "नियम", "Changelog": "बदलाव सूची", "Admin": "एडमिन",
+    "Play": "खेलें", "Rules": "नियम", "Changelog": "बदलाव सूची", "About": "परिचय", "Admin": "एडमिन",
     "Log In / Sign Up": "लॉग इन / साइन अप", "Log Out": "लॉग आउट", "Account Settings": "खाता सेटिंग्स",
     "Start Game": "खेल शुरू करें", "Join Room": "कमरे में शामिल हों", "Create Room": "कमरा बनाएं", "Leave Room": "कमरा छोड़ें",
     "Ready": "तैयार", "Not Ready": "तैयार नहीं", "Copy Room Code": "कमरा कोड कॉपी करें", "Copied!": "कॉपी किया गया!",
@@ -83,7 +83,7 @@ const translations = {
     "Make a Guess": "अनुमान लगाएं", "End Turn": "बारी समाप्त करें", "Game Settings": "खेल सेटिंग्स"
   },
   ne: {
-    "Play": "खेल्नुहोस्", "Rules": "नियमहरू", "Changelog": "परिवर्तन सूची", "Admin": "एडमिन",
+    "Play": "खेल्नुहोस्", "Rules": "नियमहरू", "Changelog": "परिवर्तन सूची", "About": "बारेमा", "Admin": "एडमिन",
     "Log In / Sign Up": "लग इन / साइन अप", "Log Out": "लग आउट", "Account Settings": "खाता सेटिंग्स",
     "Start Game": "खेल सुरु गर्नुहोस्", "Join Room": "कोठामा सामेल हुनुहोस्", "Create Room": "कोठा सिर्जना गर्नुहोस्", "Leave Room": "कोठा छोड्नुहोस्",
     "Ready": "तयार", "Not Ready": "तयार छैन", "Copy Room Code": "कोठा कोड प्रतिलिपि गर्नुहोस्", "Copied!": "प्रतिलिपि गरियो!",
@@ -92,7 +92,7 @@ const translations = {
     "Make a Guess": "अनुमान गर्नुहोस्", "End Turn": "पालो समाप्त गर्नुहोस्", "Game Settings": "खेल सेटिंग्स"
   },
   ja: {
-    "Play": "プレイ", "Rules": "ルール", "Changelog": "変更履歴", "Admin": "管理者",
+    "Play": "プレイ", "Rules": "ルール", "Changelog": "変更履歴", "About": "概要", "Admin": "管理者",
     "Log In / Sign Up": "ログイン / サインアップ", "Log Out": "ログアウト", "Account Settings": "アカウント設定",
     "Start Game": "ゲーム開始", "Join Room": "ルームに参加", "Create Room": "ルームを作成", "Leave Room": "ルームを退出",
     "Ready": "準備完了", "Not Ready": "未準備", "Copy Room Code": "ルームコードをコピー", "Copied!": "コピーしました！",
@@ -101,7 +101,7 @@ const translations = {
     "Make a Guess": "推測する", "End Turn": "ターン終了", "Game Settings": "ゲーム設定"
   },
   es: {
-    "Play": "Jugar", "Rules": "Reglas", "Changelog": "Historial de cambios", "Admin": "Admin",
+    "Play": "Jugar", "Rules": "Reglas", "Changelog": "Historial de cambios", "About": "Acerca de", "Admin": "Admin",
     "Log In / Sign Up": "Iniciar sesión / Registrarse", "Log Out": "Cerrar sesión", "Account Settings": "Ajustes de cuenta",
     "Start Game": "Iniciar juego", "Join Room": "Unirse a la sala", "Create Room": "Crear sala", "Leave Room": "Salir de la sala",
     "Ready": "Listo", "Not Ready": "No listo", "Copy Room Code": "Copiar código", "Copied!": "¡Copiado!",
@@ -110,7 +110,7 @@ const translations = {
     "Make a Guess": "Hacer una suposición", "End Turn": "Terminar turno", "Game Settings": "Ajustes de juego"
   },
   fr: {
-    "Play": "Jouer", "Rules": "Règles", "Changelog": "Notes de version", "Admin": "Admin",
+    "Play": "Jouer", "Rules": "Règles", "Changelog": "Notes de version", "About": "À propos", "Admin": "Admin",
     "Log In / Sign Up": "Connexion / Inscription", "Log Out": "Déconnexion", "Account Settings": "Paramètres du compte",
     "Start Game": "Démarrer le jeu", "Join Room": "Rejoindre la salle", "Create Room": "Créer une salle", "Leave Room": "Quitter la salle",
     "Ready": "Prêt", "Not Ready": "Pas prêt", "Copy Room Code": "Copier le code", "Copied!": "Copié !",
@@ -119,7 +119,7 @@ const translations = {
     "Make a Guess": "Faire une supposition", "End Turn": "Finir le tour", "Game Settings": "Paramètres de jeu"
   },
   de: {
-    "Play": "Spielen", "Rules": "Regeln", "Changelog": "Changelog", "Admin": "Admin",
+    "Play": "Spielen", "Rules": "Regeln", "Changelog": "Changelog", "About": "Über", "Admin": "Admin",
     "Log In / Sign Up": "Einloggen / Registrieren", "Log Out": "Ausloggen", "Account Settings": "Kontoeinstellungen",
     "Start Game": "Spiel starten", "Join Room": "Raum beitreten", "Create Room": "Raum erstellen", "Leave Room": "Raum verlassen",
     "Ready": "Bereit", "Not Ready": "Nicht bereit", "Copy Room Code": "Raumcode kopieren", "Copied!": "Kopiert!",
@@ -128,7 +128,7 @@ const translations = {
     "Make a Guess": "Tipp abgeben", "End Turn": "Zug beenden", "Game Settings": "Spieleinstellungen"
   },
   ar: {
-    "Play": "اللعب", "Rules": "القوانين", "Changelog": "سجل التغييرات", "Admin": "المشرف",
+    "Play": "اللعب", "Rules": "القوانين", "Changelog": "سجل التغييرات", "About": "حول", "Admin": "المشرف",
     "Log In / Sign Up": "تسجيل الدخول / التسجيل", "Log Out": "تسجيل الخروج", "Account Settings": "إعدادات الحساب",
     "Start Game": "بدء اللعبة", "Join Room": "انضمام للغرفة", "Create Room": "إنشاء غرفة", "Leave Room": "مغادرة الغرفة",
     "Ready": "جاهز", "Not Ready": "غير جاهز", "Copy Room Code": "نسخ رمز الغرفة", "Copied!": "تم النسخ!",

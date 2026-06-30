@@ -6,6 +6,7 @@
       "play": "खेल्नुहोस्",
       "rules": "नियमहरू",
       "changelog": "परिवर्तन सूची",
+      "about": "बारेमा",
       "admin": "एडमिन",
       "login": "लग इन / साइन अप",
       "logout": "लग आउट",
@@ -27,8 +28,8 @@
       "displayName": "Display Name",
       "chooseAvatar": "Choose Avatar",
       "gameMode": "Game Mode",
-      "classic": "Classic Multi-Team",
-      "coop": "Duet / Co-op",
+      "classic": "Multi-Team",
+      "coop": "Duet",
       "roomCode": "Room Code",
       "or": "or",
       "enterCode": "Enter room code"
@@ -170,6 +171,17 @@
     "news": {
       "title": "Changelog & Product News",
       "subtitle": "Stay up to date with the latest features, engine updates, and releases on ClueGrid."
+    },
+    "about": {
+      "title": "About ClueGrid",
+      "subtitle": "A real-time, distributed word-deduction grid system. Explore the technical specifications and structural architecture of the ClueGrid application.",
+      "missionTitle": "System Purpose",
+      "missionText": "ClueGrid is engineered to deliver high-fidelity, real-time tabletop board simulations in a distributed web environment. Utilizing a synchronized state engine, the platform enables multi-user collaboration and competitive execution across varied grid configurations and localized game variants.",
+      "howTitle": "System Architecture & Flow",
+      "techTitle": "Technical Architecture",
+      "techDesc": "Engineered with modern full-stack web technologies to ensure zero-lag gameplay, complete state safety, and a highly responsive design:",
+      "footerTitle": "ClueGrid Project Development",
+      "footerText": "ClueGrid is maintained as a modular repository, integrating real-time action logging, custom timers, and audio synthesis. Please refer to the Changelog section for release logs, visual overhaul details, and performance optimizations."
     },
     "admin": {
       "title": "Admin Cities Dashboard",

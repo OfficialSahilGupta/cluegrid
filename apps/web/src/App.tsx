@@ -5,6 +5,7 @@ import { GameBoard } from "./components/GameBoard";
 import { useAuth } from "./context/AuthContext";
 import { RulesPage } from "./components/RulesPage";
 import { ChangelogPage } from "./components/ChangelogPage";
+import { AboutPage } from "./components/AboutPage";
 import { ManagementPanel } from "./components/ManagementPanel";
 import { AuthModal } from "./components/AuthModal";
 import { ProfileSettingsModal } from "./components/ProfileSettingsModal";
@@ -158,8 +159,8 @@ export default function App() {
   // Game Mode: classic or coop
   const [gameMode, setGameMode] = useState<"classic" | "coop">("classic");
 
-  // Navigation View: lobby, rules, changelog, admin, support
-  const [currentView, setCurrentView] = useState<"lobby" | "rules" | "features" | "changelog" | "admin" | "support">("lobby");
+  // Navigation View: lobby, rules, changelog, about, admin, support
+  const [currentView, setCurrentView] = useState<"lobby" | "rules" | "features" | "changelog" | "about" | "admin" | "support">("lobby");
 
   // ─── Lightweight Audio Helpers (no external deps) ────────────────────────
   const _mkCtx = () => {
@@ -170,7 +171,7 @@ export default function App() {
     return ctx;
   };
   const playNavAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const o = ctx.createOscillator(), g = ctx.createGain(), n = ctx.currentTime; o.type = "sine"; o.frequency.setValueAtTime(880, n); o.frequency.exponentialRampToValueAtTime(1320, n + 0.04); g.gain.setValueAtTime(0.32, n); g.gain.exponentialRampToValueAtTime(0.001, n + 0.13); o.connect(g); g.connect(ctx.destination); o.start(n); o.stop(n + 0.14); } catch { /* ignore */ } };
-  const playModeAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; [[440, 0], [660, 0.07]].forEach(([f, d]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "triangle"; o.frequency.setValueAtTime(f, n + d); g.gain.setValueAtTime(0.55, n + d); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.15); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.18); }); } catch { /* ignore */ } };
+  const playModeAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; ([[440, 0], [660, 0.07]] as [number, number][]).forEach(([f, d]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "triangle"; o.frequency.setValueAtTime(f, n + d); g.gain.setValueAtTime(0.55, n + d); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.15); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.18); }); } catch { /* ignore */ } };
   const playTeamCountAudio = (count: number) => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; const s = [261.63, 329.63, 392.00, 523.25]; for (let i = 0; i < count && i < s.length; i++) { const d = i * 0.07, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.setValueAtTime(s[i]!, n + d); g.gain.setValueAtTime(0.65, n + d); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.2); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.22); } } catch { /* ignore */ } };
   const playLangAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; [1046.5, 1318.5, 1567.98].forEach((f, i) => { const d = i * 0.05, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.setValueAtTime(f, n + d); g.gain.setValueAtTime(0, n + d); g.gain.linearRampToValueAtTime(0.42, n + d + 0.02); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.35); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.38); }); } catch { /* ignore */ } };
   // ─────────────────────────────────────────────────────────────────────────
@@ -541,6 +542,12 @@ export default function App() {
           >
             {t("nav.changelog")}
           </button>
+          <button
+            onClick={() => { playNavAudio(); setCurrentView("about"); }}
+            className={`nav-link ${currentView === "about" ? "active" : ""}`}
+          >
+            {t("nav.about")}
+          </button>
 
           {user?.isAdmin && (
             <button
@@ -774,6 +781,7 @@ export default function App() {
             { label: t("nav.rules"), view: "rules" },
             { label: "Features", view: "features" },
             { label: t("nav.changelog"), view: "changelog" },
+            { label: t("nav.about"), view: "about" },
             ...(user?.isAdmin ? [{ label: t("nav.admin"), view: "admin" }] : []),
           ] as { label: string; view: typeof currentView }[]).map(({ label, view }) => (
             <button
@@ -869,6 +877,8 @@ export default function App() {
           <FeaturesPage />
         ) : currentView === "changelog" ? (
           <ChangelogPage />
+        ) : currentView === "about" ? (
+          <AboutPage />
         ) : currentView === "admin" ? (
           <ManagementPanel />
         ) : currentView === "support" ? (

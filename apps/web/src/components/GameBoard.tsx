@@ -416,7 +416,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       const audioCtx = new AudioContextClass();
       const now = audioCtx.currentTime;
       // Three ascending notes: E5 → G5 → B5, each 60ms apart
-      [[659.25, 0], [783.99, 0.06], [987.77, 0.12]].forEach(([freq, delay]) => {
+      ([[659.25, 0], [783.99, 0.06], [987.77, 0.12]] as [number, number][]).forEach(([freq, delay]) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sine';
@@ -449,7 +449,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       bass.connect(bassGain); bassGain.connect(audioCtx.destination);
       bass.start(now); bass.stop(now + 0.6);
       // Minor chord sting: A2 + E♭3 (tritone — unsettling)
-      [[110, 0.05], [155.56, 0.08]].forEach(([freq, delay]) => {
+      ([[110, 0.05], [155.56, 0.08]] as [number, number][]).forEach(([freq, delay]) => {
         const osc = audioCtx.createOscillator();
         const g = audioCtx.createGain();
         osc.type = 'sawtooth';
@@ -490,7 +490,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       if (!AudioContextClass) return;
       const audioCtx = new AudioContextClass();
       const now = audioCtx.currentTime;
-      [[440, 0], [660, 0.07]].forEach(([freq, delay]) => {
+      ([[440, 0], [660, 0.07]] as [number, number][]).forEach(([freq, delay]) => {
         const osc = audioCtx.createOscillator();
         const g = audioCtx.createGain();
         osc.type = 'triangle';
@@ -645,7 +645,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       const audioCtx = new AudioContextClass();
       const now = audioCtx.currentTime;
       // G4 → C5 — a clean herald interval
-      [[392.00, 0], [523.25, 0.14]].forEach(([freq, delay]) => {
+      ([[392.00, 0], [523.25, 0.14]] as [number, number][]).forEach(([freq, delay]) => {
         const osc = audioCtx.createOscillator();
         const g = audioCtx.createGain();
         osc.type = 'triangle';
