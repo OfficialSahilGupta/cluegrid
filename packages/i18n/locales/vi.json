@@ -1,0 +1,196 @@
+{
+  "locale": "vi",
+  "languageName": "Tiếng Việt",
+  "ui": {
+    "nav": {
+      "play": "Chơi",
+      "rules": "Luật chơi",
+      "changelog": "Nhật ký thay đổi",
+      "admin": "Quản trị",
+      "login": "Đăng nhập / Đăng ký",
+      "logout": "Đăng xuất",
+      "settings": "Cài đặt tài khoản"
+    },
+    "game": {
+      "title": "ClueGrid",
+      "tagline": "Giải mã lưới từ. Đánh bại kẻ địch.",
+      "subtitle": "Trò chơi suy đoán từ nhiều người chơi. Tạo phòng để bắt đầu.",
+      "startGame": "Bắt đầu trò chơi",
+      "joinRoom": "Vào phòng",
+      "createRoom": "Tạo phòng",
+      "leaveRoom": "Rời phòng",
+      "ready": "Sẵn sàng",
+      "notReady": "Chưa sẵn sàng",
+      "copyCode": "Sao chép mã phòng",
+      "codeCopied": "Đã sao chép!",
+      "teamCount": "Số lượng đội",
+      "displayName": "Tên hiển thị",
+      "chooseAvatar": "Chọn ảnh đại diện",
+      "gameMode": "Chế độ chơi",
+      "classic": "Nhiều đội cổ điển",
+      "coop": "Hợp tác / Song ca",
+      "roomCode": "Mã phòng",
+      "or": "hoặc",
+      "enterCode": "Nhập mã phòng"
+    },
+    "roles": {
+      "spymaster": "Gián điệp trưởng",
+      "operative": "Điệp viên",
+      "chooseRole": "Chọn vai trò",
+      "joinAs": "Tham gia với tư cách {{role}}",
+      "maxOne": "Gián điệp trưởng (Tối đa 1)"
+    },
+    "teams": {
+      "red": "Đỏ",
+      "blue": "Xanh dương",
+      "green": "Xanh lá",
+      "yellow": "Vàng",
+      "team": "Đội"
+    },
+    "turn": {
+      "giveClue": "Đưa ra gợi ý",
+      "clueWord": "Từ gợi ý",
+      "clueCount": "Số lượng thẻ",
+      "submitClue": "Gửi gợi ý",
+      "guess": "Đoán từ",
+      "endTurn": "Kết thúc lượt",
+      "unlimited": "∞",
+      "activeTurn": "Lượt của {{team}}",
+      "givingClue": "{{spymaster}} đang đưa ra gợi ý…",
+      "clueGiven": "Gợi ý: {{word}} ({{count}})",
+      "timerLabel": "Thời gian",
+      "turnsRemaining": "Số lượt còn lại",
+      "mistakesLeft": "Số lỗi còn lại"
+    },
+    "result": {
+      "youWin": "🎉 Đội {{team}} thắng!",
+      "youLose": "💀 Đội {{team}} thua",
+      "assassinHit": "Sát thủ lộ diện — Đội {{team}} thua!",
+      "coopWin": "🎉 Chiến thắng hợp tác! Tất cả điệp viên đã được tìm thấy!",
+      "coopLose": "💀 Hợp tác thất bại!",
+      "playAgain": "Chơi lại",
+      "backToLobby": "Quay lại phòng chờ"
+    },
+    "chat": {
+      "placeholder": "Nhập tin nhắn…",
+      "send": "Gửi",
+      "systemJoined": "{{name}} đã tham gia phòng.",
+      "systemLeft": "{{name}} đã rời phòng.",
+      "systemRevealed": "{{team}} đã lật mở {{word}} ({{type}}).",
+      "operativeChat": "Kênh chat Điệp viên",
+      "spymasterChat": "Kênh chat Gián điệp trưởng"
+    },
+    "errors": {
+      "roomNotFound": "Không tìm thấy phòng.",
+      "roomFull": "Phòng này đã đầy (tối đa 8 người chơi).",
+      "nameTaken": "Tên hiển thị đó đã được sử dụng.",
+      "invalidClue": "Từ gợi ý phải là một từ đơn và không chứa khoảng trắng.",
+      "notYourTurn": "Không phải lượt của bạn.",
+      "cardAlreadyRevealed": "Thẻ đó đã được lật mở.",
+      "gameNotStarted": "Trò chơi chưa bắt đầu.",
+      "generic": "Đã xảy ra lỗi. Vui lòng thử lại."
+    },
+    "lobby": {
+      "waiting": "Đang chờ người chơi…",
+      "playersReady": "{{ready}} / {{total}} người chơi sẵn sàng",
+      "needSpymasters": "Mỗi đội cần một Gián điệp trưởng trước khi trò chơi có thể bắt đầu.",
+      "minPlayers": "Cần ít nhất 4 người chơi (2 người mỗi đội)."
+    },
+    "settings": {
+      "gameSettings": "Cài đặt trò chơi",
+      "assassinRule": "Luật thẻ Sát thủ",
+      "teamEliminated": "Đội bị loại, Tiếp tục (Mặc định)",
+      "gameEnds": "Trò chơi kết thúc ngay lập tức",
+      "afkTimeout": "Thời gian tự động ngắt kết nối khi treo máy",
+      "minutes": "Phút",
+      "minute": "Phút",
+      "timerMode": "Chế độ hẹn giờ lượt chơi",
+      "timerOff": "Tắt",
+      "timerFast": "Nhanh (60 giây)",
+      "timerLong": "Lâu (180 giây)",
+      "timerCustom": "Tùy chỉnh giây",
+      "preferences": "Tùy chọn (Chỉ máy này)",
+      "sound": "Hiệu ứng âm thanh",
+      "lightMode": "Chế độ sáng",
+      "hostActions": "Hành động của Chủ phòng",
+      "randomize": "Xáo trộn đội ngẫu nhiên"
+    },
+    "presence": {
+      "active": "Hoạt động",
+      "brb": "Sẽ quay lại ngay",
+      "afk": "Treo máy",
+      "sleep": ".zZ",
+      "focus": "Tập trung",
+      "busy": "Bận"
+    },
+    "log": {
+      "gameLog": "Nhật ký trò chơi",
+      "export": "Xuất nhật ký",
+      "chat": "Trò chuyện",
+      "board": "Bảng chơi"
+    },
+    "auth": {
+      "loginTitle": "Đăng nhập vào ClueGrid",
+      "signupTitle": "Tạo tài khoản",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "username": "Tên người dùng",
+      "loginBtn": "Đăng nhập",
+      "signupBtn": "Đăng ký",
+      "switchToSignup": "Chưa có tài khoản? Đăng ký",
+      "switchToLogin": "Đã có tài khoản? Đăng nhập",
+      "orContinueWith": "hoặc tiếp tục bằng",
+      "guestNote": "Đang chơi với tư cách khách — một số tính năng sẽ bị khóa."
+    },
+    "profile": {
+      "title": "Cài đặt tài khoản",
+      "changeUsername": "Tên người dùng",
+      "chooseAvatar": "Chọn ảnh đại diện",
+      "premiumAvatars": "Ảnh đại diện cao cấp",
+      "save": "Lưu thay đổi",
+      "cancel": "Hủy"
+    },
+    "music": {
+      "title": "Trình phát nhạc",
+      "onlyYou": "Chỉ bạn mới có thể nghe thấy",
+      "youtube": "YouTube",
+      "spotify": "Spotify",
+      "pasteLinkYT": "Dán URL YouTube…",
+      "pasteLinkSP": "Dán URL Spotify…",
+      "play": "Phát",
+      "loginRequired": "Đăng nhập để sử dụng trình phát nhạc"
+    },
+    "rules": {
+      "title": "Luật chơi & Các biến thể",
+      "subtitle": "Tìm hiểu cách chơi Codenames cổ điển và khám phá các chế độ chơi hợp tác và nhiều đội tùy chỉnh của ClueGrid.",
+      "classicTitle": "Luật chơi cổ điển",
+      "multiTeamTitle": "Biến thể nhiều đội ClueGrid",
+      "coopTitle": "Chế độ Hợp tác / Song ca"
+    },
+    "news": {
+      "title": "Nhật ký thay đổi & Tin tức sản phẩm",
+      "subtitle": "Cập nhật các tính năng mới nhất, cập nhật công cụ và các bản phát hành trên ClueGrid."
+    },
+    "admin": {
+      "title": "Bảng quản trị thành phố",
+      "subtitle": "Thêm và xóa các thành phố khỏi danh sách tên được gán tự động cho các đội trong quá trình thiết lập phòng.",
+      "addCity": "Thêm thành phố",
+      "adding": "Đang thêm...",
+      "placeholder": "Nhập tên thành phố (ví dụ: Kyoto)…",
+      "delete": "Xóa",
+      "noCities": "Không có thành phố nào trong danh sách. Hãy thêm một thành phố phía trên!",
+      "accessDenied": "Truy cập bị từ chối",
+      "adminOnly": "Trang này chỉ giới hạn cho các quản trị viên."
+    },
+    "gated": {
+      "title": "Tính năng bị khóa",
+      "message": "Đăng nhập hoặc tạo tài khoản để mở khóa tính năng này.",
+      "loginBtn": "Đăng nhập / Đăng ký",
+      "dismiss": "Để sau"
+    },
+    "language": {
+      "label": "Ngôn ngữ",
+      "switchTo": "Chuyển đổi ngôn ngữ"
+    }
+  }
+}

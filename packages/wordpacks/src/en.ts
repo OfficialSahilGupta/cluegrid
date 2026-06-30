@@ -1,0 +1,67 @@
+/**
+ * English word list for ClueGrid.
+ * 400+ common nouns suitable for a word-deduction game.
+ * Words are chosen to be unambiguous, culturally neutral, and single-concept.
+ */
+export const EN_WORDS: readonly string[] = [
+  // Nature & Outdoors
+  "MOUNTAIN", "RIVER", "FOREST", "DESERT", "OCEAN", "ISLAND", "CANYON", "GLACIER",
+  "VOLCANO", "CAVE", "VALLEY", "SWAMP", "JUNGLE", "CLIFF", "REEF", "DUNE",
+  "MEADOW", "WATERFALL", "GEYSER", "LAGOON", "TUNDRA", "SAVANNA", "PLATEAU",
+  // Animals
+  "SHARK", "EAGLE", "LION", "WOLF", "BEAR", "FALCON", "COBRA", "PANTHER",
+  "WHALE", "CRAB", "MOTH", "PARROT", "SQUID", "BISON", "LYNX", "OTTER",
+  "CRANE", "DEER", "SEAL", "RAVEN", "FOX", "OWL", "MOOSE", "PENGUIN",
+  "SCORPION", "BEETLE", "PYTHON", "BUFFALO", "CHAMELEON", "WALRUS",
+  // Objects & Tools
+  "ANCHOR", "ANVIL", "ARROW", "AXE", "BARREL", "BELL", "BLADE", "BOLT",
+  "BRIDGE", "BRUSH", "BUCKET", "CANNON", "CHAIN", "CHIMNEY", "CLOCK",
+  "COMPASS", "CROWN", "CRYSTAL", "DAGGER", "DRUM", "FENCE", "FLASK",
+  "GATE", "HAMMER", "HOOK", "HORN", "JAR", "KEY", "LANTERN", "LOCK",
+  "MIRROR", "NET", "NEEDLE", "ORB", "PIPE", "PRISM", "PULLEY", "PUMP",
+  "ROPE", "SAIL", "SHIELD", "SIEVE", "SPIKE", "SPRING", "STAFF", "STAMP",
+  "STATUE", "SWORD", "TORCH", "TRAP", "VAULT", "WAGON", "WHEEL", "WHISTLE",
+  "WIRE", "WRENCH", "PLANK", "SHOVEL", "CHISEL", "LOOM", "PISTON",
+  // Places & Structures
+  "ABBEY", "ARENA", "ATTIC", "BANK", "BARN", "BAZAAR", "BUNKER", "CASTLE",
+  "CELLAR", "CHAPEL", "CITADEL", "COLONY", "COTTAGE", "DOCK", "DUNGEON",
+  "FACTORY", "FARM", "FORTRESS", "HARBOR", "HOSPITAL", "HOTEL", "LIGHTHOUSE",
+  "MANSION", "MARKET", "MINE", "MUSEUM", "PALACE", "PIER", "PORT", "PRISON",
+  "PYRAMID", "RANCH", "RUINS", "SCHOOL", "SHRINE", "STABLE", "STATION",
+  "TEMPLE", "TOWER", "TUNNEL", "VILLAGE", "WAREHOUSE", "WELL",
+  // Science & Technology
+  "ATOM", "CIRCUIT", "COMET", "CORE", "CRATER", "CURRENT", "DATA", "ECLIPSE",
+  "ELECTRON", "ENGINE", "FIBER", "FIELD", "FREQUENCY", "FUEL", "GALAXY",
+  "GAS", "GRID", "LASER", "LENS", "MAGNET", "MASS", "MATRIX", "NEBULA",
+  "NETWORK", "NUCLEUS", "ORBIT", "PARTICLE", "PLASMA", "PORTAL", "PROBE",
+  "PULSE", "RADAR", "REACTOR", "SATELLITE", "SIGNAL", "SOLAR", "SPECTRUM",
+  "STATIC", "STORM", "TERMINAL", "VECTOR", "WAVE",
+  // Food & Drink
+  "APPLE", "BACON", "BREAD", "BUTTER", "CAKE", "CANDY", "CHEESE", "CHERRY",
+  "CHOCOLATE", "CIDER", "COFFEE", "CREAM", "EGG", "GRAPE", "HONEY", "JAM",
+  "LEMON", "LIME", "MAPLE", "MELON", "MILK", "MINT", "MUSHROOM", "MUSTARD",
+  "OLIVE", "ONION", "ORANGE", "PEACH", "PEPPER", "PICKLE", "PLUM", "POTATO",
+  "PUMPKIN", "RICE", "SALT", "SAUCE", "SPICE", "STEAK", "SUGAR", "TEA",
+  "TOMATO", "VANILLA", "VINEGAR", "WALNUT", "WINE", "YEAST",
+  // People & Society
+  "AGENT", "ARCHER", "ARTIST", "BARON", "CAPTAIN", "CHEF", "COLONEL",
+  "DETECTIVE", "DIPLOMAT", "DOCTOR", "DUKE", "ELDER", "EMPEROR", "ENGINEER",
+  "EXPLORER", "GENERAL", "GUARD", "HERALD", "HUNTER", "JUDGE", "KNIGHT",
+  "LAWYER", "MERCHANT", "MONK", "NAVIGATOR", "NOBLE", "NURSE", "PILOT",
+  "PIRATE", "POET", "PRIEST", "PRINCE", "QUEEN", "RANGER", "SAILOR",
+  "SCHOLAR", "SCOUT", "SENATOR", "SHERIFF", "SOLDIER", "SURGEON", "THIEF",
+  "TRADER", "VILLAIN", "WIZARD",
+  // Abstract & Concepts
+  "ABYSS", "AGE", "ALLIANCE", "AMBUSH", "BALANCE", "BLOOD", "BOND",
+  "BORDER", "CHAOS", "CODE", "CONTRACT", "CRISIS", "CURSE", "DAWN",
+  "DEATH", "DECREE", "DOOM", "DRIFT", "DUSK", "ECHO", "EMPIRE", "ENIGMA",
+  "EXILE", "FATE", "FLAME", "FROST", "GHOST", "GLORY", "GRAVE", "HONOR",
+  "ILLUSION", "IRON", "LEGEND", "LIGHT", "LINK", "MASK", "MISSION",
+  "NIGHT", "OATH", "ORDER", "ORIGIN", "PACT", "PEACE", "PHANTOM", "PLAGUE",
+  "POISON", "POWER", "PRIME", "PROPHECY", "QUEST", "RELIC", "RIFT", "RITUAL",
+  "RUNE", "RUSH", "SHADOW", "SILENCE", "SMOKE", "SOUL", "SOURCE", "STORM",
+  "STRIKE", "THRONE", "TIDE", "TIME", "TRACE", "TRIAL", "TRUTH", "UNION",
+  "VEIL", "VOID", "WAR", "WATCH", "WIND", "ZONE",
+] as const;
+
+export type EnWord = (typeof EN_WORDS)[number];

@@ -1,0 +1,196 @@
+{
+  "locale": "tr",
+  "languageName": "Türkçe",
+  "ui": {
+    "nav": {
+      "play": "Play",
+      "rules": "Rules",
+      "changelog": "Changelog",
+      "admin": "Admin",
+      "login": "Log In / Sign Up",
+      "logout": "Log Out",
+      "settings": "Account Settings"
+    },
+    "game": {
+      "title": "ClueGrid",
+      "tagline": "Decode the grid. Outfox the enemy.",
+      "subtitle": "Multiplayer word-deduction game. Create a lobby to start.",
+      "startGame": "Start Game",
+      "joinRoom": "Join Room",
+      "createRoom": "Create Room",
+      "leaveRoom": "Leave Room",
+      "ready": "Ready",
+      "notReady": "Not Ready",
+      "copyCode": "Copy Room Code",
+      "codeCopied": "Copied!",
+      "teamCount": "Number of Teams",
+      "displayName": "Display Name",
+      "chooseAvatar": "Choose Avatar",
+      "gameMode": "Game Mode",
+      "classic": "Classic Multi-Team",
+      "coop": "Duet / Co-op",
+      "roomCode": "Room Code",
+      "or": "or",
+      "enterCode": "Enter room code"
+    },
+    "roles": {
+      "spymaster": "Spymaster",
+      "operative": "Operative",
+      "chooseRole": "Choose Role",
+      "joinAs": "Join as {{role}}",
+      "maxOne": "Spymaster (Max 1)"
+    },
+    "teams": {
+      "red": "Red",
+      "blue": "Blue",
+      "green": "Green",
+      "yellow": "Yellow",
+      "team": "Team"
+    },
+    "turn": {
+      "giveClue": "Give a Clue",
+      "clueWord": "Clue Word",
+      "clueCount": "Number of Cards",
+      "submitClue": "Submit Clue",
+      "guess": "Make a Guess",
+      "endTurn": "End Turn",
+      "unlimited": "∞",
+      "activeTurn": "{{team}}'s turn",
+      "givingClue": "{{spymaster}} is giving a clue…",
+      "clueGiven": "Clue: {{word}} ({{count}})",
+      "timerLabel": "Timer",
+      "turnsRemaining": "Turns remaining",
+      "mistakesLeft": "Mistakes left"
+    },
+    "result": {
+      "youWin": "🎉 {{team}} Team Wins!",
+      "youLose": "💀 {{team}} Team Loses",
+      "assassinHit": "Assassin revealed — {{team}} loses!",
+      "coopWin": "🎉 Co-op Victory! All agents found!",
+      "coopLose": "💀 Co-op Defeat!",
+      "playAgain": "Play Again",
+      "backToLobby": "Back to Lobby"
+    },
+    "chat": {
+      "placeholder": "Type a message…",
+      "send": "Send",
+      "systemJoined": "{{name}} joined the room.",
+      "systemLeft": "{{name}} left the room.",
+      "systemRevealed": "{{team}} revealed {{word}} ({{type}}).",
+      "operativeChat": "Operative Chat",
+      "spymasterChat": "Spymaster Chat"
+    },
+    "errors": {
+      "roomNotFound": "Room not found.",
+      "roomFull": "This room is full (max 8 players).",
+      "nameTaken": "That display name is already taken.",
+      "invalidClue": "Clue must be a single word with no spaces.",
+      "notYourTurn": "It is not your turn.",
+      "cardAlreadyRevealed": "That card has already been revealed.",
+      "gameNotStarted": "The game has not started yet.",
+      "generic": "Something went wrong. Please try again."
+    },
+    "lobby": {
+      "waiting": "Waiting for players…",
+      "playersReady": "{{ready}} / {{total}} players ready",
+      "needSpymasters": "Each team needs a Spymaster before the game can start.",
+      "minPlayers": "Need at least 4 players (2 per team)."
+    },
+    "settings": {
+      "gameSettings": "Game Settings",
+      "assassinRule": "Assassin Card Rule",
+      "teamEliminated": "Team Eliminated, Continue (Default)",
+      "gameEnds": "Game Ends Immediately",
+      "afkTimeout": "AFK Inactivity Timeout",
+      "minutes": "Minutes",
+      "minute": "Minute",
+      "timerMode": "Turn Timer Mode",
+      "timerOff": "Off",
+      "timerFast": "Fast (60s)",
+      "timerLong": "Long (180s)",
+      "timerCustom": "Custom seconds",
+      "preferences": "Preferences (Local Only)",
+      "sound": "Sound Effects",
+      "lightMode": "Light Mode",
+      "hostActions": "Host Actions",
+      "randomize": "Randomize Teams"
+    },
+    "presence": {
+      "active": "Active",
+      "brb": "BRB",
+      "afk": "AFK",
+      "sleep": ".zZ",
+      "focus": "Focus",
+      "busy": "Busy"
+    },
+    "log": {
+      "gameLog": "Game Log",
+      "export": "Export Log",
+      "chat": "Chat",
+      "board": "Board"
+    },
+    "auth": {
+      "loginTitle": "Log In to ClueGrid",
+      "signupTitle": "Create Account",
+      "email": "Email",
+      "password": "Password",
+      "username": "Username",
+      "loginBtn": "Log In",
+      "signupBtn": "Sign Up",
+      "switchToSignup": "Need an account? Sign Up",
+      "switchToLogin": "Already have an account? Log In",
+      "orContinueWith": "or continue with",
+      "guestNote": "Playing as guest — some features are locked."
+    },
+    "profile": {
+      "title": "Account Settings",
+      "changeUsername": "Username",
+      "chooseAvatar": "Choose Avatar",
+      "premiumAvatars": "Premium Avatars",
+      "save": "Save Changes",
+      "cancel": "Cancel"
+    },
+    "music": {
+      "title": "Music Player",
+      "onlyYou": "Only you can hear this",
+      "youtube": "YouTube",
+      "spotify": "Spotify",
+      "pasteLinkYT": "Paste YouTube URL…",
+      "pasteLinkSP": "Paste Spotify URL…",
+      "play": "Play",
+      "loginRequired": "Log in to use the music player"
+    },
+    "rules": {
+      "title": "Game Rules & Variants",
+      "subtitle": "Learn how to play classic Codenames and explore ClueGrid's custom cooperative and multi-team modes.",
+      "classicTitle": "Classic Rules",
+      "multiTeamTitle": "ClueGrid Multi-Team Variant",
+      "coopTitle": "Duet / Cooperative Mode"
+    },
+    "news": {
+      "title": "Changelog & Product News",
+      "subtitle": "Stay up to date with the latest features, engine updates, and releases on ClueGrid."
+    },
+    "admin": {
+      "title": "Admin Cities Dashboard",
+      "subtitle": "Add and remove cities from the curated name pool automatically assigned to teams during room setup.",
+      "addCity": "Add City",
+      "adding": "Adding...",
+      "placeholder": "Enter city name (e.g. Kyoto)…",
+      "delete": "Delete",
+      "noCities": "No cities in pool. Add one above!",
+      "accessDenied": "Access Denied",
+      "adminOnly": "This page is restricted to administrators."
+    },
+    "gated": {
+      "title": "Feature Locked",
+      "message": "Log in or create an account to unlock this feature.",
+      "loginBtn": "Log In / Sign Up",
+      "dismiss": "Maybe Later"
+    },
+    "language": {
+      "label": "Language",
+      "switchTo": "Switch language"
+    }
+  }
+}

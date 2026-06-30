@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <!-- Gold brand gradient -->
+    <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8a33d" />
+      <stop offset="100%" stop-color="#9d5b12" />
+    </linearGradient>
+    
+    <!-- Red team card gradient -->
+    <linearGradient id="red-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="100%" stop-color="#991b1b" />
+    </linearGradient>
+
+    <!-- Blue team card gradient -->
+    <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1e3a8a" />
+    </linearGradient>
+  </defs>
+
+  <!-- Dark Base Background -->
+  <rect width="64" height="64" rx="16" fill="#0c0d14"/>
+  
+  <!-- Outer Gold/Amber border glow -->
+  <rect x="0.5" y="0.5" width="63" height="63" rx="15.5" stroke="rgba(232, 163, 61, 0.25)" stroke-width="1"/>
+
+  <!-- Glowing Grid lines -->
+  <line x1="22" y1="10" x2="22" y2="54" stroke="rgba(232, 163, 61, 0.18)" stroke-width="1.5"/>
+  <line x1="42" y1="10" x2="42" y2="54" stroke="rgba(232, 163, 61, 0.18)" stroke-width="1.5"/>
+  <line x1="10" y1="22" x2="54" y2="22" stroke="rgba(232, 163, 61, 0.18)" stroke-width="1.5"/>
+  <line x1="10" y1="42" x2="54" y2="42" stroke="rgba(232, 163, 61, 0.18)" stroke-width="1.5"/>
+
+  <!-- Row 1 Cards -->
+  <rect x="12" y="12" width="8" height="8" rx="2" fill="url(#red-gradient)"/>
+  <rect x="28" y="12" width="8" height="8" rx="2" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+  <rect x="44" y="12" width="8" height="8" rx="2" fill="url(#blue-gradient)"/>
+
+  <!-- Row 2 Cards -->
+  <rect x="12" y="28" width="8" height="8" rx="2" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+  <!-- Glowing Gold/Amber Center Card (ClueGrid Brand focus) -->
+  <rect x="27.5" y="27.5" width="9" height="9" rx="2.5" fill="url(#gold-gradient)" stroke="#e8a33d" stroke-width="1"/>
+  <rect x="44" y="28" width="8" height="8" rx="2" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+
+  <!-- Row 3 Cards -->
+  <!-- Assassin card: Charcoal black with dark crimson warning border -->
+  <rect x="12" y="44" width="8" height="8" rx="2" fill="#18181b" stroke="rgb(239, 68, 68)" stroke-width="0.75"/>
+  <rect x="28" y="44" width="8" height="8" rx="2" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+  <rect x="44" y="44" width="8" height="8" rx="2" fill="url(#red-gradient)"/>
+</svg>

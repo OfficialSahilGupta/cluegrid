@@ -1,0 +1,59 @@
+/**
+ * Turkish word list for ClueGrid.
+ * 200+ common nouns in Turkish suitable for a word-deduction game.
+ */
+export const TR_WORDS: readonly string[] = [
+  // Doğa & Dış Mekan
+  "DAG", "NEHIR", "ORMAN", "COL", "OKYANUS", "ADA", "KANYON", "BUZUL",
+  "VOLKAN", "MAGARA", "VADI", "BATAKLIK", "Ucurum", "RESIF", "KUMUL",
+  "CAYIR", "SELALE", "GAYZER", "LAGUN", "TUNDRA", "SAVAN", "PLATO",
+  // Hayvanlar
+  "KOPEKBALIGI", "KARTAL", "ASLAN", "KURT", "AYI", "SAHIN", "KOBRA", "PANTER",
+  "BALINA", "YENGEC", "GUVE", "PAPAGAN", "AHTAPOT", "BIZON", "VASAK", "SAMUR",
+  "TURNA", "GEYIK", "FOK", "KARGA", "TILKI", "BAYKUS", "GEYIK", "PENGUEN",
+  "AKREP", "BOCEK", "PITON", "BOGA", "BUKALEMUN", "MORFIN",
+  // Nesneler & Araçlar
+  "CAPA", "ORS", "OK", "BALTA", "FICI", "ZIL", "BICAK", "CIVATA",
+  "KOPRU", "FIRCA", "KOVA", "TOP", "ZINCIR", "BACA", "SAAT",
+  "PUSULA", "TAC", "KRISTAL", "HANCER", "DAVUL", "CIT", "SISE", "KAPI",
+  "CEKIC", "KANCA", "BOYNUZ", "KAVANOZ", "ANAHTAR", "FENER", "KILIT",
+  "AYNA", "AG", "IGNE", "KURE", "BORU", "PRIZMA", "MAKARA", "POMPA",
+  "IP", "YELKEN", "KALKAN", "ELEK", "CIVI", "YAY", "ASA", "DAMGA",
+  "HEYKEL", "KILIC", "MESALE", "TUZAK", "KASA", "VAGON", "TEKERLEK", "DUDUK",
+  "TEL", "ANAHTAR", "TAHTA", "KUREK", "KESKI", "PISTON",
+  // Yerler & Yapılar
+  "MANASTIR", "ARENA", "TAVANARASI", "BANKA", "AHIR", "PAZAR", "SIGINAK", "KALE",
+  "MAHSEN", "SAPEL", "HISAR", "KOLONI", "KULUBE", "RIHTIM", "ZINDAN",
+  "FABRIKA", "CIFTLIK", "KALE", "LIMAN", "HASTANE", "OTEL", "DENIZFENERI",
+  "MALIKANE", "PAZAR", "MADEN", "MUZE", "SARAY", "ISKELE", "LIMAN", "HAPISHANE",
+  "PIRAMIT", "CIFTLIK", "HARABE", "OKUL", "TAPINAK", "AHIR", "ISTASYON",
+  "TAPINAK", "KULE", "TUNEL", "KOY", "DEPO", "KUYU",
+  // Yiyecek & İçecek
+  "ELMA", "PASTIRMA", "EKMEK", "TEREYAGI", "KEK", "SEKER", "PEYNIR", "KIRAZ",
+  "CIKOLATA", "SIDRE", "KAHVE", "KREMA", "YUMURTA", "UZUM", "BAL", "RECEL",
+  "LIMON", "MISKETLIMONU", "AKCAAGAC", "KAVUN", "SUT", "NANE", "MANTAR", "HARDAL",
+  "ZEYTIN", "SOGAN", "PORTAKAL", "SEFTALI", "BIBER", "TURSU", "ERIK", "PATATES",
+  "BALKABAGI", "PIRINC", "TUZ", "SOS", "BAHARAT", "BIFTEK", "SEKER", "CAY",
+  "DOMATES", "VANILYA", "SIRKE", "CEVIZ", "SARAP", "MAYA",
+  // İnsanlar & Toplum
+  "AJAN", "OKCU", "SANATCI", "BARON", "KAPTAN", "SEF", "ALBAY",
+  "DEDEKTIF", "DIPLOMAT", "DOKTOR", "DUK", "IHTIYAR", "IMPARATOR", "MUHENDIS",
+  "KASIF", "GENERAL", "MUHAFIZ", "HABERCI", "AVCI", "HAKIM", "SOVALYE",
+  "AVUKAT", "TUCCAR", "RAHIP", "DENIZCI", "SOYLU", "HEMSIRE", "PILOT",
+  "KORSAN", "SAIR", "RAHIP", "PRENS", "KRALICE", "KORUCU", "DENIZCI",
+  "BILGIN", "IZCI", "SENATOR", "SERIF", "ASKER", "CERRAH", "HIRSIZ",
+  "HAIN", "BUYUCU",
+  // Soyut Kavramlar
+  "UCURUM", "YAS", "ITTIFAK", "PUSU", "DENGE", "KAN", "BAG",
+  "SINIR", "KAOS", "KOD", "SOZLESME", "KRIZ", "LANET", "SAFAK",
+  "OLUM", "FERMAN", "KIYAMET", "YANKI", "IMPARATORLUK", "GIZEM",
+  "SURGUN", "KADER", "ALEV", "DON", "HAYALET", "GORUM", "MEZAR", "ONUR",
+  "ILLUZYON", "DEMIR", "EFSANE", "ISIK", "BAGLANTI", "MASKE", "GOREV",
+  "GECE", "YEMIN", "DUZEN", "KOKEN", "PAKT", "BARIS", "HAYALET", "SALGIN",
+  "ZEHIR", "GUC", "KEHANET", "ARAYIS", "KALINTI", "YARIK", "RITUEL",
+  "RUN", "HUCUM", "GOLGE", "SESSIZLIK", "DUMAN", "RUH", "KAYNAK", "FIRTINA",
+  "DARBE", "TAHT", "GELGIT", "ZAMAN", "IZ", "DURUSMA", "GERCEK", "BIRLIK",
+  "PECE", "BOSLUK", "SAVAS", "RUZGAR", "BOLGE"
+] as const;
+
+export type TrWord = (typeof TR_WORDS)[number];
