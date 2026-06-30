@@ -188,6 +188,8 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); line-height: 1.2; }
 .nav-center-links   { display: flex; }
 .nav-lang-wrapper   { display: flex; align-items: center; }
 .nav-member-wrapper { display: flex; align-items: center; }
+.nav-login-btn      { display: inline-flex; }
+.nav-user-btn       { display: inline-flex; }
 
 /* Hamburger button – hidden on desktop */
 .nav-hamburger {
@@ -217,10 +219,59 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); line-height: 1.2; }
   .nav-center-links   { display: none !important; }
   .nav-lang-wrapper   { display: none !important; }
   .nav-member-wrapper { display: none !important; }
+  /* Hide the full login button text — moved to mobile menu */
+  .nav-login-btn      { display: none !important; }
   .nav-hamburger      { display: flex !important; }
+
+  /* Compact user avatar chip on mobile — show avatar icon only, hide username */
+  .nav-user-btn .nav-username { display: none !important; }
+  .nav-user-btn .nav-chevron  { display: none !important; }
+  .nav-user-btn {
+    padding: 4px !important;
+    border-radius: 50% !important;
+  }
 }
 
 /* ── ≤480px breakpoint (small phones) ───────────────────────────── */
 @media (max-width: 480px) {
-  body { font-size: 15px; }
+  body { font-size: 14px; }
+
+  /* ── Game grid: tighter gaps & smaller card padding on small screens ── */
+  .game-card-word {
+    font-size: clamp(0.5rem, 3.5vw, 0.85rem) !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
+    line-height: 1.1 !important;
+    white-space: normal !important;
+  }
+
+  /* Ensure the grid doesn't overflow on small screens */
+  .game-board-grid {
+    gap: clamp(3px, 1vw, 6px) !important;
+    padding: clamp(4px, 1vw, 8px) !important;
+  }
+
+  .game-board-card {
+    padding: clamp(4px, 2vw, 10px) clamp(2px, 1vw, 6px) !important;
+    min-height: clamp(44px, 18vw, 80px) !important;
+  }
+
+  /* Room header: shrink h2, reduce padding */
+  .game-room-header {
+    padding: 12px 16px !important;
+    margin-bottom: 12px !important;
+    gap: 10px !important;
+  }
+  .game-room-header h2 {
+    font-size: 1.25rem !important;
+  }
+  .game-room-header p {
+    font-size: 0.78rem !important;
+  }
+
+  /* Make main split layout go full-width on phones */
+  .game-main-col {
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
 }

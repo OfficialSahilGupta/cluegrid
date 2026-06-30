@@ -596,6 +596,7 @@ export default function App() {
           {user ? (
             <div style={{ position: "relative" }}>
               <button
+                className="nav-user-btn"
                 onClick={() => setMenuOpen(!menuOpen)}
                 style={{
                   display: "flex",
@@ -612,8 +613,8 @@ export default function App() {
                 }}
               >
                 {renderAvatar(user.avatar, 24)}
-                <span>{user.username}</span>
-                <span style={{ fontSize: "0.6rem", opacity: 0.7 }}>▼</span>
+                <span className="nav-username">{user.username}</span>
+                <span className="nav-chevron" style={{ fontSize: "0.6rem", opacity: 0.7 }}>▼</span>
               </button>
 
               {menuOpen && (
@@ -675,6 +676,7 @@ export default function App() {
             </div>
           ) : (
             <button
+              className="nav-login-btn"
               onClick={() => setAuthOpen(true)}
               style={{
                 padding: "8px 18px",

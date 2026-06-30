@@ -3597,6 +3597,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
       {/* ─── Room Header ─── */}
       <div
+        className="game-room-header"
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -3676,7 +3677,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         }}
       >
         {/* Left Side: Game Board & Action forms */}
-        <div style={{ flex: "3 1 650px", display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div className="game-main-col" style={{ flex: "3 1 650px", display: "flex", flexDirection: "column", gap: "24px" }}>
           {/* Lobby Preset Forms */}
           {room.phase === "lobby" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -4464,20 +4465,23 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 )}
                 <div
                   className={
-                    room.phase === "ended"
-                      ? room.winner
-                        ? (localPlayer?.team && room.winner === localPlayer.team) || (!localPlayer?.team && room.winner === "red")
-                          ? "grid-victory-active"
+                    [
+                      room.phase === "ended"
+                        ? room.winner
+                          ? (localPlayer?.team && room.winner === localPlayer.team) || (!localPlayer?.team && room.winner === "red")
+                            ? "grid-victory-active"
+                            : "grid-defeat-active"
                           : "grid-defeat-active"
-                        : "grid-defeat-active"
-                      : ""
+                        : "",
+                      "game-board-grid",
+                    ].filter(Boolean).join(" ")
                   }
                   style={{
                     display: "grid",
                     gridTemplateColumns: `repeat(${cols}, 1fr)`,
-                    gap: "12px",
+                    gap: "clamp(4px, 1.5vw, 12px)",
                     width: "100%",
-                    padding: "16px",
+                    padding: "clamp(8px, 2vw, 16px)",
                     background: "rgba(255,255,255,0.02)",
                     border: "1px solid rgba(255,255,255,0.05)",
                     borderRadius: "var(--radius-lg)",
@@ -4559,20 +4563,20 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         data-card-id={card.id}
                         disabled={!isInteractive}
                         onClick={() => handleCardClick(card.id)}
-                        className={cardClassName}
+                        className={[cardClassName, "game-board-card"].filter(Boolean).join(" ")}
                         style={{
                           background: colors.bg,
                           border: clueSelectedCardIds.includes(card.id)
                             ? `3px solid ${colors.light}`
                             : `2px solid ${colors.border}`,
                           borderRadius: "var(--radius-md)",
-                          padding: "24px 12px",
+                          padding: "clamp(10px, 3.5vw, 24px) clamp(4px, 1.5vw, 10px)",
                           display: "flex",
                           flexDirection: "column",
                           alignItems: "center",
                           justifyContent: "center",
                           cursor: isInteractive ? "pointer" : "default",
-                          minHeight: "100px",
+                          minHeight: "clamp(52px, 15vw, 100px)",
                           position: "relative",
                           perspective: "1000px",
                           transformStyle: "preserve-3d",
@@ -4657,14 +4661,18 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         )}
 
                         <span
+                          className="game-card-word"
                           style={{
                             fontFamily: "var(--font-display)",
-                            fontSize: "clamp(0.85rem, 2vw, 1.25rem)",
+                            fontSize: "clamp(0.55rem, 2.8vw, 1.1rem)",
                             fontWeight: 700,
-                            letterSpacing: "0.05em",
+                            letterSpacing: "0.02em",
                             color: colors.text,
                             textAlign: "center",
-                            wordBreak: "break-all",
+                            wordBreak: "break-word",
+                            overflowWrap: "break-word",
+                            hyphens: "auto",
+                            lineHeight: 1.15,
                             opacity: card.revealed && !canSeeKey ? 0.35 : 1,
                             transform: "translateZ(20px)",
                             display: "block",
