@@ -90,6 +90,41 @@ const teamColorPresets = [
   },
 ];
 
+// ─── Custom Premium Timer Icons ──────────────────────────────────────────────
+const renderOffIcon = (color: string) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
+    <circle cx="12" cy="12" r="10" opacity="0.3" />
+    <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+  </svg>
+);
+
+const renderFastIcon = (color: string) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
+    <circle cx="12" cy="12" r="10" opacity="0.2" />
+    <line x1="12" y1="2" x2="12" y2="5" />
+    <path d="M12 9v4l2.5 2.5" />
+    <path d="M16.24 7.76a6 6 0 1 1-8.49 0" />
+    <path d="M2 12h3M19 12h3" opacity="0.5" />
+  </svg>
+);
+
+const renderLongIcon = (color: string) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
+    <path d="M5 2h14M5 22h14" />
+    <path d="M19 2v3a7 7 0 0 1-5 6.68V13.3a7 7 0 0 1 5 6.7v2H5v-2a7 7 0 0 1 5-6.7v-1.62A7 7 0 0 1 5 5V2h14z" />
+    <path d="M12 5v2" opacity="0.4" />
+    <path d="M10 18h4" opacity="0.7" />
+    <circle cx="12" cy="17" r="1" fill={color} stroke="none" />
+  </svg>
+);
+
+const renderCustomIcon = (color: string) => (
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all 0.2s ease" }}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+  </svg>
+);
+
 const typeColors: Record<string, { bg: string; border: string; text: string; light: string }> = {
   red: teamColorPresets[0]!,
   blue: teamColorPresets[1]!,
@@ -1554,42 +1589,172 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           >
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", position: "relative" }}>
               <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
-                {t("settings.timerMode", "Turn Timer Mode")}
+                {t("settings.timerMode", "Timer Settings")}
               </label>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <button
-                  type="button"
-                  disabled={!isHost}
-                  onClick={() => { if (isHost) { playSettingsToggle(); setIsTimerModeDropdownOpen(!isTimerModeDropdownOpen); } }}
-                  style={{
-                    width: "fit-content",
-                    minWidth: "160px",
-                    padding: "7px 12px",
-                    borderRadius: "var(--radius-sm)",
-                    border: "1px solid var(--border-default)",
-                    background: "var(--bg-surface-raised)",
-                    color: "var(--text-primary)",
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.9rem",
-                    textAlign: "left",
-                    cursor: isHost ? "pointer" : "not-allowed",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                    transition: "all 0.15s ease",
-                  }}
-                >
-                  <span>
-                    {room.settings.timerMode === "off" || !room.settings.timerMode ? t("settings.timerOff", "Off") :
-                     room.settings.timerMode === "fast" ? t("settings.timerFast", "Fast (90s / 60s)") :
-                     room.settings.timerMode === "long" ? t("settings.timerLong", "Long (180s / 120s)") : t("settings.timerCustom", "Custom")}
-                  </span>
-                  <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>
-                    {isTimerModeDropdownOpen ? "▲" : "▼"}
-                  </span>
-                </button>
-                {(room.settings.timerMode && room.settings.timerMode !== "off") && (
+                <div style={{ position: "relative", width: "fit-content" }}>
+                  <button
+                    type="button"
+                    disabled={!isHost}
+                    onClick={() => { if (isHost) { playSettingsToggle(); setIsTimerModeDropdownOpen(!isTimerModeDropdownOpen); } }}
+                    style={{
+                      width: "fit-content",
+                      minWidth: "160px",
+                      padding: "7px 12px",
+                      borderRadius: "var(--radius-sm)",
+                      border: "1px solid var(--border-default)",
+                      background: "var(--bg-surface-raised)",
+                      color: "var(--text-primary)",
+                      fontFamily: "var(--font-display)",
+                      fontSize: "0.9rem",
+                      textAlign: "left",
+                      cursor: isHost ? "pointer" : "not-allowed",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      transition: "all 0.15s ease",
+                    }}
+                  >
+                    <span>
+                      {room.settings.timerMode === "off" || !room.settings.timerMode ? t("settings.timerOff", "Off") :
+                       room.settings.timerMode === "fast" ? t("settings.timerFast", "Fast (90s / 60s)") :
+                       room.settings.timerMode === "long" ? t("settings.timerLong", "Long (180s / 120s)") : t("settings.timerCustom", "Custom")}
+                    </span>
+                    <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>
+                      {isTimerModeDropdownOpen ? "▲" : "▼"}
+                    </span>
+                  </button>
+
+                  {isTimerModeDropdownOpen && isHost && (
+                    <>
+                      {/* Backdrop overlay to close the popup on click */}
+                      <div
+                        style={{
+                          position: "fixed",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          background: "rgba(0, 0, 0, 0.15)",
+                          zIndex: 9998,
+                        }}
+                        onClick={() => setIsTimerModeDropdownOpen(false)}
+                      />
+                      {/* Popover content absolute positioned directly below the button */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "calc(100% + 4px)",
+                          left: 0,
+                          width: "320px",
+                          background: "var(--color-surface)",
+                          border: "2px solid var(--accent)",
+                          borderRadius: "var(--radius-md)",
+                          padding: "16px",
+                          boxShadow: "0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(232, 163, 61, 0.15)",
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "12px",
+                          zIndex: 9999,
+                        }}
+                        className="scale-up"
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "8px" }}>
+                          <span style={{ fontSize: "1.0rem", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "0.5px" }}>
+                            {t("settings.timerMode", "Timer Settings")}
+                          </span>
+                          <button
+                            onClick={() => setIsTimerModeDropdownOpen(false)}
+                            style={{
+                              background: "transparent",
+                              border: "none",
+                              color: "var(--text-secondary)",
+                              cursor: "pointer",
+                              fontSize: "1.1rem",
+                              padding: "0 4px",
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                          {[
+                            { value: "off", renderIcon: (c: string) => renderOffIcon(c), label: t("settings.timerOff", "Off"), desc: "No turn timer limit." },
+                            { value: "fast", renderIcon: (c: string) => renderFastIcon(c), label: t("settings.timerFast", "Fast (90s / 60s)"), desc: "Quick turns for high intensity." },
+                            { value: "long", renderIcon: (c: string) => renderLongIcon(c), label: t("settings.timerLong", "Long (180s / 120s)"), desc: "Relaxed pace for deeper planning." },
+                            { value: "custom", renderIcon: (c: string) => renderCustomIcon(c), label: t("settings.timerCustom", "Custom"), desc: "Fine-tune spymaster and operative limits." },
+                          ].map((opt) => {
+                            const isSelected = (room.settings.timerMode || "off") === opt.value;
+                            const iconColor = isSelected ? "var(--accent)" : "var(--text-secondary)";
+                            return (
+                              <button
+                                key={opt.value}
+                                onClick={() => {
+                                  if (socket && isHost) {
+                                    let extraSettings = {};
+                                    if (opt.value === "fast") {
+                                      extraSettings = { spymasterTimerSeconds: 90, firstClueExtraSeconds: 60, operativeTimerSeconds: 60 };
+                                    } else if (opt.value === "long") {
+                                      extraSettings = { spymasterTimerSeconds: 180, firstClueExtraSeconds: 120, operativeTimerSeconds: 120 };
+                                    } else if (opt.value === "off") {
+                                      extraSettings = { spymasterTimerSeconds: 0, firstClueExtraSeconds: 0, operativeTimerSeconds: 0 };
+                                    }
+                                    socket.emit("update_settings", {
+                                      roomCode: room.roomCode,
+                                      settings: { timerMode: opt.value, ...extraSettings },
+                                    });
+                                  }
+                                  playSettingsToggle();
+                                  setIsTimerModeDropdownOpen(false);
+                                }}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  padding: "10px 12px",
+                                  background: isSelected ? "rgba(232, 163, 61, 0.08)" : "rgba(255,255,255,0.02)",
+                                  border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                                  borderRadius: "var(--radius-sm)",
+                                  cursor: "pointer",
+                                  textAlign: "left",
+                                  width: "100%",
+                                  transition: "all 0.15s ease",
+                                }}
+                                onMouseOver={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.background = "var(--border-subtle)";
+                                  }
+                                }}
+                                onMouseOut={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                                  }
+                                }}
+                              >
+                                <span style={{ width: "30px", height: "24px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                  {opt.renderIcon(iconColor)}
+                                </span>
+                                <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
+                                  <span style={{ fontSize: "0.85rem", fontWeight: 700, color: isSelected ? "var(--accent)" : "var(--text-primary)" }}>
+                                    {opt.label}
+                                  </span>
+                                  <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)" }}>
+                                    {opt.desc}
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {(room.settings.timerMode === "custom") && (
                   <div style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(3, 1fr)",
@@ -1605,11 +1770,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       <input
                         type="number"
                         disabled={room.settings.timerMode !== "custom" || !isHost}
-                        value={
-                          room.settings.timerMode === "fast" ? 90 :
-                          room.settings.timerMode === "long" ? 180 :
-                          (room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90)
-                        }
+                        value={room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90}
                         onChange={(e) => {
                           if (socket && isHost && room.settings.timerMode === "custom") {
                             socket.emit("update_settings", {
@@ -1639,11 +1800,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       <input
                         type="number"
                         disabled={room.settings.timerMode !== "custom" || !isHost}
-                        value={
-                          room.settings.timerMode === "fast" ? 60 :
-                          room.settings.timerMode === "long" ? 120 :
-                          (room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60)
-                        }
+                        value={room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60}
                         onChange={(e) => {
                           if (socket && isHost && room.settings.timerMode === "custom") {
                             socket.emit("update_settings", {
@@ -1673,11 +1830,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       <input
                         type="number"
                         disabled={room.settings.timerMode !== "custom" || !isHost}
-                        value={
-                          room.settings.timerMode === "fast" ? 60 :
-                          room.settings.timerMode === "long" ? 120 :
-                          (room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60)
-                        }
+                        value={room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60}
                         onChange={(e) => {
                           if (socket && isHost && room.settings.timerMode === "custom") {
                             socket.emit("update_settings", {
@@ -6100,134 +6253,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         document.body
       )}
 
-      {isTimerModeDropdownOpen && isHost && (
-        <>
-          {/* Dark blur backdrop overlay */}
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background: "rgba(0, 0, 0, 0.4)",
-              backdropFilter: "blur(4px)",
-              zIndex: 9998,
-            }}
-            onClick={() => setIsTimerModeDropdownOpen(false)}
-          />
-          {/* Popover content absolute positioned directly in center of device */}
-          <div
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              background: "var(--color-surface)",
-              border: "2px solid var(--accent)",
-              borderRadius: "var(--radius-md)",
-              padding: "24px",
-              boxShadow: "0 20px 50px rgba(0,0,0,0.7), 0 0 30px rgba(232, 163, 61, 0.15)",
-              width: "360px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "20px",
-              zIndex: 9999,
-            }}
-            className="scale-up"
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "12px" }}>
-              <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "0.5px" }}>
-                {t("settings.timerMode", "Turn Timer Mode")}
-              </span>
-              <button
-                onClick={() => setIsTimerModeDropdownOpen(false)}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  color: "var(--text-secondary)",
-                  cursor: "pointer",
-                  fontSize: "1.2rem",
-                  padding: "0 4px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                ✕
-              </button>
-            </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {[
-                { value: "off", emoji: "🚫", label: t("settings.timerOff", "Off"), desc: "No turn timer limit." },
-                { value: "fast", emoji: "⏱️", label: t("settings.timerFast", "Fast (90s / 60s)"), desc: "Quick turns for high intensity." },
-                { value: "long", emoji: "⏳", label: t("settings.timerLong", "Long (180s / 120s)"), desc: "Relaxed pace for deeper planning." },
-                { value: "custom", emoji: "⚙️", label: t("settings.timerCustom", "Custom"), desc: "Fine-tune spymaster and operative limits." },
-              ].map((opt) => {
-                const isSelected = (room.settings.timerMode || "off") === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    onClick={() => {
-                      if (socket && isHost) {
-                        let extraSettings = {};
-                        if (opt.value === "fast") {
-                          extraSettings = { spymasterTimerSeconds: 90, firstClueExtraSeconds: 60, operativeTimerSeconds: 60 };
-                        } else if (opt.value === "long") {
-                          extraSettings = { spymasterTimerSeconds: 180, firstClueExtraSeconds: 120, operativeTimerSeconds: 120 };
-                        } else if (opt.value === "off") {
-                          extraSettings = { spymasterTimerSeconds: 0, firstClueExtraSeconds: 0, operativeTimerSeconds: 0 };
-                        }
-                        socket.emit("update_settings", {
-                          roomCode: room.roomCode,
-                          settings: { timerMode: opt.value, ...extraSettings },
-                        });
-                      }
-                      playSettingsToggle();
-                      setIsTimerModeDropdownOpen(false);
-                    }}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "14px",
-                      padding: "12px 14px",
-                      background: isSelected ? "rgba(232, 163, 61, 0.08)" : "rgba(255,255,255,0.02)",
-                      border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-                      borderRadius: "var(--radius-sm)",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      width: "100%",
-                      transition: "all 0.15s ease",
-                    }}
-                    onMouseOver={(e) => {
-                      if (!isSelected) {
-                        e.currentTarget.style.background = "var(--border-subtle)";
-                      }
-                    }}
-                    onMouseOut={(e) => {
-                      if (!isSelected) {
-                        e.currentTarget.style.background = "rgba(255,255,255,0.02)";
-                      }
-                    }}
-                  >
-                    <span style={{ fontSize: "1.8rem", width: "40px", display: "flex", justifyContent: "center" }}>
-                      {opt.emoji}
-                    </span>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                      <span style={{ fontSize: "0.95rem", fontWeight: 700, color: isSelected ? "var(--accent)" : "var(--text-primary)" }}>
-                        {opt.label}
-                      </span>
-                      <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
-                        {opt.desc}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 }
