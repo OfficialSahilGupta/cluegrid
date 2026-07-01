@@ -13,6 +13,8 @@ export function ChangelogPage() {
         "Daylight Dossier Theme Support: Added a warm paper light mode counterpart matching the classified folder theme.",
         "Vietnamese Locale Support: Created localized UI translations and gameplay decks supporting Vietnamese (Tiếng Việt) players.",
         "Security / Standard - Anti-Spy Action Logging: If an Operative secretly or intuitively attempts to join the Spymasters, they'll be caught and recorded in the game log.",
+        "Custom Game Timers: Control the pressure! Tailor turn and clue timers so your team can play at their own speed, whether you want a fast-paced thriller or a relaxed brainstorm.",
+        "Sensory Sound Effects: Feel every move with satisfying, responsive sound triggers for card taps, role selections, and team turns that bring the tactile feel of physical board games directly to your screen.",
       ],
     },
     {
@@ -79,7 +81,7 @@ export function ChangelogPage() {
         {updates.map((up) => (
           <section key={up.version} style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "24px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "12px" }}>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: 0, color: up.color }}>
+              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: 0, color: "var(--accent)" }}>
                 {up.version}
               </h3>
               <span style={{ fontSize: "0.85rem", color: "var(--text-muted)", fontWeight: 500 }}>

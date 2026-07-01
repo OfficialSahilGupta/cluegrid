@@ -147,8 +147,10 @@ export default function App() {
     title: string;
     message: string;
     onConfirm: () => void;
+    isWarning?: boolean;
   } | null>(null);
   const [gatedFeature, setGatedFeature] = useState<string | null>(null);
+  const [globalErrorMsg, setGlobalErrorMsg] = useState<string | null>(null);
 
   // Read config preset option selected by host
   const [selectedTeams, setSelectedTeams] = useState<number>(2);
@@ -162,18 +164,55 @@ export default function App() {
   // Navigation View: lobby, rules, changelog, about, admin, support
   const [currentView, setCurrentView] = useState<"lobby" | "rules" | "features" | "changelog" | "about" | "admin" | "support">("lobby");
 
-  // ─── Lightweight Audio Helpers (no external deps) ────────────────────────
+  // ─── Lightweight Audio & Haptic Helpers (no external deps) ────────────────
+  const triggerHaptics = (pattern: number | number[]) => {
+    if (typeof window !== "undefined" && window.navigator && typeof window.navigator.vibrate === "function") {
+      try {
+        window.navigator.vibrate(pattern);
+      } catch {
+        /* ignore */
+      }
+    }
+  };
+
   const _mkCtx = () => {
+    const isSoundEnabled = localStorage.getItem("cluegrid_sound_enabled") !== "false";
+    if (!isSoundEnabled) return null;
     const AC = window.AudioContext || (window as any).webkitAudioContext;
     if (!AC) return null;
     const ctx = new AC();
     if (ctx.state === "suspended") ctx.resume();
     return ctx;
   };
-  const playNavAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const o = ctx.createOscillator(), g = ctx.createGain(), n = ctx.currentTime; o.type = "sine"; o.frequency.setValueAtTime(880, n); o.frequency.exponentialRampToValueAtTime(1320, n + 0.04); g.gain.setValueAtTime(0.32, n); g.gain.exponentialRampToValueAtTime(0.001, n + 0.13); o.connect(g); g.connect(ctx.destination); o.start(n); o.stop(n + 0.14); } catch { /* ignore */ } };
-  const playModeAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; ([[440, 0], [660, 0.07]] as [number, number][]).forEach(([f, d]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "triangle"; o.frequency.setValueAtTime(f, n + d); g.gain.setValueAtTime(0.55, n + d); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.15); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.18); }); } catch { /* ignore */ } };
-  const playTeamCountAudio = (count: number) => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; const s = [261.63, 329.63, 392.00, 523.25]; for (let i = 0; i < count && i < s.length; i++) { const d = i * 0.07, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.setValueAtTime(s[i]!, n + d); g.gain.setValueAtTime(0.65, n + d); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.2); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.22); } } catch { /* ignore */ } };
-  const playLangAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const n = ctx.currentTime; [1046.5, 1318.5, 1567.98].forEach((f, i) => { const d = i * 0.05, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.setValueAtTime(f, n + d); g.gain.setValueAtTime(0, n + d); g.gain.linearRampToValueAtTime(0.42, n + d + 0.02); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.35); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.38); }); } catch { /* ignore */ } };
+  const _getVol = () => {
+    return Number(localStorage.getItem("cluegrid_sound_volume") ?? "80") / 100;
+  };
+  const playWarningAudio = () => {
+    try {
+      const ctx = _mkCtx();
+      if (!ctx) return;
+      const vol = _getVol();
+      const n = ctx.currentTime;
+      // Descending two-tone disconnect chime (A4 -> F4)
+      ([[440, 0], [349.23, 0.08]] as [number, number][]).forEach(([f, d]) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "sine";
+        o.frequency.setValueAtTime(f, n + d);
+        g.gain.setValueAtTime(0.45 * vol, n + d);
+        g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.22);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(n + d);
+        o.stop(n + d + 0.25);
+      });
+    } catch {
+      /* ignore */
+    }
+  };
+  const playNavAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const vol = _getVol(); const o = ctx.createOscillator(), g = ctx.createGain(), n = ctx.currentTime; o.type = "sine"; o.frequency.setValueAtTime(880, n); o.frequency.exponentialRampToValueAtTime(1320, n + 0.04); g.gain.setValueAtTime(0.32 * vol, n); g.gain.exponentialRampToValueAtTime(0.001, n + 0.13); o.connect(g); g.connect(ctx.destination); o.start(n); o.stop(n + 0.14); } catch { /* ignore */ } };
+  const playModeAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const vol = _getVol(); const n = ctx.currentTime; ([[440, 0], [660, 0.07]] as [number, number][]).forEach(([f, d]) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.type = "triangle"; o.frequency.setValueAtTime(f, n + d); g.gain.setValueAtTime(0.55 * vol, n + d); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.15); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.18); }); } catch { /* ignore */ } };
+  const playTeamCountAudio = (count: number) => { try { const ctx = _mkCtx(); if (!ctx) return; const vol = _getVol(); const n = ctx.currentTime; const s = [261.63, 329.63, 392.00, 523.25]; for (let i = 0; i < count && i < s.length; i++) { const d = i * 0.07, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.setValueAtTime(s[i]!, n + d); g.gain.setValueAtTime(0.65 * vol, n + d); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.2); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.22); } } catch { /* ignore */ } };
+  const playLangAudio = () => { try { const ctx = _mkCtx(); if (!ctx) return; const vol = _getVol(); const n = ctx.currentTime; [1046.5, 1318.5, 1567.98].forEach((f, i) => { const d = i * 0.05, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.setValueAtTime(f, n + d); g.gain.setValueAtTime(0, n + d); g.gain.linearRampToValueAtTime(0.42 * vol, n + d + 0.02); g.gain.exponentialRampToValueAtTime(0.001, n + d + 0.35); o.connect(g); g.connect(ctx.destination); o.start(n + d); o.stop(n + d + 0.38); }); } catch { /* ignore */ } };
   // ─────────────────────────────────────────────────────────────────────────
 
   // Gameplay Word Pack Language Selected by Host
@@ -302,12 +341,16 @@ export default function App() {
       if (err === "Room not found") {
         setShowUpdatePopup(true);
       } else {
-        alert(err);
+        triggerHaptics([350, 60, 350, 60, 350]);
+        playWarningAudio();
+        setGlobalErrorMsg(err);
       }
     });
 
     newSocket.on("kicked", () => {
-      alert("You have been kicked from the room by the host.");
+      triggerHaptics([350, 60, 350, 60, 350]);
+      playWarningAudio();
+      setGlobalErrorMsg("You have been kicked from the room by the host.");
       handleLeave();
     });
 
@@ -318,6 +361,7 @@ export default function App() {
   }, [room?.roomCode, isJoined, user]);
 
   const handleUpdateRefresh = () => {
+    triggerHaptics([350, 60, 350, 60, 350]);
     setShowUpdatePopup(false);
     window.history.pushState(null, "", "/");
     setRoom(null);
@@ -357,6 +401,12 @@ export default function App() {
   };
 
   const handleCreateRoom = () => {
+    try {
+      playModeAudio();
+    } catch {
+      /* ignore */
+    }
+    triggerHaptics([350, 60, 350, 60, 350]);
     setLoading(true);
     setError(null);
     fetch("/api/rooms", {
@@ -499,9 +549,12 @@ export default function App() {
           style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}
           onClick={() => {
             if (room) {
+              triggerHaptics([350, 60, 350, 60, 350]);
+              playWarningAudio();
               setGlobalConfirm({
                 title: "Abandon Grid?",
-                message: "You will leave this room and forfeit your position in the current mission. Are you sure you want to abandon the grid?",
+                message: "You will lose access to this match. Rejoining requires the invitation link or room code. Abandon anyway?",
+                isWarning: true,
                 onConfirm: () => {
                   setCurrentView("lobby");
                   handleLeave();
@@ -1279,9 +1332,12 @@ export default function App() {
           <div style={{ width: "100%" }}>
             <button
               onClick={() => {
+                triggerHaptics([350, 60, 350, 60, 350]);
+                playWarningAudio();
                 setGlobalConfirm({
                   title: "Abandon Grid?",
-                  message: "You will leave this room and forfeit your position in the current mission. Are you sure you want to abandon the grid?",
+                  message: "You will lose access to this match. Rejoining requires the invitation link or room code. Abandon anyway?",
+                  isWarning: true,
                   onConfirm: handleLeave,
                 });
               }}
@@ -1349,12 +1405,12 @@ export default function App() {
           <div
             style={{
               background: "var(--color-surface)",
-              border: "1px solid var(--accent)",
+              border: globalConfirm.isWarning ? "1.5px solid #f43f5e" : "1px solid var(--accent)",
               borderRadius: "var(--radius-md)",
               padding: "24px",
-              maxWidth: "400px",
+              maxWidth: "420px",
               width: "90%",
-              boxShadow: "0 20px 50px rgba(0,0,0,0.65)",
+              boxShadow: globalConfirm.isWarning ? "0 20px 50px rgba(244,63,94,0.15), 0 10px 25px rgba(0,0,0,0.5)" : "0 20px 50px rgba(0,0,0,0.65)",
               textAlign: "center",
               display: "flex",
               flexDirection: "column",
@@ -1362,15 +1418,38 @@ export default function App() {
             }}
             className="scale-up"
           >
-            <h4 style={{ margin: 0, fontSize: "1.2rem", fontWeight: 700, fontFamily: "var(--font-display)", color: "#fff" }}>
+            {globalConfirm.isWarning && (
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: "4px" }}>
+                <div style={{
+                  width: "48px",
+                  height: "48px",
+                  borderRadius: "50%",
+                  backgroundColor: "rgba(244, 63, 94, 0.12)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "#f43f5e",
+                }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                </div>
+              </div>
+            )}
+            <h4 style={{ margin: 0, fontSize: "1.25rem", fontWeight: 800, fontFamily: "var(--font-display)", color: globalConfirm.isWarning ? "#fda4af" : "#fff" }}>
               {globalConfirm.title}
             </h4>
-            <p style={{ margin: 0, fontSize: "0.9rem", color: "var(--color-text-muted)", lineHeight: 1.5 }}>
+            <p style={{ margin: 0, fontSize: "0.92rem", color: "var(--color-text-muted)", lineHeight: 1.55 }}>
               {globalConfirm.message}
             </p>
             <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
               <button
-                onClick={() => setGlobalConfirm(null)}
+                onClick={() => {
+                  triggerHaptics([250, 50, 250]);
+                  setGlobalConfirm(null);
+                }}
                 style={{
                   flex: 1,
                   padding: "10px 16px",
@@ -1387,6 +1466,8 @@ export default function App() {
               </button>
               <button
                 onClick={() => {
+                  triggerHaptics([350, 60, 350, 60, 350]);
+                  playWarningAudio();
                   globalConfirm.onConfirm();
                   setGlobalConfirm(null);
                 }}
@@ -1394,9 +1475,9 @@ export default function App() {
                   flex: 1,
                   padding: "10px 16px",
                   borderRadius: "var(--radius-sm)",
-                  background: "var(--accent)",
+                  background: globalConfirm.isWarning ? "#f43f5e" : "var(--accent)",
                   border: "none",
-                  color: "var(--accent-text-on)",
+                  color: globalConfirm.isWarning ? "#fff" : "var(--accent-text-on)",
                   fontWeight: 700,
                   cursor: "pointer",
                   fontFamily: "var(--font-display)",
@@ -1594,7 +1675,10 @@ export default function App() {
 
             <div style={{ display: "flex", gap: "12px" }}>
               <button
-                onClick={() => setServerError(null)}
+                onClick={() => {
+                  triggerHaptics([250, 50, 250]);
+                  setServerError(null);
+                }}
                 style={{
                   flex: 1,
                   padding: "14px 24px",
@@ -1619,6 +1703,7 @@ export default function App() {
               </button>
               <button
                 onClick={() => {
+                  triggerHaptics([350, 60, 350, 60, 350]);
                   setServerError(null);
                   window.location.reload();
                 }}
@@ -1646,6 +1731,134 @@ export default function App() {
                 Reconnect to Grid
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {globalErrorMsg && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0, 0, 0, 0.8)",
+            backdropFilter: "blur(12px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 10003,
+          }}
+          className="fade-in"
+        >
+          <div
+            style={{
+              background: "var(--color-surface)",
+              border: "2px solid var(--accent)",
+              borderRadius: "var(--radius-lg)",
+              padding: "32px",
+              maxWidth: "440px",
+              width: "90%",
+              boxShadow: "0 25px 60px rgba(232, 163, 61, 0.25), 0 0 40px rgba(0, 0, 0, 0.8)",
+              textAlign: "center",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+            }}
+            className="scale-up"
+          >
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <div style={{
+                width: "64px",
+                height: "64px",
+                borderRadius: "50%",
+                background: "rgba(232, 163, 61, 0.1)",
+                border: "1px solid var(--accent)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxShadow: "0 0 16px rgba(232, 163, 61, 0.2)",
+              }}>
+                {globalErrorMsg.toLowerCase().includes("locked") ? (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: "drop-shadow(0 0 6px var(--accent))" }}>
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                ) : (
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: "drop-shadow(0 0 6px var(--accent))" }}>
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                )}
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <h4 style={{
+                margin: 0,
+                fontSize: "1.4rem",
+                fontWeight: 800,
+                fontFamily: "var(--font-display)",
+                color: "#FFF",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+              }}>
+                Grid Alert
+              </h4>
+              <p style={{
+                margin: 0,
+                fontSize: "0.85rem",
+                color: "var(--text-secondary)",
+                fontFamily: "var(--font-display)",
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+              }}>
+                Action Blocked
+              </p>
+            </div>
+            <p style={{
+              margin: 0,
+              fontSize: "0.95rem",
+              color: "var(--text-primary)",
+              lineHeight: 1.6,
+              background: "rgba(0, 0, 0, 0.2)",
+              padding: "16px",
+              borderRadius: "var(--radius-md)",
+              border: "1px solid var(--border-subtle)",
+              fontFamily: "var(--font-body)",
+            }}>
+              {globalErrorMsg}
+            </p>
+            <button
+              onClick={() => {
+                triggerHaptics([250, 50, 250]);
+                playNavAudio();
+                setGlobalErrorMsg(null);
+              }}
+              style={{
+                width: "100%",
+                padding: "14px 24px",
+                borderRadius: "var(--radius-md)",
+                background: "var(--accent)",
+                border: "none",
+                color: "var(--accent-text-on)",
+                fontWeight: 700,
+                fontSize: "1rem",
+                cursor: "pointer",
+                fontFamily: "var(--font-display)",
+                boxShadow: "0 4px 16px rgba(232, 163, 61, 0.3)",
+                transition: "all 0.15s ease",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "var(--accent-hover)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "var(--accent)";
+              }}
+            >
+              Acknowledge
+            </button>
           </div>
         </div>
       )}

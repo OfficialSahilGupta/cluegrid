@@ -121,7 +121,7 @@ export async function createRoom(
       firstClueExtraSeconds: 60,
       operativeTimerSeconds: 60,
       roomLocked: false,
-      timerAction: "auto",
+      timerAction: "manual",
     },
     teams,
     gameMode,

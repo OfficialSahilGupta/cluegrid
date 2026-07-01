@@ -37,7 +37,7 @@ function startRoomTimer(room: RoomState, io: SocketIOServer) {
 
   const isCoop = room.gameMode === "coop";
   const timerMode = room.settings.timerMode || "off";
-  const timerAction = room.settings.timerAction || "auto";
+  const timerAction = room.settings.timerAction || "manual";
 
   const isTimerActive = isCoop || (timerMode !== "off");
   if (!isTimerActive) return;
@@ -474,10 +474,15 @@ export function registerSocketHandlers(io: SocketIOServer) {
           socketId: socket.id,
           status: "ACTIVE",
           userId: userId || null,
+          isHost: room.players.length === 0,
         };
 
         // Enforce max 1 spymaster constraint for new player team/role choice
-        if (role === "spymaster" && team) {
+        if (room.settings.roomLocked) {
+          // If room is locked, new players join as spectators
+          player.team = null;
+          player.role = null;
+        } else if (role === "spymaster" && team) {
           const hasSpymaster = room.players.some(
             (p) => p.team === team && p.role === "spymaster"
           );
@@ -544,10 +549,8 @@ export function registerSocketHandlers(io: SocketIOServer) {
       // Authorization for position switching
       if (team !== undefined || role !== undefined) {
         if (room.settings.roomLocked) {
-          if (!isCallerHost) {
-            socket.emit("error_msg", "The room is locked. Only the host can switch player positions.");
-            return;
-          }
+          socket.emit("error_msg", "The room is locked. Unlock the room to switch player positions.");
+          return;
         } else {
           if (!isCallerHost && player.id !== caller.id) {
             socket.emit("error_msg", "Only the host can change other players' positions.");
@@ -1395,13 +1398,27 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
     // Randomize players into teams
     socket.on("randomize_teams", ({ roomCode }) => {
       const room = getRoom(roomCode);
-      if (!room || room.phase !== "lobby") return;
+      if (!room) return;
+      if (room.settings.roomLocked) return;
 
-      const activePlayers = room.players.filter((p) => p.connected);
-      if (activePlayers.length === 0) return;
+      const allPlayers = room.players;
+      if (allPlayers.length === 0) return;
 
-      // Shuffle players
-      const shuffled = [...activePlayers].sort(() => 0.5 - Math.random());
+      // Persist host identity before shuffling
+      const currentHost = allPlayers.find((p) => p.isHost) || allPlayers[0];
+      if (currentHost) {
+        currentHost.isHost = true;
+      }
+
+      // Fisher-Yates Shuffle
+      const shuffled = [...allPlayers];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = shuffled[i]!;
+        shuffled[i] = shuffled[j]!;
+        shuffled[j] = temp;
+      }
+
       const teamColors = TEAM_COLORS_BY_INDEX.slice(0, room.teamCount);
 
       // Reset roles and teams
@@ -1409,10 +1426,28 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
         const teamColor = teamColors[idx % teamColors.length]!;
         p.team = teamColor;
 
-        // Balance roles: first player in team gets spymaster, subsequent get operative
-        const teamPlayersPrior = shuffled.slice(0, idx).filter((x) => x.team === teamColor);
-        const hasSpymaster = teamPlayersPrior.some((x) => x.role === "spymaster");
-        p.role = hasSpymaster ? "operative" : "spymaster";
+        if (room.gameMode === "coop") {
+          p.role = null;
+        } else {
+          // Balance roles: first player in team gets spymaster, subsequent get operative
+          const teamPlayersPrior = shuffled.slice(0, idx).filter((x) => x.team === teamColor);
+          const hasSpymaster = teamPlayersPrior.some((x) => x.role === "spymaster");
+          p.role = hasSpymaster ? "operative" : "spymaster";
+        }
+      });
+
+      // Update room.players with the shuffled new array reference
+      room.players = shuffled;
+
+      // Update socket room subscriptions for each player in the room
+      shuffled.forEach((p) => {
+        if ((p as any).socketId) {
+          const pSocket = io.sockets.sockets.get((p as any).socketId);
+          if (pSocket) {
+            updateSocketRooms(pSocket, room.roomCode, p.team, p.role);
+            sendChatHistory(pSocket, room.roomCode, p.team, p.role);
+          }
+        }
       });
 
       addGameLogEntry(

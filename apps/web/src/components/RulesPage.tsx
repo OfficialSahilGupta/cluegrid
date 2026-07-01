@@ -44,7 +44,7 @@ export function RulesPage() {
 
         {/* Section 1: Classic & Multi-Team */}
         <section style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "24px" }}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--team-1)" }}>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--accent)" }}>
             1. Classic and Multi-Team Game Modes
           </h3>
           <p style={{ lineHeight: 1.6, fontSize: "0.95rem", color: "var(--text-primary)", margin: "0 0 12px 0" }}>
@@ -60,7 +60,7 @@ export function RulesPage() {
 
         {/* Section 2: Duet/Co-op Mode */}
         <section style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "24px" }}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--team-2)" }}>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--accent)" }}>
             2. Duet and Co-op Mode
           </h3>
           <p style={{ lineHeight: 1.6, fontSize: "0.95rem", color: "var(--text-primary)", margin: "0 0 12px 0" }}>
@@ -75,7 +75,7 @@ export function RulesPage() {
 
         {/* Section 3: Clue Giving Rules & Constraints */}
         <section style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "24px" }}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--team-3)" }}>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--accent)" }}>
             3. Clue Giving Constraints (For Spymasters)
           </h3>
           <p style={{ lineHeight: 1.6, fontSize: "0.95rem", color: "var(--text-primary)", margin: "0 0 12px 0" }}>
@@ -90,7 +90,7 @@ export function RulesPage() {
 
         {/* Section 4: Special Count Rules (0 & Infinity) */}
         <section style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "24px" }}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--team-4)" }}>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--accent)" }}>
             4. Special Clue Count Rules (0 and Infinity)
           </h3>
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", fontSize: "0.95rem", lineHeight: 1.6, color: "var(--text-primary)" }}>
@@ -111,7 +111,7 @@ export function RulesPage() {
 
         {/* Section 5: Operatives Guessing Flow */}
         <section>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--text-primary)" }}>
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 12px 0", color: "var(--accent)" }}>
             5. Operative Guessing Mechanics
           </h3>
           <ul style={{ paddingLeft: "20px", lineHeight: 1.6, fontSize: "0.95rem", color: "var(--text-secondary)" }}>
