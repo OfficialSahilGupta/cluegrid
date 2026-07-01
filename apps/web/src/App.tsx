@@ -576,7 +576,46 @@ export default function App() {
             }
           }}
         >
-          <span style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1.25rem", letterSpacing: "0.05em", color: "var(--accent)" }}>ClueGrid</span>
+          <div className="rubiks-cube-container" title="ClueGrid Menu">
+            <div className="rubiks-cube">
+              {/* Front Face */}
+              <div className="cube-face front">
+                <div className="tile red"></div><div className="tile blue"></div><div className="tile green"></div>
+                <div className="tile gold"></div><div className="tile dark"></div><div className="tile red"></div>
+                <div className="tile blue"></div><div className="tile green"></div><div className="tile gold"></div>
+              </div>
+              {/* Back Face */}
+              <div className="cube-face back">
+                <div className="tile green"></div><div className="tile red"></div><div className="tile blue"></div>
+                <div className="tile gold"></div><div className="tile dark"></div><div className="tile green"></div>
+                <div className="tile red"></div><div className="tile blue"></div><div className="tile gold"></div>
+              </div>
+              {/* Left Face */}
+              <div className="cube-face left">
+                <div className="tile blue"></div><div className="tile green"></div><div className="tile red"></div>
+                <div className="tile gold"></div><div className="tile dark"></div><div className="tile blue"></div>
+                <div className="tile green"></div><div className="tile red"></div><div className="tile gold"></div>
+              </div>
+              {/* Right Face */}
+              <div className="cube-face right">
+                <div className="tile gold"></div><div className="tile red"></div><div className="tile blue"></div>
+                <div className="tile green"></div><div className="tile dark"></div><div className="tile gold"></div>
+                <div className="tile red"></div><div className="tile blue"></div><div className="tile green"></div>
+              </div>
+              {/* Top Face */}
+              <div className="cube-face top">
+                <div className="tile red"></div><div className="tile gold"></div><div className="tile green"></div>
+                <div className="tile blue"></div><div className="tile dark"></div><div className="tile red"></div>
+                <div className="tile gold"></div><div className="tile green"></div><div className="tile blue"></div>
+              </div>
+              {/* Bottom Face */}
+              <div className="cube-face bottom">
+                <div className="tile blue"></div><div className="tile red"></div><div className="tile gold"></div>
+                <div className="tile green"></div><div className="tile dark"></div><div className="tile blue"></div>
+                <div className="tile red"></div><div className="tile gold"></div><div className="tile green"></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Central navigation links — hidden on mobile via CSS class */}

@@ -1319,64 +1319,69 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
                   Spymaster
                 </div>
-                {spymasters.length > 0 ? (
-                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px" }}>
+                {spymasters.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
                     {spymasters.map((p) => renderPlayerRow(p))}
                   </div>
-                ) : !room.settings.roomLocked ? (
-                  <button
-                    onClick={() => handleJoinTeamRole(color, "spymaster")}
-                    style={{
+                )}
+                {!room.settings.roomLocked ? (
+                  (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") && (
+                    <button
+                      onClick={() => handleJoinTeamRole(color, "spymaster")}
+                      style={{
+                        width: "100%",
+                        padding: "6px 8px",
+                        background: "transparent",
+                        border: `1px solid ${themeCol.border}`,
+                        color: themeCol.text,
+                        borderRadius: "var(--radius-sm)",
+                        fontSize: "0.85rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        fontFamily: "var(--font-display)",
+                        transition: "all 0.15s ease",
+                        boxSizing: "border-box",
+                        textAlign: "center",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = themeCol.border;
+                        e.currentTarget.style.color = "#fff";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.color = themeCol.text;
+                      }}
+                    >
+                      + JOIN TEAM
+                    </button>
+                  )
+                ) : (
+                  spymasters.length === 0 && (
+                    <div style={{
                       width: "100%",
                       padding: "6px 8px",
-                      background: "transparent",
-                      border: `1px solid ${themeCol.border}`,
-                      color: themeCol.text,
+                      background: "rgba(255, 255, 255, 0.02)",
+                      border: "1px dashed var(--border-default)",
+                      color: "var(--text-muted)",
                       borderRadius: "var(--radius-sm)",
-                      fontSize: "0.85rem",
-                      fontWeight: 700,
-                      cursor: "pointer",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
                       fontFamily: "var(--font-display)",
-                      transition: "all 0.15s ease",
                       boxSizing: "border-box",
                       textAlign: "center",
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = themeCol.border;
-                      e.currentTarget.style.color = "#fff";
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = themeCol.text;
-                    }}
-                  >
-                    + JOIN TEAM
-                  </button>
-                ) : (
-                  <div style={{
-                    width: "100%",
-                    padding: "6px 8px",
-                    background: "rgba(255, 255, 255, 0.02)",
-                    border: "1px dashed var(--border-default)",
-                    color: "var(--text-muted)",
-                    borderRadius: "var(--radius-sm)",
-                    fontSize: "0.8rem",
-                    fontWeight: 500,
-                    fontFamily: "var(--font-display)",
-                    boxSizing: "border-box",
-                    textAlign: "center",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "6px",
-                    opacity: 0.6
-                  }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                    <span>Locked</span>
-                  </div>
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                      opacity: 0.6
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      <span>Locked</span>
+                    </div>
+                  )
                 )}
               </div>
 
@@ -1385,64 +1390,69 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
                   Operatives
                 </div>
-                {operatives.length > 0 ? (
-                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px" }}>
+                {operatives.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
                     {operatives.map((p) => renderPlayerRow(p))}
                   </div>
-                ) : !room.settings.roomLocked ? (
-                  <button
-                    onClick={() => handleJoinTeamRole(color, "operative")}
-                    style={{
+                )}
+                {!room.settings.roomLocked ? (
+                  (!localPlayer || localPlayer.team !== color || localPlayer.role !== "operative") && (
+                    <button
+                      onClick={() => handleJoinTeamRole(color, "operative")}
+                      style={{
+                        width: "100%",
+                        padding: "6px 8px",
+                        background: "transparent",
+                        border: `1px solid ${themeCol.border}`,
+                        color: themeCol.text,
+                        borderRadius: "var(--radius-sm)",
+                        fontSize: "0.85rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        fontFamily: "var(--font-display)",
+                        transition: "all 0.15s ease",
+                        boxSizing: "border-box",
+                        textAlign: "center",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = themeCol.border;
+                        e.currentTarget.style.color = "#fff";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.color = themeCol.text;
+                      }}
+                    >
+                      + JOIN TEAM
+                    </button>
+                  )
+                ) : (
+                  operatives.length === 0 && (
+                    <div style={{
                       width: "100%",
                       padding: "6px 8px",
-                      background: "transparent",
-                      border: `1px solid ${themeCol.border}`,
-                      color: themeCol.text,
+                      background: "rgba(255, 255, 255, 0.02)",
+                      border: "1px dashed var(--border-default)",
+                      color: "var(--text-muted)",
                       borderRadius: "var(--radius-sm)",
-                      fontSize: "0.85rem",
-                      fontWeight: 700,
-                      cursor: "pointer",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
                       fontFamily: "var(--font-display)",
-                      transition: "all 0.15s ease",
                       boxSizing: "border-box",
                       textAlign: "center",
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = themeCol.border;
-                      e.currentTarget.style.color = "#fff";
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = themeCol.text;
-                    }}
-                  >
-                    + JOIN TEAM
-                  </button>
-                ) : (
-                  <div style={{
-                    width: "100%",
-                    padding: "6px 8px",
-                    background: "rgba(255, 255, 255, 0.02)",
-                    border: "1px dashed var(--border-default)",
-                    color: "var(--text-muted)",
-                    borderRadius: "var(--radius-sm)",
-                    fontSize: "0.8rem",
-                    fontWeight: 500,
-                    fontFamily: "var(--font-display)",
-                    boxSizing: "border-box",
-                    textAlign: "center",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "6px",
-                    opacity: 0.6
-                  }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                    <span>Locked</span>
-                  </div>
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                      opacity: 0.6
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      <span>Locked</span>
+                    </div>
+                  )
                 )}
               </div>
             </div>
@@ -2888,22 +2898,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   ) => {
     playRoleTapSound();
 
-    if (!force && role === "spymaster" && team) {
-      const targetId = targetPlayerId || playerId;
-      const existingSpy = room.players.find(
-        (p) => p.team === team && p.role === "spymaster" && p.id !== targetId
-      );
-      if (existingSpy) {
-        setSpyWarningConfig({
-          spyName: existingSpy.displayName,
-          team,
-          role,
-          targetPlayerId: targetId,
-        });
-        return;
-      }
-    }
-
     if (socket) {
       socket.emit("update_player", {
         roomCode: room.roomCode,
@@ -4312,12 +4306,24 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       ) : (
                         <>
                           Clue:{" "}
-                          <span style={{ color: typeColors[room.turnState.activeTeam]!.light }}>
+                          <span style={{
+                            color: typeColors[room.turnState.activeTeam]!.light,
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            fontSize: "1.8rem",
+                            letterSpacing: "1px",
+                            textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
+                          }}>
                             {typewriterText || room.turnState.clueWord || "[Secret Clue]"}
                             {typewriterCursor && <span className="clue-cursor" />}
                           </span>{" "}
                           · Count:{" "}
-                          <span style={{ color: typeColors[room.turnState.activeTeam]!.light }}>
+                          <span style={{
+                            color: typeColors[room.turnState.activeTeam]!.light,
+                            fontWeight: 800,
+                            fontSize: "1.8rem",
+                            textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
+                          }}>
                             {room.turnState.clueCount !== null
                               ? room.turnState.clueCount === -1
                                 ? "∞"
@@ -5131,19 +5137,20 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           className="game-card-word"
                           style={{
                             fontFamily: "var(--font-display)",
-                            fontSize: "clamp(0.55rem, 2.8vw, 1.1rem)",
-                            fontWeight: 700,
-                            letterSpacing: "0.02em",
-                            color: colors.text,
+                            fontSize: "clamp(0.65rem, 3.2vw, 1.25rem)",
+                            fontWeight: 800,
+                            letterSpacing: "0.04em",
+                            color: card.revealed ? colors.text : (lightMode ? "#1C1916" : "#FFFFFF"),
                             textAlign: "center",
                             wordBreak: "break-word",
                             overflowWrap: "break-word",
                             hyphens: "auto",
                             lineHeight: 1.15,
-                            opacity: card.revealed && !canSeeKey ? 0.35 : 1,
+                            opacity: card.revealed && !canSeeKey ? 0.45 : 1,
                             transform: "translateZ(20px)",
                             display: "block",
                             zIndex: 2,
+                            textShadow: !card.revealed ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
                           }}
                         >
                           {card.word}

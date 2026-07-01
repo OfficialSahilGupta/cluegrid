@@ -439,26 +439,10 @@ export function registerSocketHandlers(io: SocketIOServer) {
         if (avatar) player.avatar = avatar;
         if (userId) player.userId = userId;
         
-        // Enforce max 1 spymaster constraint if they try to update team/role during reconnect
+        // Enforce team/role updates during reconnect
         if (team !== undefined || role !== undefined) {
-          const t = team !== undefined ? team : player.team;
-          const r = role !== undefined ? role : player.role;
-          if (r === "spymaster" && t) {
-            const hasSpymaster = room.players.some(
-              (p) => p.team === t && p.role === "spymaster" && p.id !== playerId
-            );
-            if (hasSpymaster) {
-              // Reset to operative if already occupied
-              player.team = t;
-              player.role = "operative";
-            } else {
-              player.team = t;
-              player.role = r;
-            }
-          } else {
-            player.team = t;
-            player.role = r;
-          }
+          player.team = team !== undefined ? team : player.team;
+          player.role = role !== undefined ? role : player.role;
         }
       } else {
         // Create new player
@@ -477,22 +461,10 @@ export function registerSocketHandlers(io: SocketIOServer) {
           isHost: room.players.length === 0,
         };
 
-        // Enforce max 1 spymaster constraint for new player team/role choice
         if (room.settings.roomLocked) {
           // If room is locked, new players join as spectators
           player.team = null;
           player.role = null;
-        } else if (role === "spymaster" && team) {
-          const hasSpymaster = room.players.some(
-            (p) => p.team === team && p.role === "spymaster"
-          );
-          if (!hasSpymaster) {
-            player.team = team;
-            player.role = role;
-          } else {
-            player.team = team;
-            player.role = "operative";
-          }
         } else {
           player.team = team || null;
           player.role = role || null;
@@ -571,36 +543,25 @@ export function registerSocketHandlers(io: SocketIOServer) {
           const nextTeam = team !== undefined ? team : player.team;
           const nextRole = role !== undefined ? role : player.role;
 
-          if (nextRole === "spymaster" && nextTeam) {
-            const hasSpymaster = room.players.some((p) => p.team === nextTeam && p.role === "spymaster" && p.id !== player.id);
-            if (hasSpymaster) {
-              socket.emit("error_msg", `There is already a Spymaster on the ${nextTeam} team.`);
-              return;
-            }
-
-            // Log ONLY if an operative is switching to be a spy (spymaster) during live play
-            if (room.phase === "playing" && player.role === "operative") {
-              const teamLabel = nextTeam.charAt(0).toUpperCase() + nextTeam.slice(1);
-              addGameLogEntry(
-                io,
-                room.roomCode,
-                "role_change" as any,
-                nextTeam,
-                `${player.displayName} -> ${teamLabel} spy`,
-                {
-                  playerDisplayName: player.displayName,
-                  prevRole: player.role,
-                  newRole: nextRole,
-                  newTeam: nextTeam,
-                }
-              );
-            }
-            player.team = nextTeam;
-            player.role = nextRole;
-          } else {
-            player.team = nextTeam;
-            player.role = nextRole;
+          // Log ONLY if an operative is switching to be a spy (spymaster) during live play
+          if (nextRole === "spymaster" && nextTeam && room.phase === "playing" && player.role === "operative") {
+            const teamLabel = nextTeam.charAt(0).toUpperCase() + nextTeam.slice(1);
+            addGameLogEntry(
+              io,
+              room.roomCode,
+              "role_change" as any,
+              nextTeam,
+              `${player.displayName} -> ${teamLabel} spy`,
+              {
+                playerDisplayName: player.displayName,
+                prevRole: player.role,
+                newRole: nextRole,
+                newTeam: nextTeam,
+              }
+            );
           }
+          player.team = nextTeam;
+          player.role = nextRole;
         }
         updateSocketRooms(socket, room.roomCode, player.team, player.role);
         sendChatHistory(socket, room.roomCode, player.team, player.role);
