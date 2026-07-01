@@ -276,6 +276,16 @@ export default function App() {
     };
   }, []);
 
+  // Manage font scaling class on root html element (increased font size on all screens except the main landing page)
+  useEffect(() => {
+    const isMainPage = currentView === "lobby" && !room;
+    if (isMainPage) {
+      document.documentElement.classList.remove("increased-fonts");
+    } else {
+      document.documentElement.classList.add("increased-fonts");
+    }
+  }, [currentView, room]);
+
   // Fetch room data if URL contains code path or hash
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -979,7 +989,7 @@ export default function App() {
           /* Lobby / room creator screen */
           <section className="fade-in" style={{ maxWidth: "580px", width: "100%" }}>
             <h1 className="hero-title" style={{ marginBottom: "16px" }}>{t("game.title")}</h1>
-            <p style={{ color: "var(--color-text-muted)", marginBottom: "32px" }}>
+            <p style={{ color: "var(--color-text-muted)", marginBottom: "32px", fontSize: "1.15rem" }}>
               {t("game.subtitle")}
             </p>
 

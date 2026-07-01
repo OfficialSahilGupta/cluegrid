@@ -274,7 +274,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
   // Personal Preference Toggles (Local Only)
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => localStorage.getItem("cluegrid_sound_enabled") !== "false");
-  const [soundVolume, setSoundVolume] = useState<number>(() => Number(localStorage.getItem("cluegrid_sound_volume") ?? "80"));
+  const [soundVolume, setSoundVolume] = useState<number>(() => Number(localStorage.getItem("cluegrid_sound_volume") ?? "5"));
 
   // Active Switching Player State
   const [activeSwitchPlayerId, setActiveSwitchPlayerId] = useState<string | null>(null);
@@ -292,7 +292,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const roomBoardRef = useRef(room.board);
   const soundEnabledRef = useRef(soundEnabled);
   const soundVolumeRef = useRef(soundVolume);
-  const lastVolumeRef = useRef<number>(soundVolume > 0 ? soundVolume : 80);
+  const lastVolumeRef = useRef<number>(soundVolume > 0 ? soundVolume : 5);
 
   useEffect(() => {
     roomPlayersRef.current = room.players;
@@ -1120,6 +1120,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       const operatives = teamPlayers.filter((p) => p.role === "operative" || (!p.role && p.team));
       const themeCol = typeColors[color]!;
 
+      const activePlayer = room.players.find((p) => p.id === activeSwitchPlayerId);
+      const showPopover = activePlayer && activePlayer.team === color;
+
       return (
         <div
           key={color}
@@ -1129,6 +1132,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             marginBottom: "4px",
             flex: 1,
             minWidth: "180px",
+            position: "relative",
           }}
         >
           <h4
@@ -1291,8 +1295,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       width: "100%",
                       padding: "6px 8px",
                       background: "transparent",
-                      border: "1px solid var(--accent)",
-                      color: "var(--accent)",
+                      border: `1px solid ${themeCol.border}`,
+                      color: themeCol.text,
                       borderRadius: "var(--radius-sm)",
                       fontSize: "0.85rem",
                       fontWeight: 700,
@@ -1303,15 +1307,15 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       textAlign: "center",
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.background = "var(--accent)";
-                      e.currentTarget.style.color = "var(--accent-text-on)";
+                      e.currentTarget.style.background = themeCol.border;
+                      e.currentTarget.style.color = "#fff";
                     }}
                     onMouseOut={(e) => {
                       e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = "var(--accent)";
+                      e.currentTarget.style.color = themeCol.text;
                     }}
                   >
-                    + Join Spymaster
+                    + JOIN TEAM
                   </button>
                 ) : (
                   <div style={{
@@ -1357,8 +1361,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       width: "100%",
                       padding: "6px 8px",
                       background: "transparent",
-                      border: "1px solid var(--accent)",
-                      color: "var(--accent)",
+                      border: `1px solid ${themeCol.border}`,
+                      color: themeCol.text,
                       borderRadius: "var(--radius-sm)",
                       fontSize: "0.85rem",
                       fontWeight: 700,
@@ -1369,15 +1373,15 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       textAlign: "center",
                     }}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.background = "var(--accent)";
-                      e.currentTarget.style.color = "var(--accent-text-on)";
+                      e.currentTarget.style.background = themeCol.border;
+                      e.currentTarget.style.color = "#fff";
                     }}
                     onMouseOut={(e) => {
                       e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = "var(--accent)";
+                      e.currentTarget.style.color = themeCol.text;
                     }}
                   >
-                    + Join Operative
+                    + JOIN TEAM
                   </button>
                 ) : (
                   <div style={{
@@ -1408,6 +1412,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               </div>
             </div>
           )}
+          {showPopover && renderAssignPopover(activePlayer)}
         </div>
       );
     };
@@ -1473,12 +1478,15 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             {(() => {
               const specs = room.players.filter((p) => !p.team);
               if (specs.length === 0) return null;
+              const activePlayer = room.players.find((p) => p.id === activeSwitchPlayerId);
+              const showPopover = activePlayer && !activePlayer.team;
               return (
                 <div
                   style={{
                     borderLeft: "3px solid rgba(255,255,255,0.2)",
                     paddingLeft: "12px",
                     marginTop: "8px",
+                    position: "relative",
                   }}
                 >
                   <h4
@@ -1495,6 +1503,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px" }}>
                     {specs.map((p) => renderPlayerRow(p))}
                   </div>
+                  {showPopover && renderAssignPopover(activePlayer)}
                 </div>
               );
             })()}
@@ -1590,7 +1599,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     marginTop: "12px",
                   }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
+                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "flex", alignItems: "flex-end", minHeight: "34px" }}>
                         {t("settings.spymasterTimer", "Spymaster (s)")}
                       </label>
                       <input
@@ -1624,7 +1633,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       />
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
+                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "flex", alignItems: "flex-end", minHeight: "34px" }}>
                         {t("settings.firstClueExtra", "1st Clue Extra (s)")}
                       </label>
                       <input
@@ -1658,7 +1667,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       />
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
+                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "flex", alignItems: "flex-end", minHeight: "34px" }}>
                         {t("settings.operativeTimer", "Operative (s)")}
                       </label>
                       <input
@@ -1695,88 +1704,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 )}
               </div>
 
-              {isTimerModeDropdownOpen && isHost && (
-                <>
-                  <div
-                    style={{
-                      position: "fixed",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      zIndex: 998,
-                    }}
-                    onClick={() => setIsTimerModeDropdownOpen(false)}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                      width: "240px",
-                      marginTop: "4px",
-                      background: "var(--bg-surface)",
-                      border: "1px solid var(--border-default)",
-                      borderRadius: "var(--radius-sm)",
-                      maxHeight: "220px",
-                      overflowY: "auto",
-                      zIndex: 999,
-                      boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
-                      padding: "4px 0",
-                    }}
-                    className="scale-up"
-                  >
-                    {[
-                      { value: "off", label: t("settings.timerOff", "Off") },
-                      { value: "fast", label: t("settings.timerFast", "Fast (90s / 60s)") },
-                      { value: "long", label: t("settings.timerLong", "Long (180s / 120s)") },
-                      { value: "custom", label: t("settings.timerCustom", "Custom") },
-                    ].map((opt) => (
-                      <div
-                        key={opt.value}
-                        onClick={() => {
-                          if (socket && isHost) {
-                            let extraSettings = {};
-                            if (opt.value === "fast") {
-                              extraSettings = { spymasterTimerSeconds: 90, firstClueExtraSeconds: 60, operativeTimerSeconds: 60 };
-                            } else if (opt.value === "long") {
-                              extraSettings = { spymasterTimerSeconds: 180, firstClueExtraSeconds: 120, operativeTimerSeconds: 120 };
-                            } else if (opt.value === "off") {
-                              extraSettings = { spymasterTimerSeconds: 0, firstClueExtraSeconds: 0, operativeTimerSeconds: 0 };
-                            }
-                            socket.emit("update_settings", {
-                              roomCode: room.roomCode,
-                              settings: { timerMode: opt.value, ...extraSettings },
-                            });
-                          }
-                          playSettingsToggle();
-                          setIsTimerModeDropdownOpen(false);
-                        }}
-                        style={{
-                          padding: "8px 14px",
-                          cursor: "pointer",
-                          color: (room.settings.timerMode || "off") === opt.value ? "var(--accent)" : "var(--text-primary)",
-                          background: (room.settings.timerMode || "off") === opt.value ? "rgba(232, 163, 61, 0.08)" : "transparent",
-                          fontWeight: (room.settings.timerMode || "off") === opt.value ? 700 : 500,
-                          fontSize: "0.9rem",
-                        }}
-                        onMouseOver={(e) => {
-                          if ((room.settings.timerMode || "off") !== opt.value) {
-                            e.currentTarget.style.background = "var(--border-subtle)";
-                          }
-                        }}
-                        onMouseOut={(e) => {
-                          if ((room.settings.timerMode || "off") !== opt.value) {
-                            e.currentTarget.style.background = "transparent";
-                          }
-                        }}
-                      >
-                        {opt.label}
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
+
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -1810,7 +1738,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "320px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px", width: "100%", maxWidth: "320px", marginLeft: "auto" }}>
             <div
               style={{
                 display: "flex",
@@ -1823,12 +1751,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               }}
             >
               <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
-                {t("settings.timerAction", "Timer Expiration Action")}
+                {t("settings.timerAction", "Timer Action")}
               </label>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
                 {[
-                  { value: "auto", label: t("settings.timerActionAuto", "Automatic Turn Shift") },
-                  { value: "manual", label: t("settings.timerActionManual", "Manual End Turn") },
+                  { value: "auto", label: t("settings.timerActionAuto", "Auto End") },
+                  { value: "manual", label: t("settings.timerActionManual", "Manual End") },
                 ].map((opt) => {
                   const isSelected = (room.settings.timerAction || "manual") === opt.value;
                   return (
@@ -1982,10 +1910,326 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     );
   };
 
+  const renderAssignPopover = (p: Player) => {
+    const alignLeft = p.team === "red" || p.team === "green" || !p.team;
+    const alignRight = p.team === "blue" || p.team === "yellow";
+
+    return (
+      <>
+        {/* Transparent click catcher background (no visible overlay, no blur) */}
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "transparent",
+            zIndex: 9998,
+          }}
+          onClick={() => setActiveSwitchPlayerId(null)}
+        />
+        {/* Popover content absolute positioned directly inside the team frame */}
+        <div
+          style={{
+            position: "absolute",
+            top: "40px",
+            left: alignLeft ? "0" : "auto",
+            right: alignRight ? "0" : "auto",
+            background: "var(--color-surface)",
+            border: "1px solid var(--accent)",
+            borderRadius: "var(--radius-md)",
+            padding: "24px 20px",
+            boxShadow: "0 15px 40px rgba(0,0,0,0.6)",
+            width: "320px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+            zIndex: 9999,
+          }}
+          className="scale-up"
+        >
+          <span style={{ fontSize: "1.15rem", fontWeight: 700, color: "var(--text-primary)", textTransform: "uppercase", textAlign: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "10px" }}>
+            {t("game.assign", "Assign")} {p.displayName}
+          </span>
+          
+          {room.gameMode === "coop" ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {Object.entries(room.teams).map(([color, teamState]) => (
+                <button
+                  key={color}
+                  onClick={() => {
+                    handleJoinTeamRole(color as any, null, p.id);
+                    setActiveSwitchPlayerId(null);
+                  }}
+                  style={{
+                    padding: "12px 10px",
+                    fontSize: "1.05rem",
+                    background: p.team === color ? typeColors[color as keyof typeof typeColors]!.border : typeColors[color as keyof typeof typeColors]!.bg,
+                    border: `1px solid ${typeColors[color as keyof typeof typeColors]!.border}`,
+                    borderRadius: "var(--radius-sm)",
+                    color: p.team === color ? "#fff" : typeColors[color as keyof typeof typeColors]!.text,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  {t("game.joinAs", { role: teamState.name || t(`teams.${color}`) })}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {/* Red Team */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                <button
+                  onClick={() => {
+                    handleJoinTeamRole("red", "spymaster", p.id);
+                    setActiveSwitchPlayerId(null);
+                  }}
+                  style={{
+                    padding: "10px 8px",
+                    fontSize: "1rem",
+                    background: p.team === "red" && p.role === "spymaster" ? typeColors.red!.border : typeColors.red!.bg,
+                    border: `1px solid ${typeColors.red!.border}`,
+                    borderRadius: "var(--radius-sm)",
+                    color: p.team === "red" && p.role === "spymaster" ? "#fff" : typeColors.red!.text,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {t("teams.red")} {t("roles.spymaster")}
+                </button>
+                <button
+                  onClick={() => {
+                    handleJoinTeamRole("red", "operative", p.id);
+                    setActiveSwitchPlayerId(null);
+                  }}
+                  style={{
+                    padding: "10px 8px",
+                    fontSize: "1rem",
+                    background: p.team === "red" && p.role === "operative" ? typeColors.red!.border : typeColors.red!.bg,
+                    border: `1px solid ${typeColors.red!.border}`,
+                    borderRadius: "var(--radius-sm)",
+                    color: p.team === "red" && p.role === "operative" ? "#fff" : typeColors.red!.text,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {t("teams.red")} {t("roles.operative")}
+                </button>
+              </div>
+
+              {/* Blue Team */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                <button
+                  onClick={() => {
+                    handleJoinTeamRole("blue", "spymaster", p.id);
+                    setActiveSwitchPlayerId(null);
+                  }}
+                  style={{
+                    padding: "10px 8px",
+                    fontSize: "1rem",
+                    background: p.team === "blue" && p.role === "spymaster" ? typeColors.blue!.border : typeColors.blue!.bg,
+                    border: `1px solid ${typeColors.blue!.border}`,
+                    borderRadius: "var(--radius-sm)",
+                    color: p.team === "blue" && p.role === "spymaster" ? "#fff" : typeColors.blue!.text,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {t("teams.blue")} {t("roles.spymaster")}
+                </button>
+                <button
+                  onClick={() => {
+                    handleJoinTeamRole("blue", "operative", p.id);
+                    setActiveSwitchPlayerId(null);
+                  }}
+                  style={{
+                    padding: "10px 8px",
+                    fontSize: "1rem",
+                    background: p.team === "blue" && p.role === "operative" ? typeColors.blue!.border : typeColors.blue!.bg,
+                    border: `1px solid ${typeColors.blue!.border}`,
+                    borderRadius: "var(--radius-sm)",
+                    color: p.team === "blue" && p.role === "operative" ? "#fff" : typeColors.blue!.text,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {t("teams.blue")} {t("roles.operative")}
+                </button>
+              </div>
+
+              {/* Green Team */}
+              {room.teamCount > 2 && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                  <button
+                    onClick={() => {
+                      handleJoinTeamRole("green", "spymaster", p.id);
+                      setActiveSwitchPlayerId(null);
+                    }}
+                    style={{
+                      padding: "10px 8px",
+                      fontSize: "1rem",
+                      background: p.team === "green" && p.role === "spymaster" ? typeColors.green!.border : typeColors.green!.bg,
+                      border: `1px solid ${typeColors.green!.border}`,
+                      borderRadius: "var(--radius-sm)",
+                      color: p.team === "green" && p.role === "spymaster" ? "#fff" : typeColors.green!.text,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t("teams.green")} {t("roles.spymaster")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleJoinTeamRole("green", "operative", p.id);
+                      setActiveSwitchPlayerId(null);
+                    }}
+                    style={{
+                      padding: "10px 8px",
+                      fontSize: "1rem",
+                      background: p.team === "green" && p.role === "operative" ? typeColors.green!.border : typeColors.green!.bg,
+                      border: `1px solid ${typeColors.green!.border}`,
+                      borderRadius: "var(--radius-sm)",
+                      color: p.team === "green" && p.role === "operative" ? "#fff" : typeColors.green!.text,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t("teams.green")} {t("roles.operative")}
+                  </button>
+                </div>
+              )}
+
+              {/* Yellow Team */}
+              {room.teamCount > 3 && (
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                  <button
+                    onClick={() => {
+                      handleJoinTeamRole("yellow", "spymaster", p.id);
+                      setActiveSwitchPlayerId(null);
+                    }}
+                    style={{
+                      padding: "10px 8px",
+                      fontSize: "1rem",
+                      background: p.team === "yellow" && p.role === "spymaster" ? typeColors.yellow!.border : typeColors.yellow!.bg,
+                      border: `1px solid ${typeColors.yellow!.border}`,
+                      borderRadius: "var(--radius-sm)",
+                      color: p.team === "yellow" && p.role === "spymaster" ? "#fff" : typeColors.yellow!.text,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t("teams.yellow")} {t("roles.spymaster")}
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleJoinTeamRole("yellow", "operative", p.id);
+                      setActiveSwitchPlayerId(null);
+                    }}
+                    style={{
+                      padding: "10px 8px",
+                      fontSize: "1rem",
+                      background: p.team === "yellow" && p.role === "operative" ? typeColors.yellow!.border : typeColors.yellow!.bg,
+                      border: `1px solid ${typeColors.yellow!.border}`,
+                      borderRadius: "var(--radius-sm)",
+                      color: p.team === "yellow" && p.role === "operative" ? "#fff" : typeColors.yellow!.text,
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {t("teams.yellow")} {t("roles.operative")}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Spectate Button */}
+          <button
+            onClick={() => {
+              handleJoinTeamRole(null, null, p.id);
+              setActiveSwitchPlayerId(null);
+            }}
+            style={{
+              padding: "12px",
+              fontSize: "1.05rem",
+              background: !p.team ? "var(--accent)" : "transparent",
+              border: "1px solid var(--accent)",
+              borderRadius: "var(--radius-sm)",
+              color: !p.team ? "var(--accent-text-on)" : "var(--accent)",
+              fontWeight: 700,
+              cursor: "pointer",
+              width: "100%",
+            }}
+          >
+            {t("roles.spectator", "Spectate")}
+          </button>
+
+          {/* Host Actions: Kick / Promote */}
+          {isHost && p.id !== playerId && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", borderTop: "1px solid var(--border-default)", paddingTop: "12px", marginTop: "4px" }}>
+              {!p.isHost && p.id !== room.players[0]?.id && (
+                <button
+                  onClick={() => {
+                    if (socket) socket.emit("make_host", { roomCode: room.roomCode, playerId: p.id });
+                    setActiveSwitchPlayerId(null);
+                  }}
+                  style={{
+                    padding: "10px",
+                    fontSize: "0.95rem",
+                    background: "rgba(16, 185, 129, 0.1)",
+                    border: "1px solid rgb(16, 185, 129)",
+                    borderRadius: "var(--radius-sm)",
+                    color: "hsl(142,75%,45%)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {t("game.makeHost", "Make Host")}
+                </button>
+              )}
+              {p.id !== playerId && (
+                <button
+                  onClick={() => {
+                    if (socket) socket.emit("kick_player", { roomCode: room.roomCode, playerId: p.id });
+                    setActiveSwitchPlayerId(null);
+                  }}
+                  style={{
+                    padding: "10px",
+                    fontSize: "0.95rem",
+                    background: "rgba(239, 68, 68, 0.1)",
+                    border: "1px solid rgb(239, 68, 68)",
+                    borderRadius: "var(--radius-sm)",
+                    color: "hsl(355,85%,65%)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  {t("game.kick", "Kick")}
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </>
+    );
+  };
+
   const renderPlayerRow = (p: Player) => {
     const border = p.team ? typeColors[p.team]!.border : "rgba(255,255,255,0.15)";
     const isCurrent = p.id === playerId;
     const canSwitch = isHost || (p.id === playerId && !room.settings.roomLocked);
+
+    const teamGlows: Record<string, string> = {
+      red: "rgba(196, 69, 54, 0.45)",
+      blue: "rgba(45, 110, 142, 0.45)",
+      green: "rgba(122, 140, 92, 0.45)",
+      yellow: "rgba(176, 122, 31, 0.45)",
+    };
+    const glowColor = p.team ? teamGlows[p.team]! : "rgba(232, 163, 61, 0.45)";
+    const finalBorderColor = p.team ? typeColors[p.team]!.border : (isCurrent ? "var(--accent)" : "rgba(255,255,255,0.15)");
 
     return (
       <div
@@ -2013,20 +2257,20 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             height: "54px",
             borderRadius: "50%",
             background: "rgba(255,255,255,0.03)",
-            border: `2px solid ${isCurrent ? "var(--accent)" : border}`,
+            border: `2px solid ${finalBorderColor}`,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            boxShadow: isCurrent ? "0 0 10px rgba(232, 163, 61, 0.4)" : "none",
+            boxShadow: isCurrent ? `0 0 10px ${glowColor}` : "none",
             transition: "all 0.2s ease",
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.borderColor = "var(--accent)";
-            if (isCurrent) e.currentTarget.style.boxShadow = "0 0 14px rgba(232, 163, 61, 0.6)";
+            e.currentTarget.style.borderColor = p.team ? typeColors[p.team]!.light : "var(--accent)";
+            if (isCurrent) e.currentTarget.style.boxShadow = `0 0 14px ${glowColor}`;
           }}
           onMouseOut={(e) => {
-            e.currentTarget.style.borderColor = isCurrent ? "var(--accent)" : border;
-            e.currentTarget.style.boxShadow = isCurrent ? "0 0 10px rgba(232, 163, 61, 0.4)" : "none";
+            e.currentTarget.style.borderColor = finalBorderColor;
+            e.currentTarget.style.boxShadow = isCurrent ? `0 0 10px ${glowColor}` : "none";
           }}
         >
           {/* Avatar inside */}
@@ -2100,7 +2344,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           style={{
             fontSize: "0.9rem",
             fontWeight: isCurrent ? 700 : 500,
-            color: isCurrent ? "var(--accent)" : "var(--color-text-muted)",
+            color: p.team ? typeColors[p.team]!.border : (isCurrent ? "var(--accent)" : "var(--color-text-muted)"),
             maxWidth: "70px",
             overflow: "hidden",
             textOverflow: "ellipsis",
@@ -2112,327 +2356,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         >
           {p.displayName}
         </span>
-
-        {activeSwitchPlayerId === p.id && (
-          <>
-            {/* Transparent click catcher background (no visible overlay, no blur) */}
-            <div
-              style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: "transparent",
-                zIndex: 9998,
-              }}
-              onClick={() => setActiveSwitchPlayerId(null)}
-            />
-            {/* Popover content absolute positioned directly below the circle */}
-            <div
-              style={{
-                position: "absolute",
-                top: "60px",
-                left: (p.team === "red" || p.team === "green") ? "0" : ((p.team === "blue" || p.team === "yellow") ? "auto" : "50%"),
-                right: (p.team === "blue" || p.team === "yellow") ? "0" : "auto",
-                transform: (p.team === "red" || p.team === "green" || p.team === "blue" || p.team === "yellow") ? "none" : "translateX(-50%)",
-                background: "var(--color-surface)",
-                border: "1px solid var(--accent)",
-                borderRadius: "var(--radius-md)",
-                padding: "20px",
-                boxShadow: "0 15px 40px rgba(0,0,0,0.6)",
-                width: "250px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-                zIndex: 9999,
-              }}
-              className="scale-up"
-            >
-              <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase", textAlign: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "4px" }}>
-                {t("game.assign", "Assign")} {p.displayName}
-              </span>
-              
-              {room.gameMode === "coop" ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  {Object.entries(room.teams).map(([color, teamState]) => (
-                    <button
-                      key={color}
-                      onClick={() => {
-                        handleJoinTeamRole(color as any, null, p.id);
-                        setActiveSwitchPlayerId(null);
-                      }}
-                      style={{
-                        padding: "8px",
-                        fontSize: "0.75rem",
-                        background: p.team === color ? typeColors[color as keyof typeof typeColors]!.border : typeColors[color as keyof typeof typeColors]!.bg,
-                        border: `1px solid ${typeColors[color as keyof typeof typeColors]!.border}`,
-                        borderRadius: "4px",
-                        color: p.team === color ? "#fff" : typeColors[color as keyof typeof typeColors]!.text,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                        transition: "all 0.15s ease",
-                      }}
-                    >
-                      {t("game.joinAs", { role: teamState.name || t(`teams.${color}`) })}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {/* Red Team */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                    <button
-                      onClick={() => {
-                        handleJoinTeamRole("red", "spymaster", p.id);
-                        setActiveSwitchPlayerId(null);
-                      }}
-                      style={{
-                        padding: "6px",
-                        fontSize: "0.75rem",
-                        background: p.team === "red" && p.role === "spymaster" ? typeColors.red!.border : typeColors.red!.bg,
-                        border: `1px solid ${typeColors.red!.border}`,
-                        borderRadius: "4px",
-                        color: p.team === "red" && p.role === "spymaster" ? "#fff" : typeColors.red!.text,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                      }}
-                    >
-                      {t("teams.red")} {t("roles.spymaster")}
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleJoinTeamRole("red", "operative", p.id);
-                        setActiveSwitchPlayerId(null);
-                      }}
-                      style={{
-                        padding: "6px",
-                        fontSize: "0.75rem",
-                        background: p.team === "red" && p.role === "operative" ? typeColors.red!.border : typeColors.red!.bg,
-                        border: `1px solid ${typeColors.red!.border}`,
-                        borderRadius: "4px",
-                        color: p.team === "red" && p.role === "operative" ? "#fff" : typeColors.red!.text,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                      }}
-                    >
-                      {t("teams.red")} {t("roles.operative")}
-                    </button>
-                  </div>
-
-                  {/* Blue Team */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                    <button
-                      onClick={() => {
-                        handleJoinTeamRole("blue", "spymaster", p.id);
-                        setActiveSwitchPlayerId(null);
-                      }}
-                      style={{
-                        padding: "6px",
-                        fontSize: "0.75rem",
-                        background: p.team === "blue" && p.role === "spymaster" ? typeColors.blue!.border : typeColors.blue!.bg,
-                        border: `1px solid ${typeColors.blue!.border}`,
-                        borderRadius: "4px",
-                        color: p.team === "blue" && p.role === "spymaster" ? "#fff" : typeColors.blue!.text,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                      }}
-                    >
-                      {t("teams.blue")} {t("roles.spymaster")}
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleJoinTeamRole("blue", "operative", p.id);
-                        setActiveSwitchPlayerId(null);
-                      }}
-                      style={{
-                        padding: "6px",
-                        fontSize: "0.75rem",
-                        background: p.team === "blue" && p.role === "operative" ? typeColors.blue!.border : typeColors.blue!.bg,
-                        border: `1px solid ${typeColors.blue!.border}`,
-                        borderRadius: "4px",
-                        color: p.team === "blue" && p.role === "operative" ? "#fff" : typeColors.blue!.text,
-                        fontWeight: 600,
-                        cursor: "pointer",
-                      }}
-                    >
-                      {t("teams.blue")} {t("roles.operative")}
-                    </button>
-                  </div>
-
-                  {/* Green Team */}
-                  {room.teamCount > 2 && (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                      <button
-                        onClick={() => {
-                          handleJoinTeamRole("green", "spymaster", p.id);
-                          setActiveSwitchPlayerId(null);
-                        }}
-                        style={{
-                          padding: "6px",
-                          fontSize: "0.75rem",
-                          background: p.team === "green" && p.role === "spymaster" ? typeColors.green!.border : typeColors.green!.bg,
-                          border: `1px solid ${typeColors.green!.border}`,
-                          borderRadius: "4px",
-                          color: p.team === "green" && p.role === "spymaster" ? "#fff" : typeColors.green!.text,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        {t("teams.green")} {t("roles.spymaster")}
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleJoinTeamRole("green", "operative", p.id);
-                          setActiveSwitchPlayerId(null);
-                        }}
-                        style={{
-                          padding: "6px",
-                          fontSize: "0.75rem",
-                          background: p.team === "green" && p.role === "operative" ? typeColors.green!.border : typeColors.green!.bg,
-                          border: `1px solid ${typeColors.green!.border}`,
-                          borderRadius: "4px",
-                          color: p.team === "green" && p.role === "operative" ? "#fff" : typeColors.green!.text,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        {t("teams.green")} {t("roles.operative")}
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Yellow Team */}
-                  {room.teamCount > 3 && (
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                      <button
-                        onClick={() => {
-                          handleJoinTeamRole("yellow", "spymaster", p.id);
-                          setActiveSwitchPlayerId(null);
-                        }}
-                        style={{
-                          padding: "6px",
-                          fontSize: "0.75rem",
-                          background: p.team === "yellow" && p.role === "spymaster" ? typeColors.yellow!.border : typeColors.yellow!.bg,
-                          border: `1px solid ${typeColors.yellow!.border}`,
-                          borderRadius: "4px",
-                          color: p.team === "yellow" && p.role === "spymaster" ? "#fff" : typeColors.yellow!.text,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        {t("teams.yellow")} {t("roles.spymaster")}
-                      </button>
-                      <button
-                        onClick={() => {
-                          handleJoinTeamRole("yellow", "operative", p.id);
-                          setActiveSwitchPlayerId(null);
-                        }}
-                        style={{
-                          padding: "6px",
-                          fontSize: "0.75rem",
-                          background: p.team === "yellow" && p.role === "operative" ? typeColors.yellow!.border : typeColors.yellow!.bg,
-                          border: `1px solid ${typeColors.yellow!.border}`,
-                          borderRadius: "4px",
-                          color: p.team === "yellow" && p.role === "operative" ? "#fff" : typeColors.yellow!.text,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        {t("teams.yellow")} {t("roles.operative")}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Spectate Button */}
-              <button
-                onClick={() => {
-                  handleJoinTeamRole(null, null, p.id);
-                  setActiveSwitchPlayerId(null);
-                }}
-                style={{
-                  padding: "6px",
-                  fontSize: "0.75rem",
-                  background: !p.team ? "var(--accent)" : "transparent",
-                  border: "1px solid var(--accent)",
-                  borderRadius: "4px",
-                  color: !p.team ? "var(--accent-text-on)" : "var(--accent)",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  width: "100%",
-                }}
-              >
-                {t("roles.spectator", "Spectate")}
-              </button>
-
-              {/* Host Actions: Kick / Promote */}
-              {isHost && p.id !== playerId && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px", borderTop: "1px solid var(--border-default)", paddingTop: "8px", marginTop: "4px" }}>
-                  {!p.isHost && p.id !== room.players[0]?.id && (
-                    <button
-                      onClick={() => {
-                        if (socket) socket.emit("make_host", { roomCode: room.roomCode, playerId: p.id });
-                        setActiveSwitchPlayerId(null);
-                      }}
-                      style={{
-                        padding: "6px",
-                        fontSize: "0.75rem",
-                        background: "rgba(16, 185, 129, 0.1)",
-                        border: "1px solid rgb(16, 185, 129)",
-                        borderRadius: "4px",
-                        color: "hsl(142,75%,45%)",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      {t("game.makeHost", "Make Host")}
-                    </button>
-                  )}
-                  {p.id !== playerId && (
-                    <button
-                      onClick={() => {
-                        if (socket) socket.emit("kick_player", { roomCode: room.roomCode, playerId: p.id });
-                        setActiveSwitchPlayerId(null);
-                      }}
-                      style={{
-                        padding: "6px",
-                        fontSize: "0.75rem",
-                        background: "rgba(239, 68, 68, 0.1)",
-                        border: "1px solid rgb(239, 68, 68)",
-                        borderRadius: "4px",
-                        color: "hsl(355,85%,65%)",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      {t("game.kick", "Kick")}
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {/* Cancel Button */}
-              <button
-                onClick={() => setActiveSwitchPlayerId(null)}
-                style={{
-                  padding: "6px",
-                  fontSize: "0.75rem",
-                  background: "transparent",
-                  border: "1px solid var(--border-default)",
-                  borderRadius: "4px",
-                  color: "var(--text-primary)",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  width: "100%",
-                }}
-              >
-                {t("profile.cancel", "Cancel")}
-              </button>
-            </div>
-          </>
-        )}
       </div>
     );
   };
@@ -4308,36 +4231,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             End Turn
                           </button>
                         )}
-                      {room.gameMode !== "coop" &&
-                        localPlayer &&
-                        localPlayer.team !== room.turnState.activeTeam &&
-                        room.settings.timerAction === "manual" &&
-                        timerCount <= 0 && (
-                          <button
-                            onClick={handleEndTurn}
-                            style={{
-                              padding: "10px 24px",
-                              borderRadius: "var(--radius-md)",
-                              background: "rgba(196, 69, 54, 0.12)",
-                              border: "1px solid var(--team-1)",
-                              color: "var(--team-1)",
-                              fontFamily: "var(--font-display)",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.background = "var(--team-1)";
-                              e.currentTarget.style.color = "#fff";
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.background = "rgba(196, 69, 54, 0.12)";
-                              e.currentTarget.style.color = "var(--team-1)";
-                            }}
-                          >
-                            End Opponent&apos;s Turn
-                          </button>
-                        )}
+
                       {isHost && (
                         <div style={{ display: "flex", gap: "10px" }}>
                           <button
@@ -6204,6 +6098,135 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           {isChatFloatingOpen && renderChatAndLogPanel()}
         </>,
         document.body
+      )}
+
+      {isTimerModeDropdownOpen && isHost && (
+        <>
+          {/* Dark blur backdrop overlay */}
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "rgba(0, 0, 0, 0.4)",
+              backdropFilter: "blur(4px)",
+              zIndex: 9998,
+            }}
+            onClick={() => setIsTimerModeDropdownOpen(false)}
+          />
+          {/* Popover content absolute positioned directly in center of device */}
+          <div
+            style={{
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              background: "var(--color-surface)",
+              border: "2px solid var(--accent)",
+              borderRadius: "var(--radius-md)",
+              padding: "24px",
+              boxShadow: "0 20px 50px rgba(0,0,0,0.7), 0 0 30px rgba(232, 163, 61, 0.15)",
+              width: "360px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+              zIndex: 9999,
+            }}
+            className="scale-up"
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "12px" }}>
+              <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "0.5px" }}>
+                {t("settings.timerMode", "Turn Timer Mode")}
+              </span>
+              <button
+                onClick={() => setIsTimerModeDropdownOpen(false)}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  color: "var(--text-secondary)",
+                  cursor: "pointer",
+                  fontSize: "1.2rem",
+                  padding: "0 4px",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {[
+                { value: "off", emoji: "🚫", label: t("settings.timerOff", "Off"), desc: "No turn timer limit." },
+                { value: "fast", emoji: "⏱️", label: t("settings.timerFast", "Fast (90s / 60s)"), desc: "Quick turns for high intensity." },
+                { value: "long", emoji: "⏳", label: t("settings.timerLong", "Long (180s / 120s)"), desc: "Relaxed pace for deeper planning." },
+                { value: "custom", emoji: "⚙️", label: t("settings.timerCustom", "Custom"), desc: "Fine-tune spymaster and operative limits." },
+              ].map((opt) => {
+                const isSelected = (room.settings.timerMode || "off") === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => {
+                      if (socket && isHost) {
+                        let extraSettings = {};
+                        if (opt.value === "fast") {
+                          extraSettings = { spymasterTimerSeconds: 90, firstClueExtraSeconds: 60, operativeTimerSeconds: 60 };
+                        } else if (opt.value === "long") {
+                          extraSettings = { spymasterTimerSeconds: 180, firstClueExtraSeconds: 120, operativeTimerSeconds: 120 };
+                        } else if (opt.value === "off") {
+                          extraSettings = { spymasterTimerSeconds: 0, firstClueExtraSeconds: 0, operativeTimerSeconds: 0 };
+                        }
+                        socket.emit("update_settings", {
+                          roomCode: room.roomCode,
+                          settings: { timerMode: opt.value, ...extraSettings },
+                        });
+                      }
+                      playSettingsToggle();
+                      setIsTimerModeDropdownOpen(false);
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "14px",
+                      padding: "12px 14px",
+                      background: isSelected ? "rgba(232, 163, 61, 0.08)" : "rgba(255,255,255,0.02)",
+                      border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                      borderRadius: "var(--radius-sm)",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      width: "100%",
+                      transition: "all 0.15s ease",
+                    }}
+                    onMouseOver={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.background = "var(--border-subtle)";
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                      }
+                    }}
+                  >
+                    <span style={{ fontSize: "1.8rem", width: "40px", display: "flex", justifyContent: "center" }}>
+                      {opt.emoji}
+                    </span>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                      <span style={{ fontSize: "0.95rem", fontWeight: 700, color: isSelected ? "var(--accent)" : "var(--text-primary)" }}>
+                        {opt.label}
+                      </span>
+                      <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                        {opt.desc}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

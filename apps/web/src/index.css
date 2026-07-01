@@ -275,3 +275,29 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); line-height: 1.2; }
     min-width: 0 !important;
   }
 }
+
+/* ─── Global Font Size Scaling (except Main/Lobby Home Page) ────────── */
+html.increased-fonts {
+  font-size: 19px !important;
+}
+
+@media (max-width: 1200px) {
+  html.increased-fonts {
+    font-size: 18px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  html.increased-fonts {
+    font-size: 16.5px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  html.increased-fonts {
+    font-size: 15px !important;
+  }
+  html.increased-fonts body {
+    font-size: 15px !important;
+  }
+}

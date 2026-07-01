@@ -1166,44 +1166,8 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
       } else {
         const isOpponent = player.team !== room.turnState.activeTeam;
         if (isOpponent) {
-          if (!isManualTimer) {
-            socket.emit("error_msg", "Only active Operatives on the playing team can end the turn.");
-            return;
-          }
-          const mode = room.settings.timerMode || "off";
-          if (mode === "off") {
-            socket.emit("error_msg", "Cannot end turn: timer is turned off.");
-            return;
-          }
-
-          let spyTime = 90;
-          let opTime = 60;
-          let extraTime = 60;
-
-          if (mode === "fast") {
-            spyTime = 90;
-            opTime = 60;
-            extraTime = 60;
-          } else if (mode === "long") {
-            spyTime = 180;
-            opTime = 120;
-            extraTime = 120;
-          } else if (mode === "custom") {
-            spyTime = room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90;
-            extraTime = room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60;
-            opTime = room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60;
-          }
-
-          let limit = room.turnState.phase === "giving_clue" ? spyTime : opTime;
-          if (room.turnState.phase === "giving_clue" && room.turnState.turnNumber === 1) {
-            limit += extraTime;
-          }
-
-          const elapsed = (Date.now() - (room.turnState.phaseStartedAt || Date.now())) / 1000;
-          if (elapsed < limit) {
-            socket.emit("error_msg", "Cannot end turn before opponent's time runs out.");
-            return;
-          }
+          socket.emit("error_msg", "Only active Operatives on the playing team can end the turn.");
+          return;
         } else {
           const isSpymasterAutoEnd = player.role === "spymaster" && room.turnState.phase === "giving_clue" && !isManualTimer;
           const isOperativeGuessEnd = player.role === "operative" && room.turnState.phase === "guessing";

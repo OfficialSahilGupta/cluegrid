@@ -62,10 +62,10 @@ export function GravityGrid({ lightMode }: GravityGridProps) {
         mouse.currentY += (-1000 - mouse.currentY) * 0.08;
       }
 
-      // Read current theme grid line color dynamically
-      const gridColor = lightMode ? "rgba(28, 25, 22, 0.15)" : "rgba(214, 207, 194, 0.15)";
+      // Read current theme grid line color dynamically (yellow accent to match theme)
+      const gridColor = lightMode ? "rgba(176, 122, 31, 0.15)" : "rgba(232, 163, 61, 0.12)";
       ctx.strokeStyle = gridColor;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = 2.0;
 
       const cols = Math.ceil(width / spacing) + 2;
       const rows = Math.ceil(height / spacing) + 2;
@@ -103,6 +103,30 @@ export function GravityGrid({ lightMode }: GravityGridProps) {
             y: origY + displaceY,
           };
         }
+      }
+
+      // Draw radial glow around the mouse cursor (pulses softly using a sine wave)
+      if (mouse.active && mouse.currentX !== -1000) {
+        const time = Date.now() * 0.003;
+        const glowRadius = 160 + Math.sin(time) * 15;
+        const glowGradient = ctx.createRadialGradient(
+          mouse.currentX,
+          mouse.currentY,
+          0,
+          mouse.currentX,
+          mouse.currentY,
+          glowRadius
+        );
+        const opacity = 0.12 + Math.sin(time) * 0.03;
+        const accentColorGlow = lightMode
+          ? `rgba(176, 122, 31, ${opacity * 0.8})`
+          : `rgba(232, 163, 61, ${opacity})`;
+        glowGradient.addColorStop(0, accentColorGlow);
+        glowGradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = glowGradient;
+        ctx.beginPath();
+        ctx.arc(mouse.currentX, mouse.currentY, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
       }
 
       // Draw horizontal lines
