@@ -114,7 +114,6 @@ export async function createRoom(
     turnState: null,
     settings: {
       eliminationRule: "continue",
-      afkTimeoutMinutes: 5,
       timerMode: "fast",
       timerSeconds: 120,
       spymasterTimerSeconds: 90,

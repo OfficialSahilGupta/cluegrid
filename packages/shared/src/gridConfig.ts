@@ -66,7 +66,6 @@ export interface CardState {
 
 export interface RoomSettings {
   eliminationRule: "game_end" | "continue";
-  afkTimeoutMinutes: number;
   timerMode?: "off" | "fast" | "long" | "custom";
   timerSeconds?: number;
   spymasterTimerSeconds?: number;

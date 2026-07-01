@@ -1263,9 +1263,6 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
         if (settings.eliminationRule) {
           room.settings.eliminationRule = settings.eliminationRule;
         }
-        if (settings.afkTimeoutMinutes !== undefined) {
-          room.settings.afkTimeoutMinutes = settings.afkTimeoutMinutes;
-        }
         if (settings.timerMode) {
           room.settings.timerMode = settings.timerMode;
         }

@@ -1515,396 +1515,359 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           textAlign: "left",
           display: "flex",
           flexDirection: "column",
-          gap: "32px",
+          gap: "24px",
         }}
       >
         <div
           style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "20px",
             filter: isHost ? "none" : "blur(1.5px)",
-            pointerEvents: isHost ? "auto" : "none",
             opacity: isHost ? 1 : 0.7,
             transition: "all 0.3s ease",
-            position: "relative",
           }}
         >
-          <div>
-            <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
-              {t("settings.hostSettings", "Host Settings")}
-            </h4>
-          </div>
+          <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
+            {t("settings.hostSettings", "Host Settings")}
+          </h4>
+        </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "32px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px", position: "relative" }}>
-                <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
-                  {t("settings.timerMode", "Turn Timer Mode")}
-                </label>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <button
-                    type="button"
-                    disabled={!isHost}
-                    onClick={() => { if (isHost) { playSettingsToggle(); setIsTimerModeDropdownOpen(!isTimerModeDropdownOpen); } }}
-                    style={{
-                      width: "fit-content",
-                      minWidth: "160px",
-                      padding: "7px 12px",
-                      borderRadius: "var(--radius-sm)",
-                      border: "1px solid var(--border-default)",
-                      background: "var(--bg-surface-raised)",
-                      color: "var(--text-primary)",
-                      fontFamily: "var(--font-display)",
-                      fontSize: "0.9rem",
-                      textAlign: "left",
-                      cursor: isHost ? "pointer" : "not-allowed",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      transition: "all 0.15s ease",
-                    }}
-                  >
-                    <span>
-                      {room.settings.timerMode === "off" || !room.settings.timerMode ? t("settings.timerOff", "Off") :
-                       room.settings.timerMode === "fast" ? t("settings.timerFast", "Fast (90s / 60s)") :
-                       room.settings.timerMode === "long" ? t("settings.timerLong", "Long (180s / 120s)") : t("settings.timerCustom", "Custom")}
-                    </span>
-                    <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>
-                      {isTimerModeDropdownOpen ? "▲" : "▼"}
-                    </span>
-                  </button>
-                  {(room.settings.timerMode && room.settings.timerMode !== "off") && (
-                    <div style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)",
-                      gap: "12px",
-                      width: "100%",
-                      maxWidth: "440px",
-                      marginTop: "12px",
-                    }}>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
-                          {t("settings.spymasterTimer", "Spymaster (s)")}
-                        </label>
-                        <input
-                          type="number"
-                          disabled={room.settings.timerMode !== "custom" || !isHost}
-                          value={
-                            room.settings.timerMode === "fast" ? 90 :
-                            room.settings.timerMode === "long" ? 180 :
-                            (room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90)
-                          }
-                          onChange={(e) => {
-                            if (socket && isHost && room.settings.timerMode === "custom") {
-                              socket.emit("update_settings", {
-                                roomCode: room.roomCode,
-                                settings: { spymasterTimerSeconds: Number(e.target.value) },
-                              });
-                            }
-                          }}
-                          style={{
-                            width: "100%",
-                            padding: "6px 8px",
-                            borderRadius: "var(--radius-sm)",
-                            border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-                            background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
-                            color: "var(--color-text)",
-                            fontSize: "0.82rem",
-                            outline: "none",
-                            textAlign: "center",
-                            opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
-                          }}
-                        />
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
-                          {t("settings.firstClueExtra", "1st Clue Extra (s)")}
-                        </label>
-                        <input
-                          type="number"
-                          disabled={room.settings.timerMode !== "custom" || !isHost}
-                          value={
-                            room.settings.timerMode === "fast" ? 60 :
-                            room.settings.timerMode === "long" ? 120 :
-                            (room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60)
-                          }
-                          onChange={(e) => {
-                            if (socket && isHost && room.settings.timerMode === "custom") {
-                              socket.emit("update_settings", {
-                                roomCode: room.roomCode,
-                                settings: { firstClueExtraSeconds: Number(e.target.value) },
-                              });
-                            }
-                          }}
-                          style={{
-                            width: "100%",
-                            padding: "6px 8px",
-                            borderRadius: "var(--radius-sm)",
-                            border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-                            background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
-                            color: "var(--color-text)",
-                            fontSize: "0.82rem",
-                            outline: "none",
-                            textAlign: "center",
-                            opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
-                          }}
-                        />
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
-                          {t("settings.operativeTimer", "Operative (s)")}
-                        </label>
-                        <input
-                          type="number"
-                          disabled={room.settings.timerMode !== "custom" || !isHost}
-                          value={
-                            room.settings.timerMode === "fast" ? 60 :
-                            room.settings.timerMode === "long" ? 120 :
-                            (room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60)
-                          }
-                          onChange={(e) => {
-                            if (socket && isHost && room.settings.timerMode === "custom") {
-                              socket.emit("update_settings", {
-                                roomCode: room.roomCode,
-                                settings: { operativeTimerSeconds: Number(e.target.value) },
-                              });
-                            }
-                          }}
-                          style={{
-                            width: "100%",
-                            padding: "6px 8px",
-                            borderRadius: "var(--radius-sm)",
-                            border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-                            background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
-                            color: "var(--color-text)",
-                            fontSize: "0.82rem",
-                            outline: "none",
-                            textAlign: "center",
-                            opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {isTimerModeDropdownOpen && isHost && (
-                  <>
-                    <div
-                      style={{
-                        position: "fixed",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        zIndex: 998,
-                      }}
-                      onClick={() => setIsTimerModeDropdownOpen(false)}
-                    />
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: "100%",
-                        left: 0,
-                        width: "240px",
-                        marginTop: "4px",
-                        background: "var(--bg-surface)",
-                        border: "1px solid var(--border-default)",
-                        borderRadius: "var(--radius-sm)",
-                        maxHeight: "220px",
-                        overflowY: "auto",
-                        zIndex: 999,
-                        boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
-                        padding: "4px 0",
-                      }}
-                      className="scale-up"
-                    >
-                      {[
-                        { value: "off", label: t("settings.timerOff", "Off") },
-                        { value: "fast", label: t("settings.timerFast", "Fast (90s / 60s)") },
-                        { value: "long", label: t("settings.timerLong", "Long (180s / 120s)") },
-                        { value: "custom", label: t("settings.timerCustom", "Custom") },
-                      ].map((opt) => (
-                        <div
-                          key={opt.value}
-                          onClick={() => {
-                            if (socket && isHost) {
-                              let extraSettings = {};
-                              if (opt.value === "fast") {
-                                extraSettings = { spymasterTimerSeconds: 90, firstClueExtraSeconds: 60, operativeTimerSeconds: 60 };
-                              } else if (opt.value === "long") {
-                                extraSettings = { spymasterTimerSeconds: 180, firstClueExtraSeconds: 120, operativeTimerSeconds: 120 };
-                              } else if (opt.value === "off") {
-                                extraSettings = { spymasterTimerSeconds: 0, firstClueExtraSeconds: 0, operativeTimerSeconds: 0 };
-                              }
-                              socket.emit("update_settings", {
-                                roomCode: room.roomCode,
-                                settings: { timerMode: opt.value, ...extraSettings },
-                              });
-                            }
-                            playSettingsToggle();
-                            setIsTimerModeDropdownOpen(false);
-                          }}
-                          style={{
-                            padding: "8px 14px",
-                            cursor: "pointer",
-                            color: (room.settings.timerMode || "off") === opt.value ? "var(--accent)" : "var(--text-primary)",
-                            background: (room.settings.timerMode || "off") === opt.value ? "rgba(232, 163, 61, 0.08)" : "transparent",
-                            fontWeight: (room.settings.timerMode || "off") === opt.value ? 700 : 500,
-                            fontSize: "0.9rem",
-                          }}
-                          onMouseOver={(e) => {
-                            if ((room.settings.timerMode || "off") !== opt.value) {
-                              e.currentTarget.style.background = "var(--border-subtle)";
-                            }
-                          }}
-                          onMouseOut={(e) => {
-                            if ((room.settings.timerMode || "off") !== opt.value) {
-                              e.currentTarget.style.background = "transparent";
-                            }
-                          }}
-                        >
-                          {opt.label}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "32px" }}>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "20px",
+              filter: isHost ? "none" : "blur(1.5px)",
+              pointerEvents: isHost ? "auto" : "none",
+              opacity: isHost ? 1 : 0.7,
+              transition: "all 0.3s ease",
+              position: "relative",
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", position: "relative" }}>
+              <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
+                {t("settings.timerMode", "Turn Timer Mode")}
+              </label>
               <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
-                  {t("settings.assassinRule", "Assassin Card Rule")}
-                </label>
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: isHost ? "pointer" : "not-allowed" }}>
-                    <input
-                      type="radio"
-                      disabled={!isHost}
-                      name="eliminationRule"
-                      checked={room.settings.eliminationRule === "continue"}
-                      onChange={() => isHost && handleUpdateEliminationRule("continue")}
-                      style={{ cursor: isHost ? "pointer" : "not-allowed", accentColor: "var(--accent)" }}
-                    />
-                    <span style={{ fontSize: "0.9rem" }}>{t("settings.teamEliminatedContinue", "Team Eliminated, Continue (Default)")}</span>
-                  </label>
-                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: isHost ? "pointer" : "not-allowed" }}>
-                    <input
-                      type="radio"
-                      disabled={!isHost}
-                      name="eliminationRule"
-                      checked={room.settings.eliminationRule === "game_end"}
-                      onChange={() => isHost && handleUpdateEliminationRule("game_end")}
-                      style={{ cursor: isHost ? "pointer" : "not-allowed", accentColor: "var(--accent)" }}
-                    />
-                    <span style={{ fontSize: "0.9rem" }}>{t("settings.gameEndsImmediately", "Game Ends Immediately")}</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "20px", maxWidth: "320px" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
-                  {t("settings.timerAction", "Timer Expiration Action")}
-                </label>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
-                  {[
-                    { value: "auto", label: t("settings.timerActionAuto", "Automatic Turn Shift") },
-                    { value: "manual", label: t("settings.timerActionManual", "Manual End Turn") },
-                  ].map((opt) => {
-                    const isSelected = (room.settings.timerAction || "manual") === opt.value;
-                    return (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        disabled={!isHost}
-                        onClick={() => {
-                          playSettingsToggle();
-                          if (socket && isHost) {
+                <button
+                  type="button"
+                  disabled={!isHost}
+                  onClick={() => { if (isHost) { playSettingsToggle(); setIsTimerModeDropdownOpen(!isTimerModeDropdownOpen); } }}
+                  style={{
+                    width: "fit-content",
+                    minWidth: "160px",
+                    padding: "7px 12px",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1px solid var(--border-default)",
+                    background: "var(--bg-surface-raised)",
+                    color: "var(--text-primary)",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.9rem",
+                    textAlign: "left",
+                    cursor: isHost ? "pointer" : "not-allowed",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    transition: "all 0.15s ease",
+                  }}
+                >
+                  <span>
+                    {room.settings.timerMode === "off" || !room.settings.timerMode ? t("settings.timerOff", "Off") :
+                     room.settings.timerMode === "fast" ? t("settings.timerFast", "Fast (90s / 60s)") :
+                     room.settings.timerMode === "long" ? t("settings.timerLong", "Long (180s / 120s)") : t("settings.timerCustom", "Custom")}
+                  </span>
+                  <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>
+                    {isTimerModeDropdownOpen ? "▲" : "▼"}
+                  </span>
+                </button>
+                {(room.settings.timerMode && room.settings.timerMode !== "off") && (
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gap: "12px",
+                    width: "100%",
+                    maxWidth: "440px",
+                    marginTop: "12px",
+                  }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
+                        {t("settings.spymasterTimer", "Spymaster (s)")}
+                      </label>
+                      <input
+                        type="number"
+                        disabled={room.settings.timerMode !== "custom" || !isHost}
+                        value={
+                          room.settings.timerMode === "fast" ? 90 :
+                          room.settings.timerMode === "long" ? 180 :
+                          (room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90)
+                        }
+                        onChange={(e) => {
+                          if (socket && isHost && room.settings.timerMode === "custom") {
                             socket.emit("update_settings", {
                               roomCode: room.roomCode,
-                              settings: { timerAction: opt.value },
+                              settings: { spymasterTimerSeconds: Number(e.target.value) },
                             });
                           }
                         }}
                         style={{
-                          padding: "10px 8px",
+                          width: "100%",
+                          padding: "6px 8px",
                           borderRadius: "var(--radius-sm)",
-                          border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
-                          background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
-                          color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
-                          fontFamily: "var(--font-display)",
-                          fontWeight: 700,
+                          border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                          background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
+                          color: "var(--color-text)",
                           fontSize: "0.82rem",
-                          cursor: isHost ? "pointer" : "not-allowed",
+                          outline: "none",
                           textAlign: "center",
-                          transition: "all 0.15s ease",
-                          boxShadow: isSelected ? "0 0 8px rgba(232,163,61,0.3)" : "none",
+                          opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
+                        {t("settings.firstClueExtra", "1st Clue Extra (s)")}
+                      </label>
+                      <input
+                        type="number"
+                        disabled={room.settings.timerMode !== "custom" || !isHost}
+                        value={
+                          room.settings.timerMode === "fast" ? 60 :
+                          room.settings.timerMode === "long" ? 120 :
+                          (room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60)
+                        }
+                        onChange={(e) => {
+                          if (socket && isHost && room.settings.timerMode === "custom") {
+                            socket.emit("update_settings", {
+                              roomCode: room.roomCode,
+                              settings: { firstClueExtraSeconds: Number(e.target.value) },
+                            });
+                          }
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          borderRadius: "var(--radius-sm)",
+                          border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                          background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
+                          color: "var(--color-text)",
+                          fontSize: "0.82rem",
+                          outline: "none",
+                          textAlign: "center",
+                          opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
+                        }}
+                      />
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <label style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontWeight: 600, display: "block" }}>
+                        {t("settings.operativeTimer", "Operative (s)")}
+                      </label>
+                      <input
+                        type="number"
+                        disabled={room.settings.timerMode !== "custom" || !isHost}
+                        value={
+                          room.settings.timerMode === "fast" ? 60 :
+                          room.settings.timerMode === "long" ? 120 :
+                          (room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60)
+                        }
+                        onChange={(e) => {
+                          if (socket && isHost && room.settings.timerMode === "custom") {
+                            socket.emit("update_settings", {
+                              roomCode: room.roomCode,
+                              settings: { operativeTimerSeconds: Number(e.target.value) },
+                            });
+                          }
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          borderRadius: "var(--radius-sm)",
+                          border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                          background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
+                          color: "var(--color-text)",
+                          fontSize: "0.82rem",
+                          outline: "none",
+                          textAlign: "center",
+                          opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {isTimerModeDropdownOpen && isHost && (
+                <>
+                  <div
+                    style={{
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      zIndex: 998,
+                    }}
+                    onClick={() => setIsTimerModeDropdownOpen(false)}
+                  />
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      width: "240px",
+                      marginTop: "4px",
+                      background: "var(--bg-surface)",
+                      border: "1px solid var(--border-default)",
+                      borderRadius: "var(--radius-sm)",
+                      maxHeight: "220px",
+                      overflowY: "auto",
+                      zIndex: 999,
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+                      padding: "4px 0",
+                    }}
+                    className="scale-up"
+                  >
+                    {[
+                      { value: "off", label: t("settings.timerOff", "Off") },
+                      { value: "fast", label: t("settings.timerFast", "Fast (90s / 60s)") },
+                      { value: "long", label: t("settings.timerLong", "Long (180s / 120s)") },
+                      { value: "custom", label: t("settings.timerCustom", "Custom") },
+                    ].map((opt) => (
+                      <div
+                        key={opt.value}
+                        onClick={() => {
+                          if (socket && isHost) {
+                            let extraSettings = {};
+                            if (opt.value === "fast") {
+                              extraSettings = { spymasterTimerSeconds: 90, firstClueExtraSeconds: 60, operativeTimerSeconds: 60 };
+                            } else if (opt.value === "long") {
+                              extraSettings = { spymasterTimerSeconds: 180, firstClueExtraSeconds: 120, operativeTimerSeconds: 120 };
+                            } else if (opt.value === "off") {
+                              extraSettings = { spymasterTimerSeconds: 0, firstClueExtraSeconds: 0, operativeTimerSeconds: 0 };
+                            }
+                            socket.emit("update_settings", {
+                              roomCode: room.roomCode,
+                              settings: { timerMode: opt.value, ...extraSettings },
+                            });
+                          }
+                          playSettingsToggle();
+                          setIsTimerModeDropdownOpen(false);
+                        }}
+                        style={{
+                          padding: "8px 14px",
+                          cursor: "pointer",
+                          color: (room.settings.timerMode || "off") === opt.value ? "var(--accent)" : "var(--text-primary)",
+                          background: (room.settings.timerMode || "off") === opt.value ? "rgba(232, 163, 61, 0.08)" : "transparent",
+                          fontWeight: (room.settings.timerMode || "off") === opt.value ? 700 : 500,
+                          fontSize: "0.9rem",
+                        }}
+                        onMouseOver={(e) => {
+                          if ((room.settings.timerMode || "off") !== opt.value) {
+                            e.currentTarget.style.background = "var(--border-subtle)";
+                          }
+                        }}
+                        onMouseOut={(e) => {
+                          if ((room.settings.timerMode || "off") !== opt.value) {
+                            e.currentTarget.style.background = "transparent";
+                          }
                         }}
                       >
                         {opt.label}
-                      </button>
-                    );
-                  })}
-                </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
+                {t("settings.assassinRule", "Assassin Card Rule")}
+              </label>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: isHost ? "pointer" : "not-allowed" }}>
+                  <input
+                    type="radio"
+                    disabled={!isHost}
+                    name="eliminationRule"
+                    checked={room.settings.eliminationRule === "continue"}
+                    onChange={() => isHost && handleUpdateEliminationRule("continue")}
+                    style={{ cursor: isHost ? "pointer" : "not-allowed", accentColor: "var(--accent)" }}
+                  />
+                  <span style={{ fontSize: "0.9rem" }}>{t("settings.teamEliminatedContinue", "Team Eliminated, Continue (Default)")}</span>
+                </label>
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: isHost ? "pointer" : "not-allowed" }}>
+                  <input
+                    type="radio"
+                    disabled={!isHost}
+                    name="eliminationRule"
+                    checked={room.settings.eliminationRule === "game_end"}
+                    onChange={() => isHost && handleUpdateEliminationRule("game_end")}
+                    style={{ cursor: isHost ? "pointer" : "not-allowed", accentColor: "var(--accent)" }}
+                  />
+                  <span style={{ fontSize: "0.9rem" }}>{t("settings.gameEndsImmediately", "Game Ends Immediately")}</span>
+                </label>
               </div>
             </div>
           </div>
-        </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "20px", borderTop: "1px solid var(--border-subtle)", paddingTop: "24px" }}>
-          <div>
-            <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", margin: 0, fontWeight: 700, color: "var(--text-primary)" }}>
-              {t("settings.gameSettings", "Game Settings")}
-            </h4>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "32px" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "24px", maxWidth: "320px" }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+                filter: isHost ? "none" : "blur(1.5px)",
+                pointerEvents: isHost ? "auto" : "none",
+                opacity: isHost ? 1 : 0.7,
+                transition: "all 0.3s ease",
+              }}
+            >
               <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
-                {t("settings.afkTimeout", "AFK Timeout")}
+                {t("settings.timerAction", "Timer Expiration Action")}
               </label>
-              <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                {[1, 3, 5, 10, 15].map((mins) => {
-                  const isSelected = (room.settings.afkTimeoutMinutes || 5) === mins;
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
+                {[
+                  { value: "auto", label: t("settings.timerActionAuto", "Automatic Turn Shift") },
+                  { value: "manual", label: t("settings.timerActionManual", "Manual End Turn") },
+                ].map((opt) => {
+                  const isSelected = (room.settings.timerAction || "manual") === opt.value;
                   return (
                     <button
-                      key={mins}
+                      key={opt.value}
                       type="button"
+                      disabled={!isHost}
                       onClick={() => {
                         playSettingsToggle();
-                        if (socket) {
+                        if (socket && isHost) {
                           socket.emit("update_settings", {
                             roomCode: room.roomCode,
-                            settings: { afkTimeoutMinutes: mins },
+                            settings: { timerAction: opt.value },
                           });
                         }
                       }}
                       style={{
-                        padding: "6px 12px",
+                        padding: "10px 8px",
                         borderRadius: "var(--radius-sm)",
                         border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
                         background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
                         color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
                         fontFamily: "var(--font-display)",
                         fontWeight: 700,
-                        fontSize: "0.85rem",
-                        cursor: "pointer",
+                        fontSize: "0.82rem",
+                        cursor: isHost ? "pointer" : "not-allowed",
+                        textAlign: "center",
                         transition: "all 0.15s ease",
                         boxShadow: isSelected ? "0 0 8px rgba(232,163,61,0.3)" : "none",
                       }}
                     >
-                      {mins}{t("settings.minutes", "m").charAt(0)}
+                      {opt.label}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px", borderTop: "1px solid var(--border-subtle)", paddingTop: "20px" }}>
               <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
                 {t("settings.preferences", "Preferences")}
               </label>
@@ -1914,103 +1877,103 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     <input
                       type="checkbox"
                       checked={soundEnabled}
-                    onChange={(e) => {
-                      const enabled = e.target.checked;
-                      setSoundEnabled(enabled);
-                      if (enabled) {
-                        const restoredVol = lastVolumeRef.current > 0 ? lastVolumeRef.current : 80;
-                        setSoundVolume(restoredVol);
-                        try {
-                          const AC = window.AudioContext || (window as any).webkitAudioContext;
-                          if (AC) {
-                            const ctx = new AC();
-                            const osc = ctx.createOscillator();
-                            const g = ctx.createGain();
-                            osc.type = 'sine';
-                            osc.frequency.setValueAtTime(659.25, ctx.currentTime);
-                            g.gain.setValueAtTime(0.55 * (restoredVol / 100), ctx.currentTime);
-                            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-                            osc.connect(g); g.connect(ctx.destination);
-                            osc.start(); osc.stop(ctx.currentTime + 0.09);
+                      onChange={(e) => {
+                        const enabled = e.target.checked;
+                        setSoundEnabled(enabled);
+                        if (enabled) {
+                          const restoredVol = lastVolumeRef.current > 0 ? lastVolumeRef.current : 80;
+                          setSoundVolume(restoredVol);
+                          try {
+                            const AC = window.AudioContext || (window as any).webkitAudioContext;
+                            if (AC) {
+                              const ctx = new AC();
+                              const osc = ctx.createOscillator();
+                              const g = ctx.createGain();
+                              osc.type = 'sine';
+                              osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+                              g.gain.setValueAtTime(0.55 * (restoredVol / 100), ctx.currentTime);
+                              g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+                              osc.connect(g); g.connect(ctx.destination);
+                              osc.start(); osc.stop(ctx.currentTime + 0.09);
+                            }
+                          } catch { /* ignore */ }
+                        } else {
+                          if (soundVolume > 0) {
+                            lastVolumeRef.current = soundVolume;
                           }
-                        } catch { /* ignore */ }
-                      } else {
-                        if (soundVolume > 0) {
-                          lastVolumeRef.current = soundVolume;
+                          setSoundVolume(0);
                         }
-                        setSoundVolume(0);
+                      }}
+                      style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: 0,
+                        backgroundColor: soundEnabled ? "var(--accent)" : "var(--border-default)",
+                        borderRadius: "22px",
+                        transition: "all 0.2s ease",
+                        boxShadow: soundEnabled ? "0 0 8px rgba(232,163,61,0.4)" : "none",
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "2px",
+                        left: soundEnabled ? "22px" : "2px",
+                        width: "18px",
+                        height: "18px",
+                        backgroundColor: "#fff",
+                        borderRadius: "50%",
+                        transition: "all 0.2s ease",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
+                      }}
+                    />
+                  </div>
+                  <span style={{ fontSize: "0.95rem", color: "var(--color-text)", fontWeight: 500 }}>
+                    {t("settings.sound", "Sound Effects")}
+                  </span>
+                </label>
+
+                <div style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  width: "100%",
+                  maxWidth: "260px",
+                  opacity: soundEnabled ? 1 : 0.45,
+                  transition: "opacity 0.2s ease",
+                  pointerEvents: "auto",
+                }}>
+                  <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)", minWidth: "36px", fontWeight: 600 }}>
+                    {soundVolume}%
+                  </span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={soundVolume}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setSoundVolume(val);
+                      if (val > 0) {
+                        setSoundEnabled(true);
+                        lastVolumeRef.current = val;
+                      } else {
+                        setSoundEnabled(false);
                       }
                     }}
-                    style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
-                  />
-                  <div
                     style={{
-                      position: "absolute",
-                      inset: 0,
-                      backgroundColor: soundEnabled ? "var(--accent)" : "var(--border-default)",
-                      borderRadius: "22px",
-                      transition: "all 0.2s ease",
-                      boxShadow: soundEnabled ? "0 0 8px rgba(232,163,61,0.4)" : "none",
-                    }}
-                  />
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "2px",
-                      left: soundEnabled ? "22px" : "2px",
-                      width: "18px",
-                      height: "18px",
-                      backgroundColor: "#fff",
-                      borderRadius: "50%",
-                      transition: "all 0.2s ease",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
+                      flex: 1,
+                      height: "6px",
+                      borderRadius: "3px",
+                      background: "var(--border-default)",
+                      outline: "none",
+                      cursor: "pointer",
+                      accentColor: "var(--accent)",
                     }}
                   />
                 </div>
-                <span style={{ fontSize: "0.95rem", color: "var(--color-text)", fontWeight: 500 }}>
-                  {t("settings.sound", "Sound Effects")}
-                </span>
-              </label>
-
-              <div style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                width: "100%",
-                maxWidth: "260px",
-                opacity: soundEnabled ? 1 : 0.45,
-                transition: "opacity 0.2s ease",
-                pointerEvents: "auto", // Allow dragging even when greyed out to auto-enable sound
-              }}>
-                <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)", minWidth: "36px", fontWeight: 600 }}>
-                  {soundVolume}%
-                </span>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={soundVolume}
-                  onChange={(e) => {
-                    const val = Number(e.target.value);
-                    setSoundVolume(val);
-                    if (val > 0) {
-                      setSoundEnabled(true);
-                      lastVolumeRef.current = val;
-                    } else {
-                      setSoundEnabled(false);
-                    }
-                  }}
-                  style={{
-                    flex: 1,
-                    height: "6px",
-                    borderRadius: "3px",
-                    background: "var(--border-default)",
-                    outline: "none",
-                    cursor: "pointer",
-                    accentColor: "var(--accent)",
-                  }}
-                />
-              </div>
               </div>
             </div>
           </div>
@@ -2814,51 +2777,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     return () => clearTimeout(t);
   }, [cooldownRemaining]);
 
-  // Inactivity tracking (Auto AFK)
-  useEffect(() => {
-    if (!socket || !localPlayer) return;
 
-    let inactivityTimeout: NodeJS.Timeout;
-    const timeoutMins = room.settings.afkTimeoutMinutes || 5;
-    const INACTIVITY_LIMIT_MS = timeoutMins * 60 * 1000;
-
-    const resetInactivityTimer = () => {
-      clearTimeout(inactivityTimeout);
-
-      // Auto-restore status to ACTIVE if current status is AFK and user interacts
-      if (localPlayer?.status === "AFK") {
-        socket.emit("update_status", {
-          roomCode: room.roomCode,
-          playerId,
-          status: "ACTIVE",
-        });
-      }
-
-      inactivityTimeout = setTimeout(() => {
-        if (localPlayer?.status !== "AFK") {
-          socket.emit("update_status", {
-            roomCode: room.roomCode,
-            playerId,
-            status: "AFK",
-          });
-        }
-      }, INACTIVITY_LIMIT_MS);
-    };
-
-    const events = ["mousedown", "mousemove", "keypress", "scroll", "touchstart"];
-    events.forEach((evt) => {
-      document.addEventListener(evt, resetInactivityTimer);
-    });
-
-    resetInactivityTimer();
-
-    return () => {
-      clearTimeout(inactivityTimeout);
-      events.forEach((evt) => {
-        document.removeEventListener(evt, resetInactivityTimer);
-      });
-    };
-  }, [socket, localPlayer, room.roomCode, playerId, room.settings.afkTimeoutMinutes]);
 
   // Auto-scroll chat to bottom on new messages (disabled in lobby)
   useEffect(() => {

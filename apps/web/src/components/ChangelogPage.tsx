@@ -50,7 +50,7 @@ export function ChangelogPage() {
         "Real-time turn engine, card reveals, and clue forms over Socket.IO.",
         "Isolated Chat Channels: Physical isolation of operative and spymaster channels.",
         "Real-time game logging sidebar with unread notification badges.",
-        "Player presence badges (ACTIVE, BRB, AFK, .zZ) with auto-AFK timers.",
+        "Player presence badges (ACTIVE, BRB, AFK, .zZ).",
       ],
     },
   ];
