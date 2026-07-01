@@ -615,11 +615,14 @@ export default function App() {
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
           {/* Hide language switcher on mobile — surfaced in mobile menu */}
           <div className="nav-lang-wrapper"><LanguageSwitcher /></div>
-          {/* Hide 'Become a Member' on mobile — surfaced in mobile menu */}
-          <div className="nav-member-wrapper">
+          {/* Hide 'Buy me a coffee' on mobile — surfaced in mobile menu */}
+          <div className="nav-support-wrapper">
             <button
               onClick={() => setCurrentView("support")}
               style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
                 background: currentView === "support" ? "var(--accent)" : "rgba(232, 163, 61, 0.12)",
                 border: "1px solid var(--accent)",
                 color: currentView === "support" ? "var(--accent-text-on)" : "var(--accent)",
@@ -644,7 +647,23 @@ export default function App() {
                 }
               }}
             >
-              Become a Member
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+                <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+                <line x1="6" x2="6" y1="2" y2="4" />
+                <line x1="10" x2="10" y1="2" y2="4" />
+                <line x1="14" x2="14" y1="2" y2="4" />
+              </svg>
+              Buy me a coffee
             </button>
           </div>
           <button
@@ -863,7 +882,7 @@ export default function App() {
             <LanguageSwitcher />
           </div>
 
-          {/* Become a Member */}
+          {/* Buy me a coffee */}
           <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border-subtle)" }}>
             <button
               onClick={() => { setCurrentView("support"); setMobileNavOpen(false); }}
@@ -878,9 +897,29 @@ export default function App() {
                 fontWeight: 700,
                 fontSize: "1rem",
                 cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "8px",
               }}
             >
-              Become a Member
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+                <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+                <line x1="6" x2="6" y1="2" y2="4" />
+                <line x1="10" x2="10" y1="2" y2="4" />
+                <line x1="14" x2="14" y1="2" y2="4" />
+              </svg>
+              Buy me a coffee
             </button>
           </div>
 

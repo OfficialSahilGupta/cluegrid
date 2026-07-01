@@ -187,7 +187,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); line-height: 1.2; }
 /* Desktop-default states for nav classes */
 .nav-center-links   { display: flex; }
 .nav-lang-wrapper   { display: flex; align-items: center; }
-.nav-member-wrapper { display: flex; align-items: center; }
+.nav-support-wrapper { display: flex; align-items: center; }
 .nav-login-btn      { display: inline-flex; }
 .nav-user-btn       { display: inline-flex; }
 
@@ -218,7 +218,7 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); line-height: 1.2; }
 @media (max-width: 768px) {
   .nav-center-links   { display: none !important; }
   .nav-lang-wrapper   { display: none !important; }
-  .nav-member-wrapper { display: none !important; }
+  .nav-support-wrapper { display: none !important; }
   /* Hide the full login button text — moved to mobile menu */
   .nav-login-btn      { display: none !important; }
   .nav-hamburger      { display: flex !important; }

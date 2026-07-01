@@ -9,6 +9,8 @@ import {
   GoogleAuthProvider,
   OAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
 } from "firebase/auth";
 
 export interface UserProfile {
@@ -97,6 +99,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [getHeaders]);
 
+  // Handle redirect result if user was redirected back from sign-in
+  useEffect(() => {
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          console.log("Successfully signed in via redirect:", result.user);
+        }
+      })
+      .catch((err) => {
+        console.error("Redirect sign-in failed:", err);
+      });
+  }, []);
+
   // Subscribe to Firebase Auth state transitions
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -163,7 +178,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Discord is configured as an OIDC / Custom OAuth provider in Firebase console
         authProvider = new OAuthProvider("oidc.discord");
       }
-      await signInWithPopup(auth, authProvider);
+      try {
+        await signInWithPopup(auth, authProvider);
+      } catch (popupErr: any) {
+        if (
+          popupErr.code === "auth/popup-closed-by-user" ||
+          popupErr.code === "auth/popup-blocked" ||
+          popupErr.code === "auth/cancelled-popup-request"
+        ) {
+          console.warn("Popup blocked or closed by user, attempting redirect login fallback...");
+          await signInWithRedirect(auth, authProvider);
+        } else {
+          throw popupErr;
+        }
+      }
     } catch (err: any) {
       setLoading(false);
       throw new Error(err.message || `Simulated ${provider} authentication failed.`);

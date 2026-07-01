@@ -24,8 +24,24 @@ export function SupportPage() {
       }}
       className="fade-in"
     >
-      <h2 style={{ fontFamily: "var(--font-display)", fontSize: "2.2rem", fontWeight: 800, margin: "0 0 12px 0", color: "var(--text-primary)" }}>
-        Become a Member
+      <h2 style={{ fontFamily: "var(--font-display)", fontSize: "2.2rem", fontWeight: 800, margin: "0 0 12px 0", color: "var(--text-primary)", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="var(--accent)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+          <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+          <line x1="6" x2="6" y1="2" y2="4" />
+          <line x1="10" x2="10" y1="2" y2="4" />
+          <line x1="14" x2="14" y1="2" y2="4" />
+        </svg>
+        Buy Me a Coffee
       </h2>
       <p style={{ color: "var(--text-secondary)", fontSize: "1.05rem", margin: "0 0 32px 0", lineHeight: 1.6 }}>
         Help keep ClueGrid free, open-source, and running ad-free. Supporting us covers our hosting, websocket operations, and database infrastructure. Think of it like buying us a coffee!
@@ -69,7 +85,7 @@ export function SupportPage() {
             Share in-game background music with everyone in the room (all players hear your stream).
           </li>
           <li style={{ marginBottom: "6px" }}>
-            A dedicated Member badge displayed next to your avatar in lobbies, game rooms, and chat.
+            A dedicated Supporter badge displayed next to your avatar in lobbies, game rooms, and chat.
           </li>
           <li style={{ marginBottom: "6px" }}>
             Special name mention inside the website&apos;s credits index.
@@ -119,7 +135,11 @@ export function SupportPage() {
               strokeLinecap="round"
               strokeLinejoin="round"
             >
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+              <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+              <line x1="6" x2="6" y1="2" y2="4" />
+              <line x1="10" x2="10" y1="2" y2="4" />
+              <line x1="14" x2="14" y1="2" y2="4" />
             </svg>
           </div>
         </div>
@@ -142,7 +162,7 @@ export function SupportPage() {
             margin: 0,
           }}
         >
-          We are currently working on integrating secure payment options (like Stripe Checkout) to enable Supporter subscriptions. Once ready, you&apos;ll be able to support ClueGrid and instantly unlock exclusive member perks.
+          We are currently working on integrating secure payment options (like Stripe Checkout) to enable Supporter subscriptions. Once ready, you&apos;ll be able to support ClueGrid and instantly unlock exclusive supporter perks.
         </p>
       </div>
 

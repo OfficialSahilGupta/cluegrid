@@ -3,52 +3,84 @@ import { getSession } from "@auth/express";
 import { authConfig } from "../auth.js";
 import { db } from "../db.js";
 import { verifyFirebaseToken } from "../firebaseAdmin.js";
+import fs from "fs";
+import path from "path";
 
 const router = express.Router();
 
+function debugLog(msg: string) {
+  try {
+    const logMsg = `[${new Date().toISOString()}] ${msg}\n`;
+    fs.appendFileSync(path.join(process.cwd(), "auth_debug.log"), logMsg);
+    console.log(`[auth-debug] ${msg}`);
+  } catch (err) {
+    // ignore
+  }
+}
+
 async function resolveAuthenticatedUser(req: express.Request): Promise<string | null> {
-  // 1. Check for Bearer token in Authorization header
   const authHeader = req.headers["authorization"];
+  debugLog(`Incoming request path: ${req.path}, authHeader: ${authHeader ? authHeader.substring(0, 25) + "..." : "none"}`);
+  
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
     try {
       const firebaseUser = await verifyFirebaseToken(token);
+      debugLog(`verifyFirebaseToken result: ${JSON.stringify(firebaseUser)}`);
+      
       if (firebaseUser && firebaseUser.uid) {
         // Query user by firebase_uid
         const uidRes = await db.query("SELECT id FROM users WHERE firebase_uid = $1", [firebaseUser.uid]);
+        debugLog(`Query by firebase_uid (${firebaseUser.uid}) rows found: ${uidRes.rows.length}`);
+        
         if (uidRes.rows.length > 0) {
-          return String(uidRes.rows[0].id);
+          const resolvedId = String(uidRes.rows[0].id);
+          debugLog(`Resolved user ID by firebase_uid: ${resolvedId}`);
+          return resolvedId;
         }
 
         // If not found by firebase_uid, try finding by email to link accounts
         const email = firebaseUser.email?.trim().toLowerCase();
+        debugLog(`Email associated: ${email}`);
+        
         if (email) {
           const emailRes = await db.query("SELECT id FROM users WHERE email = $1", [email]);
+          debugLog(`Query by email (${email}) rows found: ${emailRes.rows.length}`);
+          
           if (emailRes.rows.length > 0) {
             const existingId = emailRes.rows[0].id;
             // Link the account
             await db.query("UPDATE users SET firebase_uid = $1 WHERE id = $2", [firebaseUser.uid, existingId]);
+            debugLog(`Linked firebase_uid ${firebaseUser.uid} to existing user ID: ${existingId}`);
             return String(existingId);
           }
         }
 
         // If still not found, create a new user profile
         const username = firebaseUser.name || (email ? email.split("@")[0] : "Agent");
+        const defaultAvatar = "🕵️‍♂️";
+        debugLog(`Creating new user with email: ${email || 'none'}, username: ${username}`);
+        
         const insertRes = await db.query(
-          "INSERT INTO users (email, username, avatar, firebase_uid) VALUES ($1, $2, $3, $4) RETURNING id",
-          [email || `${firebaseUser.uid}@firebase.local`, username, "🕵️‍♂️", firebaseUser.uid]
+          "INSERT INTO users (email, username, avatar, firebase_uid, password_hash) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+          [email || `${firebaseUser.uid}@firebase.local`, username, defaultAvatar, firebaseUser.uid, "firebase_auth"]
         );
         const newId = insertRes.rows[0].id;
+        debugLog(`Created new user record ID: ${newId}`);
 
         // Initialize user stats
         await db.query(
           "INSERT INTO user_stats (user_id, games_played, games_won, total_guesses, correct_guesses) VALUES ($1, 0, 0, 0, 0)",
           [newId]
         );
+        debugLog(`Initialized user_stats for user ID: ${newId}`);
 
         return String(newId);
+      } else {
+        debugLog("firebaseUser or firebaseUser.uid is falsy");
       }
-    } catch (err) {
+    } catch (err: any) {
+      debugLog(`Firebase token verification threw error: ${err?.message || err}`);
       console.error("[auth] Firebase token verification failed:", err);
       return null;
     }
@@ -60,6 +92,7 @@ async function resolveAuthenticatedUser(req: express.Request): Promise<string | 
     const session = await getSession(req, authConfig);
     if (session?.user) {
       userId = (session.user as any).id;
+      debugLog(`Resolved user ID from session: ${userId}`);
     }
   } catch (e) {
     // ignore auth.js parsing error in mock environments
@@ -72,8 +105,14 @@ async function resolveAuthenticatedUser(req: express.Request): Promise<string | 
       .find((c) => c.trim().startsWith("mock_user_id="))
       ?.split("=")[1];
     userId = (headerVal || cookieVal || null) as string | null;
+    if (userId) {
+      debugLog(`Resolved user ID from mock headers/cookies: ${userId}`);
+    }
   }
 
+  if (!userId) {
+    debugLog("No authenticated user resolved");
+  }
   return userId;
 }
 

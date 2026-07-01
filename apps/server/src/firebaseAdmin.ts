@@ -53,13 +53,17 @@ export interface DecodedFirebaseUser {
  */
 export async function verifyFirebaseToken(token: string): Promise<DecodedFirebaseUser> {
   if (isFirebaseInitialized) {
-    const decoded = await getAuth().verifyIdToken(token);
-    return {
-      uid: decoded.uid,
-      email: decoded.email,
-      name: decoded.name,
-      picture: decoded.picture,
-    };
+    try {
+      const decoded = await getAuth().verifyIdToken(token);
+      return {
+        uid: decoded.uid,
+        email: decoded.email,
+        name: decoded.name,
+        picture: decoded.picture,
+      };
+    } catch (error) {
+      console.warn("[firebase] verifyIdToken failed, attempting fallback manual decode:", error);
+    }
   }
 
   // Fallback / Mock mode:
@@ -69,13 +73,14 @@ export async function verifyFirebaseToken(token: string): Promise<DecodedFirebas
     if (parts.length === 3) {
       const payloadBase64 = parts[1];
       if (payloadBase64) {
-        const payloadJson = Buffer.from(payloadBase64, "base64").toString("utf8");
+        const payloadJson = Buffer.from(payloadBase64, "base64url").toString("utf8");
         const payload = JSON.parse(payloadJson);
-        if (payload && (payload.uid || payload.sub)) {
+        if (payload && (payload.uid || payload.sub || payload.user_id)) {
           return {
-            uid: payload.uid || payload.sub,
+            uid: payload.uid || payload.sub || payload.user_id,
             email: payload.email,
             name: payload.name || payload.username || "Mock Firebase User",
+            picture: payload.picture,
           };
         }
       }

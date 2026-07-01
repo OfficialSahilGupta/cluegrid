@@ -231,7 +231,7 @@ export function ProfileSettingsModal({ onClose }: ProfileSettingsModalProps) {
               </label>
               {!user?.isSupporter && (
                 <span style={{ fontSize: "0.75rem", color: "var(--accent)", fontWeight: 700 }}>
-                  Only members can use
+                  Only supporters can use
                 </span>
               )}
             </div>
