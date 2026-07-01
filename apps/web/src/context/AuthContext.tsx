@@ -11,8 +11,8 @@ import {
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
+  signInWithCredential,
 } from "firebase/auth";
-
 export interface UserProfile {
   id: string;
   email: string;
@@ -42,7 +42,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (username: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  mockSocialLogin: (provider: "google" | "discord") => Promise<void>;
+  mockSocialLogin: (provider: "discord") => Promise<void>;
+  loginWithGoogleCredential: (idToken: string) => Promise<void>;
   updateSettings: (username: string, avatar: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -168,16 +169,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const mockSocialLogin = async (provider: "google" | "discord") => {
+  const mockSocialLogin = async (provider: "discord") => {
     setLoading(true);
     try {
-      let authProvider;
-      if (provider === "google") {
-        authProvider = new GoogleAuthProvider();
-      } else {
-        // Discord is configured as an OIDC / Custom OAuth provider in Firebase console
-        authProvider = new OAuthProvider("oidc.discord");
-      }
+      // Discord is configured as an OIDC / Custom OAuth provider in Firebase console
+      const authProvider = new OAuthProvider("oidc.discord");
       try {
         await signInWithPopup(auth, authProvider);
       } catch (popupErr: any) {
@@ -195,6 +191,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err: any) {
       setLoading(false);
       throw new Error(err.message || `Simulated ${provider} authentication failed.`);
+    }
+  };
+
+  const loginWithGoogleCredential = async (idToken: string) => {
+    setLoading(true);
+    try {
+      const credential = GoogleAuthProvider.credential(idToken);
+      await signInWithCredential(auth, credential);
+    } catch (err: any) {
+      setLoading(false);
+      throw new Error(err.message || "Failed to sign in via Google Identity Services.");
     }
   };
 
@@ -224,6 +231,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signup,
         logout,
         mockSocialLogin,
+        loginWithGoogleCredential,
         updateSettings,
         refreshProfile,
       }}
