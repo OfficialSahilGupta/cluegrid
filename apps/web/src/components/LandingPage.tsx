@@ -1252,7 +1252,7 @@ export function LandingPage({
         const targetSpeak = isSpeaking ? 1 : 0;
         d.speaking += (targetSpeak - d.speaking) * 0.08;
 
-        op.position.y = Math.sin(t * 1.6 + op.position.x) * 0.05 + d.speaking * Math.sin(t * 8) * 0.065;
+        op.position.y = Math.sin(t * 0.6 + op.position.x) * 0.04 + d.speaking * Math.sin(t * 3.5) * 0.045;
         d.mat.rotation = 0;
         d.eyeGlow.material.opacity = 0.4 + d.speaking * 0.5 + Math.abs(Math.sin(t * 6)) * d.speaking * 0.15;
         op.scale.setScalar(1 + d.speaking * 0.025);
