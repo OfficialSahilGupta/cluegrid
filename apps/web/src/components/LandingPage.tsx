@@ -535,7 +535,7 @@ export function LandingPage({
     };
 
     const skylineMat = new THREE.MeshBasicMaterial({ map: makeSkylineTexture(), fog: true });
-    const skyline = new THREE.Mesh(new THREE.PlaneGeometry(64, 13), skylineMat);
+    const skyline = new THREE.Mesh(new THREE.PlaneGeometry(16, 13), skylineMat);
     skyline.position.set(0, 4.2, -9);
     scene.add(skyline);
 
@@ -545,8 +545,7 @@ export function LandingPage({
       c.width = 512;
       c.height = 512;
       const ctx = c.getContext("2d")!;
-      ctx.fillStyle = "#0c2126";
-      ctx.fillRect(0, 0, 512, 512);
+      // Canvas is transparent, draw lines only
       const step = 64;
       let gi = 0;
       for (let i = 0; i <= 512; i += step) {
@@ -570,7 +569,7 @@ export function LandingPage({
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(60, 60),
-      new THREE.MeshStandardMaterial({ map: makeGridTexture(), roughness: 0.9, metalness: 0.1 })
+      new THREE.MeshStandardMaterial({ map: makeGridTexture(), roughness: 0.9, metalness: 0.1, transparent: true })
     );
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
@@ -1211,11 +1210,11 @@ export function LandingPage({
     scene.add(opB);
 
     const opC = createOperative(0x1b9aaa, { hairStyle: "short", handedness: "right", scale: 0.94, ambient: true });
-    opC.position.set(-4.1, 0, -1.3);
+    opC.position.set(-3.2, 0, -1.3);
     scene.add(opC);
 
     const opD = createOperative(0x9aa29b, { hairStyle: "swept", handedness: "left", scale: 0.94, ambient: true });
-    opD.position.set(4.1, 0, -1.3);
+    opD.position.set(3.2, 0, -1.3);
     scene.add(opD);
 
     const agents = [opA, opB];
@@ -1245,7 +1244,7 @@ export function LandingPage({
       const state = threeStateRef.current;
       if (!state) return;
 
-      // Animate active briefing agents
+      // Animate active briefing agents (strictly vertical bobbing, zero rotation/swaying)
       state.agents.forEach((op, idx) => {
         const d = op.userData;
         const activeSide = idx === 0 ? "A" : "B";
@@ -1253,17 +1252,17 @@ export function LandingPage({
         const targetSpeak = isSpeaking ? 1 : 0;
         d.speaking += (targetSpeak - d.speaking) * 0.08;
 
-        op.position.y = Math.sin(t * 1.4 + op.position.x) * 0.035;
-        d.mat.rotation = Math.sin(t * 7) * 0.05 * d.speaking + Math.sin(t * 0.5 + op.position.x) * 0.015;
+        op.position.y = Math.sin(t * 1.6 + op.position.x) * 0.05 + d.speaking * Math.sin(t * 8) * 0.065;
+        d.mat.rotation = 0;
         d.eyeGlow.material.opacity = 0.4 + d.speaking * 0.5 + Math.abs(Math.sin(t * 6)) * d.speaking * 0.15;
         op.scale.setScalar(1 + d.speaking * 0.025);
       });
 
-      // Animate ambient supporting agents
+      // Animate ambient supporting agents (strictly vertical breathing, zero rotation)
       ambientAgents.forEach((op) => {
         const d = op.userData;
-        op.position.y = Math.sin(t * 0.9 + op.position.x) * 0.02;
-        d.mat.rotation = Math.sin(t * 0.3 + op.position.x * 0.5) * 0.02;
+        op.position.y = Math.sin(t * 1.0 + op.position.x) * 0.038;
+        d.mat.rotation = 0;
         d.eyeGlow.material.opacity = 0.32 + Math.abs(Math.sin(t * 0.8 + op.position.x)) * 0.16;
       });
 
@@ -1416,8 +1415,8 @@ export function LandingPage({
         backgroundImage: `repeating-linear-gradient(to bottom, rgba(178,239,155,0.035) 0px, rgba(178,239,155,0.035) 1px, transparent 1px, transparent 3px)`
       }} />
 
-      {/* Left Column Advanced Decryption Center Panel (zIndex 4 - placed in front of canvas) */}
-      <div style={{ position: "fixed", top: "110px", left: "24px", zIndex: 4, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
+      {/* Left Column Advanced Decryption Center Panel (zIndex 2 - placed behind the spies) */}
+      <div style={{ position: "fixed", top: "110px", left: "24px", zIndex: 2, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#1b9aaa", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", justifyContent: "space-between" }}>
           <span>🔒 SIGNAL INTEL</span>
           <span style={{ color: "#ef959c" }}>ONLINE</span>
@@ -1449,8 +1448,8 @@ export function LandingPage({
         </div>
       </div>
 
-      {/* Right Column Advanced Surveillance Feed Panel (zIndex 4 - placed in front of canvas) */}
-      <div style={{ position: "fixed", top: "110px", right: "24px", zIndex: 4, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #ef959c", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
+      {/* Right Column Advanced Surveillance Feed Panel (zIndex 2 - placed behind the spies) */}
+      <div style={{ position: "fixed", top: "110px", right: "24px", zIndex: 2, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #ef959c", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#ef959c", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span>🌐 ACTIVE SURVEILLANCE</span>
           <span style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "9.5px", color: "#ef959c" }}>

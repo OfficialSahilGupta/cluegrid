@@ -2,6 +2,7 @@
 agy-images/
 node_modules/
 /node_modules
+html-files/
 
 # Build outputs
 dist/
