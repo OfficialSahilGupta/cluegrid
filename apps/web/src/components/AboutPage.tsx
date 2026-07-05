@@ -5,106 +5,60 @@ export function AboutPage() {
   const { t } = useTranslation();
 
   return (
-    <div
-      style={{
-        maxWidth: "850px",
-        width: "100%",
-        background: "var(--bg-surface)",
-        border: "1px solid var(--border-default)",
-        borderRadius: "var(--radius-lg)",
-        padding: "36px",
-        textAlign: "left",
-        margin: "0 auto",
-        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.25)",
-      }}
-      className="fade-in"
-    >
-      {/* Title */}
-      <h2 style={{ fontFamily: "var(--font-display)", fontSize: "2.2rem", fontWeight: 800, margin: "0 0 8px 0", color: "var(--text-primary)" }}>
+    <div className="fade-in" style={{ color: "#eef3ee", fontFamily: "'JetBrains Mono', monospace" }}>
+      <h2 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "2.5rem", fontWeight: 900, margin: "0 0 8px 0", color: "#00f0ff", textTransform: "uppercase", letterSpacing: "0.05em" }}>
         {t("about.title", "About ClueGrid")}
       </h2>
-      <p style={{ color: "var(--text-secondary)", fontSize: "1.1rem", margin: "0 0 28px 0", lineHeight: 1.5 }}>
+      <p style={{ color: "#9AA29B", fontSize: "1.1rem", margin: "0 0 28px 0", lineHeight: 1.5 }}>
         {t("about.subtitle", "Welcome to ClueGrid — the ultimate word game to play with your friends!")}
       </p>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
-        
         {/* Intro Section */}
-        <section style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "24px" }}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 10px 0", color: "var(--accent)" }}>
+        <section style={{ borderBottom: "1px solid rgba(0,240,255,0.15)", paddingBottom: "24px" }}>
+          <h3 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.4rem", fontWeight: 900, margin: "0 0 10px 0", color: "#ff0055", letterSpacing: "0.06em" }}>
             {t("about.introTitle", "Why Play ClueGrid?")}
           </h3>
-          <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: 1.6, color: "var(--text-primary)" }}>
-            {t("about.introText", "ClueGrid brings the fun of classic word games straight to your screen. Whether you want to challenge your brain, hang out with friends online, or play with a large group at a party, ClueGrid is built to give you the smoothest, most exciting game night possible. It's fast to set up, easy to learn, and infinitely fun to play.")}
+          <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: 1.6, color: "#9AA29B" }}>
+            {t("about.introText", "ClueGrid brings the fun of classic word games straight to your screen. Challenge your brain, coordinate with teammates, or host a large group party session. ClueGrid is fast to set up, easy to learn, and infinitely fun to play.")}
           </p>
         </section>
 
         {/* Highlighted features section */}
-        <section style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "28px" }}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: "0 0 20px 0", color: "var(--accent)" }}>
-            {t("about.featuresTitle", "Why You'll Love ClueGrid")}
+        <section style={{ borderBottom: "1px solid rgba(0,240,255,0.15)", paddingBottom: "28px" }}>
+          <h3 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.4rem", fontWeight: 900, margin: "0 0 20px 0", color: "#00f0ff", letterSpacing: "0.06em" }}>
+            {t("about.featuresTitle", "Protocol Highlights")}
           </h3>
-          
+
           <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-            
-            <div style={{ padding: "16px", background: "var(--bg-surface-raised)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)" }}>
-              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.05rem", fontWeight: 700, margin: "0 0 6px 0", color: "var(--text-primary)" }}>
-                {t("about.feature1Title", "Start playing in seconds")}
+            <div style={{ padding: "16px", background: "rgba(6,24,28,0.4)", border: "1px solid rgba(0,240,255,0.2)", borderRadius: "8px" }}>
+              <h4 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.2rem", fontWeight: 900, margin: "0 0 6px 0", color: "#eef3ee", letterSpacing: "0.04em" }}>
+                {t("about.feature1Title", "Instant Deployment")}
               </h4>
-              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.5 }}>
-                {t("about.feature1Text", "No downloads or signups required. Just create a room, share a quick link with your friends, and start playing instantly.")}
+              <p style={{ fontSize: "0.85rem", color: "#9AA29B", margin: 0, lineHeight: 1.5 }}>
+                {t("about.feature1Text", "No downloads or signups required. Just spin up a secure room link, transmit it to your squad, and initiate operations instantly.")}
               </p>
             </div>
 
-            <div style={{ padding: "16px", background: "var(--bg-surface-raised)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)" }}>
-              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.05rem", fontWeight: 700, margin: "0 0 6px 0", color: "var(--text-primary)" }}>
-                {t("about.feature2Title", "Play your way")}
+            <div style={{ padding: "16px", background: "rgba(6,24,28,0.4)", border: "1px solid rgba(255,0,85,0.2)", borderRadius: "8px" }}>
+              <h4 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.2rem", fontWeight: 900, margin: "0 0 6px 0", color: "#eef3ee", letterSpacing: "0.04em" }}>
+                {t("about.feature2Title", "Multiple Operation Modes")}
               </h4>
-              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.5 }}>
-                {t("about.feature2Text", "Go head-to-head in competitive team modes (up to 4 teams!) or team up and work together to beat the game in cooperative Duet mode.")}
+              <p style={{ fontSize: "0.85rem", color: "#9AA29B", margin: 0, lineHeight: 1.5 }}>
+                {t("about.feature2Text", "Go head-to-head in competitive team operations (up to 4 teams!) or run co-op diagnostics in cooperative Duet mode.")}
               </p>
             </div>
 
-            <div style={{ padding: "16px", background: "var(--bg-surface-raised)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)" }}>
-              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.05rem", fontWeight: 700, margin: "0 0 6px 0", color: "var(--text-primary)" }}>
-                {t("about.feature3Title", "Super smooth real-time action")}
+            <div style={{ padding: "16px", background: "rgba(6,24,28,0.4)", border: "1px solid rgba(0,240,255,0.2)", borderRadius: "8px" }}>
+              <h4 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.2rem", fontWeight: 900, margin: "0 0 6px 0", color: "#eef3ee", letterSpacing: "0.04em" }}>
+                {t("about.feature3Title", "Real-Time WebSocket Sync")}
               </h4>
-              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.5 }}>
-                {t("about.feature3Text", "Everything updates instantly. Chat with your team, watch cards flip in real time, and hear satisfying game sound effects.")}
+              <p style={{ fontSize: "0.85rem", color: "#9AA29B", margin: 0, lineHeight: 1.5 }}>
+                {t("about.feature3Text", "All actions transmit instantly. Chat channels, voting indicators, and card flips synchronize with zero latency.")}
               </p>
             </div>
-
-            <div style={{ padding: "16px", background: "var(--bg-surface-raised)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)" }}>
-              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.05rem", fontWeight: 700, margin: "0 0 6px 0", color: "var(--text-primary)" }}>
-                {t("about.feature4Title", "Play in your language")}
-              </h4>
-              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.5 }}>
-                {t("about.feature4Text", "ClueGrid supports over 40 languages, so you can play in whichever language you and your friends feel most comfortable with.")}
-              </p>
-            </div>
-
-            <div style={{ padding: "16px", background: "var(--bg-surface-raised)", border: "1px solid var(--border-subtle)", borderRadius: "var(--radius-md)" }}>
-              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.05rem", fontWeight: 700, margin: "0 0 6px 0", color: "var(--text-primary)" }}>
-                {t("about.feature5Title", "Packed with cool features")}
-              </h4>
-              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0, lineHeight: 1.5 }}>
-                {t("about.feature5Text", "Stuck on a word? Use our built-in definition search helper. Want some background music? Play your favorite tunes directly inside our docked player.")}
-              </p>
-            </div>
-
           </div>
         </section>
-
-        {/* Footer info section */}
-        <section style={{ background: "rgba(232, 163, 61, 0.05)", border: "1px solid rgba(232, 163, 61, 0.2)", borderRadius: "var(--radius-md)", padding: "20px" }}>
-          <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", fontWeight: 700, margin: "0 0 8px 0", color: "var(--accent)" }}>
-            {t("about.footerTitle", "Always Getting Better")}
-          </h4>
-          <p style={{ margin: 0, fontSize: "0.9rem", lineHeight: 1.6, color: "var(--text-primary)" }}>
-            {t("about.footerText", "We are always working to make ClueGrid even more fun! Check out our Changelog in the main menu to see all the cool new features, modes, and designs we add regularly.")}
-          </p>
-        </section>
-
       </div>
     </div>
   );

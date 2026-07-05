@@ -10,57 +10,28 @@ export function SupportPage() {
   }, []);
 
   return (
-    <div
-      style={{
-        maxWidth: "680px",
-        width: "100%",
-        background: "var(--bg-surface)",
-        border: "1px solid var(--border-default)",
-        borderRadius: "var(--radius-lg)",
-        padding: "40px",
-        textAlign: "center",
-        margin: "0 auto",
-        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.25)",
-      }}
-      className="fade-in"
-    >
-      <h2 style={{ fontFamily: "var(--font-display)", fontSize: "2.2rem", fontWeight: 800, margin: "0 0 12px 0", color: "var(--text-primary)", display: "flex", alignItems: "center", justifyContent: "center", gap: "12px" }}>
-        <svg
-          width="32"
-          height="32"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="var(--accent)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
-          <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
-          <line x1="6" x2="6" y1="2" y2="4" />
-          <line x1="10" x2="10" y1="2" y2="4" />
-          <line x1="14" x2="14" y1="2" y2="4" />
-        </svg>
-        Buy Me a Coffee
+    <div className="fade-in" style={{ color: "#eef3ee", fontFamily: "'JetBrains Mono', monospace" }}>
+      <h2 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "2.5rem", fontWeight: 900, margin: "0 0 12px 0", color: "#00f0ff", display: "flex", alignItems: "center", gap: "12px", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        <span>☕</span> SUPPLY LINE : PROJECT SUPPORT
       </h2>
-      <p style={{ color: "var(--text-secondary)", fontSize: "1.05rem", margin: "0 0 32px 0", lineHeight: 1.6 }}>
-        Help keep ClueGrid free, open-source, and running ad-free. Supporting us covers our hosting, websocket operations, and database infrastructure. Think of it like buying us a coffee!
+      <p style={{ color: "#9AA29B", fontSize: "1.05rem", margin: "0 0 32px 0", lineHeight: 1.6 }}>
+        Fund our server grid and secure operations. Supporting covers real-time WebSockets, database logs, and secure hosting infrastructure. No tracking. No ads. Just pure intelligence.
       </p>
 
       {success && (
         <div
           style={{
-            background: "rgba(16, 185, 129, 0.12)",
-            border: "1px solid rgb(16, 185, 129)",
-            borderRadius: "var(--radius-md)",
+            background: "rgba(178, 239, 155, 0.12)",
+            border: "1.5px solid #b2ef9b",
+            borderRadius: "6px",
             padding: "16px",
-            color: "var(--text-primary)",
-            fontWeight: 600,
+            color: "#b2ef9b",
+            fontWeight: 700,
             marginBottom: "24px",
             fontSize: "0.95rem",
           }}
         >
-          Thank you so much for your support! Your Supporter Badge has been unlocked!
+          [ACCESS GRANTED] Supporter badge unlocked. Thank you for securing our supply lines.
         </div>
       )}
 
@@ -69,106 +40,69 @@ export function SupportPage() {
           display: "flex",
           flexDirection: "column",
           gap: "20px",
-          background: "var(--bg-surface-raised)",
-          border: "1px solid var(--border-subtle)",
-          borderRadius: "var(--radius-md)",
+          background: "rgba(6,24,28,0.4)",
+          border: "1px solid rgba(0,240,255,0.2)",
+          borderRadius: "8px",
           padding: "24px",
           marginBottom: "32px",
           textAlign: "left",
         }}
       >
-        <h3 style={{ margin: "0 0 8px 0", color: "var(--accent)", fontWeight: 700 }}>
-          Supporter Benefits
+        <h3 style={{ margin: "0 0 8px 0", color: "#ff0055", fontWeight: 900, textTransform: "uppercase", fontSize: "1.1rem", letterSpacing: "0.08em" }}>
+          📡 CLEARANCE BENEFITS (SUPPORTER LEVEL)
         </h3>
-        <ul style={{ margin: 0, paddingLeft: "20px", lineHeight: 1.7, color: "var(--text-secondary)" }}>
-          <li style={{ marginBottom: "6px" }}>
-            Share in-game background music with everyone in the room (all players hear your stream).
+        <ul style={{ margin: 0, paddingLeft: "20px", lineHeight: 1.7, color: "#9AA29B", listStyleType: "square" }}>
+          <li style={{ marginBottom: "8px" }}>
+            <strong style={{ color: "#eef3ee" }}>Synchronized Intel Stream:</strong> Broadcast background music with all players currently connected to the spy grid.
           </li>
-          <li style={{ marginBottom: "6px" }}>
-            A dedicated Supporter badge displayed next to your avatar in lobbies, game rooms, and chat.
+          <li style={{ marginBottom: "8px" }}>
+            <strong style={{ color: "#eef3ee" }}>Tactical Identifier:</strong> Dedicated Supporter Badge overlayed next to your avatar in lobbies, lists, and main chats.
           </li>
-          <li style={{ marginBottom: "6px" }}>
-            Special name mention inside the website&apos;s credits index.
+          <li style={{ marginBottom: "8px" }}>
+            <strong style={{ color: "#eef3ee" }}>Wall of Operatives:</strong> Special codename mention in our permanent credits terminal.
           </li>
-          <li style={{ marginBottom: "6px" }}>
-            Add and customize a custom bio description on your player profile card.
+          <li style={{ marginBottom: "8px" }}>
+            <strong style={{ color: "#eef3ee" }}>Custom Profile Encryption:</strong> Edit and customize a bio description visible to players viewing your dossier.
           </li>
           <li>
-            No gameplay advantages: ClueGrid remains completely fair and balanced for all players.
+            <strong style={{ color: "#eef3ee" }}>Fair Play Protocol:</strong> No unfair gameplay advantages. Standard agents and elite operatives remain mathematically balanced.
           </li>
         </ul>
       </div>
 
       <div
         style={{
-          background: "var(--accent-bg-subtle)",
-          border: "1px solid var(--accent)",
-          borderRadius: "var(--radius-md)",
+          background: "rgba(255,0,85,0.06)",
+          border: "1.5px solid #ff0055",
+          borderRadius: "8px",
           padding: "24px 32px",
           textAlign: "center",
-          maxWidth: "500px",
-          margin: "0 auto",
-          boxShadow: "0 8px 32px rgba(232, 163, 61, 0.08)",
-          animation: "float-pulse 3s ease-in-out infinite",
+          boxShadow: "0 8px 32px rgba(255,0,85,0.1)",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: "16px" }}>
-          <div
-            style={{
-              width: "48px",
-              height: "48px",
-              borderRadius: "50%",
-              background: "rgba(232, 163, 61, 0.15)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              boxShadow: "0 0 15px rgba(232, 163, 61, 0.3)",
-            }}
-          >
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="var(--accent)"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
-              <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
-              <line x1="6" x2="6" y1="2" y2="4" />
-              <line x1="10" x2="10" y1="2" y2="4" />
-              <line x1="14" x2="14" y1="2" y2="4" />
-            </svg>
-          </div>
-        </div>
         <h4
           style={{
-            fontFamily: "var(--font-display)",
-            fontSize: "1.2rem",
-            fontWeight: 700,
+            fontFamily: "'Big Shoulders Display', sans-serif",
+            fontSize: "1.4rem",
+            fontWeight: 900,
             margin: "0 0 8px 0",
-            color: "var(--accent-text-on-subtle)",
+            color: "#ff0055",
+            letterSpacing: "0.06em",
           }}
         >
-          Supporter Options Coming Soon!
+          [GATEWAY DOWN] PAYMENT SYSTEM UNDER MAINTENANCE
         </h4>
         <p
           style={{
-            color: "var(--text-secondary)",
+            color: "#9AA29B",
             fontSize: "0.95rem",
             lineHeight: 1.5,
             margin: 0,
           }}
         >
-          We are currently working on integrating secure payment options (like Stripe Checkout) to enable Supporter subscriptions. Once ready, you&apos;ll be able to support ClueGrid and instantly unlock exclusive supporter perks.
+          Our secure checkout portal is undergoing local encryption configuration. Direct stripe transactions will be functional shortly. Check back during future cycles to support.
         </p>
       </div>
-
-      <p style={{ marginTop: "24px", fontSize: "0.8rem", color: "var(--text-muted)" }}>
-        Thank you for playing and supporting the development of ClueGrid!
-      </p>
     </div>
   );
 }

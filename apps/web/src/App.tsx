@@ -17,6 +17,7 @@ import { FeaturesPage } from "./components/FeaturesPage";
 import { FeedbackRobot } from "./components/FeedbackRobot";
 import { GatedUpsellModal } from "./components/GatedUpsellModal";
 import { renderAvatar } from "./utils/avatar";
+import { LandingPage } from "./components/LandingPage";
 
 const AVATARS = ["🦊", "🦉", "🦁", "🐼", "🤖", "🎮", "👤", "🎩"];
 
@@ -454,6 +455,49 @@ export default function App() {
       .finally(() => setLoading(false));
   };
 
+  const handleCreateRoomWithOptions = (options: { teamCount: number; gameMode: "classic" | "coop"; language: string }) => {
+    try {
+      playModeAudio();
+    } catch {
+      /* ignore */
+    }
+    triggerHaptics([350, 60, 350, 60, 350]);
+    setLoading(true);
+    setError(null);
+    fetch("/api/rooms", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ teamCount: options.teamCount, gameMode: options.gameMode, language: options.language }),
+    })
+      .then(async (r) => {
+        if (!r.ok) {
+          let message = `Server error (${r.status})`;
+          try {
+            const json = await r.json();
+            if (json?.error) message = json.error;
+          } catch {
+            const text = await r.text().catch(() => "");
+            if (text) message = text;
+          }
+          throw new Error(message);
+        }
+        return r.json();
+      })
+      .then((res) => {
+        if (res.success && res.roomCode) {
+          loadRoom(res.roomCode);
+        } else {
+          setError(res.error || "Could not create room");
+        }
+      })
+      .catch((err) => {
+        const isOffline = err instanceof TypeError && err.message.includes("fetch");
+        setError(isOffline ? "Cannot reach the server. Make sure the ClueGrid server is running." : err.message);
+      })
+      .finally(() => setLoading(false));
+  };
+
+
 
   const handleLeave = () => {
     if (socket) {
@@ -486,6 +530,38 @@ export default function App() {
     localStorage.setItem("cluegrid_avatar", tempAvatar);
     setHasProfile(true);
   };
+
+  if (!room) {
+    return (
+      <>
+        <LandingPage
+          currentView={currentView}
+          setCurrentView={setCurrentView}
+          setAuthOpen={setAuthOpen}
+          handleCreateRoom={handleCreateRoomWithOptions}
+          loading={loading}
+        >
+          {currentView === "rules" && <RulesPage />}
+          {currentView === "features" && <FeaturesPage />}
+          {currentView === "changelog" && <ChangelogPage />}
+          {currentView === "about" && <AboutPage />}
+          {currentView === "admin" && <ManagementPanel />}
+          {currentView === "support" && <SupportPage />}
+        </LandingPage>
+
+        {/* Global Auth Modal & Settings Modal */}
+        {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
+        {settingsOpen && <ProfileSettingsModal onClose={() => setSettingsOpen(false)} />}
+        {gatedFeature && (
+          <GatedUpsellModal
+            featureName={gatedFeature}
+            onClose={() => setGatedFeature(null)}
+            onOpenAuth={() => setAuthOpen(true)}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>

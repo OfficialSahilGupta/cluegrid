@@ -6,21 +6,32 @@ export function ChangelogPage() {
 
   const updates = [
     {
+      version: "v1.4.0 - Operation Cyber-Stealth Redesign",
+      date: "July 2026",
+      color: "#00f0ff",
+      features: [
+        "Purged Yellow/Amber color tokens for tactical stealth cyber-cyan (#00F0FF) and magenta (#FF0055) palette.",
+        "Redesigned Navigation Link styling with dotted underlines.",
+        "Implemented real-time surveillance terminal animations in empty background zones.",
+        "Created real-time Spy Dossier panels tracking active operatives Fox, Owl, Lion, and Shadow.",
+      ],
+    },
+    {
       version: "v1.3.0 - Visual Overhaul and Core Polish",
       date: "June 2026",
-      color: "var(--accent)",
+      color: "#ff0055",
       features: [
         "Daylight Dossier Theme Support: Added a warm paper light mode counterpart matching the classified folder theme.",
         "Vietnamese Locale Support: Created localized UI translations and gameplay decks supporting Vietnamese (Tiếng Việt) players.",
         "Security / Standard - Anti-Spy Action Logging: If an Operative secretly or intuitively attempts to join the Spymasters, they'll be caught and recorded in the game log.",
-        "Custom Game Timers: Control the pressure! Tailor turn and clue timers so your team can play at their own speed, whether you want a fast-paced thriller or a relaxed brainstorm.",
-        "Sensory Sound Effects: Feel every move with satisfying, responsive sound triggers for card taps, role selections, and team turns that bring the tactile feel of physical board games directly to your screen.",
+        "Custom Game Timers: Control the pressure! Tailor turn and clue timers so your team can play at their own speed.",
+        "Sensory Sound Effects: Satisfying, responsive sound triggers for card taps, role selections, and team turns.",
       ],
     },
     {
       version: "v1.2.0 - Duet Mode & Custom Settings",
       date: "June 2026",
-      color: "var(--team-1)",
+      color: "#00f0ff",
       features: [
         "Cooperative Duet Mode: Play cooperatively against a shared mistake limit of 9 tokens.",
         "Turn & Clue Timers: Integrated 120-second timers with Spymaster and Operative auto-skips.",
@@ -32,7 +43,7 @@ export function ChangelogPage() {
     {
       version: "v1.1.0 - Profiles & Match Statistics",
       date: "May 2026",
-      color: "var(--team-2)",
+      color: "#ff0055",
       features: [
         "Auth.js Integration: Support credentials signup, Google, and Discord login.",
         "Deterministic Identicons: Symmetrical 5x5 SVG grid icons generated from guest usernames.",
@@ -44,7 +55,7 @@ export function ChangelogPage() {
     {
       version: "v1.0.0 - Classic Multi-Team Launch",
       date: "April 2026",
-      color: "var(--team-3)",
+      color: "#00f0ff",
       features: [
         "Classic 2-team, 3-team, and 4-team Codenames match rooms.",
         "Real-time turn engine, card reveals, and clue forms over Socket.IO.",
@@ -56,41 +67,28 @@ export function ChangelogPage() {
   ];
 
   return (
-    <div
-      style={{
-        maxWidth: "850px",
-        width: "100%",
-        background: "var(--bg-surface)",
-        border: "1px solid var(--border-default)",
-        borderRadius: "var(--radius-lg)",
-        padding: "36px",
-        textAlign: "left",
-        margin: "0 auto",
-        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.25)",
-      }}
-      className="fade-in"
-    >
-      <h2 style={{ fontFamily: "var(--font-display)", fontSize: "2rem", fontWeight: 800, margin: "0 0 8px 0", color: "var(--text-primary)" }}>
+    <div className="fade-in" style={{ color: "#eef3ee", fontFamily: "'JetBrains Mono', monospace", fontSize: "0.88rem" }}>
+      <h2 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "2rem", fontWeight: 900, margin: "0 0 8px 0", color: "#00f0ff", textTransform: "uppercase", letterSpacing: "0.05em" }}>
         {t("news.title")}
       </h2>
-      <p style={{ color: "var(--text-secondary)", fontSize: "1rem", margin: "0 0 28px 0" }}>
+      <p style={{ color: "#9AA29B", fontSize: "0.9rem", margin: "0 0 20px 0" }}>
         {t("news.subtitle")}
       </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
         {updates.map((up) => (
-          <section key={up.version} style={{ borderBottom: "1px solid var(--border-subtle)", paddingBottom: "24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "12px" }}>
-              <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 700, margin: 0, color: "var(--accent)" }}>
+          <section key={up.version} style={{ borderBottom: "1px solid rgba(0,240,255,0.15)", paddingBottom: "18px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "8px" }}>
+              <h3 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.2rem", fontWeight: 900, margin: 0, color: up.color, letterSpacing: "0.04em" }}>
                 {up.version}
               </h3>
-              <span style={{ fontSize: "0.85rem", color: "var(--text-muted)", fontWeight: 500 }}>
+              <span style={{ fontSize: "0.8rem", color: "#9AA29B", fontWeight: 500 }}>
                 {up.date}
               </span>
             </div>
-            <ul style={{ margin: 0, paddingLeft: "20px", lineHeight: 1.6, fontSize: "0.95rem", color: "var(--text-primary)" }}>
+            <ul style={{ margin: 0, paddingLeft: "18px", lineHeight: 1.5, fontSize: "0.82rem", color: "#9AA29B", listStyleType: "square" }}>
               {up.features.map((feat, i) => (
-                <li key={i} style={{ marginBottom: "8px" }}>
+                <li key={i} style={{ marginBottom: "6px" }}>
                   {feat}
                 </li>
               ))}

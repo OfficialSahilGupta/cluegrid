@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CLUEGRID.GAMES — Classified Briefing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --mint:#B2EF9B;
+    --sage:#9AA29B;
+    --teal:#1B9AAA;
+    --gold:#FFC43D;
+    --rose:#EF959C;
+    --ink:#081619;
+    --ink-2:#0c2126;
+    --paper:#eef3ee;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'JetBrains Mono', monospace;
+    overflow:hidden;
+  }
+  #scene{position:fixed; inset:0; z-index:1;}
+
+  /* ---------- top header ---------- */
+  .wordmark{
+    position:fixed; top:clamp(16px,3vw,32px); left:clamp(16px,3vw,32px); z-index:5;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .wordmark .logo{
+    font-family:'Big Shoulders Display', sans-serif;
+    font-weight:900;
+    font-size:clamp(22px,3.2vw,34px);
+    letter-spacing:0.04em;
+    color:var(--paper);
+    line-height:1;
+  }
+  .wordmark .logo span{color:var(--gold);}
+  .tag{
+    display:flex; align-items:center; gap:8px;
+    font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--sage);
+  }
+  .dot{
+    width:7px; height:7px; border-radius:50%; background:var(--rose);
+    box-shadow:0 0 8px var(--rose);
+    animation:pulse 1.6s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1; transform:scale(1);}50%{opacity:.35; transform:scale(.7);}}
+
+  /* ---------- case stamp watermark ---------- */
+  .case-stamp{
+    position:fixed; bottom:22px; right:24px; z-index:5;
+    font-size:11px; letter-spacing:0.14em; color:rgba(238,243,238,0.28);
+    border:1px solid rgba(238,243,238,0.18);
+    padding:6px 10px; border-radius:3px;
+    transform:rotate(-3deg);
+    user-select:none;
+  }
+
+  /* ---------- top-right horizontal nav ---------- */
+  .nav-links{
+    position:fixed; top:clamp(16px,3vw,32px); right:clamp(56px,7vw,80px); z-index:5;
+    display:flex; align-items:center; gap:16px;
+    font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--sage);
+  }
+  .nav-links a{
+    color:var(--sage); text-decoration:none; border-bottom:1px dotted transparent;
+    transition:color .2s ease, border-color .2s ease; white-space:nowrap;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{ color:var(--gold); border-color:var(--gold); }
+  .nav-links .divider{ opacity:0.35; }
+  @media (max-width:640px){
+    .nav-links{ gap:9px; font-size:9.5px; right:clamp(48px,9vw,64px); }
+  }
+  @media (max-width:420px){
+    .nav-links{ display:none; }
+  }
+
+  /* ---------- decryption logs (left) + surveillance feed (right) ---------- */
+  .intel-panel{
+    position:fixed; top:clamp(96px,13vh,150px); z-index:5;
+    width:min(300px, 30vw); max-height:230px; overflow:hidden;
+    background:rgba(8,22,25,0.72); backdrop-filter:blur(6px);
+    border:1px solid rgba(238,243,238,0.14); border-radius:4px;
+    padding:14px 16px;
+  }
+  .intel-panel.left{ left:24px; border-top:2px solid var(--teal); }
+  .intel-panel.right{ right:24px; border-top:2px solid var(--rose); }
+  .intel-head{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    font-size:12px; letter-spacing:0.12em; text-transform:uppercase; font-weight:700;
+    margin-bottom:11px; padding-bottom:9px; border-bottom:1px solid rgba(238,243,238,0.1);
+  }
+  .intel-panel.left .intel-head{ color:var(--teal); }
+  .intel-panel.right .intel-head{ color:var(--rose); }
+  .intel-live{ display:flex; align-items:center; gap:5px; font-size:9.5px; color:var(--rose); letter-spacing:0.08em; }
+  .intel-live .ldot{ width:6px; height:6px; border-radius:50%; background:var(--rose); box-shadow:0 0 6px var(--rose); animation:pulse 1.6s ease-in-out infinite; }
+
+  .log-line{
+    font-size:11px; color:rgba(238,243,238,0.55); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    padding:4px 0; opacity:0; transform:translateY(4px);
+    animation:logIn .4s ease forwards;
+  }
+  .log-line .tag{ color:var(--teal); }
+  @keyframes logIn{ to{ opacity:1; transform:translateY(0); } }
+
+  .roster-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(238,243,238,0.06); }
+  .roster-row:last-child{ border-bottom:none; }
+  .roster-icon{ width:15px; height:15px; flex:none; border:2px solid currentColor; }
+  .roster-icon.diamond{ transform:rotate(45deg); }
+  .roster-icon.hex{ clip-path:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); border-width:0; background:currentColor; opacity:0.85; }
+  .roster-icon.circle{ border-radius:50%; }
+  .roster-icon.plus{ border:none; background:
+      linear-gradient(currentColor,currentColor) center/100% 2px no-repeat,
+      linear-gradient(currentColor,currentColor) center/2px 100% no-repeat; }
+  .roster-name{ font-size:12.5px; font-weight:700; color:var(--paper); line-height:1.3; }
+  .roster-sub{ font-size:10px; color:rgba(238,243,238,0.4); }
+  .roster-sub .status{ font-weight:600; }
+
+  @media (max-width:1180px){ .intel-panel{ display:none; } }
+
+  /* ---------- subtitle / transcript panel ---------- */
+  .transcript{
+    position:fixed; left:50%; bottom:clamp(70px,10vh,110px); transform:translateX(-50%);
+    z-index:5; width:min(680px, 88vw);
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    pointer-events:none;
+  }
+  .speaker-row{
+    width:100%; display:flex; align-items:center; justify-content:space-between;
+    gap:10px;
+  }
+  .speaker-chip{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:4px 12px; border-radius:2px;
+    font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+    border:1px solid currentColor;
+    opacity:0; transform:translateY(6px);
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  .speaker-chip.show{opacity:1; transform:translateY(0);}
+  .speaker-chip.A{color:var(--mint);}
+  .speaker-chip.B{color:var(--rose);}
+
+  .line-box{
+    min-height:56px; width:100%;
+    background:linear-gradient(180deg, rgba(8,22,25,0.15), rgba(8,22,25,0.55));
+    border-left:2px solid rgba(238,243,238,0.15);
+    padding:12px 18px;
+    font-size:clamp(14px,1.9vw,17px);
+    line-height:1.5;
+    color:var(--paper);
+    text-align:center;
+    backdrop-filter:blur(2px);
+  }
+  .line-box .cursor{
+    display:inline-block; width:8px; height:1em; background:var(--gold);
+    margin-left:2px; vertical-align:-2px;
+    animation:blink 0.9s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  .skip-btn{
+    pointer-events:auto; z-index:6;
+    background:transparent; border:1px solid rgba(238,243,238,0.3); color:rgba(238,243,238,0.75);
+    font-family:'JetBrains Mono', monospace; font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase;
+    padding:6px 12px; border-radius:2px; cursor:pointer;
+    transition:border-color .2s ease, color .2s ease, opacity .4s ease;
+    white-space:nowrap;
+  }
+  .skip-btn:hover{border-color:var(--gold); color:var(--gold);}
+  .skip-btn:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+  .skip-btn.hide{opacity:0; pointer-events:none;}
+
+  .dialogue-controls{
+    pointer-events:auto; display:flex; align-items:center; gap:8px;
+  }
+  .sfx-toggle{
+    background:transparent; border:1px solid rgba(238,243,238,0.3); color:rgba(238,243,238,0.75);
+    display:flex; align-items:center; justify-content:center;
+    padding:8px 10px; border-radius:2px; cursor:pointer;
+    transition:border-color .2s ease, opacity .4s ease;
+  }
+  .sfx-toggle:hover{ border-color:var(--gold); }
+  .sfx-toggle:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+  .sfx-toggle.hide{ opacity:0; pointer-events:none; }
+
+  .sfx-icon .cursor-mark{ fill:rgba(238,243,238,0.55); }
+  .sfx-icon .bar{ fill:var(--gold); transform-origin:center; transform-box:fill-box; }
+  .sfx-icon .bar1{ animation:eqBar 0.85s ease-in-out infinite; }
+  .sfx-icon .bar2{ animation:eqBar 0.65s ease-in-out infinite 0.12s; }
+  .sfx-icon .bar3{ animation:eqBar 1.05s ease-in-out infinite 0.24s; }
+  @keyframes eqBar{ 0%,100%{ transform:scaleY(0.45); } 50%{ transform:scaleY(1); } }
+
+  .sfx-icon .mute-slash{ stroke:rgba(238,243,238,0.85); display:none; }
+  .sfx-toggle.muted .sfx-icon .bar{ animation-play-state:paused; transform:scaleY(0.35); opacity:0.3; }
+  .sfx-toggle.muted .sfx-icon .mute-slash{ display:block; }
+  .sfx-toggle.muted .sfx-icon .cursor-mark{ opacity:0.35; }
+
+
+  /* ---------- CTA panel ---------- */
+  .cta-wrap{
+    position:fixed; left:50%; bottom:clamp(60px,9vh,100px); transform:translate(-50%,18px);
+    z-index:6; display:flex; flex-direction:column; align-items:center; gap:16px;
+    opacity:0; pointer-events:none;
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  .cta-wrap.show{opacity:1; transform:translate(-50%,0); pointer-events:auto;}
+
+  .stamp-ring{
+    width:78px; height:78px; border-radius:50%;
+    border:2px solid var(--gold);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:10px;
+    letter-spacing:0.08em; text-align:center; color:var(--gold);
+    transform:scale(0) rotate(-18deg);
+    animation:stampIn .5s cubic-bezier(.2,1.4,.4,1) forwards;
+    animation-delay:.15s;
+    box-shadow:0 0 22px rgba(255,196,61,0.25);
+  }
+  @keyframes stampIn{
+    0%{transform:scale(2.4) rotate(-18deg); opacity:0;}
+    60%{transform:scale(0.9) rotate(-18deg); opacity:1;}
+    100%{transform:scale(1) rotate(-18deg); opacity:1;}
+  }
+
+  .enter-btn{
+    font-family:'Big Shoulders Display', sans-serif;
+    font-weight:800; font-size:clamp(18px,2.4vw,24px); letter-spacing:0.06em;
+    background:var(--gold); color:var(--ink);
+    border:none; padding:15px 36px; border-radius:2px; cursor:pointer;
+    display:flex; align-items:center; gap:10px;
+    box-shadow:0 8px 30px rgba(255,196,61,0.25);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+  .enter-btn:hover{transform:translateY(-2px); box-shadow:0 12px 34px rgba(255,196,61,0.35);}
+  .enter-btn:focus-visible{outline:3px solid var(--paper); outline-offset:3px;}
+  .enter-btn .arrow{transition:transform .2s ease;}
+  .enter-btn:hover .arrow{transform:translateX(4px);}
+
+  .cta-sub{font-size:11px; letter-spacing:0.14em; color:var(--sage); text-transform:uppercase;}
+
+  .cta-links{
+    display:flex; gap:14px; align-items:center; flex-wrap:wrap; justify-content:center;
+    font-size:11px; letter-spacing:0.04em; color:var(--sage); margin-top:2px;
+  }
+  .cta-links a{
+    color:var(--sage); text-decoration:none; border-bottom:1px dotted transparent;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .cta-links a:hover, .cta-links a:focus-visible{ color:var(--gold); border-color:var(--gold); }
+  .cta-links .divider{ opacity:0.35; }
+
+  .feedback-chip{
+    position:fixed; bottom:22px; left:24px; z-index:5;
+    display:inline-flex; align-items:center; gap:7px;
+    background:rgba(238,243,238,0.04); border:1px solid rgba(238,243,238,0.16);
+    color:var(--sage); font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.03em;
+    padding:8px 14px 8px 12px; border-radius:20px; cursor:pointer;
+    opacity:0; transform:translateY(8px);
+    animation:feedbackIn .6s ease forwards; animation-delay:2.4s;
+    transition:border-color .2s ease, color .2s ease;
+  }
+  .feedback-chip .fdot-wrap{ position:relative; width:5px; height:5px; }
+  .feedback-chip .fdot{
+    position:relative; width:5px; height:5px; border-radius:50%; background:var(--gold);
+    box-shadow:0 0 6px var(--gold);
+  }
+  .feedback-chip .fping{
+    position:absolute; inset:-3px; border-radius:50%; border:1px solid var(--gold);
+    opacity:0; animation:fping 3.2s ease-out infinite;
+  }
+  @keyframes fping{
+    0%{ opacity:0.6; transform:scale(1); }
+    80%{ opacity:0; transform:scale(4.2); }
+    100%{ opacity:0; transform:scale(4.2); }
+  }
+  .feedback-chip:hover, .feedback-chip:focus-visible{ border-color:rgba(255,196,61,0.4); color:var(--gold); }
+  @keyframes feedbackIn{ to{ opacity:1; transform:translateY(0); } }
+
+  /* ---------- field-report panel: 3D badge-flip card ---------- */
+  .report-overlay{
+    position:fixed; inset:0; z-index:25;
+    display:flex; align-items:flex-end; justify-content:flex-start;
+    padding:clamp(16px,4vw,40px);
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  .report-overlay.show{ opacity:1; pointer-events:auto; }
+
+  .report-stage{ perspective:1400px; }
+  .report-panel{
+    width:min(420px, 88vw);
+    background:linear-gradient(155deg, rgba(16,40,45,0.97) 0%, rgba(9,26,30,0.98) 100%);
+    backdrop-filter:blur(6px);
+    border:1px solid rgba(255,196,61,0.25);
+    border-radius:12px;
+    padding:24px 24px 22px;
+    transform-style:preserve-3d;
+    transform:rotateX(-85deg) translateY(20px);
+    transform-origin:bottom left;
+    opacity:0;
+    transition:transform .5s cubic-bezier(.2,.9,.25,1.15), opacity .35s ease;
+    box-shadow:0 30px 60px rgba(0,0,0,0.5);
+    position:relative;
+    overflow:hidden;
+  }
+  .report-overlay.show .report-panel{ transform:rotateX(0deg) translateY(0); opacity:1; }
+
+  .report-panel::before{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:linear-gradient(120deg, rgba(255,196,61,0.14) 0%, rgba(255,196,61,0) 35%);
+    opacity:0; transition:opacity .2s ease; z-index:2;
+  }
+  .report-panel.tilting::before{ opacity:1; }
+
+  .report-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; }
+  .report-title{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:19px;
+    color:var(--gold); letter-spacing:0.02em; margin:0;
+  }
+  .report-close{
+    background:transparent; border:1px solid rgba(238,243,238,0.25); color:var(--paper);
+    width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:13px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .2s ease, color .2s ease;
+  }
+  .report-close:hover{ border-color:var(--gold); color:var(--gold); }
+  .report-sub{ font-size:11px; color:var(--sage); margin:0 0 18px 0; letter-spacing:0.03em; }
+
+  .report-textarea{
+    width:100%; min-height:88px; resize:none;
+    background:rgba(238,243,238,0.04); border:1.5px solid rgba(238,243,238,0.14); border-radius:8px;
+    color:var(--paper); font-family:'JetBrains Mono', monospace; font-size:13px; line-height:1.6;
+    padding:12px; margin-bottom:18px;
+  }
+  .report-textarea:focus-visible{ outline:2px solid var(--gold); border-color:var(--gold); }
+  .report-textarea::placeholder{ color:rgba(154,162,155,0.6); }
+
+  .transmit-btn{
+    width:100%; font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:17px;
+    letter-spacing:0.03em; background:var(--gold); color:var(--ink); border:none;
+    padding:13px; border-radius:8px; cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 6px 20px rgba(255,196,61,0.18);
+  }
+  .transmit-btn:hover{ transform:translateY(-1px); }
+  .transmit-btn:focus-visible{ outline:3px solid var(--paper); outline-offset:3px; }
+  .transmit-btn[disabled]{ opacity:0.7; cursor:default; transform:none; }
+
+  .report-handoff{ font-size:10.5px; color:var(--sage); text-align:center; margin-top:12px; line-height:1.5; }
+
+  .scan-sweep{
+    position:absolute; left:0; right:0; height:60px; z-index:3; pointer-events:none;
+    background:linear-gradient(180deg, rgba(255,196,61,0) 0%, rgba(255,196,61,0.16) 50%, rgba(255,196,61,0) 100%);
+    top:-60px; opacity:0;
+  }
+  .report-panel.scanning .scan-sweep{ opacity:1; animation:scanSweep 0.9s linear; }
+  @keyframes scanSweep{ from{ top:-60px; } to{ top:100%; } }
+
+  @media (prefers-reduced-motion: reduce){
+    .fping{ animation:none; display:none; }
+    .report-panel{ transition:opacity .3s ease; transform:none !important; }
+    .scan-sweep{ animation:none !important; }
+  }
+
+  /* ---------- redaction wipe transition ---------- */
+  .wipe{
+    position:fixed; inset:0; z-index:20; background:var(--ink);
+    clip-path:inset(0 100% 0 0);
+    pointer-events:none;
+  }
+  .wipe.play{animation:wipeIn 0.7s cubic-bezier(.7,0,.2,1) forwards;}
+  @keyframes wipeIn{
+    0%{clip-path:inset(0 100% 0 0);}
+    55%{clip-path:inset(0 0 0 0);}
+    100%{clip-path:inset(0 0 0 100%);}
+  }
+
+  /* ---------- guest room setup panel ---------- */
+  .welcome{
+    position:fixed; inset:0; z-index:15;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .5s ease;
+    padding:24px;
+  }
+  .welcome.show{opacity:1; pointer-events:auto;}
+  .welcome-card{
+    width:min(560px, 100%);
+    max-height:92vh; overflow-y:auto;
+    background:rgba(12,33,38,0.82);
+    border:1px solid rgba(255,196,61,0.35);
+    backdrop-filter:blur(6px);
+    padding:clamp(28px,5vw,40px);
+    position:relative;
+    border-radius:14px;
+  }
+  .welcome-card::before, .welcome-card::after{
+    content:''; position:absolute; width:18px; height:18px; border:2px solid var(--gold);
+  }
+  .welcome-card::before{top:-1px; left:-1px; border-right:none; border-bottom:none;}
+  .welcome-card::after{bottom:-1px; right:-1px; border-left:none; border-top:none;}
+
+  .field-label{
+    font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--paper);
+    opacity:0.85; margin-bottom:10px; font-weight:700;
+  }
+  .pill-row{display:flex; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .pill{
+    flex:1; min-width:90px;
+    background:rgba(238,243,238,0.04); border:1.5px solid rgba(238,243,238,0.14);
+    color:var(--paper); font-family:'JetBrains Mono', monospace; font-weight:700;
+    font-size:13.5px; padding:13px 10px; border-radius:8px; cursor:pointer; text-align:center;
+    transition:border-color .15s ease, color .15s ease, background .15s ease;
+  }
+  .pill:hover{border-color:rgba(255,196,61,0.4);}
+  .pill.active{border-color:var(--gold); color:var(--gold); background:rgba(255,196,61,0.08);}
+  .pill:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+
+  .field-block{margin-bottom:22px;}
+  .helper-text{font-size:11.5px; color:var(--sage); margin-top:2px;}
+
+  .select-wrap{position:relative;}
+  select.lang-select{
+    width:100%; appearance:none;
+    background:rgba(238,243,238,0.04); border:1.5px solid rgba(238,243,238,0.14); border-radius:8px;
+    color:var(--paper); font-family:'JetBrains Mono', monospace; font-size:14px;
+    padding:13px 40px 13px 14px; cursor:pointer;
+  }
+  select.lang-select:focus-visible{outline:2px solid var(--gold);}
+  .select-wrap::after{
+    content:'▾'; position:absolute; right:14px; top:50%; transform:translateY(-50%);
+    color:var(--sage); pointer-events:none; font-size:13px;
+  }
+
+  .create-btn{
+    width:100%; font-family:'Big Shoulders Display', sans-serif; font-weight:800;
+    font-size:19px; letter-spacing:0.03em;
+    background:var(--gold); color:var(--ink); border:none; padding:15px; border-radius:8px; cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 6px 24px rgba(255,196,61,0.2);
+  }
+  .create-btn:hover{transform:translateY(-1px); box-shadow:0 10px 28px rgba(255,196,61,0.3);}
+  .create-btn:focus-visible{outline:3px solid var(--paper); outline-offset:3px;}
+  .create-btn[disabled]{opacity:0.6; cursor:default; transform:none;}
+
+  .replay-link{
+    display:block; margin:16px auto 0; background:none; border:none; color:var(--sage);
+    font-family:'JetBrains Mono', monospace; font-size:12px; text-decoration:underline; cursor:pointer; letter-spacing:0.04em;
+  }
+  .replay-link:hover{color:var(--paper);}
+
+  @media (max-width:560px){
+    .transcript{bottom:150px;}
+    .cta-wrap{bottom:80px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .dot, .cursor{animation:none;}
+    .scanline{animation:none;}
+    .feedback-chip{animation:none; opacity:1; transform:none;}
+  }
+
+  /* ---------- cinematic overlay: vignette + scanline + HUD frame ---------- */
+  .vignette{
+    position:fixed; inset:0; z-index:2; pointer-events:none;
+    background:
+      radial-gradient(ellipse at center, rgba(0,0,0,0) 42%, rgba(3,10,12,0.75) 100%),
+      linear-gradient(180deg, rgba(3,10,12,0.55) 0%, rgba(3,10,12,0) 16%, rgba(3,10,12,0) 78%, rgba(3,10,12,0.65) 100%);
+  }
+  .scanline{
+    position:fixed; inset:0; z-index:3; pointer-events:none; opacity:0.5;
+    background:repeating-linear-gradient(
+      to bottom, rgba(178,239,155,0.035) 0px, rgba(178,239,155,0.035) 1px,
+      transparent 1px, transparent 3px
+    );
+    mix-blend-mode:screen;
+  }
+  .scanline::after{
+    content:''; position:absolute; left:0; right:0; height:120px;
+    background:linear-gradient(180deg, rgba(255,196,61,0) 0%, rgba(255,196,61,0.06) 50%, rgba(255,196,61,0) 100%);
+    animation:sweep 7s linear infinite;
+  }
+  @keyframes sweep{0%{top:-120px;}100%{top:100%;}}
+
+  .hud-corner{
+    position:fixed; z-index:4; width:34px; height:34px; pointer-events:none;
+    border-color:rgba(178,239,155,0.4);
+    opacity:0.85;
+  }
+  .hud-corner.tl{top:14px; left:14px; border-top:2px solid; border-left:2px solid;}
+  .hud-corner.tr{top:14px; right:14px; border-top:2px solid; border-right:2px solid; border-color:rgba(239,149,156,0.4);}
+  .hud-corner.bl{bottom:14px; left:14px; border-bottom:2px solid; border-left:2px solid; border-color:rgba(239,149,156,0.4);}
+  .hud-corner.br{bottom:14px; right:14px; border-bottom:2px solid; border-right:2px solid; border-color:rgba(178,239,155,0.4);}
+</style>
+</head>
+<body>
+
+<div id="scene"></div>
+<div class="vignette"></div>
+<div class="scanline"></div>
+<div class="hud-corner tl"></div>
+<div class="hud-corner tr"></div>
+<div class="hud-corner bl"></div>
+<div class="hud-corner br"></div>
+
+<div class="wordmark">
+  <div class="logo">CLUE<span>GRID</span>.GAMES</div>
+  <div class="tag"><span class="dot"></span> Classified briefing — live feed</div>
+</div>
+
+<nav class="nav-links">
+  <a href="https://cluegrid.games/features" target="_blank" rel="noopener">Features</a>
+  <span class="divider">·</span>
+  <a href="https://cluegrid.games/changelog" target="_blank" rel="noopener">Changelog</a>
+  <span class="divider">·</span>
+  <a href="https://cluegrid.games/about" target="_blank" rel="noopener">About</a>
+</nav>
+
+<div class="case-stamp">CASE FILE №0042</div>
+
+<div class="intel-panel left" id="decryptPanel">
+  <div class="intel-head"><span>🔒 Decryption Logs</span></div>
+  <div id="logStream"></div>
+</div>
+
+<div class="intel-panel right">
+  <div class="intel-head">
+    <span>🌐 Surveillance Feed</span>
+    <span class="intel-live"><span class="ldot"></span>LIVE</span>
+  </div>
+  <div class="roster-row">
+    <span class="roster-icon diamond" style="color:var(--rose)"></span>
+    <div>
+      <div class="roster-name">ORACLE-3</div>
+      <div class="roster-sub">Leader · <span class="status" style="color:var(--rose)">Active Grid</span></div>
+    </div>
+  </div>
+  <div class="roster-row">
+    <span class="roster-icon hex" style="color:var(--mint)"></span>
+    <div>
+      <div class="roster-name">NOX-7</div>
+      <div class="roster-sub">Analyst · <span class="status" style="color:var(--mint)">Surveilled</span></div>
+    </div>
+  </div>
+  <div class="roster-row">
+    <span class="roster-icon circle" style="color:var(--teal)"></span>
+    <div>
+      <div class="roster-name">WARDEN</div>
+      <div class="roster-sub">Military Intel · <span class="status" style="color:var(--teal)">Compromised</span></div>
+    </div>
+  </div>
+  <div class="roster-row">
+    <span class="roster-icon plus" style="color:var(--sage)"></span>
+    <div>
+      <div class="roster-name">GHOST</div>
+      <div class="roster-sub">Infiltrator · <span class="status" style="color:var(--sage)">Decrypted</span></div>
+    </div>
+  </div>
+</div>
+
+<button class="feedback-chip" id="feedbackChip">
+  <span class="fdot-wrap"><span class="fdot"></span><span class="fping"></span></span>
+  Need a feature or found a bug?
+</button>
+
+<div class="report-overlay" id="reportOverlay">
+  <div class="report-stage">
+    <div class="report-panel" id="reportPanel">
+      <div class="scan-sweep"></div>
+      <div class="report-head">
+        <p class="report-title">Field Report</p>
+        <button class="report-close" id="reportClose" aria-label="Close">✕</button>
+      </div>
+      <p class="report-sub">Bugs, ideas, anything that's not working — goes straight to the team.</p>
+
+      <div class="field-block">
+        <div class="field-label">Report Type</div>
+        <div class="pill-row" id="reportTypeRow">
+          <button class="pill active" data-type="bug">Bug</button>
+          <button class="pill" data-type="idea">Idea</button>
+          <button class="pill" data-type="other">Other</button>
+        </div>
+      </div>
+
+      <textarea class="report-textarea" id="reportText" placeholder="What happened, or what would make this better?"></textarea>
+
+      <button class="transmit-btn" id="transmitBtn">Transmit Report</button>
+      <p class="report-handoff">Handing off to <a href="https://cluegrid.games/feedback" target="_blank" rel="noopener" style="color:var(--gold)">cluegrid.games/feedback</a> to submit.</p>
+    </div>
+  </div>
+</div>
+
+<div class="transcript" id="transcript">
+  <div class="speaker-row">
+    <div class="speaker-chip" id="chip"></div>
+    <div class="dialogue-controls">
+      <button class="sfx-toggle" id="sfxToggle" aria-pressed="true" title="Toggle typing sound">
+        <svg class="sfx-icon" width="20" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect class="cursor-mark" x="1" y="4" width="2.4" height="8" rx="0.5"/>
+          <g class="bars">
+            <rect class="bar bar1" x="8" y="6" width="2.6" height="4" rx="1"/>
+            <rect class="bar bar2" x="13" y="3" width="2.6" height="10" rx="1"/>
+            <rect class="bar bar3" x="18" y="5.5" width="2.6" height="5" rx="1"/>
+          </g>
+          <line class="mute-slash" x1="1" y1="1" x2="23" y2="15" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="skip-btn" id="skipBtn">Skip briefing</button>
+    </div>
+  </div>
+  <div class="line-box" id="lineBox"><span id="lineText"></span><span class="cursor" id="cursor" style="display:none;"></span></div>
+</div>
+
+<div class="cta-wrap" id="ctaWrap">
+  <div class="stamp-ring">CLEARANCE<br/>GRANTED</div>
+  <button class="enter-btn" id="enterBtn">ENTER AS GUEST <span class="arrow">→</span></button>
+  <div class="cta-sub">No badge required · guest clearance</div>
+  <div class="cta-links">
+    <a href="https://cluegrid.games/rules" target="_blank" rel="noopener">How to play</a>
+    <span class="divider">·</span>
+    <a href="https://cluegrid.games/login" target="_blank" rel="noopener">Already have an account? Sign in →</a>
+  </div>
+</div>
+
+<div class="wipe" id="wipe"></div>
+
+<div class="welcome" id="welcome">
+  <div class="welcome-card">
+
+    <div class="field-block">
+      <div class="field-label">Game Mode</div>
+      <div class="pill-row" id="modeRow">
+        <button class="pill active" data-mode="multi-team">Multi-Team</button>
+        <button class="pill" data-mode="duet">Duet</button>
+      </div>
+    </div>
+
+    <div class="field-block" id="teamsBlock">
+      <div class="field-label">Number of Teams</div>
+      <div class="pill-row" id="teamsRow">
+        <button class="pill active" data-teams="2">2 Teams</button>
+        <button class="pill" data-teams="3">3 Teams</button>
+        <button class="pill" data-teams="4">4 Teams</button>
+      </div>
+      <div class="helper-text" id="teamsHelper">2 Teams: 9 / 8 Cards, 7 Neutrals, 1 Assassin (5x5)</div>
+    </div>
+
+    <div class="field-block">
+      <div class="field-label">Gameplay Word Pack Language</div>
+      <div class="select-wrap">
+        <select class="lang-select" id="langSelect">
+          <option value="en">🇬🇧 English</option>
+          <option value="es">🇪🇸 Spanish</option>
+          <option value="fr">🇫🇷 French</option>
+          <option value="de">🇩🇪 German</option>
+          <option value="hi">🇮🇳 Hindi</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="create-btn" id="createBtn">Create Room</button>
+    <button class="replay-link" id="replayBtn">Run the briefing again</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ============ THREE.JS SCENE ============ */
+const container = document.getElementById('scene');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x081619);
+scene.fog = new THREE.FogExp2(0x081619, 0.055);
+
+const camera = new THREE.PerspectiveCamera(42, window.innerWidth/window.innerHeight, 0.1, 100);
+let baseCameraZ = 5.4;
+camera.position.set(0, 2.3, baseCameraZ);
+camera.lookAt(0, 1.7, 0);
+
+function updateCameraFraming(){
+  const aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = aspect;
+  // beyond a standard 16:9 frame, pull the camera in so the operatives
+  // keep filling the shot instead of just adding more empty stage on the sides
+  const baseAspect = 1.78;
+  const overshoot = Math.max(0, aspect - baseAspect);
+  baseCameraZ = 5.4 - Math.min(1.5, overshoot * 1.4);
+  if(!entering) camera.position.z = baseCameraZ;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+container.appendChild(renderer.domElement);
+
+/* lighting */
+scene.add(new THREE.AmbientLight(0x2a3a3d, 0.7));
+
+const spotGold = new THREE.SpotLight(0xFFC43D, 2.4, 14, Math.PI/6, 0.5, 1.2);
+spotGold.position.set(-2.4, 5.5, 2.5);
+spotGold.target.position.set(-1.6, 1.6, 0);
+scene.add(spotGold, spotGold.target);
+
+const spotRose = new THREE.SpotLight(0xEF959C, 2.4, 14, Math.PI/6, 0.5, 1.2);
+spotRose.position.set(2.4, 5.5, 2.5);
+spotRose.target.position.set(1.6, 1.6, 0);
+scene.add(spotRose, spotRose.target);
+
+const rim = new THREE.PointLight(0x1B9AAA, 1.1, 20);
+rim.position.set(0, 2.5, -3);
+scene.add(rim);
+
+/* ---------- glow sprite helper (fake bloom) ---------- */
+function makeGlowTexture(hex){
+  const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+  const ctx = c.getContext('2d');
+  const col = '#' + hex.toString(16).padStart(6,'0');
+  const grad = ctx.createRadialGradient(128,128,0,128,128,128);
+  grad.addColorStop(0, col);
+  grad.addColorStop(0.35, col);
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,256,256);
+  return new THREE.CanvasTexture(c);
+}
+function addGlowSprite(color, x,y,z, scale, opacity){
+  const tex = makeGlowTexture(color);
+  const mat = new THREE.SpriteMaterial({ map:tex, color:color, transparent:true, opacity:opacity, blending:THREE.AdditiveBlending, depthWrite:false });
+  const sprite = new THREE.Sprite(mat);
+  sprite.position.set(x,y,z);
+  sprite.scale.set(scale,scale,1);
+  scene.add(sprite);
+  return sprite;
+}
+// ambient color pools behind each operative + a warm center glow — spread wider to cover wide viewports
+/* ---------- toon gradient map (cel-shading bands, the core of the anime-shader look) ---------- */
+function makeToonGradient(){
+  const data = new Uint8Array([60, 60, 60, 130, 130, 130, 200, 200, 200, 255, 255, 255]);
+  const tex = new THREE.DataTexture(data, 4, 1, THREE.RGBFormat);
+  tex.needsUpdate = true;
+  tex.magFilter = THREE.NearestFilter;
+  tex.minFilter = THREE.NearestFilter;
+  return tex;
+}
+const toonGradient = makeToonGradient();
+
+addGlowSprite(0xB2EF9B, -4.4, 2.2, -4.5, 8.5, 0.2);
+addGlowSprite(0xEF959C, 4.4, 2.2, -4.5, 8.5, 0.2);
+addGlowSprite(0xFFC43D, 0, 3.4, -6, 9, 0.18);
+addGlowSprite(0x1B9AAA, 0, 0.4, -3, 10, 0.15);
+// low, wide floor-level fill so the far left/right edges don't read as empty void
+addGlowSprite(0xB2EF9B, -8, 0.6, -5, 6, 0.14);
+addGlowSprite(0xEF959C, 8, 0.6, -5, 6, 0.14);
+
+/* ---------- noir skyline backdrop ---------- */
+function makeSkylineTexture(){
+  const w = 2048, h = 512;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  const sky = ctx.createLinearGradient(0,0,0,h);
+  sky.addColorStop(0, '#050f13');
+  sky.addColorStop(0.6, '#0a1c21');
+  sky.addColorStop(1, '#0c2126');
+  ctx.fillStyle = sky; ctx.fillRect(0,0,w,h);
+
+  const winColors = ['#FFC43D','#B2EF9B','#EF959C','#1B9AAA'];
+  function drawBuildingRow(baseY, minH, maxH, minW, maxW, alpha){
+    let x = 0;
+    while(x < w){
+      const bw = minW + Math.random()*(maxW-minW);
+      const bh = minH + Math.random()*(maxH-minH);
+      ctx.fillStyle = `rgba(4,12,15,${alpha})`;
+      ctx.fillRect(x, baseY-bh, bw, bh);
+      for(let wy = baseY-bh+10; wy < baseY-8; wy += 16){
+        for(let wx = x+6; wx < x+bw-6; wx += 14){
+          if(Math.random() < 0.16){
+            ctx.fillStyle = winColors[Math.floor(Math.random()*winColors.length)];
+            ctx.globalAlpha = 0.55;
+            ctx.fillRect(wx, wy, 5, 7);
+            ctx.globalAlpha = 1;
+          }
+        }
+      }
+      x += bw + 4 + Math.random()*10;
+    }
+  }
+  drawBuildingRow(h*0.78, 60, 160, 40, 90, 0.55);
+  drawBuildingRow(h*0.9, 100, 260, 30, 70, 0.85);
+
+  const haze = ctx.createLinearGradient(0,h*0.55,0,h);
+  haze.addColorStop(0,'rgba(11,32,39,0)');
+  haze.addColorStop(1,'rgba(8,22,25,0.9)');
+  ctx.fillStyle = haze; ctx.fillRect(0,0,w,h);
+
+  const tex = new THREE.CanvasTexture(c);
+  return tex;
+}
+const skylineMat = new THREE.MeshBasicMaterial({ map: makeSkylineTexture(), fog:true });
+const skyline = new THREE.Mesh(new THREE.PlaneGeometry(64, 13), skylineMat);
+skyline.position.set(0, 4.2, -9);
+scene.add(skyline);
+
+/* floor grid */
+function makeGridTexture(){
+  const c = document.createElement('canvas'); c.width = 512; c.height = 512;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#0c2126'; ctx.fillRect(0,0,512,512);
+  const step = 64;
+  let gi = 0;
+  for(let i=0;i<=512;i+=step){
+    ctx.strokeStyle = gi % 4 === 0 ? 'rgba(255,196,61,0.28)' : 'rgba(178,239,155,0.1)';
+    ctx.lineWidth = gi % 4 === 0 ? 2 : 1;
+    ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,512); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(512,i); ctx.stroke();
+    gi++;
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(10,10);
+  return tex;
+}
+const floorGeo = new THREE.PlaneGeometry(60,60);
+const floorMat = new THREE.MeshStandardMaterial({ map: makeGridTexture(), roughness:0.9, metalness:0.1 });
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.rotation.x = -Math.PI/2;
+scene.add(floor);
+
+/* drifting dust particles */
+const particleCount = 180;
+const pGeo = new THREE.BufferGeometry();
+const positions = new Float32Array(particleCount*3);
+for(let i=0;i<particleCount;i++){
+  positions[i*3] = (Math.random()-0.5)*22;
+  positions[i*3+1] = Math.random()*5.5;
+  positions[i*3+2] = (Math.random()-0.5)*12;
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+const pMat = new THREE.PointsMaterial({ color:0xB2EF9B, size:0.02, transparent:true, opacity:0.35 });
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+/* ---------- drifting letter tiles: fills the empty flanking columns with
+   the actual product mechanic (grid letters) instead of arbitrary decoration ---------- */
+function makeLetterTexture(letter, colorHex){
+  const c = document.createElement('canvas'); c.width = 128; c.height = 128;
+  const ctx = c.getContext('2d');
+  ctx.strokeStyle = colorHex; ctx.lineWidth = 4; ctx.globalAlpha = 0.55;
+  ctx.strokeRect(16,16,96,96);
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = colorHex;
+  ctx.font = "700 60px 'JetBrains Mono', monospace";
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(letter, 64, 70);
+  return new THREE.CanvasTexture(c);
+}
+const tileLetters = 'CLUEGRIDWORDPACKTEAMASSASSINGUESSVERB';
+const tileColors = [0xFFC43D, 0xB2EF9B, 0xEF959C, 0x1B9AAA];
+const letterTiles = [];
+function seedLetterZone(count, xMin, xMax, yMin, yMax, zMin, zMax){
+  for(let i=0;i<count;i++){
+    const ch = tileLetters[Math.floor(Math.random()*tileLetters.length)];
+    const colHex = tileColors[Math.floor(Math.random()*tileColors.length)];
+    const colStr = '#' + colHex.toString(16).padStart(6,'0');
+    const mat = new THREE.SpriteMaterial({ map:makeLetterTexture(ch, colStr), transparent:true, opacity:0, depthWrite:false });
+    const spr = new THREE.Sprite(mat);
+    const x = xMin + Math.random()*(xMax-xMin);
+    const z = zMin + Math.random()*(zMax-zMin);
+    spr.position.set(x, yMin, z);
+    const s = 0.58 + Math.random()*0.42;
+    spr.scale.set(s,s,1);
+    spr.userData = {
+      baseY: Math.random()*(yMax-yMin),
+      yMin, yMax, x, z,
+      speed: 0.06 + Math.random()*0.08,
+      phase: Math.random()*Math.PI*2,
+      baseOpacity: 0.32 + Math.random()*0.34
+    };
+    scene.add(spr);
+    letterTiles.push(spr);
+  }
+}
+// far-left and far-right columns — the two dead zones flagged in review
+seedLetterZone(12, -11.5, -6, 0.4, 5.6, -7, -1.5);
+seedLetterZone(12, 6, 11.5, 0.4, 5.6, -7, -1.5);
+// thin band above/between the operatives' heads, staying clear of the dialogue + CTA area
+seedLetterZone(8, -2.6, 2.6, 3.4, 5.6, -6, -3.5);
+
+/* ---------- grid hologram + preview cards ----------
+   Real 3D geometry (not a sprite): a small wireframe grid frame — literally a
+   miniature of the actual word-grid — with orbiting cards color-coded exactly
+   like real ClueGrid cards (team / neutral / assassin), floating in the two
+   side dead-zones. Self-lit so it reads as a projected hologram regardless
+   of scene lighting. */
+function roundRectPath(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+function makeGridCardTexture(word, colorHex, isAssassin){
+  const c = document.createElement('canvas'); c.width = 200; c.height = 240;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = isAssassin ? '#0a0a0a' : '#0d1116';
+  roundRectPath(ctx, 6, 6, 188, 228, 16); ctx.fill();
+  ctx.strokeStyle = colorHex; ctx.lineWidth = isAssassin ? 3 : 4;
+  roundRectPath(ctx, 6, 6, 188, 228, 16); ctx.stroke();
+  ctx.fillStyle = colorHex;
+  ctx.beginPath(); ctx.arc(30, 34, 7, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#EDEFEC';
+  ctx.font = "700 24px 'JetBrains Mono', monospace";
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(word, 100, 145);
+  if(isAssassin){
+    ctx.strokeStyle = colorHex; ctx.lineWidth = 4; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(80,185); ctx.lineTo(120,205); ctx.moveTo(120,185); ctx.lineTo(80,205); ctx.stroke();
+  }
+  return new THREE.CanvasTexture(c);
+}
+function makeHologramFrame(){
+  const size = 2.6;
+  const group = new THREE.Group();
+  const boxGeo = new THREE.BoxGeometry(size, size, 0.02);
+  const edges = new THREE.EdgesGeometry(boxGeo);
+  const frame = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color:0xFFC43D, transparent:true, opacity:0.62 }));
+  group.add(frame);
+
+  const pts = [];
+  const step = size/3;
+  for(let i=1;i<3;i++){
+    const p = -size/2 + i*step;
+    pts.push(-size/2,p,0, size/2,p,0);
+    pts.push(p,-size/2,0, p,size/2,0);
+  }
+  const innerGeo = new THREE.BufferGeometry();
+  innerGeo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+  const innerLines = new THREE.LineSegments(innerGeo, new THREE.LineBasicMaterial({ color:0xFFC43D, transparent:true, opacity:0.3 }));
+  group.add(innerLines);
+
+  // base projector emitter — small glowing disc at the floor of the hologram,
+  // sells the "this is being projected" read at a glance
+  const baseDisc = new THREE.Mesh(new THREE.CircleGeometry(size*0.42, 24), new THREE.MeshBasicMaterial({ color:0xFFC43D, transparent:true, opacity:0.1 }));
+  baseDisc.rotation.x = -Math.PI/2;
+  baseDisc.position.y = -size/2 - 0.02;
+  group.add(baseDisc);
+  return group;
+}
+
+const hologramGroups = [];
+function createGridHologram(x, y, z, cards){
+  const group = new THREE.Group();
+  group.position.set(x, y, z);
+  group.add(makeHologramFrame());
+
+  cards.forEach((spec, idx) => {
+    const colorStr = '#' + spec.color.toString(16).padStart(6,'0');
+    const tex = makeGridCardTexture(spec.word, colorStr, !!spec.assassin);
+    const mat = new THREE.MeshBasicMaterial({ map:tex, transparent:true, opacity:0, depthWrite:false });
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.86, 1.05), mat);
+    const ang = (idx / cards.length) * Math.PI * 2;
+    mesh.position.set(Math.cos(ang)*0.92, Math.sin(ang)*0.74, 0.22 + idx*0.03);
+    mesh.userData = {
+      baseOpacity: 0.5 + Math.random()*0.28,
+      phase: Math.random()*Math.PI*2,
+      bobSpeed: 0.3 + Math.random()*0.2,
+      spinSpeed: 0.12 + Math.random()*0.12,
+      baseY: mesh.position.y
+    };
+    group.add(mesh);
+  });
+  scene.add(group);
+  hologramGroups.push(group);
+  return group;
+}
+
+createGridHologram(-8.6, 2.9, -4.6, [
+  { word:'OCEAN', color:0xB2EF9B },
+  { word:'MIRROR', color:0xEF959C },
+  { word:'ANCHOR', color:0x9AA29B }
+]);
+createGridHologram(8.6, 2.9, -4.6, [
+  { word:'ORBIT', color:0xB2EF9B },
+  { word:'VOID', color:0xFFC43D, assassin:true },
+  { word:'LANTERN', color:0x9AA29B }
+]);
+
+/* ---------- illustrated portrait bust — flat-shaded, anime-style, drawn from primitive
+   canvas shapes (arcs + curves), not traced from any existing character. Parameterized by
+   accent color + hairstyle so each operative reads as visually distinct. ---------- */
+function drawPortraitBust(ctx, cx, cy, r, accentHex, hairStyle){
+  const hex = '#' + accentHex.toString(16).padStart(6,'0');
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  // collar / shoulders
+  ctx.fillStyle = '#161c22';
+  ctx.beginPath();
+  ctx.moveTo(-r*1.15, r*1.7);
+  ctx.quadraticCurveTo(-r*1.1, r*0.55, 0, r*0.5);
+  ctx.quadraticCurveTo(r*1.1, r*0.55, r*1.15, r*1.7);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = hex; ctx.lineWidth = 2; ctx.stroke();
+
+  // neck
+  ctx.fillStyle = '#8a6a5c';
+  ctx.fillRect(-r*0.22, r*0.28, r*0.44, r*0.35);
+
+  // head (flat skin tone, subtle cel shadow on one side)
+  ctx.fillStyle = '#9c7a68';
+  ctx.beginPath(); ctx.ellipse(0,0, r*0.72, r*0.82, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(0,0,0,0.14)';
+  ctx.beginPath(); ctx.ellipse(r*0.28,r*0.05, r*0.42, r*0.75, 0, -0.4, 1.6); ctx.fill();
+
+  // hair — shape varies by hairStyle, colored dark with an accent-colored streak
+  ctx.fillStyle = '#0d0f12';
+  if(hairStyle === 'swept'){
+    ctx.beginPath();
+    ctx.moveTo(-r*0.78,-r*0.15);
+    ctx.quadraticCurveTo(-r*0.9,-r*1.05, 0,-r*1.02);
+    ctx.quadraticCurveTo(r*0.95,-r*1.1, r*0.65,-r*0.1);
+    ctx.quadraticCurveTo(r*0.3,-r*0.55, r*0.05,-r*0.2);
+    ctx.quadraticCurveTo(-r*0.35,-r*0.65, -r*0.78,-r*0.15);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = hex; ctx.globalAlpha = 0.55;
+    ctx.beginPath(); ctx.moveTo(r*0.2,-r*0.95); ctx.quadraticCurveTo(r*0.55,-r*0.5,r*0.35,-r*0.05); ctx.quadraticCurveTo(r*0.15,-r*0.5,r*0.2,-r*0.95); ctx.fill();
+    ctx.globalAlpha = 1;
+  } else {
+    ctx.beginPath();
+    ctx.ellipse(0,-r*0.35, r*0.82, r*0.55, 0, Math.PI, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = hex; ctx.globalAlpha = 0.5;
+    ctx.fillRect(-r*0.7,-r*0.42, r*0.3, r*0.16);
+    ctx.globalAlpha = 1;
+  }
+
+  // eyes — narrow, angled, accent-colored (the "operative in shadow" read, stylized not literal)
+  ctx.fillStyle = hex;
+  [-1,1].forEach(side => {
+    ctx.save();
+    ctx.translate(side*r*0.28, r*0.06);
+    ctx.rotate(side*-0.12);
+    ctx.beginPath(); ctx.ellipse(0,0, r*0.16, r*0.065, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.globalAlpha = 0.8;
+    ctx.beginPath(); ctx.arc(side*r*0.04,-r*0.02, r*0.035, 0, Math.PI*2); ctx.fill();
+    ctx.globalAlpha = 1; ctx.fillStyle = hex;
+    ctx.restore();
+  });
+  // brow line
+  ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.lineWidth = r*0.05; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(-r*0.4,-r*0.16); ctx.lineTo(-r*0.14,-r*0.22); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(r*0.14,-r*0.22); ctx.lineTo(r*0.4,-r*0.16); ctx.stroke();
+
+  ctx.restore();
+}
+
+/* ---------- case-file monitor: sits below the grid hologram in the same
+   dead columns. Ties into the "classified briefing / case file" narrative
+   already established by the header and watermark, instead of adding an
+   unrelated decorative system. Redaction bars + scanline are real animated
+   children (userData-driven), not baked into the static texture. ---------- */
+function makeCaseFileTexture(feedId, operative){
+  const w = 320, h = 400;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#050d10'; ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle = 'rgba(255,196,61,0.5)'; ctx.lineWidth = 3;
+  ctx.strokeRect(6,6,w-12,h-12);
+
+  ctx.fillStyle = 'rgba(255,196,61,0.85)';
+  ctx.font = "700 15px 'JetBrains Mono', monospace";
+  ctx.textAlign = 'left';
+  ctx.fillText('FEED: ' + feedId, 22, 34);
+  ctx.fillStyle = 'rgba(238,243,238,0.4)';
+  ctx.font = "500 11px 'JetBrains Mono', monospace";
+  ctx.fillText('OPERATIVES LOG: VALIDATED', 22, 54);
+
+  // illustrated dossier portrait, replacing the old fingerprint dot-grid placeholder
+  drawPortraitBust(ctx, 234, 108, 46, operative.accent, operative.hairStyle);
+  ctx.fillStyle = '#' + operative.accent.toString(16).padStart(6,'0');
+  ctx.font = "700 12px 'JetBrains Mono', monospace";
+  ctx.textAlign = 'center';
+  ctx.fillText(operative.name, 234, 172);
+  ctx.fillStyle = 'rgba(238,243,238,0.45)';
+  ctx.font = "500 9.5px 'JetBrains Mono', monospace";
+  ctx.fillText(operative.role, 234, 186);
+  ctx.textAlign = 'left';
+
+  // redaction bars — permanent black strokes baked in (the flashing ones are separate meshes)
+  ctx.fillStyle = '#000';
+  const barsY = [96, 118, 140, 220, 242, 264];
+  barsY.forEach(by => {
+    const bw = 60 + Math.random()*100;
+    ctx.fillRect(22, by, bw, 12);
+  });
+
+  ctx.fillStyle = 'rgba(178,239,155,0.7)';
+  ctx.font = "700 12px 'JetBrains Mono', monospace";
+  ctx.fillText('DEX_NET ACTIVE', 22, h-58);
+  ctx.fillStyle = 'rgba(238,243,238,0.32)';
+  ctx.font = "500 10px 'JetBrains Mono', monospace";
+  ctx.fillText('CYBERNET PROTOCOL', 22, h-38);
+  ctx.fillText('AUTH: CLUEGRID INTEL DIV.', 22, h-22);
+
+  return new THREE.CanvasTexture(c);
+}
+
+const caseMonitors = [];
+function createCaseMonitor(x, y, z, feedId, operative){
+  const group = new THREE.Group();
+  group.position.set(x, y, z);
+
+  const bezel = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.86, 2.3),
+    new THREE.MeshBasicMaterial({ color:0x02080a, transparent:true, opacity:0.55 })
+  );
+  bezel.position.z = -0.01;
+  group.add(bezel);
+
+  const screenMat = new THREE.MeshBasicMaterial({ map: makeCaseFileTexture(feedId, operative), transparent:true, opacity:0 });
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 2.1), screenMat);
+  group.add(screen);
+
+  // moving scanline — a soft additive band that sweeps top to bottom, like the
+  // report panel's .scan-sweep but rendered as real 3D geometry
+  const scanTex = makeGlowTexture(0xFFC43D);
+  const scanMat = new THREE.MeshBasicMaterial({ map:scanTex, transparent:true, opacity:0.35, blending:THREE.AdditiveBlending, depthWrite:false });
+  const scanline = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 0.5), scanMat);
+  scanline.position.z = 0.01;
+  group.add(scanline);
+
+  // flashing redaction chips — small opaque bars that blink on/off independently,
+  // reinforcing "actively being redacted" rather than a static image
+  const flashers = [];
+  const flashSpecs = [ [-0.32,0.58,0.5], [0.1,0.36,0.7], [-0.2,-0.02,0.42] ];
+  flashSpecs.forEach(([fx,fy,fw]) => {
+    const fm = new THREE.Mesh(new THREE.PlaneGeometry(fw, 0.1), new THREE.MeshBasicMaterial({ color:0xFFC43D, transparent:true, opacity:0 }));
+    fm.position.set(fx, fy, 0.015);
+    fm.userData = { phase: Math.random()*Math.PI*2, speed: 0.5 + Math.random()*0.4 };
+    group.add(fm);
+    flashers.push(fm);
+  });
+
+  const blinkDot = new THREE.Mesh(new THREE.CircleGeometry(0.035,12), new THREE.MeshBasicMaterial({ color:0xEF959C }));
+  blinkDot.position.set(0.78, 0.98, 0.02);
+  group.add(blinkDot);
+
+  group.userData = { screenMat, scanline, flashers, blinkDot, phase: Math.random()*Math.PI*2 };
+  scene.add(group);
+  caseMonitors.push(group);
+  return group;
+}
+
+createCaseMonitor(-9.1, 1.05, -3.9, 'OPER-01', { name:'NOX-7', role:'Analyst', accent:0xB2EF9B, hairStyle:'swept' });
+createCaseMonitor(9.1, 1.05, -3.9, 'OPER-02', { name:'ORACLE-3', role:'Leader', accent:0xEF959C, hairStyle:'short' });
+
+/* ---------- illustrated spy silhouette — full trench-coat-and-fedora figure, drawn as
+   real vector artwork (bezier coat flare, popped collar, pocketed hand) and rendered as a
+   camera-facing billboard. This replaces the primitive-geometry body entirely — no boxes,
+   cylinders, or spheres standing in for a torso — because that was the actual complaint,
+   not a shading problem. ---------- */
+function makeSpyTexture(accentHex, hairStyle, handedness){
+  const w = 300, h = 600;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  const hex = '#' + accentHex.toString(16).padStart(6,'0');
+  const cx = w/2;
+  const flip = handedness === 'left' ? -1 : 1;
+
+  // ground contact shadow
+  ctx.fillStyle = 'rgba(0,0,0,0.4)';
+  ctx.beginPath(); ctx.ellipse(cx, 572, 62, 12, 0, 0, Math.PI*2); ctx.fill();
+
+  // shoes
+  ctx.fillStyle = '#0c0e11';
+  ctx.beginPath(); ctx.ellipse(cx-22, 560, 20, 11, 0.1, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx+22, 560, 20, 11, -0.1, 0, Math.PI*2); ctx.fill();
+
+  // trousers (mostly hidden by coat, visible at the cuff)
+  ctx.fillStyle = '#14171c';
+  ctx.fillRect(cx-34, 500, 26, 62);
+  ctx.fillRect(cx+8, 500, 26, 62);
+
+  // ---- coat: drawn as one flared silhouette with a bezier hem ----
+  ctx.fillStyle = '#191d24';
+  ctx.beginPath();
+  ctx.moveTo(cx-58, 250);
+  ctx.bezierCurveTo(cx-95, 340, cx-100, 460, cx-96, 520);
+  ctx.lineTo(cx+96, 520);
+  ctx.bezierCurveTo(cx+100, 460, cx+95, 340, cx+58, 250);
+  ctx.closePath(); ctx.fill();
+
+  // coat rim-light on one side — the cel-shading accent that carries the character's color identity
+  ctx.save(); ctx.globalAlpha = 0.5;
+  ctx.fillStyle = hex;
+  ctx.beginPath();
+  ctx.moveTo(cx+40, 258);
+  ctx.bezierCurveTo(cx+78, 340, cx+90, 450, cx+88, 512);
+  ctx.lineTo(cx+96, 520);
+  ctx.bezierCurveTo(cx+100, 460, cx+95, 340, cx+58, 250);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  // open coat front + lining flash
+  ctx.fillStyle = '#0c0e11';
+  ctx.beginPath();
+  ctx.moveTo(cx-6, 268); ctx.lineTo(cx-24, 500); ctx.lineTo(cx-2, 500);
+  ctx.bezierCurveTo(cx+4, 400, cx+2, 320, cx+10, 268); ctx.closePath(); ctx.fill();
+  ctx.save(); ctx.globalAlpha = 0.65; ctx.fillStyle = hex;
+  ctx.beginPath();
+  ctx.moveTo(cx-6, 270); ctx.lineTo(cx-16, 420); ctx.lineTo(cx-3, 420);
+  ctx.lineTo(cx+2, 270); ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  // belt
+  ctx.fillStyle = '#0c0e11'; ctx.fillRect(cx-62, 372, 124, 14);
+  ctx.fillStyle = hex; ctx.fillRect(cx-8, 373, 16, 12);
+
+  // shoulders / lapels
+  ctx.fillStyle = '#20252d';
+  ctx.beginPath();
+  ctx.moveTo(cx-58,250); ctx.lineTo(cx-30,225); ctx.lineTo(cx-6,268); ctx.lineTo(cx-40,278); ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(cx+58,250); ctx.lineTo(cx+30,225); ctx.lineTo(cx+6,268); ctx.lineTo(cx+40,278); ctx.closePath(); ctx.fill();
+
+  // arms — one relaxed along the body, one tucked into the coat pocket (classic operative stance)
+  ctx.fillStyle = '#191d24';
+  ctx.beginPath(); // relaxed arm
+  ctx.moveTo(cx-58*flip, 258); ctx.quadraticCurveTo(cx-84*flip, 340, cx-72*flip, 430);
+  ctx.lineTo(cx-52*flip, 428); ctx.quadraticCurveTo(cx-62*flip, 340, cx-38*flip, 262); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#8a6a5c';
+  ctx.beginPath(); ctx.ellipse(cx-64*flip, 438, 12, 15, 0, 0, Math.PI*2); ctx.fill();
+  // pocketed arm — a bent fold shape reads as "hand tucked in", no separate hand needed
+  ctx.fillStyle = '#15181d';
+  ctx.beginPath();
+  ctx.moveTo(cx+30*flip, 265); ctx.quadraticCurveTo(cx+58*flip, 320, cx+46*flip, 370);
+  ctx.quadraticCurveTo(cx+26*flip, 382, cx+14*flip, 372);
+  ctx.quadraticCurveTo(cx+24*flip, 320, cx+8*flip, 268); ctx.closePath(); ctx.fill();
+
+  // collar — popped up on both sides framing the jaw, the single strongest "spy" silhouette cue
+  ctx.fillStyle = '#20252d';
+  ctx.beginPath(); ctx.moveTo(cx-46,232); ctx.lineTo(cx-14,196); ctx.lineTo(cx-4,236); ctx.lineTo(cx-30,252); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(cx+46,232); ctx.lineTo(cx+14,196); ctx.lineTo(cx+4,236); ctx.lineTo(cx+30,252); ctx.closePath(); ctx.fill();
+  ctx.save(); ctx.globalAlpha = 0.4; ctx.fillStyle = hex;
+  ctx.beginPath(); ctx.moveTo(cx+46,232); ctx.lineTo(cx+30,210); ctx.lineTo(cx+22,232); ctx.lineTo(cx+30,252); ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  // neck + face
+  ctx.fillStyle = '#8a6a5c';
+  ctx.fillRect(cx-11, 205, 22, 26);
+  ctx.beginPath(); ctx.ellipse(cx, 178, 30, 34, 0, 0, Math.PI*2); ctx.fill();
+  ctx.save(); ctx.globalAlpha = 0.14; ctx.fillStyle = '#000';
+  ctx.beginPath(); ctx.ellipse(cx+11,180, 18, 32, 0, -0.4, 1.6); ctx.fill();
+  ctx.restore();
+
+  // eyes — narrow, angled, accent-glow (the "operative in shadow" read)
+  ctx.fillStyle = hex;
+  [-1,1].forEach(side => {
+    ctx.save(); ctx.translate(cx+side*11, 176); ctx.rotate(side*-0.14);
+    ctx.beginPath(); ctx.ellipse(0,0,6.5,2.6,0,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  });
+  ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 2.2; ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(cx-18,166); ctx.lineTo(cx-5,161); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx+5,161); ctx.lineTo(cx+18,166); ctx.stroke();
+  ctx.strokeStyle='rgba(0,0,0,0.4)'; ctx.lineWidth=1.6;
+  ctx.beginPath(); ctx.moveTo(cx-4,196); ctx.lineTo(cx+4,196); ctx.stroke(); // mouth, neutral
+
+  // hair peeking from under the fedora brim
+  ctx.fillStyle = '#0d0f12';
+  if(hairStyle === 'swept'){
+    ctx.beginPath(); ctx.moveTo(cx-30,158); ctx.quadraticCurveTo(cx-40,140,cx-24,132); ctx.quadraticCurveTo(cx-30,150,cx-14,156); ctx.closePath(); ctx.fill();
+  } else {
+    ctx.beginPath(); ctx.ellipse(cx-24,150,9,14,0.3,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx+24,150,9,14,-0.3,0,Math.PI*2); ctx.fill();
+  }
+
+  // fedora — crown + brim, the other unmistakable silhouette cue
+  ctx.fillStyle = '#14171c';
+  ctx.beginPath(); ctx.moveTo(cx-24,142); ctx.quadraticCurveTo(cx-20,102,cx,100); ctx.quadraticCurveTo(cx+20,102,cx+24,142); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx, 144, 52, 14, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = hex; ctx.fillRect(cx-24, 126, 48, 7); // hat band, accent color — identity marker
+
+  return new THREE.CanvasTexture(c);
+}
+
+function createOperative(accentHex, opts){
+  opts = opts || {};
+  const group = new THREE.Group();
+  const tex = makeSpyTexture(accentHex, opts.hairStyle || 'swept', opts.handedness || 'right');
+  const mat = new THREE.SpriteMaterial({ map:tex, transparent:true, alphaTest:0.35 });
+  const sprite = new THREE.Sprite(mat);
+  const height = 2.9 * (opts.scale || 1);
+  const width = height * (300/600);
+  sprite.scale.set(width, height, 1);
+  sprite.position.y = height/2;
+  group.add(sprite);
+
+  const eyeGlow = addGlowSprite(accentHex, 0, height*0.815, 0.16, 0.5, 0.5);
+  group.add(eyeGlow); eyeGlow.position.set(0, height*0.815, 0.18);
+  const groundGlow = addGlowSprite(accentHex, 0, 0.04, 0.16, 1.5, 0.14);
+  groundGlow.rotation.x = -Math.PI/2; group.add(groundGlow);
+
+  group.userData = { sprite, mat, eyeGlow, baseY:0, speaking:0, ambient: !!opts.ambient };
+  return group;
+}
+
+const opA = createOperative(0xB2EF9B, { hairStyle:'swept', handedness:'right' }); // NOX-7, mint accent — Analyst
+opA.position.set(-1.7, 0, 0);
+scene.add(opA);
+
+const opB = createOperative(0xEF959C, { hairStyle:'short', handedness:'left' }); // ORACLE-3, rose accent — Leader
+opB.position.set(1.7, 0, 0);
+scene.add(opB);
+
+// ---------- ambient supporting cast — original codenames only, no borrowed IP names.
+// These stand further back and never speak; they exist to make "five suspects, one grid"
+// (already in the dialogue below) read as a real ensemble instead of an empty claim.
+const opC = createOperative(0x1B9AAA, { hairStyle:'short', handedness:'right', scale:0.94, ambient:true }); // WARDEN, teal — Military Intel
+opC.position.set(-4.1, 0, -1.3);
+scene.add(opC);
+
+const opD = createOperative(0x9AA29B, { hairStyle:'swept', handedness:'left', scale:0.94, ambient:true }); // GHOST, sage — Infiltrator
+opD.position.set(4.1, 0, -1.3);
+scene.add(opD);
+
+const ambientOperatives = [opC, opD];
+
+/* ---------- animation loop ---------- */
+const clock = new THREE.Clock();
+let camDrift = true;
+let dollyProgress = 0;
+let entering = false;
+let currentSpeaker = null;
+updateCameraFraming();
+
+function animateOperative(op, t, isSpeaking){
+  const d = op.userData;
+  const targetSpeak = isSpeaking ? 1 : 0;
+  d.speaking += (targetSpeak - d.speaking) * 0.08;
+
+  op.position.y = Math.sin(t*1.4 + op.position.x) * 0.035;
+  // a flat billboard can't swing an arm, so "speaking" reads through a slight in-plane
+  // sway (material.rotation) plus a brighter, flickering eye-glow — a talking-head cue
+  d.mat.rotation = Math.sin(t*7) * 0.05 * d.speaking + Math.sin(t*0.5 + op.position.x) * 0.015;
+  d.eyeGlow.material.opacity = 0.4 + d.speaking*0.5 + Math.abs(Math.sin(t*6))*d.speaking*0.15;
+  op.scale.setScalar(1 + d.speaking*0.025);
+}
+
+// slow breathing sway for the two silent background operatives — enough life to
+// read as "present in the scene", without competing with whoever is actually speaking
+function animateAmbient(op, t){
+  const d = op.userData;
+  op.position.y = Math.sin(t*0.9 + op.position.x) * 0.02;
+  d.mat.rotation = Math.sin(t*0.3 + op.position.x*0.5) * 0.02;
+  d.eyeGlow.material.opacity = 0.32 + Math.abs(Math.sin(t*0.8 + op.position.x)) * 0.16;
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+
+  animateOperative(opA, t, currentSpeaker === 'A');
+  animateOperative(opB, t, currentSpeaker === 'B');
+  ambientOperatives.forEach(op => animateAmbient(op, t));
+
+  particles.rotation.y = t * 0.01;
+
+  letterTiles.forEach(spr => {
+    const d = spr.userData;
+    const range = d.yMax - d.yMin;
+    spr.position.y = d.yMin + ((d.baseY + t*d.speed) % range);
+    spr.material.opacity = d.baseOpacity * (0.35 + 0.65*Math.abs(Math.sin(t*0.35 + d.phase)));
+  });
+
+  caseMonitors.forEach(g => {
+    const d = g.userData;
+    if(d.screenMat.opacity < 0.78) d.screenMat.opacity += 0.006; // slow power-on fade
+
+    const sweepT = (t*0.18 + d.phase) % 1.6;
+    d.scanline.position.y = 1.05 - sweepT * 2.1;
+    d.scanline.material.opacity = 0.28 * Math.max(0, 1 - Math.abs(sweepT-0.8)/0.8);
+
+    d.flashers.forEach(f => {
+      const fd = f.userData;
+      f.material.opacity = Math.max(0, Math.sin(t*fd.speed + fd.phase)) * 0.5;
+    });
+
+    d.blinkDot.material.opacity = 0.4 + Math.abs(Math.sin(t*3 + d.phase)) * 0.6;
+  });
+
+  hologramGroups.forEach(g => {
+    g.rotation.y = t * 0.07;
+    g.rotation.x = Math.sin(t * 0.05) * 0.05;
+    g.children.forEach(child => {
+      const d = child.userData;
+      if(!d || d.baseOpacity === undefined) return;
+      child.material.opacity = d.baseOpacity * (0.5 + 0.5*Math.sin(t*d.bobSpeed*2 + d.phase));
+      child.position.y = d.baseY + Math.sin(t*d.bobSpeed + d.phase) * 0.08;
+      child.rotation.y = t * d.spinSpeed;
+    });
+  });
+
+  if(camDrift && !entering){
+    camera.position.x = Math.sin(t*0.12) * 0.4;
+    camera.position.y = 2.3 + Math.sin(t*0.2) * 0.06;
+    camera.lookAt(0, 1.7, 0);
+  }
+  if(entering){
+    dollyProgress = Math.min(1, dollyProgress + 0.02);
+    camera.position.z = baseCameraZ - dollyProgress*2.6;
+    camera.position.x *= 0.95;
+    camera.lookAt(0, 1.75, 0);
+  }
+
+  renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', updateCameraFraming);
+
+/* ============ DIALOGUE SEQUENCE ============ */
+const lines = [
+  { s:'A', name:'NOX-7', text:"Target's still watching the door. Good instincts." },
+  { s:'B', name:'ORACLE-3', text:"That's not a target. That's our next recruit." },
+  { s:'A', name:'NOX-7', text:"For CLUEGRID? They haven't even seen the board." },
+  { s:'B', name:'ORACLE-3', text:"Nobody sees the board until they sit down. Five suspects, one grid — the truth hides in the overlap." },
+  { s:'A', name:'NOX-7', text:"And if they're slow to crack it?" },
+  { s:'B', name:'ORACLE-3', text:"Then the grid teaches them fast. Sharp minds don't survive it — curious ones do." },
+  { s:'A', name:'NOX-7', text:"Runs on instinct. No confessions, no shortcuts." },
+  { s:'B', name:'ORACLE-3', text:"Ready when you are, recruit. No badge required — guest clearance works." },
+];
+
+let lineIndex = 0;
+let typeTimer = null;
+let advanceTimer = null;
+let sequenceDone = false;
+
+const chipEl = document.getElementById('chip');
+const lineTextEl = document.getElementById('lineText');
+const cursorEl = document.getElementById('cursor');
+const ctaWrap = document.getElementById('ctaWrap');
+const skipBtn = document.getElementById('skipBtn');
+const sfxToggle = document.getElementById('sfxToggle');
+
+/* ============ TYPING SFX: procedural, no external audio files ============
+   Browsers block audio until the user interacts with the page at least once —
+   that's a platform policy, not something JS can override. Blips will start
+   silently and unlock the moment the user clicks/taps/presses any key. */
+const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+let sfxEnabled = true;
+
+function ensureAudio(){
+  if(!AudioCtxClass) return;
+  if(!audioCtx) audioCtx = new AudioCtxClass();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+}
+['pointerdown','keydown','touchstart'].forEach(evt => {
+  document.addEventListener(evt, ensureAudio, { once:true, passive:true });
+});
+
+const speakerPitch = { A: 150, B: 210 }; // NOX-7 lower thump, ORACLE-3 higher — distinct "voice" per character
+
+// precompute one short decaying-noise buffer once and reuse it for every click —
+// cheap to trigger every character, no repeated buffer allocation
+let clickNoiseBuffer = null;
+function getClickNoiseBuffer(){
+  if(clickNoiseBuffer) return clickNoiseBuffer;
+  const len = Math.floor(audioCtx.sampleRate * 0.02);
+  const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for(let i=0;i<len;i++){
+    data[i] = (Math.random()*2 - 1) * Math.pow(1 - i/len, 2); // sharp decay
+  }
+  clickNoiseBuffer = buf;
+  return buf;
+}
+
+function playTypeBlip(speaker){
+  if(!sfxEnabled || !audioCtx || audioCtx.state !== 'running') return;
+  const now = audioCtx.currentTime;
+  const base = speakerPitch[speaker] || 170;
+
+  // layer 1: crisp mechanical "key strike" — filtered noise, very short
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = getClickNoiseBuffer();
+  const noiseFilter = audioCtx.createBiquadFilter();
+  noiseFilter.type = 'highpass';
+  noiseFilter.frequency.value = 3400 + Math.random()*600;
+  const noiseGain = audioCtx.createGain();
+  noiseGain.gain.setValueAtTime(0.16, now);
+  noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.018);
+  noise.connect(noiseFilter);
+  noiseFilter.connect(noiseGain);
+  noiseGain.connect(audioCtx.destination);
+  noise.start(now);
+  noise.stop(now + 0.02);
+
+  // layer 2: low body thump, speaker-pitched — gives each robot a distinct "voice"
+  const osc = audioCtx.createOscillator();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(base + (Math.random()*14 - 7), now);
+  osc.frequency.exponentialRampToValueAtTime(base*0.7, now + 0.03);
+  const oscGain = audioCtx.createGain();
+  oscGain.gain.setValueAtTime(0.0001, now);
+  oscGain.gain.exponentialRampToValueAtTime(0.085, now + 0.003);
+  oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+  osc.connect(oscGain);
+  oscGain.connect(audioCtx.destination);
+  osc.start(now);
+  osc.stop(now + 0.05);
+}
+
+sfxToggle.addEventListener('click', () => {
+  ensureAudio();
+  sfxEnabled = !sfxEnabled;
+  sfxToggle.classList.toggle('muted', !sfxEnabled);
+  sfxToggle.setAttribute('aria-pressed', String(sfxEnabled));
+});
+
+function clearTimers(){
+  if(typeTimer) clearInterval(typeTimer);
+  if(advanceTimer) clearTimeout(advanceTimer);
+}
+
+function typeLine(entry, onDone){
+  chipEl.textContent = entry.name;
+  chipEl.className = 'speaker-chip ' + entry.s + ' show';
+  currentSpeaker = entry.s;
+  lineTextEl.textContent = '';
+  cursorEl.style.display = 'inline-block';
+  let i = 0;
+  typeTimer = setInterval(() => {
+    lineTextEl.textContent = entry.text.slice(0, i+1);
+    const ch = entry.text[i];
+    // blip on every other non-space character — same reveal step as the visible text,
+    // so audio and typing are locked to one clock, not two
+    if(ch && ch !== ' ' && i % 2 === 0){
+      playTypeBlip(entry.s);
+    }
+    i++;
+    if(i >= entry.text.length){
+      clearInterval(typeTimer);
+      cursorEl.style.display = 'none';
+      onDone();
+    }
+  }, 26);
+}
+
+function playSequence(){
+  if(sequenceDone) return;
+  if(lineIndex >= lines.length){
+    finishSequence();
+    return;
+  }
+  typeLine(lines[lineIndex], () => {
+    advanceTimer = setTimeout(() => {
+      lineIndex++;
+      playSequence();
+    }, 1300);
+  });
+}
+
+function finishSequence(){
+  sequenceDone = true;
+  currentSpeaker = null;
+  chipEl.classList.remove('show');
+  lineTextEl.textContent = '';
+  cursorEl.style.display = 'none';
+  skipBtn.classList.add('hide');
+  sfxToggle.classList.add('hide');
+  ctaWrap.classList.add('show');
+}
+
+skipBtn.addEventListener('click', () => {
+  clearTimers();
+  finishSequence();
+});
+
+playSequence();
+
+/* ============ ENTER AS GUEST -> ROOM SETUP FLOW ============ */
+const enterBtn = document.getElementById('enterBtn');
+const wipe = document.getElementById('wipe');
+const welcome = document.getElementById('welcome');
+const replayBtn = document.getElementById('replayBtn');
+const modeRow = document.getElementById('modeRow');
+const teamsBlock = document.getElementById('teamsBlock');
+const teamsRow = document.getElementById('teamsRow');
+const teamsHelper = document.getElementById('teamsHelper');
+const langSelect = document.getElementById('langSelect');
+const createBtn = document.getElementById('createBtn');
+
+const roomState = { mode:'multi-team', teams:'2', lang:'en' };
+
+const teamsInfo = {
+  '2': '2 Teams: 9 / 8 Cards, 7 Neutrals, 1 Assassin (5x5)',
+  '3': '3 Teams: 7 / 7 / 6 Cards, 4 Neutrals, 1 Assassin (5x5)',
+  '4': '4 Teams: 6 / 6 / 6 / 6 Cards, 5 Neutrals, 1 Assassin (6x6)'
+};
+
+modeRow.addEventListener('click', (e) => {
+  const btn = e.target.closest('.pill');
+  if(!btn) return;
+  [...modeRow.children].forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  roomState.mode = btn.dataset.mode;
+  teamsBlock.style.display = roomState.mode === 'duet' ? 'none' : 'block';
+});
+
+teamsRow.addEventListener('click', (e) => {
+  const btn = e.target.closest('.pill');
+  if(!btn) return;
+  [...teamsRow.children].forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  roomState.teams = btn.dataset.teams;
+  teamsHelper.textContent = teamsInfo[roomState.teams];
+});
+
+langSelect.addEventListener('change', () => { roomState.lang = langSelect.value; });
+
+function randomRoomCode(){
+  return Math.random().toString(36).slice(2,7).toUpperCase();
+}
+
+enterBtn.addEventListener('click', () => {
+  entering = true;
+  ctaWrap.classList.remove('show');
+  wipe.classList.add('play');
+  setTimeout(() => { welcome.classList.add('show'); }, 420);
+  setTimeout(() => { wipe.classList.remove('play'); }, 900);
+});
+
+createBtn.addEventListener('click', () => {
+  createBtn.disabled = true;
+  createBtn.textContent = 'Creating room…';
+  const params = new URLSearchParams({
+    mode: roomState.mode,
+    teams: roomState.mode === 'duet' ? '2' : roomState.teams,
+    lang: roomState.lang,
+    guest: '1',
+    room: randomRoomCode()
+  });
+  setTimeout(() => {
+    window.open('https://cluegrid.games/?' + params.toString(), '_blank', 'noopener');
+    createBtn.disabled = false;
+    createBtn.textContent = 'Create Room';
+  }, 650);
+});
+
+replayBtn.addEventListener('click', () => {
+  welcome.classList.remove('show');
+  entering = false;
+  dollyProgress = 0;
+  camera.position.set(0, 2.3, baseCameraZ);
+  lineIndex = 0;
+  sequenceDone = false;
+  skipBtn.classList.remove('hide');
+  sfxToggle.classList.remove('hide');
+  clearTimers();
+  playSequence();
+});
+
+/* ============ FIELD REPORT PANEL ============ */
+const feedbackChip = document.getElementById('feedbackChip');
+const reportOverlay = document.getElementById('reportOverlay');
+const reportPanel = document.getElementById('reportPanel');
+const reportClose = document.getElementById('reportClose');
+const reportTypeRow = document.getElementById('reportTypeRow');
+const reportText = document.getElementById('reportText');
+const transmitBtn = document.getElementById('transmitBtn');
+
+const reportState = { type:'bug' };
+
+function openReportPanel(){
+  ensureAudio();
+  reportOverlay.classList.add('show');
+  setTimeout(() => reportText.focus(), 350);
+}
+function closeReportPanel(){
+  reportOverlay.classList.remove('show');
+  reportPanel.style.transform = '';
+  reportPanel.style.transition = '';
+  reportPanel.classList.remove('tilting');
+}
+
+feedbackChip.addEventListener('click', openReportPanel);
+
+/* ---------- decryption log stream — cycles through system lines to sell
+   "live briefing" without needing a real backend feed ---------- */
+const logMessages = [
+  { tag:'SYSTEM', text:'Establish connection to CLUEGRID relay…' },
+  { tag:'SYSTEM', text:'Handshake accepted — channel encrypted.' },
+  { tag:'MONITOR', text:'NOX-7 analyzing suspect overlap…' },
+  { tag:'SECURITY', text:'WARDEN verified operational clearance.' },
+  { tag:'MONITOR', text:'GHOST signal intermittent — re-acquiring.' },
+  { tag:'SYSTEM', text:'ORACLE-3 has entered the grid.' }
+];
+const logStream = document.getElementById('logStream');
+const MAX_LOG_LINES = 5;
+let logIdx = 0;
+function pushLogLine(){
+  const msg = logMessages[logIdx % logMessages.length];
+  logIdx++;
+  const row = document.createElement('div');
+  row.className = 'log-line';
+  row.innerHTML = '<span class="tag">&gt; ' + msg.tag + ':</span> ' + msg.text;
+  logStream.appendChild(row);
+  while(logStream.children.length > MAX_LOG_LINES){
+    logStream.removeChild(logStream.firstChild);
+  }
+}
+pushLogLine();
+setInterval(pushLogLine, 2600);
+reportClose.addEventListener('click', closeReportPanel);
+reportOverlay.addEventListener('click', (e) => {
+  if(e.target === reportOverlay) closeReportPanel();
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && reportOverlay.classList.contains('show')) closeReportPanel();
+});
+
+// 3D badge-tilt — panel gently follows the cursor like a holographic ID card,
+// only while open, only on pointer (not touch) so it never fights mobile scrolling
+reportPanel.addEventListener('pointermove', (e) => {
+  if(e.pointerType === 'touch') return;
+  reportPanel.style.transition = 'transform 0.12s ease-out';
+  const rect = reportPanel.getBoundingClientRect();
+  const px = (e.clientX - rect.left) / rect.width - 0.5;
+  const py = (e.clientY - rect.top) / rect.height - 0.5;
+  reportPanel.style.transform = `rotateX(${(-py*8).toFixed(2)}deg) rotateY(${(px*10).toFixed(2)}deg)`;
+  reportPanel.classList.add('tilting');
+});
+reportPanel.addEventListener('pointerleave', () => {
+  reportPanel.style.transform = 'rotateX(0deg) rotateY(0deg)';
+  reportPanel.classList.remove('tilting');
+});
+
+reportTypeRow.addEventListener('click', (e) => {
+  const btn = e.target.closest('.pill');
+  if(!btn) return;
+  [...reportTypeRow.children].forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  reportState.type = btn.dataset.type;
+});
+
+// reuse the same typing-blip engine from the briefing dialogue — one sound
+// language for the whole page instead of a separate "form" sound
+reportText.addEventListener('keydown', (e) => {
+  if(e.key.length === 1) playTypeBlip(Math.random() < 0.5 ? 'A' : 'B');
+});
+
+transmitBtn.addEventListener('click', () => {
+  if(!reportText.value.trim()){
+    reportText.focus();
+    return;
+  }
+  transmitBtn.disabled = true;
+  transmitBtn.textContent = 'Transmitting…';
+  reportPanel.classList.add('scanning');
+  const params = new URLSearchParams({
+    type: reportState.type,
+    message: reportText.value.trim()
+  });
+  setTimeout(() => {
+    window.open('https://cluegrid.games/feedback?' + params.toString(), '_blank', 'noopener');
+    reportPanel.classList.remove('scanning');
+    transmitBtn.disabled = false;
+    transmitBtn.textContent = 'Transmit Report';
+    reportText.value = '';
+    closeReportPanel();
+  }, 750);
+});
+</script>
+</body>
+</html>
