@@ -23,9 +23,10 @@ export function LandingPage({
   const { t } = useTranslation();
   const mountRef = useRef<HTMLDivElement>(null);
   const leftCanvasRef = useRef<HTMLCanvasElement>(null);
+  const rightCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // States
-  const [isPlayingBriefing, setIsPlayingBriefing] = useState(true);
+  const [isPlayingBriefing, setIsPlayingBriefing] = useState(false); // Controlled by intro timeline
   const [showCTA, setShowCTA] = useState(false);
   const [isWiping, setIsWiping] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -54,7 +55,7 @@ export function LandingPage({
     { name: "GHOST", role: "Infiltrator", status: "Decrypted", color: "#9aa29b", shape: "plus", ping: 8, signal: "99%" },
   ]);
 
-  // Dialogue properties (Edwardian intelligence briefing)
+  // Subtitle briefing sequence matching video subtitles
   const lines = [
     { s: "B", name: "ORACLE-3", text: "Security grid bypassed. System is open." },
     { s: "A", name: "NOX-7", text: "Decrypting board keys... We have 5 suspects, 1 grid." },
@@ -122,7 +123,6 @@ export function LandingPage({
     const speakerPitch: Record<string, number> = { A: 130, B: 180 };
     const base = speakerPitch[speaker] || 160;
 
-    // strike click
     const noise = ctx.createBufferSource();
     noise.buffer = getClickNoiseBuffer(ctx);
     const noiseFilter = ctx.createBiquadFilter();
@@ -137,7 +137,6 @@ export function LandingPage({
     noise.start(now);
     noise.stop(now + 0.02);
 
-    // pitched tone
     const osc = ctx.createOscillator();
     osc.type = "sine";
     osc.frequency.setValueAtTime(base + (Math.random() * 10 - 5), now);
@@ -152,7 +151,7 @@ export function LandingPage({
     osc.stop(now + 0.04);
   };
 
-  // Live signal radar sweep and scrolling encryption rate graph visualizer
+  // Radar sweep and encryption scrolling graph
   useEffect(() => {
     const canvas = leftCanvasRef.current;
     if (!canvas) return;
@@ -161,16 +160,13 @@ export function LandingPage({
     let animationFrame: number;
     let phase = 0;
     
-    // Track line chart history points
     const historyPoints: number[] = Array.from({ length: 25 }, () => 15 + Math.random() * 30);
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
       const cw = canvas.width;
       const ch = canvas.height;
 
-      // 1. Draw background grid lines
       ctx.strokeStyle = "rgba(27,154,170,0.06)";
       ctx.lineWidth = 1;
       for (let x = 0; x < cw; x += 16) {
@@ -180,26 +176,22 @@ export function LandingPage({
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(cw, y); ctx.stroke();
       }
 
-      // 2. Left Side: Surveillance Radar Sweep (cx: 36, cy: 32, r: 26)
       const rcx = 36;
       const rcy = ch / 2;
       const rr = 24;
 
-      // Outer radar ring
       ctx.strokeStyle = "rgba(27,154,170,0.3)";
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(rcx, rcy, rr, 0, Math.PI * 2);
       ctx.stroke();
 
-      // Inner crosshairs
       ctx.strokeStyle = "rgba(27,154,170,0.15)";
       ctx.beginPath();
       ctx.moveTo(rcx - rr, rcy); ctx.lineTo(rcx + rr, rcy);
       ctx.moveTo(rcx, rcy - rr); ctx.lineTo(rcx, rcy + rr);
       ctx.stroke();
 
-      // Sweeping radar arm
       const sweepAngle = phase * 0.05;
       ctx.strokeStyle = "rgba(178,239,155,0.7)";
       ctx.lineWidth = 1.8;
@@ -208,7 +200,6 @@ export function LandingPage({
       ctx.lineTo(rcx + Math.cos(sweepAngle) * rr, rcy + Math.sin(sweepAngle) * rr);
       ctx.stroke();
 
-      // Radar targets (flickering green blips)
       const targets = [
         { tx: rcx - 12, ty: rcy - 8, offset: 0.5 },
         { tx: rcx + 10, ty: rcy + 12, offset: 2.2 },
@@ -224,25 +215,20 @@ export function LandingPage({
         ctx.restore();
       });
 
-      // 3. Right Side: Scrolling Encryption Rate Graph (x: 82 to cw - 12)
       const gxStart = 82;
       const gxEnd = cw - 12;
       const gWidth = gxEnd - gxStart;
       const gHeight = ch - 16;
-      const gYCenter = ch / 2;
 
-      // Graph frame
       ctx.strokeStyle = "rgba(27,154,170,0.2)";
       ctx.lineWidth = 1.2;
       ctx.strokeRect(gxStart, 8, gWidth, gHeight);
 
-      // Shift history and push a new calculated signal point
       if (Math.random() < 0.22) {
         historyPoints.shift();
         historyPoints.push(10 + Math.random() * 32);
       }
 
-      // Draw filled gradient area under the curve
       const grad = ctx.createLinearGradient(gxStart, 8, gxStart, 8 + gHeight);
       grad.addColorStop(0, "rgba(27,154,170,0.22)");
       grad.addColorStop(1, "rgba(27,154,170,0)");
@@ -259,7 +245,6 @@ export function LandingPage({
       ctx.closePath();
       ctx.fill();
 
-      // Draw the green plot line
       ctx.strokeStyle = "#b2ef9b";
       ctx.lineWidth = 1.6;
       ctx.beginPath();
@@ -281,7 +266,83 @@ export function LandingPage({
     return () => cancelAnimationFrame(animationFrame);
   }, []);
 
-  // Decryption Log stream, Hex cipher streams, and Vector grid calculations
+  // Cyber Surveillance World Map Drawing in Right Panel
+  useEffect(() => {
+    const canvas = rightCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    let animationFrame: number;
+    let mapPhase = 0;
+
+    const drawWorldMap = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const cw = canvas.width;
+      const ch = canvas.height;
+
+      ctx.strokeStyle = "rgba(0, 240, 255, 0.05)";
+      ctx.lineWidth = 0.5;
+      for (let x = 0; x < cw; x += 12) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, ch); ctx.stroke();
+      }
+      for (let y = 0; y < ch; y += 12) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(cw, y); ctx.stroke();
+      }
+
+      const continents = [
+        [[15, 20], [35, 15], [52, 25], [42, 45], [32, 40], [22, 45]],
+        [[32, 40], [42, 45], [45, 60], [38, 85], [32, 70], [28, 55]],
+        [[58, 20], [85, 12], [125, 15], [130, 38], [105, 48], [80, 48], [72, 38], [62, 35]],
+        [[68, 38], [82, 42], [90, 55], [82, 75], [74, 75], [64, 52]],
+        [[112, 60], [128, 60], [126, 74], [114, 72]]
+      ];
+
+      ctx.strokeStyle = "rgba(27,154,170,0.45)";
+      ctx.lineWidth = 1.2;
+      continents.forEach((poly) => {
+        ctx.beginPath();
+        poly.forEach((pt, idx) => {
+          const px = (pt[0]! / 140) * cw;
+          const py = (pt[1]! / 95) * ch;
+          if (idx === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        });
+        ctx.closePath();
+        ctx.stroke();
+      });
+
+      const sweepX = (mapPhase * 1.5) % cw;
+      ctx.strokeStyle = "rgba(0, 240, 255, 0.12)";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(sweepX, 0);
+      ctx.lineTo(sweepX, ch);
+      ctx.stroke();
+
+      const targets = [
+        { x: cw * 0.25, y: ch * 0.32, color: "#ef959c" },
+        { x: cw * 0.65, y: ch * 0.28, color: "#b2ef9b" },
+        { x: cw * 0.85, y: ch * 0.42, color: "#00f0ff" },
+        { x: cw * 0.58, y: ch * 0.62, color: "#ef959c" }
+      ];
+      targets.forEach((tgt) => {
+        const rad = 2 + Math.abs(Math.sin(mapPhase * 0.08 + tgt.x)) * 3;
+        ctx.fillStyle = tgt.color;
+        ctx.globalAlpha = 0.4 + 0.6 * Math.abs(Math.sin(mapPhase * 0.1));
+        ctx.beginPath();
+        ctx.arc(tgt.x, tgt.y, rad, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+
+      mapPhase += 0.8;
+      animationFrame = requestAnimationFrame(drawWorldMap);
+    };
+    drawWorldMap();
+    return () => cancelAnimationFrame(animationFrame);
+  }, []);
+
+  // Cryptographic matrices
   useEffect(() => {
     const logPool = [
       { text: "DECRYPT: AES key handshake validated.", tag: "DEC" },
@@ -300,7 +361,6 @@ export function LandingPage({
         return next;
       });
 
-      // Shifting hexadecimal keys
       const hexChars = "0123456789ABCDEF";
       let key = "";
       for (let i = 0; i < 6; i++) {
@@ -308,7 +368,6 @@ export function LandingPage({
       }
       setHexKeyStream(key.trim());
 
-      // Target vector shifts
       setVectorGrid({
         x: Math.floor(Math.random() * 24),
         y: Math.floor(Math.random() * 24),
@@ -318,7 +377,7 @@ export function LandingPage({
     return () => clearInterval(timer);
   }, []);
 
-  // Latency ping adjustments
+  // Latency pings
   useEffect(() => {
     const timer = setInterval(() => {
       setSurveillanceRoster((prev) => {
@@ -332,7 +391,7 @@ export function LandingPage({
     return () => clearInterval(timer);
   }, []);
 
-  // Listeners to unlock audio
+  // Audio trigger
   useEffect(() => {
     const unlock = () => {
       ensureAudio();
@@ -388,7 +447,6 @@ export function LandingPage({
         clearInterval(typeInterval);
         setShowCursor(false);
 
-        // Wait then move to next line
         setTimeout(() => {
           setLineIndex((prev) => prev + 1);
         }, 1800);
@@ -400,14 +458,14 @@ export function LandingPage({
     };
   }, [lineIndex, isPlayingBriefing]);
 
-  // Three.js Setup & Loop
+  // Three.js Setup & Timeline animation loop
   useEffect(() => {
     if (typeof THREE === "undefined" || !mountRef.current) return;
 
+    let mounted = true;
     const sceneEl = mountRef.current;
     const scene = new THREE.Scene();
     
-    // Clear color is transparent so the HTML panels behind the canvas are visible
     const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 100);
     let baseCameraZ = 5.4;
     camera.position.set(0, 2.3, baseCameraZ);
@@ -434,7 +492,7 @@ export function LandingPage({
     updateCameraFraming();
     window.addEventListener("resize", updateCameraFraming);
 
-    // lighting
+    // Lighting
     scene.add(new THREE.AmbientLight(0x2a3a3d, 0.7));
 
     const spotRose = new THREE.SpotLight(0xef959c, 2.4, 14, Math.PI / 6, 0.5, 1.2);
@@ -451,7 +509,7 @@ export function LandingPage({
     rim.position.set(0, 2.5, -3);
     scene.add(rim);
 
-    // Glow sprite maker (fake bloom)
+    // Glow generators
     const makeGlowTexture = (hex: number) => {
       const c = document.createElement("canvas");
       c.width = 256;
@@ -477,67 +535,135 @@ export function LandingPage({
       return sprite;
     };
 
-    // Ambient glow pools
     addGlowSprite(0xb2ef9b, -4.4, 2.2, -4.5, 8.5, 0.2);
     addGlowSprite(0xef959c, 4.4, 2.2, -4.5, 8.5, 0.2);
     addGlowSprite(0x1b9aaa, 0, 3.4, -6, 9, 0.18);
     addGlowSprite(0x00f0ff, 0, 0.4, -3, 10, 0.15);
 
-    // Floor-level fill
     addGlowSprite(0xb2ef9b, -8, 0.6, -5, 6, 0.14);
     addGlowSprite(0xef959c, 8, 0.6, -5, 6, 0.14);
 
-    // Skyline backdrop
-    const makeSkylineTexture = () => {
-      const w = 2048, h = 512;
+    // 1. Data-Mapped Server Clusters Background
+    const makeServerClusterTexture = () => {
+      const w = 512, h = 512;
       const c = document.createElement("canvas");
       c.width = w;
       c.height = h;
       const ctx = c.getContext("2d")!;
-      const sky = ctx.createLinearGradient(0, 0, 0, h);
-      sky.addColorStop(0, "#050f13");
-      sky.addColorStop(0.6, "#0a1c21");
-      sky.addColorStop(1, "#0c2126");
-      ctx.fillStyle = sky;
+      ctx.fillStyle = "#091215";
       ctx.fillRect(0, 0, w, h);
-
-      const winColors = ["#1b9aaa", "#b2ef9b", "#ef959c", "#00f0ff"];
-      const drawBuildingRow = (baseY: number, minH: number, maxH: number, minW: number, maxW: number, alpha: number) => {
-        let x = 0;
-        while (x < w) {
-          const bw = minW + Math.random() * (maxW - minW);
-          const bh = minH + Math.random() * (maxH - minH);
-          ctx.fillStyle = `rgba(4,12,15,${alpha})`;
-          ctx.fillRect(x, baseY - bh, bw, bh);
-          for (let wy = baseY - bh + 10; wy < baseY - 8; wy += 16) {
-            for (let wx = x + 6; wx < x + bw - 6; wx += 14) {
-              if (Math.random() < 0.16) {
-                ctx.fillStyle = winColors[Math.floor(Math.random() * winColors.length)]!;
-                ctx.globalAlpha = 0.55;
-                ctx.fillRect(wx, wy, 5, 7);
-                ctx.globalAlpha = 1;
-              }
-            }
-          }
-          x += bw + 4 + Math.random() * 10;
+      ctx.strokeStyle = "rgba(0,240,255,0.15)";
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 4; i++) {
+        const sx = 20 + i * 120;
+        ctx.strokeRect(sx, 10, 100, h - 20);
+        for (let y = 30; y < h - 20; y += 28) {
+          ctx.strokeStyle = "rgba(238,243,238,0.06)";
+          ctx.beginPath(); ctx.moveTo(sx + 5, y); ctx.lineTo(sx + 95, y); ctx.stroke();
+          ctx.strokeStyle = "rgba(0,240,255,0.08)";
+          ctx.beginPath(); ctx.moveTo(sx + 10, y + 10); ctx.lineTo(sx + 30, y + 10); ctx.stroke();
         }
-      };
-      drawBuildingRow(h * 0.78, 60, 160, 40, 90, 0.55);
-      drawBuildingRow(h * 0.9, 100, 260, 30, 70, 0.85);
-
-      const haze = ctx.createLinearGradient(0, h * 0.55, 0, h);
-      haze.addColorStop(0, "rgba(11,32,39,0)");
-      haze.addColorStop(1, "rgba(8,22,25,0.9)");
-      ctx.fillStyle = haze;
-      ctx.fillRect(0, 0, w, h);
-
+      }
       return new THREE.CanvasTexture(c);
     };
 
-    const skylineMat = new THREE.MeshBasicMaterial({ map: makeSkylineTexture(), fog: true });
-    const skyline = new THREE.Mesh(new THREE.PlaneGeometry(16, 13), skylineMat);
-    skyline.position.set(0, 4.2, -9);
-    scene.add(skyline);
+    const serverClusterMat = new THREE.MeshBasicMaterial({ map: makeServerClusterTexture(), transparent: true, opacity: 0.8 });
+    const serverClusterLeft = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), serverClusterMat);
+    serverClusterLeft.position.set(-4.5, 3.0, -4.5);
+    scene.add(serverClusterLeft);
+
+    const serverClusterRight = new THREE.Mesh(new THREE.PlaneGeometry(6, 6), serverClusterMat);
+    serverClusterRight.position.set(2.8, 3.0, -4.5);
+    scene.add(serverClusterRight);
+
+    // Blinking lights on server racks
+    const serverLEDs: any[] = [];
+    const createServerLEDs = (parentX: number, startZ: number) => {
+      for (let i = 0; i < 15; i++) {
+        const ledColor = Math.random() > 0.5 ? 0x00f0ff : 0xef959c;
+        const led = addGlowSprite(ledColor, parentX + (Math.random() - 0.5) * 4.0, 1.0 + Math.random() * 3.8, startZ + 0.05, 0.16, 0.4);
+        led.userData = { 
+          phase: Math.random() * Math.PI * 2, 
+          speed: 1.5 + Math.random() * 2.0,
+          baseOpacity: 0.35 + Math.random() * 0.4 
+        };
+        serverLEDs.push(led);
+      }
+    };
+    createServerLEDs(-4.5, -4.5);
+    createServerLEDs(2.8, -4.5);
+
+    // 2. Mechanical Book Archive (Behind Albion)
+    const makeBookArchiveTexture = () => {
+      const w = 512, h = 512;
+      const c = document.createElement("canvas");
+      c.width = w;
+      c.height = h;
+      const ctx = c.getContext("2d")!;
+      ctx.fillStyle = "#060d10";
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = "#121b1f";
+      for (let y = 80; y < h; y += 120) {
+        ctx.fillRect(10, y, w - 20, 12);
+        ctx.fillStyle = "#1e2b30";
+        ctx.fillRect(10, y + 12, w - 20, 3);
+        let bx = 30;
+        while (bx < w - 60) {
+          const bw = 16 + Math.random() * 14;
+          const bh = 70 + Math.random() * 25;
+          ctx.fillStyle = "#0c1518";
+          ctx.fillRect(bx, y - bh, bw, bh);
+          ctx.strokeStyle = "rgba(178,239,155,0.4)";
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(bx + 2, y - bh + 2, bw - 4, bh - 4);
+          ctx.beginPath();
+          ctx.moveTo(bx + bw/2 - 4, y - bh/2);
+          ctx.lineTo(bx + bw/2 + 4, y - bh/2);
+          ctx.stroke();
+          bx += bw + 4 + Math.random() * 6;
+        }
+        ctx.fillStyle = "#121b1f";
+      }
+      return new THREE.CanvasTexture(c);
+    };
+
+    const bookArchiveMat = new THREE.MeshBasicMaterial({ map: makeBookArchiveTexture(), transparent: true, opacity: 0.95 });
+    const bookArchive = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 5.8), bookArchiveMat);
+    bookArchive.position.set(-1.0, 2.9, -4.2);
+    scene.add(bookArchive);
+
+    // Etched gear texture for rotating overlays
+    const makeGearTexture = () => {
+      const c = document.createElement("canvas");
+      c.width = 128; c.height = 128;
+      const ctx = c.getContext("2d")!;
+      const cx = 64, cy = 64, r = 40;
+      ctx.strokeStyle = "rgba(178,239,155,0.5)";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx, cy, r * 0.4, 0, Math.PI * 2); ctx.stroke();
+      for (let i = 0; i < 12; i++) {
+        const ang = (i / 12) * Math.PI * 2;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(ang);
+        ctx.fillRect(-6, -r - 6, 12, 10);
+        ctx.restore();
+      }
+      return new THREE.CanvasTexture(c);
+    };
+
+    const gearMat = new THREE.MeshBasicMaterial({ map: makeGearTexture(), transparent: true, opacity: 0.65 });
+    
+    const gear1 = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.2), gearMat);
+    gear1.position.set(-2.0, 4.4, -4.1);
+    scene.add(gear1);
+
+    const gear2 = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.8), gearMat);
+    gear2.position.set(-0.2, 4.6, -4.1);
+    scene.add(gear2);
+
+    const gears = [gear1, gear2];
 
     // Floor grid
     const makeGridTexture = () => {
@@ -545,7 +671,6 @@ export function LandingPage({
       c.width = 512;
       c.height = 512;
       const ctx = c.getContext("2d")!;
-      // Canvas is transparent, draw lines only
       const step = 64;
       let gi = 0;
       for (let i = 0; i <= 512; i += step) {
@@ -588,7 +713,7 @@ export function LandingPage({
     const particles = new THREE.Points(pGeo, pMat);
     scene.add(particles);
 
-    // Drifting Letter Tiles
+    // Drifting letter tiles
     const makeLetterTexture = (letter: string, colorHex: string) => {
       const c = document.createElement("canvas");
       c.width = 128;
@@ -607,7 +732,7 @@ export function LandingPage({
       return new THREE.CanvasTexture(c);
     };
 
-    const tileLetters = "CLUEGRIDWORDPACKTEAMASSASSINGUESSVERB";
+    const tileLetters = "RMDB";
     const tileColors = [0x00f0ff, 0xb2ef9b, 0xef959c, 0x1b9aaa];
     const letterTiles: any[] = [];
 
@@ -641,212 +766,73 @@ export function LandingPage({
     seedLetterZone(12, 6, 11.5, 0.4, 5.6, -7, -1.5);
     seedLetterZone(8, -2.6, 2.6, 3.4, 5.6, -6, -3.5);
 
-    // Grid Holograms
-    const roundRectPath = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-    };
-
-    const makeGridCardTexture = (word: string, colorHex: string, isAssassin: boolean) => {
+    // 3. Central Hologram Platform/Emitter
+    const makeHolographicEmitterTexture = () => {
       const c = document.createElement("canvas");
-      c.width = 200;
-      c.height = 240;
+      c.width = 256;
+      c.height = 256;
       const ctx = c.getContext("2d")!;
-      ctx.fillStyle = isAssassin ? "#0a0a0a" : "#0d1116";
-      roundRectPath(ctx, 6, 6, 188, 228, 16);
-      ctx.fill();
-      ctx.strokeStyle = colorHex;
-      ctx.lineWidth = isAssassin ? 3 : 4;
-      roundRectPath(ctx, 6, 6, 188, 228, 16);
-      ctx.stroke();
-      ctx.fillStyle = colorHex;
+      ctx.strokeStyle = "rgba(0, 240, 255, 0.8)";
+      ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.arc(30, 34, 7, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "#EDEFEC";
-      ctx.font = "700 24px 'JetBrains Mono', monospace";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(word, 100, 145);
-      if (isAssassin) {
-        ctx.strokeStyle = colorHex;
-        ctx.lineWidth = 4;
-        ctx.lineCap = "round";
+      ctx.arc(128, 128, 110, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      ctx.strokeStyle = "rgba(0, 240, 255, 0.3)";
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < 8; i++) {
+        const ang = (i / 8) * Math.PI * 2;
         ctx.beginPath();
-        ctx.moveTo(80, 185);
-        ctx.lineTo(120, 205);
-        ctx.moveTo(120, 185);
-        ctx.lineTo(80, 205);
+        ctx.moveTo(128, 128);
+        ctx.lineTo(128 + Math.cos(ang) * 110, 128 + Math.sin(ang) * 110);
         ctx.stroke();
       }
       return new THREE.CanvasTexture(c);
     };
 
-    const makeHologramFrame = () => {
-      const size = 2.6;
-      const group = new THREE.Group();
-      const boxGeo = new THREE.BoxGeometry(size, size, 0.02);
-      const edges = new THREE.EdgesGeometry(boxGeo);
-      const frame = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0x1b9aaa, transparent: true, opacity: 0.62 }));
-      group.add(frame);
+    const emitterMat = new THREE.MeshBasicMaterial({ 
+      map: makeHolographicEmitterTexture(), 
+      transparent: true, 
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide
+    });
+    const platform = new THREE.Mesh(new THREE.PlaneGeometry(3.6, 3.6), emitterMat);
+    platform.rotation.x = -Math.PI / 2;
+    platform.position.set(0, 0.02, 0);
+    scene.add(platform);
 
-      const pts: number[] = [];
-      const step = size / 3;
-      for (let i = 1; i < 3; i++) {
-        const p = -size / 2 + i * step;
-        pts.push(-size / 2, p, 0, size / 2, p, 0);
-        pts.push(p, -size / 2, 0, p, size / 2, 0);
-      }
-      const innerGeo = new THREE.BufferGeometry();
-      innerGeo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
-      const innerLines = new THREE.LineSegments(innerGeo, new THREE.LineBasicMaterial({ color: 0x1b9aaa, transparent: true, opacity: 0.3 }));
-      group.add(innerLines);
+    const ringMat = new THREE.LineBasicMaterial({ color: 0x00f0ff, transparent: true, opacity: 0.5 });
+    const ringGeo = new THREE.BufferGeometry();
+    const rPoints = [];
+    for (let i = 0; i <= 32; i++) {
+      const ang = (i / 32) * Math.PI * 2;
+      rPoints.push(Math.cos(ang) * 1.5, 0, Math.sin(ang) * 1.5);
+    }
+    ringGeo.setAttribute("position", new THREE.Float32BufferAttribute(rPoints, 3));
+    
+    const projRing1 = new THREE.Line(ringGeo, ringMat);
+    projRing1.position.set(0, 0.2, 0);
+    scene.add(projRing1);
 
-      const baseDisc = new THREE.Mesh(new THREE.CircleGeometry(size * 0.42, 24), new THREE.MeshBasicMaterial({ color: 0x1b9aaa, transparent: true, opacity: 0.1 }));
-      baseDisc.rotation.x = -Math.PI / 2;
-      baseDisc.position.y = -size / 2 - 0.02;
-      group.add(baseDisc);
-      return group;
-    };
+    const projRing2 = new THREE.Line(ringGeo, ringMat);
+    projRing2.scale.set(0.7, 1, 0.7);
+    projRing2.position.set(0, 0.45, 0);
+    scene.add(projRing2);
+
+    const beamGeo = new THREE.CylinderGeometry(1.4, 1.8, 4.0, 16, 1, true);
+    const beamMat = new THREE.MeshBasicMaterial({ 
+      color: 0x00f0ff, 
+      transparent: true, 
+      opacity: 0.12, 
+      blending: THREE.AdditiveBlending, 
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
+    const emitterBeam = new THREE.Mesh(beamGeo, beamMat);
+    emitterBeam.position.set(0, 2.0, 0);
+    scene.add(emitterBeam);
 
     const hologramGroups: any[] = [];
-    const createGridHologram = (x: number, y: number, z: number, cards: { word: string; color: number; assassin?: boolean }[]) => {
-      const group = new THREE.Group();
-      group.position.set(x, y, z);
-      group.add(makeHologramFrame());
-
-      cards.forEach((spec, idx) => {
-        const colorStr = "#" + spec.color.toString(16).padStart(6, "0");
-        const tex = makeGridCardTexture(spec.word, colorStr, !!spec.assassin);
-        const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0, depthWrite: false });
-        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.86, 1.05), mat);
-        const ang = (idx / cards.length) * Math.PI * 2;
-        mesh.position.set(Math.cos(ang) * 0.92, Math.sin(ang) * 0.74, 0.22 + idx * 0.03);
-        mesh.userData = {
-          baseOpacity: 0.5 + Math.random() * 0.28,
-          phase: Math.random() * Math.PI * 2,
-          bobSpeed: 0.3 + Math.random() * 0.2,
-          spinSpeed: 0.12 + Math.random() * 0.12,
-          baseY: mesh.position.y,
-        };
-        group.add(mesh);
-      });
-      scene.add(group);
-      hologramGroups.push(group);
-      return group;
-    };
-
-    createGridHologram(-8.6, 2.9, -4.6, [
-      { word: "OCEAN", color: 0xb2ef9b },
-      { word: "MIRROR", color: 0xef959c },
-      { word: "ANCHOR", color: 0x1b9aaa },
-    ]);
-    createGridHologram(8.6, 2.9, -4.6, [
-      { word: "ORBIT", color: 0xb2ef9b },
-      { word: "VOID", color: 0xef959c, assassin: true },
-      { word: "LANTERN", color: 0x1b9aaa },
-    ]);
-
-    // Vector dossier drawing helper
-    const drawPortraitBust = (ctx: CanvasRenderingContext2D, cx: number, cy: number, r: number, accentHex: number, hairStyle: string) => {
-      const hex = "#" + accentHex.toString(16).padStart(6, "0");
-      ctx.save();
-      ctx.translate(cx, cy);
-
-      // shoulders
-      ctx.fillStyle = "#161c22";
-      ctx.beginPath();
-      ctx.moveTo(-r * 1.15, r * 1.7);
-      ctx.quadraticCurveTo(-r * 1.1, r * 0.55, 0, r * 0.5);
-      ctx.quadraticCurveTo(r * 1.1, r * 0.55, r * 1.15, r * 1.7);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = hex;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // neck
-      ctx.fillStyle = "#8a6a5c";
-      ctx.fillRect(-r * 0.22, r * 0.28, r * 0.44, r * 0.35);
-
-      // head
-      ctx.fillStyle = "#9c7a68";
-      ctx.beginPath();
-      ctx.ellipse(0, 0, r * 0.72, r * 0.82, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = "rgba(0,0,0,0.14)";
-      ctx.beginPath();
-      ctx.ellipse(r * 0.28, r * 0.05, r * 0.42, r * 0.75, 0, -0.4, 1.6);
-      ctx.fill();
-
-      // hair
-      ctx.fillStyle = "#0d0f12";
-      if (hairStyle === "swept") {
-        ctx.beginPath();
-        ctx.moveTo(-r * 0.78, -r * 0.15);
-        ctx.quadraticCurveTo(-r * 0.9, -r * 1.05, 0, -r * 1.02);
-        ctx.quadraticCurveTo(r * 0.95, -r * 1.1, r * 0.65, -r * 0.1);
-        ctx.quadraticCurveTo(r * 0.3, -r * 0.55, r * 0.05, -r * 0.2);
-        ctx.quadraticCurveTo(-r * 0.35, -r * 0.65, -r * 0.78, -r * 0.15);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = hex;
-        ctx.globalAlpha = 0.55;
-        ctx.beginPath();
-        ctx.moveTo(r * 0.2, -r * 0.95);
-        ctx.quadraticCurveTo(r * 0.55, -r * 0.5, r * 0.35, -r * 0.05);
-        ctx.quadraticCurveTo(r * 0.15, -r * 0.5, r * 0.2, -r * 0.95);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      } else {
-        ctx.beginPath();
-        ctx.ellipse(0, -r * 0.35, r * 0.82, r * 0.55, 0, Math.PI, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = hex;
-        ctx.globalAlpha = 0.5;
-        ctx.fillRect(-r * 0.7, -r * 0.42, r * 0.3, r * 0.16);
-        ctx.globalAlpha = 1;
-      }
-
-      // eyes
-      ctx.fillStyle = hex;
-      [-1, 1].forEach((side) => {
-        ctx.save();
-        ctx.translate(side * r * 0.28, r * 0.06);
-        ctx.rotate(side * -0.12);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, r * 0.16, r * 0.065, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#fff";
-        ctx.globalAlpha = 0.8;
-        ctx.beginPath();
-        ctx.arc(side * r * 0.04, -r * 0.02, r * 0.035, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = hex;
-        ctx.restore();
-      });
-
-      // brow
-      ctx.strokeStyle = "rgba(0,0,0,0.55)";
-      ctx.lineWidth = r * 0.05;
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(-r * 0.4, -r * 0.16);
-      ctx.lineTo(-r * 0.14, -r * 0.22);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(r * 0.14, -r * 0.22);
-      ctx.lineTo(r * 0.4, -r * 0.16);
-      ctx.stroke();
-
-      ctx.restore();
-    };
 
     // Case File Monitor
     const makeCaseFileTexture = (feedId: string, operative: { name: string; role: string; accent: number; hairStyle: string }) => {
@@ -869,18 +855,6 @@ export function LandingPage({
       ctx.font = "500 11px 'JetBrains Mono', monospace";
       ctx.fillText("OPERATIVES LOG: VALIDATED", 22, 54);
 
-      drawPortraitBust(ctx, 234, 108, 46, operative.accent, operative.hairStyle);
-
-      ctx.fillStyle = "#" + operative.accent.toString(16).padStart(6, "0");
-      ctx.font = "700 12px 'JetBrains Mono', monospace";
-      ctx.textAlign = "center";
-      ctx.fillText(operative.name, 234, 172);
-      ctx.fillStyle = "rgba(238,243,238,0.45)";
-      ctx.font = "500 9.5px 'JetBrains Mono', monospace";
-      ctx.fillText(operative.role, 234, 186);
-      ctx.textAlign = "left";
-
-      // Redaction bars
       ctx.fillStyle = "#000";
       const barsY = [96, 118, 140, 220, 242, 264];
       barsY.forEach((by) => {
@@ -915,14 +889,12 @@ export function LandingPage({
       const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 2.1), screenMat);
       group.add(screen);
 
-      // Moving scanline
       const scanTex = makeGlowTexture(0x00f0ff);
       const scanMat = new THREE.MeshBasicMaterial({ map: scanTex, transparent: true, opacity: 0.35, blending: THREE.AdditiveBlending, depthWrite: false });
       const scanline = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 0.5), scanMat);
       scanline.position.z = 0.01;
       group.add(scanline);
 
-      // Flashing redaction chips
       const flashers: any[] = [];
       const flashSpecs = [
         [-0.32, 0.58, 0.5],
@@ -950,275 +922,136 @@ export function LandingPage({
     createCaseMonitor(-9.1, 1.05, -3.9, "OPER-01", { name: "NOX-7", role: "Analyst", accent: 0xb2ef9b, hairStyle: "swept" });
     createCaseMonitor(9.1, 1.05, -3.9, "OPER-02", { name: "ORACLE-3", role: "Leader", accent: 0xef959c, hairStyle: "short" });
 
-    // Procedural vector character texture builder
-    const makeSpyTexture = (accentHex: number, hairStyle: string, handedness: string) => {
-      const w = 300, h = 600;
+    // Blank texture maker for placeholder use before loaded
+    const makeBlankTexture = () => {
       const c = document.createElement("canvas");
-      c.width = w;
-      c.height = h;
-      const ctx = c.getContext("2d")!;
-      const hex = "#" + accentHex.toString(16).padStart(6, "0");
-      const cx = w / 2;
-      const flip = handedness === "left" ? -1 : 1;
-
-      // shadow
-      ctx.fillStyle = "rgba(0,0,0,0.4)";
-      ctx.beginPath();
-      ctx.ellipse(cx, 572, 62, 12, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // shoes
-      ctx.fillStyle = "#0c0e11";
-      ctx.beginPath();
-      ctx.ellipse(cx - 22, 560, 20, 11, 0.1, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(cx + 22, 560, 20, 11, -0.1, 0, Math.PI * 2);
-      ctx.fill();
-
-      // trousers
-      ctx.fillStyle = "#14171c";
-      ctx.fillRect(cx - 34, 500, 26, 62);
-      ctx.fillRect(cx + 8, 500, 26, 62);
-
-      // coat silhouette
-      ctx.fillStyle = "#191d24";
-      ctx.beginPath();
-      ctx.moveTo(cx - 58, 250);
-      ctx.bezierCurveTo(cx - 95, 340, cx - 100, 460, cx - 96, 520);
-      ctx.lineTo(cx + 96, 520);
-      ctx.bezierCurveTo(cx + 100, 460, cx + 95, 340, cx + 58, 250);
-      ctx.closePath();
-      ctx.fill();
-
-      // coat rim highlight
-      ctx.save();
-      ctx.globalAlpha = 0.5;
-      ctx.fillStyle = hex;
-      ctx.beginPath();
-      ctx.moveTo(cx + 40, 258);
-      ctx.bezierCurveTo(cx + 78, 340, cx + 90, 450, cx + 88, 512);
-      ctx.lineTo(cx + 96, 520);
-      ctx.bezierCurveTo(cx + 100, 460, cx + 95, 340, cx + 58, 250);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-
-      // vest/inside coat lining
-      ctx.fillStyle = "#0c0e11";
-      ctx.beginPath();
-      ctx.moveTo(cx - 6, 268);
-      ctx.lineTo(cx - 24, 500);
-      ctx.lineTo(cx - 2, 500);
-      ctx.bezierCurveTo(cx + 4, 400, cx + 2, 320, cx + 10, 268);
-      ctx.closePath();
-      ctx.fill();
-      ctx.save();
-      ctx.globalAlpha = 0.65;
-      ctx.fillStyle = hex;
-      ctx.beginPath();
-      ctx.moveTo(cx - 6, 270);
-      ctx.lineTo(cx - 16, 420);
-      ctx.lineTo(cx - 3, 420);
-      ctx.lineTo(cx + 2, 270);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-
-      // belt
-      ctx.fillStyle = "#0c0e11";
-      ctx.fillRect(cx - 62, 372, 124, 14);
-      ctx.fillStyle = hex;
-      ctx.fillRect(cx - 8, 373, 16, 12);
-
-      // shoulders
-      ctx.fillStyle = "#20252d";
-      ctx.beginPath();
-      ctx.moveTo(cx - 58, 250);
-      ctx.lineTo(cx - 30, 225);
-      ctx.lineTo(cx - 6, 268);
-      ctx.lineTo(cx - 40, 278);
-      ctx.closePath();
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(cx + 58, 250);
-      ctx.lineTo(cx + 30, 225);
-      ctx.lineTo(cx + 6, 268);
-      ctx.lineTo(cx + 40, 278);
-      ctx.closePath();
-      ctx.fill();
-
-      // arms
-      ctx.fillStyle = "#191d24";
-      ctx.beginPath(); // relaxed arm
-      ctx.moveTo(cx - 58 * flip, 258);
-      ctx.quadraticCurveTo(cx - 84 * flip, 340, cx - 72 * flip, 430);
-      ctx.lineTo(cx - 52 * flip, 428);
-      ctx.quadraticCurveTo(cx - 62 * flip, 340, cx - 38 * flip, 262);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = "#8a6a5c";
-      ctx.beginPath();
-      ctx.ellipse(cx - 64 * flip, 438, 12, 15, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // pocketed arm
-      ctx.fillStyle = "#15181d";
-      ctx.beginPath();
-      ctx.moveTo(cx + 30 * flip, 265);
-      ctx.quadraticCurveTo(cx + 58 * flip, 320, cx + 46 * flip, 370);
-      ctx.quadraticCurveTo(cx + 26 * flip, 382, cx + 14 * flip, 372);
-      ctx.quadraticCurveTo(cx + 24 * flip, 320, cx + 8 * flip, 268);
-      ctx.closePath();
-      ctx.fill();
-
-      // popped collar
-      ctx.fillStyle = "#20252d";
-      ctx.beginPath();
-      ctx.moveTo(cx - 46, 232);
-      ctx.lineTo(cx - 14, 196);
-      ctx.lineTo(cx - 4, 236);
-      ctx.lineTo(cx - 30, 252);
-      ctx.closePath();
-      ctx.fill();
-      ctx.beginPath();
-      ctx.moveTo(cx + 46, 232);
-      ctx.lineTo(cx + 14, 196);
-      ctx.lineTo(cx + 4, 236);
-      ctx.lineTo(cx + 30, 252);
-      ctx.closePath();
-      ctx.fill();
-      ctx.save();
-      ctx.globalAlpha = 0.4;
-      ctx.fillStyle = hex;
-      ctx.beginPath();
-      ctx.moveTo(cx + 46, 232);
-      ctx.lineTo(cx + 30, 210);
-      ctx.lineTo(cx + 22, 232);
-      ctx.lineTo(cx + 30, 252);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-
-      // neck + face
-      ctx.fillStyle = "#8a6a5c";
-      ctx.fillRect(cx - 11, 205, 22, 26);
-      ctx.beginPath();
-      ctx.ellipse(cx, 178, 30, 34, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.save();
-      ctx.globalAlpha = 0.14;
-      ctx.fillStyle = "#000";
-      ctx.beginPath();
-      ctx.ellipse(cx + 11, 180, 18, 32, 0, -0.4, 1.6);
-      ctx.fill();
-      ctx.restore();
-
-      // eyes
-      ctx.fillStyle = hex;
-      [-1, 1].forEach((side) => {
-        ctx.save();
-        ctx.translate(cx + side * 11, 176);
-        ctx.rotate(side * -0.14);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 6.5, 2.6, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
-      ctx.strokeStyle = "rgba(0,0,0,0.6)";
-      ctx.lineWidth = 2.2;
-      ctx.lineCap = "round";
-      ctx.beginPath();
-      ctx.moveTo(cx - 18, 166);
-      ctx.lineTo(cx - 5, 161);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(cx + 5, 161);
-      ctx.lineTo(cx + 18, 166);
-      ctx.stroke();
-      ctx.strokeStyle = "rgba(0,0,0,0.4)";
-      ctx.lineWidth = 1.6;
-      ctx.beginPath();
-      ctx.moveTo(cx - 4, 196);
-      ctx.lineTo(cx + 4, 196);
-      ctx.stroke();
-
-      // hair peeking
-      ctx.fillStyle = "#0d0f12";
-      if (hairStyle === "swept") {
-        ctx.beginPath();
-        ctx.moveTo(cx - 30, 158);
-        ctx.quadraticCurveTo(cx - 40, 140, cx - 24, 132);
-        ctx.quadraticCurveTo(cx - 30, 150, cx - 14, 156);
-        ctx.closePath();
-        ctx.fill();
-      } else {
-        ctx.beginPath();
-        ctx.ellipse(cx - 24, 150, 9, 14, 0.3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.ellipse(cx + 24, 150, 9, 14, -0.3, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // fedora
-      ctx.fillStyle = "#14171c";
-      ctx.beginPath();
-      ctx.moveTo(cx - 24, 142);
-      ctx.quadraticCurveTo(cx - 20, 102, cx, 100);
-      ctx.quadraticCurveTo(cx+20, 102, cx+24, 142);
-      ctx.closePath();
-      ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(cx, 144, 52, 14, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = hex;
-      ctx.fillRect(cx - 24, 126, 48, 7);
-
+      c.width = 1; c.height = 1;
       return new THREE.CanvasTexture(c);
     };
 
-    const createOperative = (accentHex: number, opts: { hairStyle?: string; handedness?: string; scale?: number; ambient?: boolean }) => {
+    // Operatives container
+    const agents: any[] = [];
+    const ambientAgents: any[] = [];
+    const allOps: any[] = [];
+    let materializeProgress = 0.0;
+
+    const createOperative = (charIndex: number, accentHex: number, scale: number, isAmbient: boolean) => {
       const group = new THREE.Group();
-      const tex = makeSpyTexture(accentHex, opts.hairStyle || "swept", opts.handedness || "right");
-      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, alphaTest: 0.35 });
+      
+      const canvas = document.createElement("canvas");
+      canvas.width = 256;
+      canvas.height = 512;
+      const sctx = canvas.getContext("2d")!;
+      const tex = new THREE.CanvasTexture(canvas);
+
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, color: accentHex, opacity: 0 });
       const sprite = new THREE.Sprite(mat);
-      const height = 2.9 * (opts.scale || 1);
-      const width = height * (300 / 600);
+      const height = 3.2 * scale;
+      const width = height * 0.5;
       sprite.scale.set(width, height, 1);
       sprite.position.y = height / 2;
       group.add(sprite);
 
-      const eyeGlow = addGlowSprite(accentHex, 0, height * 0.815, 0.16, 0.5, 0.5);
+      const eyeHeights = [0.815, 0.815, 0.805, 0.83];
+      const eyeH = eyeHeights[charIndex] || 0.815;
+
+      const eyeGlow = addGlowSprite(accentHex, 0, height * eyeH, 0.16, 0.42, 0.0); // starts hidden
       group.add(eyeGlow);
-      eyeGlow.position.set(0, height * 0.815, 0.18);
-      const groundGlow = addGlowSprite(accentHex, 0, 0.04, 0.16, 1.5, 0.14);
+      eyeGlow.position.set(0, height * eyeH, 0.18);
+
+      const groundGlow = addGlowSprite(accentHex, 0, 0.04, 0.16, 1.4, 0.0); // starts hidden
       groundGlow.rotation.x = -Math.PI / 2;
       group.add(groundGlow);
 
-      group.userData = { sprite, mat, eyeGlow, baseY: 0, speaking: 0, ambient: !!opts.ambient };
+      // System Font and Theme Styled Nameplate Canvas Texture
+      const makeNamePlateTexture = (name: string, role: string, colorStr: string) => {
+        const c = document.createElement("canvas");
+        c.width = 256;
+        c.height = 72;
+        const ctx = c.getContext("2d")!;
+        
+        ctx.strokeStyle = colorStr;
+        ctx.lineWidth = 1.5;
+        // Draw cyber-border
+        ctx.strokeRect(8, 8, 240, 56);
+        
+        // Corner indicators
+        ctx.fillStyle = colorStr;
+        ctx.fillRect(8, 8, 5, 5);
+        ctx.fillRect(243, 8, 5, 5);
+        ctx.fillRect(8, 59, 5, 5);
+        ctx.fillRect(243, 59, 5, 5);
+        
+        // Name text
+        ctx.fillStyle = "#eef3ee";
+        ctx.font = "700 13px 'JetBrains Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(name, 128, 26);
+        
+        // Role text
+        ctx.fillStyle = colorStr;
+        ctx.font = "500 9.5px 'JetBrains Mono', monospace";
+        ctx.fillText(role, 128, 44);
+        
+        return new THREE.CanvasTexture(c);
+      };
+
+      const charInfo = [
+        { name: "VESPER", role: "THE HANDLER" },
+        { name: "ALBION", role: "THE STRATEGIST" },
+        { name: "LACE", role: "THE INFILTRATOR" },
+        { name: "REQUIEM", role: "THE ENFORCER" },
+      ][charIndex] || { name: "AGENT", role: "OPERATIVE" };
+
+      const colorStr = "#" + accentHex.toString(16).padStart(6, "0");
+      const namePlateMat = new THREE.SpriteMaterial({ 
+        map: makeNamePlateTexture(charInfo.name, charInfo.role, colorStr), 
+        transparent: true,
+        opacity: 0, // starts hidden
+        depthWrite: false
+      });
+      const namePlateSprite = new THREE.Sprite(namePlateMat);
+      namePlateSprite.position.set(0, -0.28, 0.1);
+      namePlateSprite.scale.set(1.5, 0.42, 1);
+      group.add(namePlateSprite);
+
+      group.userData = { sprite, mat, eyeGlow, groundGlow, namePlateSprite, canvas, sctx, img: null, baseScale: scale, baseY: 0, speaking: 0, ambient: isAmbient };
       return group;
     };
 
-    // Instantiate 4 illustrated operatives
-    const opA = createOperative(0xb2ef9b, { hairStyle: "swept", handedness: "right" });
-    opA.position.set(-1.7, 0, 0);
-    scene.add(opA);
-
-    const opB = createOperative(0xef959c, { hairStyle: "short", handedness: "left" });
-    opB.position.set(1.7, 0, 0);
-    scene.add(opB);
-
-    const opC = createOperative(0x1b9aaa, { hairStyle: "short", handedness: "right", scale: 0.94, ambient: true });
-    opC.position.set(-3.2, 0, -1.3);
+    // Instantiate 4 ambient & active operatives (grouped closer in the center grid)
+    const opC = createOperative(0, 0x1b9aaa, 0.92, true); // Vesper
+    opC.position.set(-2.5, 0, -0.8);
     scene.add(opC);
 
-    const opD = createOperative(0x9aa29b, { hairStyle: "swept", handedness: "left", scale: 0.94, ambient: true });
-    opD.position.set(3.2, 0, -1.3);
+    const opA = createOperative(1, 0xb2ef9b, 1.0, false); // Albion
+    opA.position.set(-1.0, 0, 0);
+    scene.add(opA);
+
+    const opB = createOperative(2, 0xef959c, 1.0, false); // Lace
+    opB.position.set(1.0, 0, 0);
+    scene.add(opB);
+
+    const opD = createOperative(3, 0x9aa29b, 0.92, true); // Requiem
+    opD.position.set(2.5, 0, -0.8);
     scene.add(opD);
 
-    const agents = [opA, opB];
-    const ambientAgents = [opC, opD];
+    agents.push(opA, opB);
+    ambientAgents.push(opC, opD);
+    allOps.push(opC, opA, opB, opD);
+
+    // Load character sheet asset asynchronously
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.load("/spy-characters.png", (texture: any) => {
+      const img = texture.image;
+      allOps.forEach((op) => {
+        op.userData.img = img;
+      });
+    });
+
+    let introTime = 0.0;
+    let briefingStarted = false;
 
     threeStateRef.current = {
       renderer,
@@ -1240,31 +1073,148 @@ export function LandingPage({
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      const delta = clock.getDelta();
       const t = clock.getElapsedTime();
       const state = threeStateRef.current;
       if (!state) return;
 
-      // Animate active briefing agents (strictly vertical bobbing, zero rotation/swaying)
-      state.agents.forEach((op, idx) => {
-        const d = op.userData;
-        const activeSide = idx === 0 ? "A" : "B";
-        const isSpeaking = state.currentSpeaker === activeSide;
-        const targetSpeak = isSpeaking ? 1 : 0;
-        d.speaking += (targetSpeak - d.speaking) * 0.08;
+      // Dynamic materialization entrance (voxelization, scanning sweep, opacity shimmer)
+      if (materializeProgress < 1.0) {
+        materializeProgress = Math.min(1.0, materializeProgress + 0.007);
+        
+        // Easing factor: easeOutCubic
+        const tProgress = 1 - Math.pow(1 - materializeProgress, 3);
+        
+        allOps.forEach((op, i) => {
+          const d = op.userData;
+          if (!d.img) return;
+          
+          const canvas = d.canvas;
+          const sctx = d.sctx;
+          const img = d.img;
+          const w = canvas.width;
+          const h = canvas.height;
+          
+          sctx.clearRect(0, 0, w, h);
+          
+          // Smoothly increase voxelization resolution
+          const resScale = 0.03 + 0.97 * Math.pow(tProgress, 2.5);
+          const tempW = Math.max(8, Math.floor(256 * resScale));
+          const tempH = Math.max(16, Math.floor(512 * resScale));
+          
+          const tempCanvas = document.createElement("canvas");
+          tempCanvas.width = tempW;
+          tempCanvas.height = tempH;
+          const tctx = tempCanvas.getContext("2d")!;
+          
+          const srcW = img.width / 4;
+          const srcH = img.height;
+          const srcX = i * srcW;
+          
+          tctx.drawImage(img, srcX, 0, srcW, srcH, 0, 0, tempW, tempH);
+          
+          // White background chroma keying
+          const imgData = tctx.getImageData(0, 0, tempW, tempH);
+          const pix = imgData.data;
+          for (let p = 0; p < pix.length; p += 4) {
+            const r = pix[p]!;
+            const g = pix[p+1]!;
+            const b = pix[p+2]!;
+            if (r > 240 && g > 240 && b > 240) {
+              pix[p+3] = 0;
+            } else if (r > 210 && g > 210 && b > 210) {
+              const maxVal = Math.max(r, g, b);
+              const factor = (240 - maxVal) / 30;
+              pix[p+3] = Math.max(0, Math.floor(pix[p+3]! * factor));
+            }
+          }
+          tctx.putImageData(imgData, 0, 0);
+          
+          sctx.imageSmoothingEnabled = false;
+          sctx.drawImage(tempCanvas, 0, 0, tempW, tempH, 0, 0, w, h);
+          
+          // Scanlines
+          const scanY = (t * 240) % h;
+          sctx.fillStyle = "rgba(0, 240, 255, 0.45)";
+          sctx.fillRect(0, scanY, w, 4.5);
+          
+          // Mask edges
+          sctx.globalCompositeOperation = "destination-in";
+          const gradV = sctx.createLinearGradient(0, 0, 0, 512);
+          gradV.addColorStop(0, "rgba(0,0,0,0)");
+          gradV.addColorStop(0.1, "rgba(0,0,0,1)");
+          gradV.addColorStop(0.85, "rgba(0,0,0,1)");
+          gradV.addColorStop(1, "rgba(0,0,0,0)");
+          sctx.fillStyle = gradV;
+          sctx.fillRect(0, 0, 256, 512);
 
-        op.position.y = Math.sin(t * 0.6 + op.position.x) * 0.04 + d.speaking * Math.sin(t * 3.5) * 0.045;
-        d.mat.rotation = 0;
-        d.eyeGlow.material.opacity = 0.4 + d.speaking * 0.5 + Math.abs(Math.sin(t * 6)) * d.speaking * 0.15;
-        op.scale.setScalar(1 + d.speaking * 0.025);
-      });
+          const gradH = sctx.createLinearGradient(0, 0, 256, 0);
+          gradH.addColorStop(0, "rgba(0,0,0,0)");
+          gradH.addColorStop(0.12, "rgba(0,0,0,1)");
+          gradH.addColorStop(0.88, "rgba(0,0,0,1)");
+          gradH.addColorStop(1, "rgba(0,0,0,0)");
+          sctx.fillStyle = gradH;
+          sctx.fillRect(0, 0, 256, 512);
+          sctx.globalCompositeOperation = "source-over";
+          
+          d.mat.map.needsUpdate = true;
+          
+          // Eased rise up position transition
+          const targetY = Math.sin(t * 0.8 + op.position.x) * 0.02;
+          op.position.y = -0.22 * (1.0 - tProgress) + targetY;
+          
+          d.mat.opacity = tProgress * (0.75 + 0.25 * Math.random());
+          d.eyeGlow.material.opacity = tProgress * 0.45;
+          d.groundGlow.material.opacity = tProgress * 0.12;
+          d.namePlateSprite.material.opacity = tProgress * 0.9;
+          
+          // Set correct group scale
+          op.scale.set(1, 1, 1);
+          op.scale.y = 0.1 + 0.9 * tProgress;
+        });
+      } else {
+        // Stabilized standing animations
+        state.agents.forEach((op, idx) => {
+          const d = op.userData;
+          const activeSide = idx === 0 ? "A" : "B";
+          const isSpeaking = state.currentSpeaker === activeSide;
+          const targetSpeak = isSpeaking ? 1 : 0;
+          d.speaking += (targetSpeak - d.speaking) * 0.08;
 
-      // Animate ambient supporting agents (strictly vertical breathing, zero rotation)
-      ambientAgents.forEach((op) => {
-        const d = op.userData;
-        op.position.y = Math.sin(t * 1.0 + op.position.x) * 0.038;
-        d.mat.rotation = 0;
-        d.eyeGlow.material.opacity = 0.32 + Math.abs(Math.sin(t * 0.8 + op.position.x)) * 0.16;
-      });
+          op.position.y = Math.sin(t * 0.5 + op.position.x) * 0.015 + d.speaking * Math.sin(t * 2.8) * 0.016;
+          d.mat.rotation = 0;
+          d.mat.opacity = 1.0;
+          d.eyeGlow.material.opacity = 0.4 + d.speaking * 0.5 + Math.abs(Math.sin(t * 6)) * d.speaking * 0.15;
+          d.groundGlow.material.opacity = 0.12;
+          d.namePlateSprite.material.opacity = 0.9;
+          op.scale.set(1, 1, 1);
+          op.scale.setScalar(1 + d.speaking * 0.025);
+        });
+
+        ambientAgents.forEach((op) => {
+          const d = op.userData;
+          op.position.y = Math.sin(t * 1.0 + op.position.x) * 0.038;
+          d.mat.rotation = 0;
+          d.mat.opacity = 1.0;
+          d.eyeGlow.material.opacity = 0.32 + Math.abs(Math.sin(t * 0.8 + op.position.x)) * 0.16;
+          d.groundGlow.material.opacity = 0.12;
+          d.namePlateSprite.material.opacity = 0.8;
+          op.scale.set(1, 1, 1);
+        });
+
+        // Trigger briefing typing
+        if (!briefingStarted) {
+          briefingStarted = true;
+          setIsPlayingBriefing(true);
+        }
+      }
+
+      // Rotate projection platform and rings
+      projRing1.rotation.y = t * 0.4;
+      projRing2.rotation.y = -t * 0.6;
+      platform.rotation.z = -t * 0.12;
+
+      emitterBeam.material.opacity = 0.08 + Math.abs(Math.sin(t * 4.5)) * 0.08;
 
       particles.rotation.y = t * 0.01;
 
@@ -1291,6 +1241,17 @@ export function LandingPage({
         });
 
         d.blinkDot.material.opacity = 0.4 + Math.abs(Math.sin(t * 3 + d.phase)) * 0.6;
+      });
+
+      // Rotate gears in control room backdrop
+      gears.forEach((gear, idx) => {
+        gear.rotation.z = t * 0.14 * (idx === 0 ? 1 : -1.2);
+      });
+
+      // Flashing server cluster LEDs
+      serverLEDs.forEach((led) => {
+        const ud = led.userData;
+        led.material.opacity = ud.baseOpacity * (0.35 + 0.65 * Math.abs(Math.sin(t * ud.speed + ud.phase)));
       });
 
       // Projector holograms spinning
@@ -1322,6 +1283,7 @@ export function LandingPage({
     animate();
 
     return () => {
+      mounted = false;
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener("resize", updateCameraFraming);
       if (renderer) {
@@ -1415,25 +1377,22 @@ export function LandingPage({
         backgroundImage: `repeating-linear-gradient(to bottom, rgba(178,239,155,0.035) 0px, rgba(178,239,155,0.035) 1px, transparent 1px, transparent 3px)`
       }} />
 
-      {/* Left Column Advanced Decryption Center Panel (zIndex 2 - placed behind the spies) */}
+      {/* Left Column Advanced Decryption Center Panel (zIndex 2) */}
       <div style={{ position: "fixed", top: "110px", left: "24px", zIndex: 2, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#1b9aaa", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", justifyContent: "space-between" }}>
           <span>🔒 SIGNAL INTEL</span>
           <span style={{ color: "#ef959c" }}>ONLINE</span>
         </div>
         
-        {/* Oscilloscope canvas */}
         <div style={{ width: "100%", height: "65px", background: "rgba(0,0,0,0.2)", borderRadius: "3px", overflow: "hidden", marginBottom: "10px", border: "1px solid rgba(27,154,170,0.15)" }}>
           <canvas ref={leftCanvasRef} width="238" height="65" style={{ width: "100%", height: "100%" }} />
         </div>
 
-        {/* Shifting cryptographic matrix keys */}
         <div style={{ fontSize: "9px", fontFamily: "monospace", color: "#b2ef9b", background: "rgba(255,255,255,0.02)", padding: "6px 8px", borderRadius: "3px", marginBottom: "10px", borderLeft: "2px solid #b2ef9b" }}>
           <div style={{ color: "rgba(238,243,238,0.4)", textTransform: "uppercase", fontSize: "8px", marginBottom: "2px" }}>KEY EXCHANGE STREAM:</div>
           <div>{hexKeyStream}</div>
         </div>
 
-        {/* Coordinates Vector Grid Status */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "9.5px", background: "rgba(0,0,0,0.15)", padding: "6px", borderRadius: "3px", marginBottom: "12px", border: "1px dashed rgba(238,243,238,0.1)" }}>
           <span>TARGET VCT: [{vectorGrid.x}, {vectorGrid.y}]</span>
           <span style={{ color: vectorGrid.status === "LOCKED" ? "#ef959c" : "#00f0ff", fontWeight: "bold" }}>{vectorGrid.status}</span>
@@ -1448,7 +1407,7 @@ export function LandingPage({
         </div>
       </div>
 
-      {/* Right Column Advanced Surveillance Feed Panel (zIndex 2 - placed behind the spies) */}
+      {/* Right Column Cyber Surveillance Map HUD Panel (zIndex 2 - matching video!) */}
       <div style={{ position: "fixed", top: "110px", right: "24px", zIndex: 2, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #ef959c", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#ef959c", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span>🌐 ACTIVE SURVEILLANCE</span>
@@ -1457,36 +1416,26 @@ export function LandingPage({
             LIVE
           </span>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-          {surveillanceRoster.map((op, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", borderBottom: i < 3 ? "1px solid rgba(238,243,238,0.06)" : "none", paddingBottom: "6px" }}>
-              <span style={{ display: "inline-flex", width: "15px", height: "15px", flexShrink: 0, color: op.color, transform: op.shape === "diamond" ? "rotate(45deg)" : "none" }}>
-                {op.shape === "diamond" && <span style={{ width: "11px", height: "11px", border: "2px solid currentColor" }} />}
-                {op.shape === "hexagon" && <span style={{ width: "15px", height: "15px", background: "currentColor", clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)" }} />}
-                {op.shape === "circle" && <span style={{ width: "13px", height: "13px", border: "2px solid currentColor", borderRadius: "50%" }} />}
-                {op.shape === "plus" && (
-                  <span style={{ position: "relative", width: "13px", height: "13px" }}>
-                    <span style={{ position: "absolute", left: "5px", top: 0, width: "3px", height: "13px", background: "currentColor" }} />
-                    <span style={{ position: "absolute", left: 0, top: "5px", width: "13px", height: "3px", background: "currentColor" }} />
-                  </span>
-                )}
-              </span>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <span style={{ fontSize: "12px", fontWeight: 700, color: "#eef3ee" }}>{op.name}</span>
-                  <span style={{ fontSize: "8.5px", fontFamily: "monospace", color: "#b2ef9b" }}>{op.ping}ms</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "9.5px", color: "rgba(238,243,238,0.4)" }}>
-                  <span>{op.role} · <span style={{ color: op.color, fontWeight: 600 }}>{op.status}</span></span>
-                  <span style={{ fontSize: "8.5px" }}>SIG: {op.signal}</span>
-                </div>
-              </div>
+        
+        <div style={{ width: "100%", height: "115px", background: "rgba(0,0,0,0.25)", borderRadius: "3px", overflow: "hidden", marginBottom: "10px", border: "1px solid rgba(239,149,156,0.15)" }}>
+          <canvas ref={rightCanvasRef} width="238" height="115" style={{ width: "100%", height: "100%" }} />
+        </div>
+
+        <div style={{ fontSize: "10.5px", color: "#ef959c", fontWeight: "bold", display: "flex", justifyContent: "space-between", borderTop: "1px dashed rgba(238,243,238,0.1)", paddingTop: "8px", marginTop: "4px" }}>
+          <span>NETWORK WEMAPS</span>
+          <span style={{ color: "#eef3ee", opacity: 0.5, fontSize: "9px" }}>v3.42</span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "8px" }}>
+          {surveillanceRoster.slice(0, 3).map((op, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: "9.5px", color: "rgba(238,243,238,0.45)" }}>
+              <span>{op.name} ({op.role})</span>
+              <span style={{ color: op.color }}>{op.status}</span>
             </div>
           ))}
         </div>
       </div>
 
-      {/* 3D WebGL Canvas container (zIndex 3 - Rendered in front of vignette, scanlines & side panels) */}
+      {/* 3D WebGL Canvas container (zIndex 3) */}
       <div ref={mountRef} style={{ position: "fixed", inset: 0, zIndex: 3, pointerEvents: "none" }} />
 
       {/* HUD Corners (zIndex 4) */}
@@ -1501,7 +1450,6 @@ export function LandingPage({
           onClick={() => setCurrentView("lobby")}
           style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
         >
-          {/* Animated Sonar Rubik Logo */}
           <div className="rubiks-cube-container" style={{ width: "32px", height: "32px", perspective: "250px", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <div className="rubiks-cube" style={{ width: "24px", height: "24px", position: "relative", transformStyle: "preserve-3d", animation: "rotate-cube 8s infinite linear" }}>
               <div className="cube-face front" style={{ position: "absolute", width: "24px", height: "24px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1px", background: "#000", transform: "translateZ(12px)" }}>
@@ -1526,7 +1474,7 @@ export function LandingPage({
         </div>
       </div>
 
-      {/* Top Right Navigation (zIndex 5) */}
+      {/* Navigation links */}
       <nav className="nav-links" style={{ position: "fixed", top: "28px", right: "64px", zIndex: 5, display: "flex", alignItems: "center", gap: "16px", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
         <button onClick={() => setCurrentView("features")} style={{ background: "none", border: "none", color: "#9AA29B", cursor: "pointer", transition: "color .2s ease", borderBottom: "2px dotted rgba(0,240,255,0.45)", paddingBottom: "2px" }} className="hover:text-[#00f0ff]">Features</button>
         <span style={{ opacity: 0.35 }}>·</span>
@@ -1535,7 +1483,7 @@ export function LandingPage({
         <button onClick={() => setCurrentView("about")} style={{ background: "none", border: "none", color: "#9AA29B", cursor: "pointer", transition: "color .2s ease", borderBottom: "2px dotted rgba(0,240,255,0.45)", paddingBottom: "2px" }} className="hover:text-[#00f0ff]">About</button>
       </nav>
 
-      {/* Bottom Left Buttons & Feedback (zIndex 5) */}
+      {/* Bottom left indicators */}
       <button 
         onClick={() => setCurrentView("support")}
         style={{
@@ -1571,7 +1519,7 @@ export function LandingPage({
         Need a feature or found a bug?
       </button>
 
-      {/* Field Report Overlay (zIndex 25) */}
+      {/* Field Report Overlay */}
       {showReport && (
         <div 
           onClick={(e) => { if (e.target === e.currentTarget) setShowReport(false); }}
@@ -1590,7 +1538,7 @@ export function LandingPage({
               overflow: "hidden"
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 900, fontSize: "19px", color: "#00f0ff", letterSpacing: "0.02em" }}>Field Report</span>
               <button 
                 onClick={() => setShowReport(false)}
@@ -1638,7 +1586,7 @@ export function LandingPage({
         </div>
       )}
 
-      {/* Briefing dialogue panel (zIndex 5) */}
+      {/* Briefing dialogue panel (types automatically after intro ends) */}
       {isPlayingBriefing && (
         <div style={{ position: "fixed", left: "50%", bottom: "110px", transform: "translateX(-50%)", zIndex: 5, width: "min(680px, 88vw)", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
           <div style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px" }}>
@@ -1681,7 +1629,7 @@ export function LandingPage({
         </div>
       )}
 
-      {/* CTA Wrap (zIndex 6) */}
+      {/* CTA Wrap */}
       {showCTA && !showWelcome && currentView === "lobby" && (
         <div style={{ position: "fixed", left: "50%", bottom: "100px", transform: "translateX(-50%)", zIndex: 6, display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
           <div style={{ width: "78px", height: "78px", borderRadius: "50%", border: "2px solid #00f0ff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 800, fontSize: "10px", letterSpacing: "0.08em", textAlign: "center", color: "#00f0ff", transform: "rotate(-18deg)", boxShadow: "0 0 22px rgba(0,240,255,0.25)" }}>
@@ -1702,7 +1650,7 @@ export function LandingPage({
         </div>
       )}
 
-      {/* Redaction wipe transition (zIndex 20) */}
+      {/* Redaction wipe transition */}
       {isWiping && (
         <div style={{
           position: "fixed", inset: 0, zIndex: 20, background: "#040b0d",
@@ -1710,11 +1658,10 @@ export function LandingPage({
         }} />
       )}
 
-      {/* Centered content overlay (Welcome room config, or sub-view) (zIndex 15) */}
+      {/* Centered content overlay */}
       {(showWelcome || currentView !== "lobby") && (
         <div style={{ position: "fixed", inset: 0, zIndex: 15, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", overflowY: "auto" }}>
           {currentView === "lobby" ? (
-            /* Welcome Room Setup */
             <div style={{ width: "min(560px, 100%)", background: "rgba(6,24,28,0.9)", border: "1px solid rgba(0,240,255,0.35)", backdropFilter: "blur(6px)", padding: "40px", position: "relative", borderRadius: "14px" }}>
               <div style={{ marginBottom: "22px" }}>
                 <div style={{ fontSize: "11.5px", letterSpacing: "0.14em", textTransform: "uppercase", color: "#eef3ee", opacity: 0.85, marginBottom: "10px", fontWeight: 700 }}>Game Mode</div>
@@ -1800,7 +1747,6 @@ export function LandingPage({
               </button>
             </div>
           ) : (
-            /* Sub-views like Rules, About, Changelog, Support, Features, etc. */
             <div 
               style={{ 
                 width: "min(800px, 95%)", 
@@ -1815,7 +1761,6 @@ export function LandingPage({
                 textAlign: "left"
               }}
             >
-              {/* Back to lobby button */}
               <button 
                 onClick={() => setCurrentView("lobby")}
                 style={{ 
@@ -1828,7 +1773,6 @@ export function LandingPage({
                 ← Back to Briefing
               </button>
               
-              {/* Content slot */}
               <div style={{ marginTop: "24px" }}>
                 {children}
               </div>
@@ -1837,7 +1781,7 @@ export function LandingPage({
         </div>
       )}
 
-      {/* Embedded CSS for animations */}
+      {/* Embedded CSS */}
       <style>{`
         @keyframes wipeIn {
           0% { clip-path: inset(0 100% 0 0); }
