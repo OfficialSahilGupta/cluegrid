@@ -415,7 +415,6 @@ export function LandingPage({
       setActiveSpeaker(null);
       setTypedText("");
       setShowCursor(false);
-      setShowCTA(true);
       if (threeStateRef.current) {
         threeStateRef.current.currentSpeaker = null;
       }
@@ -424,6 +423,7 @@ export function LandingPage({
 
     if (lineIndex >= lines.length) {
       setIsPlayingBriefing(false);
+      setShowCTA(true);
       return;
     }
 
@@ -446,6 +446,9 @@ export function LandingPage({
       if (charIdx >= currentEntry.text.length) {
         clearInterval(typeInterval);
         setShowCursor(false);
+        if (threeStateRef.current) {
+          threeStateRef.current.currentSpeaker = null;
+        }
 
         setTimeout(() => {
           setLineIndex((prev) => prev + 1);
@@ -1615,7 +1618,10 @@ export function LandingPage({
                 </svg>
               </button>
               <button 
-                onClick={() => setIsPlayingBriefing(false)}
+                onClick={() => {
+                  setIsPlayingBriefing(false);
+                  setShowCTA(true);
+                }}
                 style={{ background: "transparent", border: "1px solid rgba(238,243,238,0.3)", color: "rgba(238,243,238,0.75)", fontFamily: "inherit", fontSize: "10.5px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "6px 12px", borderRadius: "2px", cursor: "pointer" }}
               >
                 Skip briefing

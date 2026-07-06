@@ -58,7 +58,7 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
       <div
         className="scale-up"
         style={{
-          background: "rgba(6, 24, 28, 0.96)",
+          background: "linear-gradient(155deg, rgba(6,24,28,0.97) 0%, rgba(4,12,15,0.98) 100%)",
           border: "2px solid #00f0ff",
           borderRadius: "12px",
           width: "100%",
@@ -75,7 +75,7 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
             position: "absolute",
             top: "20px",
             right: "20px",
-            background: "none",
+            background: "transparent",
             border: "1.5px solid rgba(0, 240, 255, 0.4)",
             borderRadius: "50%",
             width: "30px",
@@ -94,7 +94,7 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
         <h3
           style={{
             fontFamily: "'Big Shoulders Display', sans-serif",
-            fontSize: "2rem",
+            fontSize: "1.8rem",
             fontWeight: 900,
             marginBottom: "8px",
             color: "#00f0ff",
@@ -104,19 +104,19 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
         >
           {isSignUp ? "RECRUIT CODEX" : "OPERATIVE LOGIN"}
         </h3>
-        <p style={{ color: "#9AA29B", fontSize: "0.9rem", marginBottom: "24px" }}>
+        <p style={{ color: "#9AA29B", fontSize: "12px", marginBottom: "24px", lineHeight: 1.4 }}>
           {isSignUp ? "Generate new clearance key to record tactical statistics." : "Input encrypted parameters to verify identity."}
         </p>
 
         {upsellMessage && (
           <div
             style={{
-              background: "rgba(255, 0, 85, 0.08)",
-              border: "1px solid #ff0055",
+              background: "rgba(239, 149, 156, 0.08)",
+              border: "1.5px solid #ef959c",
               borderRadius: "6px",
               padding: "10px 14px",
-              color: "#ff0055",
-              fontSize: "0.85rem",
+              color: "#ef959c",
+              fontSize: "11px",
               fontWeight: 700,
               marginBottom: "20px",
               textAlign: "left",
@@ -130,12 +130,12 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
         {error && (
           <div
             style={{
-              padding: "12px",
-              background: "rgba(255, 0, 85, 0.1)",
-              border: "1px solid #ff0055",
+              padding: "10px 14px",
+              background: "rgba(239, 149, 156, 0.1)",
+              border: "1.5px solid #ef959c",
               borderRadius: "6px",
-              color: "#ff0055",
-              fontSize: "0.85rem",
+              color: "#ef959c",
+              fontSize: "12px",
               marginBottom: "16px",
               fontWeight: 700,
             }}
@@ -147,7 +147,7 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {isSignUp && (
             <div>
-              <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "6px", fontWeight: 700, color: "#9AA29B", textTransform: "uppercase" }}>
+              <label style={{ display: "block", fontSize: "11px", marginBottom: "6px", fontWeight: 700, color: "#9AA29B", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 CODENAME
               </label>
               <input
@@ -160,18 +160,19 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
                   width: "100%",
                   padding: "10px 12px",
                   borderRadius: "6px",
-                  border: "1.5px solid rgba(0, 240, 255, 0.2)",
-                  background: "rgba(255, 255, 255, 0.03)",
+                  border: "1.5px solid rgba(0, 240, 255, 0.25)",
+                  background: "rgba(0, 0, 0, 0.2)",
                   color: "#eef3ee",
-                  fontSize: "0.95rem",
-                  outline: "none"
+                  fontSize: "14px",
+                  outline: "none",
+                  fontFamily: "inherit"
                 }}
               />
             </div>
           )}
 
           <div>
-            <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "6px", fontWeight: 700, color: "#9AA29B", textTransform: "uppercase" }}>
+            <label style={{ display: "block", fontSize: "11px", marginBottom: "6px", fontWeight: 700, color: "#9AA29B", textTransform: "uppercase", letterSpacing: "0.05em" }}>
               SECURE EMAIL
             </label>
             <input
@@ -184,17 +185,18 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
                 width: "100%",
                 padding: "10px 12px",
                 borderRadius: "6px",
-                border: "1.5px solid rgba(0, 240, 255, 0.2)",
-                background: "rgba(255, 255, 255, 0.03)",
+                border: "1.5px solid rgba(0, 240, 255, 0.25)",
+                background: "rgba(0, 0, 0, 0.2)",
                 color: "#eef3ee",
-                fontSize: "0.95rem",
-                outline: "none"
+                fontSize: "14px",
+                outline: "none",
+                fontFamily: "inherit"
               }}
             />
           </div>
 
           <div>
-            <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "6px", fontWeight: 700, color: "#9AA29B", textTransform: "uppercase" }}>
+            <label style={{ display: "block", fontSize: "11px", marginBottom: "6px", fontWeight: 700, color: "#9AA29B", textTransform: "uppercase", letterSpacing: "0.05em" }}>
               ENCRYPTED PASSCODE
             </label>
             <input
@@ -207,11 +209,12 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
                 width: "100%",
                 padding: "10px 12px",
                 borderRadius: "6px",
-                border: "1.5px solid rgba(0, 240, 255, 0.2)",
-                background: "rgba(255, 255, 255, 0.03)",
+                border: "1.5px solid rgba(0, 240, 255, 0.25)",
+                background: "rgba(0, 0, 0, 0.2)",
                 color: "#eef3ee",
-                fontSize: "0.95rem",
-                outline: "none"
+                fontSize: "14px",
+                outline: "none",
+                fontFamily: "inherit"
               }}
             />
           </div>
@@ -230,7 +233,7 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
               border: "none",
               borderRadius: "6px",
               cursor: loading ? "not-allowed" : "pointer",
-              boxShadow: "0 0 15px rgba(0, 240, 255, 0.2)",
+              boxShadow: "0 0 15px rgba(0, 240, 255, 0.25)",
               marginTop: "8px",
               transition: "all 0.2s ease",
             }}
@@ -239,7 +242,7 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
           </button>
         </form>
 
-        <div style={{ textAlign: "center", margin: "16px 0", color: "#9AA29B", fontSize: "0.85rem", letterSpacing: "0.05em" }}>
+        <div style={{ textAlign: "center", margin: "16px 0", color: "#9AA29B", fontSize: "11px", letterSpacing: "0.05em" }}>
           — OR ACCESS GRID VIA —
         </div>
 
@@ -252,15 +255,15 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
               height: "100%",
               padding: "10px",
               borderRadius: "6px",
-              border: "1.5px solid rgba(0, 240, 255, 0.2)",
-              background: "rgba(255, 255, 255, 0.03)",
+              border: "1.5px solid rgba(0, 240, 255, 0.25)",
+              background: "rgba(0, 0, 0, 0.2)",
               color: "#eef3ee",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               gap: "8px",
-              fontSize: "0.9rem",
+              fontSize: "13px",
               fontWeight: 700,
               pointerEvents: "none",
             }}
@@ -298,14 +301,15 @@ export function AuthModal({ onClose, upsellMessage }: AuthModalProps) {
           <button
             onClick={() => setIsSignUp(!isSignUp)}
             style={{
-              background: "none",
+              background: "transparent",
               border: "none",
-              color: "#ff0055",
-              fontSize: "0.9rem",
+              color: "#ef959c",
+              fontSize: "12px",
               cursor: "pointer",
               fontWeight: 700,
-              borderBottom: "1.5px dotted rgba(255, 0, 85, 0.5)",
-              paddingBottom: "2px"
+              borderBottom: "1.5px dotted rgba(239, 149, 156, 0.5)",
+              paddingBottom: "2px",
+              fontFamily: "inherit"
             }}
           >
             {isSignUp ? "Already registered? Verify credentials" : "Need registration? Apply recruits"}
