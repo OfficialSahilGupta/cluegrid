@@ -955,12 +955,7 @@ export function LandingPage({
       sprite.position.y = height / 2;
       group.add(sprite);
 
-      const eyeHeights = [0.815, 0.815, 0.805, 0.83];
-      const eyeH = eyeHeights[charIndex] || 0.815;
 
-      const eyeGlow = addGlowSprite(accentHex, 0, height * eyeH, 0.16, 0.42, 0.0); // starts hidden
-      group.add(eyeGlow);
-      eyeGlow.position.set(0, height * eyeH, 0.18);
 
       const groundGlow = addGlowSprite(accentHex, 0, 0.04, 0.16, 1.4, 0.0); // starts hidden
       groundGlow.rotation.x = -Math.PI / 2;
@@ -1019,7 +1014,7 @@ export function LandingPage({
       namePlateSprite.scale.set(1.5, 0.42, 1);
       group.add(namePlateSprite);
 
-      group.userData = { sprite, mat, eyeGlow, groundGlow, namePlateSprite, canvas, sctx, img: null, baseScale: scale, baseY: 0, speaking: 0, ambient: isAmbient };
+      group.userData = { sprite, mat, groundGlow, namePlateSprite, canvas, sctx, img: null, baseScale: scale, baseY: 0, speaking: 0, ambient: isAmbient };
       return group;
     };
 
@@ -1167,7 +1162,6 @@ export function LandingPage({
           op.position.y = -0.22 * (1.0 - tProgress) + targetY;
           
           d.mat.opacity = tProgress * (0.75 + 0.25 * Math.random());
-          d.eyeGlow.material.opacity = tProgress * 0.45;
           d.groundGlow.material.opacity = tProgress * 0.12;
           d.namePlateSprite.material.opacity = tProgress * 0.9;
           
@@ -1187,7 +1181,6 @@ export function LandingPage({
           op.position.y = Math.sin(t * 0.5 + op.position.x) * 0.015 + d.speaking * Math.sin(t * 2.8) * 0.016;
           d.mat.rotation = 0;
           d.mat.opacity = 1.0;
-          d.eyeGlow.material.opacity = 0.4 + d.speaking * 0.5 + Math.abs(Math.sin(t * 6)) * d.speaking * 0.15;
           d.groundGlow.material.opacity = 0.12;
           d.namePlateSprite.material.opacity = 0.9;
           op.scale.set(1, 1, 1);
@@ -1199,7 +1192,6 @@ export function LandingPage({
           op.position.y = Math.sin(t * 1.0 + op.position.x) * 0.038;
           d.mat.rotation = 0;
           d.mat.opacity = 1.0;
-          d.eyeGlow.material.opacity = 0.32 + Math.abs(Math.sin(t * 0.8 + op.position.x)) * 0.16;
           d.groundGlow.material.opacity = 0.12;
           d.namePlateSprite.material.opacity = 0.8;
           op.scale.set(1, 1, 1);
