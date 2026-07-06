@@ -133,8 +133,8 @@ export function MusicPlayer({ onShowGatedUpsell, noBorder }: MusicPlayerProps) {
           onClick={() => handleTabChange("youtube")}
           style={{
             flex: 1,
-            background: activeTab === "youtube" ? "rgba(232, 163, 61, 0.12)" : "transparent",
-            border: activeTab === "youtube" ? "1px solid rgba(232, 163, 61, 0.3)" : "1px solid transparent",
+            background: activeTab === "youtube" ? "var(--accent-bg-subtle)" : "transparent",
+            border: activeTab === "youtube" ? "1px solid var(--accent)" : "1px solid transparent",
             color: activeTab === "youtube" ? "var(--accent)" : "var(--color-text-muted)",
             padding: "8px 12px",
             borderRadius: "var(--radius-md)",
@@ -151,8 +151,8 @@ export function MusicPlayer({ onShowGatedUpsell, noBorder }: MusicPlayerProps) {
           onClick={() => handleTabChange("spotify")}
           style={{
             flex: 1,
-            background: activeTab === "spotify" ? "rgba(232, 163, 61, 0.12)" : "transparent",
-            border: activeTab === "spotify" ? "1px solid rgba(232, 163, 61, 0.3)" : "1px solid transparent",
+            background: activeTab === "spotify" ? "var(--accent-bg-subtle)" : "transparent",
+            border: activeTab === "spotify" ? "1px solid var(--accent)" : "1px solid transparent",
             color: activeTab === "spotify" ? "var(--accent)" : "var(--color-text-muted)",
             padding: "8px 12px",
             borderRadius: "var(--radius-md)",
@@ -206,7 +206,7 @@ export function MusicPlayer({ onShowGatedUpsell, noBorder }: MusicPlayerProps) {
                   border: "none",
                   color: "var(--accent-text-on)",
                   cursor: "pointer",
-                  boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
                   transition: "all 0.2s ease",
                   fontFamily: "var(--font-display)",
                 }}
@@ -303,7 +303,7 @@ export function MusicPlayer({ onShowGatedUpsell, noBorder }: MusicPlayerProps) {
                   border: "none",
                   color: "var(--accent-text-on)",
                   cursor: "pointer",
-                  boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
                   transition: "all 0.2s ease",
                   fontFamily: "var(--font-display)",
                 }}

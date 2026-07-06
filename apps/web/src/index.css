@@ -40,14 +40,14 @@
   --team-4-text: #ff9100;
 
   /* Card states */
-  --card-neutral-bg: rgba(6, 24, 28, 0.65);
-  --card-neutral-border: rgba(0, 240, 255, 0.25);
-  --card-neutral-text: #eef3ee;
+  --card-neutral-bg: rgba(255, 255, 255, 0.08);
+  --card-neutral-border: rgba(255, 255, 255, 0.2);
+  --card-neutral-text: #f4f4f5;
 
-  --card-assassin-bg: rgba(239, 149, 156, 0.08);
-  --card-assassin-border: #ef959c;
-  --card-assassin-text: #ef959c;
-  --card-assassin-label-text: #ef959c;
+  --card-assassin-bg: #09090b;
+  --card-assassin-border: #3f3f46;
+  --card-assassin-text: #a1a1aa;
+  --card-assassin-label-text: #fafafa;
 
   /* Status badges */
   --status-active-bg: rgba(178, 239, 155, 0.15);

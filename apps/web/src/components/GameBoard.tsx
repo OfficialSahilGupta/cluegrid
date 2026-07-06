@@ -151,13 +151,7 @@ const typeColors: Record<string, { bg: string; border: string; text: string; lig
 };
 
 function triggerHaptics(pattern: number | number[]) {
-  if (typeof window !== "undefined" && window.navigator && typeof window.navigator.vibrate === "function") {
-    try {
-      window.navigator.vibrate(pattern);
-    } catch {
-      /* ignore */
-    }
-  }
+  // navigator.vibrate disabled
 }
 
 function playBeep(frequency = 440, type: OscillatorType = "sine") {
@@ -314,6 +308,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   // Active Switching Player State
   const [activeSwitchPlayerId, setActiveSwitchPlayerId] = useState<string | null>(null);
   const [votedCardIds, setVotedCardIds] = useState<number[]>([]);
+  const [showWordCardIds, setShowWordCardIds] = useState<number[]>([]);
   const [clueSelectedCardIds, setClueSelectedCardIds] = useState<number[]>([]);
   const [recentlyFlippedCardIds, setRecentlyFlippedCardIds] = useState<number[]>([]);
   const prevBoardRef = useRef<CardState[]>([]);
@@ -796,31 +791,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   };
 
   const playHapticClick = (gainVal = 0.12) => {
-    if (!soundEnabled) return;
-    try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContextClass) return;
-      const audioCtx = new AudioContextClass();
-      const now = audioCtx.currentTime;
-
-      const osc = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-      
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(150, now);
-      osc.frequency.exponentialRampToValueAtTime(60, now + 0.05);
-
-      gainNode.gain.setValueAtTime(gainVal, now);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-
-      osc.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      
-      osc.start(now);
-      osc.stop(now + 0.05);
-    } catch (e) {
-      // ignore
-    }
+    // playHapticClick disabled
   };
 
   const playOperativeAlertSound = () => {
@@ -3526,8 +3497,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     gap: "clamp(4px, 1.5vw, 12px)",
                     width: "100%",
                     padding: "clamp(8px, 2vw, 16px)",
-                    background: "rgba(255,255,255,0.02)",
-                    border: "1px solid rgba(255,255,255,0.05)",
+                    background: "rgba(4, 11, 13, 0.75)",
+                    backdropFilter: "blur(8px)",
+                    border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: "var(--radius-lg)",
                   }}
                 >
@@ -3605,7 +3577,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       <button
                         key={card.id}
                         data-card-id={card.id}
-                        disabled={!isInteractive}
+                        disabled={!isInteractive && !card.revealed}
                         onClick={() => handleCardClick(card.id)}
                         className={[cardClassName, "game-board-card"].filter(Boolean).join(" ")}
                         style={{
@@ -3619,7 +3591,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           flexDirection: "column",
                           alignItems: "center",
                           justifyContent: "center",
-                          cursor: isInteractive ? "pointer" : "default",
+                          cursor: (isInteractive || card.revealed) ? "pointer" : "default",
                           minHeight: "clamp(52px, 15vw, 100px)",
                           position: "relative",
                           perspective: "1000px",
@@ -3682,6 +3654,29 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           }}
                         />
 
+                        {/* Character Image Overlay for Flipped/Revealed Team Cards */}
+                        {card.revealed && card.type && ["red", "blue", "green", "yellow"].includes(card.type) && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              inset: 0,
+                              backgroundImage: 'url("/spy-characters.png")',
+                              backgroundSize: '480% 320%',
+                              backgroundPosition: `${
+                                card.type === "red" ? 66.666 :
+                                card.type === "blue" ? 33.333 :
+                                card.type === "green" ? 0 : 100
+                              }% 1%`,
+                              opacity: showWordCardIds.includes(card.id) ? 0.08 : 0.85,
+                              mixBlendMode: "luminosity",
+                              pointerEvents: "none",
+                              zIndex: 1,
+                              borderRadius: "inherit",
+                              transition: "opacity 0.25s ease",
+                            }}
+                          />
+                        )}
+
                         {(card.revealed || (canSeeKey && card.type === "assassin")) && !votedCardIds.includes(card.id) && (
                           <span
                             style={{
@@ -3717,11 +3712,18 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             overflowWrap: "break-word",
                             hyphens: "auto",
                             lineHeight: 1.15,
-                            opacity: card.revealed && !canSeeKey ? 0.45 : 1,
+                            opacity: card.revealed
+                              ? showWordCardIds.includes(card.id)
+                                ? 1
+                                : 0
+                              : canSeeKey
+                                ? 0.45
+                                : 1,
                             transform: "translateZ(20px)",
                             display: "block",
                             zIndex: 2,
                             textShadow: !card.revealed ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
+                            transition: "opacity 0.25s ease",
                           }}
                         >
                           {card.word}
@@ -5758,6 +5760,15 @@ const renderSettingsCard = (side?: "left" | "right") => {
   };
 
   const handleCardClick = (cardId: number) => {
+    const clickedCard = room.board.find((c) => c.id === cardId);
+    if (clickedCard && clickedCard.revealed) {
+      playPremiumRichClick();
+      setShowWordCardIds((prev) =>
+        prev.includes(cardId) ? prev.filter((id) => id !== cardId) : [...prev, cardId]
+      );
+      return;
+    }
+
     if (!room.turnState || room.phase !== "playing") return;
 
     // 1. Spymaster / Duet clue-giver card selection
@@ -6308,10 +6319,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
-              background: "linear-gradient(135deg, hsl(355, 75%, 20%) 0%, hsl(355, 80%, 35%) 100%)",
-              border: "1.5px solid hsl(355, 85%, 55%)",
+              background: "linear-gradient(135deg, hsl(355, 75%, 15%) 0%, hsl(355, 80%, 25%) 100%)",
+              border: "1.5px solid hsl(355, 80%, 48%)",
               color: "#fff",
-              boxShadow: isButton ? "none" : "0 8px 30px rgba(239, 68, 68, 0.6)",
+              boxShadow: isButton ? "none" : "0 6px 20px rgba(239, 68, 68, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -6337,10 +6348,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
-              background: "linear-gradient(135deg, hsl(15, 85%, 25%) 0%, hsl(25, 90%, 45%) 100%)",
-              border: "1.5px solid hsl(25, 100%, 55%)",
+              background: "linear-gradient(135deg, hsl(35, 85%, 18%) 0%, hsl(35, 90%, 30%) 100%)",
+              border: "1.5px solid hsl(35, 90%, 55%)",
               color: "#fff",
-              boxShadow: isButton ? "none" : "0 8px 30px rgba(249, 115, 22, 0.6)",
+              boxShadow: isButton ? "none" : "0 6px 20px rgba(226, 163, 61, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -6364,10 +6375,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
-              background: "linear-gradient(135deg, hsl(270, 75%, 15%) 0%, hsl(275, 80%, 30%) 100%)",
-              border: "1.5px solid hsl(270, 90%, 60%)",
-              color: "#fff",
-              boxShadow: isButton ? "none" : "0 8px 30px rgba(168, 85, 247, 0.6)",
+              background: "linear-gradient(135deg, #09090b 0%, #18181b 100%)",
+              border: "1.5px solid #3f3f46",
+              color: "#fafafa",
+              boxShadow: isButton ? "none" : "0 6px 20px rgba(63, 63, 70, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -6394,10 +6405,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
-              background: "linear-gradient(135deg, hsl(45, 85%, 25%) 0%, hsl(45, 90%, 45%) 100%)",
-              border: "1.5px solid hsl(45, 100%, 55%)",
-              color: "#fff",
-              boxShadow: isButton ? "none" : "0 8px 30px rgba(234, 179, 8, 0.6)",
+              background: "linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(0, 240, 255, 0.18) 100%)",
+              border: "1.5px solid var(--accent)",
+              color: "var(--accent)",
+              boxShadow: isButton ? "none" : "0 6px 20px rgba(0, 240, 255, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -6421,10 +6432,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
-              background: "linear-gradient(135deg, hsl(142, 75%, 15%) 0%, hsl(142, 80%, 30%) 100%)",
-              border: "1.5px solid hsl(142, 85%, 50%)",
+              background: "linear-gradient(135deg, hsl(142, 75%, 12%) 0%, hsl(142, 80%, 22%) 100%)",
+              border: "1.5px solid hsl(142, 70%, 45%)",
               color: "#fff",
-              boxShadow: isButton ? "none" : "0 8px 30px rgba(34, 197, 94, 0.6)",
+              boxShadow: isButton ? "none" : "0 6px 20px rgba(34, 197, 94, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -6448,10 +6459,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
-              background: "linear-gradient(135deg, hsl(330, 75%, 20%) 0%, hsl(330, 80%, 35%) 100%)",
-              border: "1.5px solid hsl(330, 85%, 55%)",
+              background: "linear-gradient(135deg, hsl(217, 85%, 15%) 0%, hsl(217, 80%, 25%) 100%)",
+              border: "1.5px solid hsl(217, 91%, 60%)",
               color: "#fff",
-              boxShadow: isButton ? "none" : "0 8px 30px rgba(236, 72, 153, 0.6)",
+              boxShadow: isButton ? "none" : "0 6px 20px rgba(59, 130, 246, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -6862,7 +6873,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 background: peekKey ? "var(--accent)" : "transparent",
                 border: `1px solid ${peekKey ? "var(--accent)" : "var(--border-default)"}`,
                 color: peekKey ? "var(--accent-text-on)" : "var(--text-secondary)",
-                boxShadow: peekKey ? "0 0 12px var(--accent)" : "none",
+                boxShadow: peekKey ? "0 0 6px var(--accent)" : "none",
                 transition: "all 0.2s ease",
               }}
             >

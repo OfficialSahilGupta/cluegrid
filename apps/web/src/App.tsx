@@ -179,13 +179,7 @@ export default function App() {
 
   // ─── Lightweight Audio & Haptic Helpers (no external deps) ────────────────
   const triggerHaptics = (pattern: number | number[]) => {
-    if (typeof window !== "undefined" && window.navigator && typeof window.navigator.vibrate === "function") {
-      try {
-        window.navigator.vibrate(pattern);
-      } catch {
-        /* ignore */
-      }
-    }
+    // navigator.vibrate disabled
   };
 
   const _mkCtx = () => {

@@ -229,26 +229,8 @@ function getRoomStateForPlayer(room: RoomState, playerId: string): any {
     return safeCard;
   });
 
-  // Clue filtering: clueWord and clueCount are broadcast to active team only
-  let turnState = null;
-  if (room.turnState) {
-    const isTeamMember = player && player.team === room.turnState.activeTeam;
-    // Spymaster of active team can see it, operatives of active team can see it.
-    // If it's the guessing phase, everyone can see it to play, wait, is that true?
-    // Let's check the prompt: "Spymaster gives a clue (one word + a number) via a simple form; this clue is broadcast to their team's operatives only."
-    // Yes! Broadcast to their team's operatives only. Let's make sure that if a player is NOT on the active team (or spectator), they see null.
-    // Wait, does the active team's spymaster see it? Yes, they gave it.
-    // So if isTeamMember is true, we show the clue. Otherwise, we hide it.
-    if (isTeamMember) {
-      turnState = room.turnState;
-    } else {
-      turnState = {
-        ...room.turnState,
-        clueWord: null,
-        clueCount: null,
-      };
-    }
-  }
+  // Broadcast turnState (including clueWord and clueCount) to everyone
+  const turnState = room.turnState;
 
   return {
     ...room,
