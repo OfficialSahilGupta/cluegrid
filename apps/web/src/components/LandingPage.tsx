@@ -1095,7 +1095,7 @@ export function LandingPage({
           
           sctx.clearRect(0, 0, w, h);
           
-          // Smoothly increase voxelization resolution
+          // Smoothly increase voxelization resolution based on progress
           const resScale = 0.03 + 0.97 * Math.pow(tProgress, 2.5);
           const tempW = Math.max(8, Math.floor(256 * resScale));
           const tempH = Math.max(16, Math.floor(512 * resScale));
@@ -1598,15 +1598,15 @@ export function LandingPage({
             <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
               <button 
                 onClick={() => setSfxEnabled(!sfxEnabled)} 
-                style={{ background: "transparent", border: "1px solid rgba(238,243,238,0.3)", color: "rgba(238,243,238,0.75)", display: "flex", alignItems: "center", justifyContent: "center", padding: "8px 10px", borderRadius: "2px", cursor: "pointer" }}
+                style={{ background: "rgba(239, 149, 156, 0.08)", border: "1.5px solid #ef959c", color: "#ef959c", display: "flex", alignItems: "center", justifyContent: "center", padding: "8px 12px", borderRadius: "4px", cursor: "pointer", boxShadow: "0 0 10px rgba(239, 149, 156, 0.15)", transition: "all 0.2s ease" }}
                 title="Toggle typing sound"
               >
                 <svg width="20" height="16" viewBox="0 0 24 16" fill="none" style={{ opacity: sfxEnabled ? 1 : 0.4 }}>
-                  <rect x="1" y="4" width="2.4" height="8" rx="0.5" fill="#eef3ee"/>
-                  <rect x="8" y="6" width="2.6" height="4" rx="1" fill="#00f0ff"/>
-                  <rect x="13" y="3" width="2.6" height="10" rx="1" fill="#00f0ff"/>
-                  <rect x="18" y="5.5" width="2.6" height="5" rx="1" fill="#00f0ff"/>
-                  {!sfxEnabled && <line x1="1" y1="1" x2="23" y2="15" stroke="#eef3ee" strokeWidth="1.6"/>}
+                  <rect x="1" y="4" width="2.4" height="8" rx="0.5" fill="#ef959c"/>
+                  <rect x="8" y="6" width="2.6" height="4" rx="1" fill="#ef959c"/>
+                  <rect x="13" y="3" width="2.6" height="10" rx="1" fill="#ef959c"/>
+                  <rect x="18" y="5.5" width="2.6" height="5" rx="1" fill="#ef959c"/>
+                  {!sfxEnabled && <line x1="1" y1="1" x2="23" y2="15" stroke="#ef959c" strokeWidth="1.6"/>}
                 </svg>
               </button>
               <button 
@@ -1614,7 +1614,7 @@ export function LandingPage({
                   setIsPlayingBriefing(false);
                   setShowCTA(true);
                 }}
-                style={{ background: "transparent", border: "1px solid rgba(238,243,238,0.3)", color: "rgba(238,243,238,0.75)", fontFamily: "inherit", fontSize: "10.5px", letterSpacing: "0.12em", textTransform: "uppercase", padding: "6px 12px", borderRadius: "2px", cursor: "pointer" }}
+                style={{ background: "rgba(0, 240, 255, 0.08)", border: "1.5px solid #00f0ff", color: "#00f0ff", fontFamily: "inherit", fontSize: "11px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", padding: "8px 16px", borderRadius: "4px", cursor: "pointer", boxShadow: "0 0 12px rgba(0, 240, 255, 0.2)", transition: "all 0.2s ease" }}
               >
                 Skip briefing
               </button>
