@@ -1443,12 +1443,12 @@ export function LandingPage({
       }} />
 
       {/* 3D WebGL Canvas container (always visible) */}
-      <div ref={mountRef} style={{ position: "fixed", inset: 0, zIndex: 3, pointerEvents: "none" }} />
+      <div ref={mountRef} style={{ position: "fixed", inset: 0, zIndex: 4, pointerEvents: "none" }} />
 
       {!isActiveRoom && (
         <>
           {/* Left Column Advanced Decryption Center Panel (zIndex 5) */}
-          <div style={{ position: "fixed", top: "110px", left: "24px", zIndex: 5, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
+          <div className="hud-side-panel-left" style={{ position: "fixed", top: "110px", left: "24px", width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#1b9aaa", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", justifyContent: "space-between" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
@@ -1481,7 +1481,7 @@ export function LandingPage({
       </div>
 
       {/* Right Column Cyber Surveillance Map HUD Panel (zIndex 5) */}
-      <div style={{ position: "fixed", top: "110px", right: "24px", zIndex: 5, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #ef959c", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
+      <div className="hud-side-panel-right" style={{ position: "fixed", top: "110px", right: "24px", width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #ef959c", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#ef959c", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span>🌐 ACTIVE SURVEILLANCE</span>
           <span style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "9.5px", color: "#ef959c" }}>

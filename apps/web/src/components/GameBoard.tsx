@@ -6951,12 +6951,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
       {/* ─── Main Content Split Layout ─── */}
             <div
+        className={room.phase === "lobby" ? "game-main-split-layout" : ""}
         style={
           room.phase === "lobby"
             ? {
-                display: "grid",
-                gridTemplateColumns: "1fr minmax(360px, 1.3fr) 1fr",
-                gap: "24px",
                 width: "100%",
                 alignItems: "flex-start",
               }
