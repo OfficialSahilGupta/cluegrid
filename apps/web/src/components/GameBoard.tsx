@@ -1557,23 +1557,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
             
-            {/* Row 1: Red and Blue Teams */}
-            <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
+            {/* All Teams in one row */}
+            <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", width: "100%" }}>
               {renderTeamSegment("red", `${t("teams.red")} ${t("teams.team")}`)}
               {renderTeamSegment("blue", `${t("teams.blue")} ${t("teams.team")}`)}
+              {room.teamCount > 2 && renderTeamSegment("green", `${t("teams.green")} ${t("teams.team")}`)}
+              {room.teamCount > 3 && renderTeamSegment("yellow", `${t("teams.yellow")} ${t("teams.team")}`)}
             </div>
-
-            {/* Row 2: Green and Yellow Teams */}
-            {room.teamCount > 2 && (
-              <div style={{ display: "flex", gap: "24px", flexWrap: "wrap" }}>
-                {renderTeamSegment("green", `${t("teams.green")} ${t("teams.team")}`)}
-                {room.teamCount > 3 ? (
-                  renderTeamSegment("yellow", `${t("teams.yellow")} ${t("teams.team")}`)
-                ) : (
-                  <div style={{ flex: 1, minWidth: "180px" }} />
-                )}
-              </div>
-            )}
 
             {/* Spectators / Unassigned Group */}
             {(() => {
@@ -1717,9 +1707,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 <div
                   style={{
                     position: "absolute",
-                    top: "calc(100% + 12px)",
-                    left: "50%",
-                    transform: "translateX(-50%)",
+                    top: "0",
+                    right: "calc(100% + 16px)",
                     width: "320px",
                     background: "var(--color-surface)",
                     border: "2px solid var(--accent)",
@@ -1762,7 +1751,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           My Status
                         </label>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                          {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY"].map((st) => {
+                          {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY", "THINKING", "COOKING"].map((st) => {
                             const isSelected = (localPlayer?.status || "ACTIVE") === st;
                             return (
                               <button
@@ -2201,9 +2190,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 <div
                   style={{
                     position: "absolute",
-                    top: "calc(100% + 12px)",
-                    left: "50%",
-                    transform: "translateX(-50%)",
+                    top: "0",
+                    left: "calc(100% + 16px)",
                     width: "320px",
                     background: "var(--color-surface)",
                     border: "2px solid var(--accent)",
@@ -2248,7 +2236,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           My Status
                         </label>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                          {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY"].map((st) => {
+                          {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY", "THINKING", "COOKING"].map((st) => {
                             const isSelected = (localPlayer?.status || "ACTIVE") === st;
                             return (
                               <button

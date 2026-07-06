@@ -1433,7 +1433,7 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
       const player = room.players.find((p) => p.id === playerId);
       if (!player) return;
 
-      const validStatuses = ["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY"];
+      const validStatuses = ["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY", "THINKING", "COOKING"];
       if (validStatuses.includes(status)) {
         player.status = status;
         broadcastRoomState(room, io);
