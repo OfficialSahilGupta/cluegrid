@@ -1643,6 +1643,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               background: "var(--color-surface)",
               border: "1px solid var(--color-border)",
               borderRadius: "var(--radius-md)",
+              position: "relative",
             }}
           >
             <div
@@ -1699,7 +1700,60 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               </div>
             </div>
             {statsExpanded && (
-              <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "12px" }} className="scale-up">
+              <>
+                <div
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(0, 0, 0, 0.4)",
+                    backdropFilter: "blur(1.5px)",
+                    zIndex: 9998,
+                  }}
+                  onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 12px)",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "320px",
+                    background: "var(--color-surface)",
+                    border: "2px solid var(--accent)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "20px",
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(232, 163, 61, 0.15)",
+                    zIndex: 9999,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                  }}
+                  className="scale-up"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--color-border)", paddingBottom: "8px" }}>
+                    <span style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                      Profile Settings & Stats
+                    </span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); }}
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        color: "var(--color-text-muted)",
+                        cursor: "pointer",
+                        fontSize: "1.1rem",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div style={{ maxHeight: "360px", overflowY: "auto", paddingRight: "4px", display: "flex", flexDirection: "column", gap: "16px" }}>
                 {user ? (
                   <>
                     <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -1896,7 +1950,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   </div>
                 )}
               </div>
-            )}
+            </div>
+          </>
+        )}
           </div>
           
           {/* Music Player */}
@@ -2037,10 +2093,24 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const renderGameplayLayout = () => {
     return (
       <>
-        {/* Top Horizontal Row: User Profile, Music Player, and Host Controls */}
-        <div style={{ display: "flex", gap: "24px", width: "100%", flexWrap: "wrap", alignItems: "stretch", marginBottom: "8px" }}>
+        {/* Top Horizontal Row: User Profile, Music Player, and Host Controls Unified in a Single Card */}
+        <div
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-md)",
+            padding: "24px",
+            display: "flex",
+            gap: "32px",
+            width: "100%",
+            flexWrap: "wrap",
+            alignItems: "stretch",
+            marginBottom: "8px",
+            boxSizing: "border-box",
+          }}
+        >
           {/* User Profile */}
-          <div style={{ flex: "1 1 280px", display: "flex", flexDirection: "column" }}>
+          <div style={{ flex: "1 1 250px", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
             {/* User Profile Card / Statistics */}
           {/* User Profile Circular Widget */}
           <div
@@ -2049,10 +2119,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               flexDirection: "column",
               alignItems: "center",
               gap: "8px",
-              padding: "16px",
-              background: "var(--color-surface)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-md)",
+              width: "100%",
             }}
           >
             {/* Clickable Circle Container */}
@@ -2117,7 +2184,60 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
             {/* Stats list expands below */}
             {statsExpanded && (
-              <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "12px" }} className="scale-up">
+              <>
+                <div
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(0, 0, 0, 0.4)",
+                    backdropFilter: "blur(1.5px)",
+                    zIndex: 9998,
+                  }}
+                  onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "calc(100% + 12px)",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "320px",
+                    background: "var(--color-surface)",
+                    border: "2px solid var(--accent)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "20px",
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(232, 163, 61, 0.15)",
+                    zIndex: 9999,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "16px",
+                  }}
+                  className="scale-up"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--color-border)", paddingBottom: "8px" }}>
+                    <span style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                      Profile Settings & Stats
+                    </span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); }}
+                      style={{
+                        background: "transparent",
+                        border: "none",
+                        color: "var(--color-text-muted)",
+                        cursor: "pointer",
+                        fontSize: "1.1rem",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div style={{ maxHeight: "360px", overflowY: "auto", paddingRight: "4px", display: "flex", flexDirection: "column", gap: "16px" }}>
                 {user ? (
                   <>
                     {/* Profile Role & Status Settings */}
@@ -2473,29 +2593,28 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   </div>
                 )}
               </div>
-            )}
+            </div>
+          </>
+        )}
           </div>
 
           {/* Music Player Widget (Gated personal audio player) */}
           </div>
           
           {/* Music Player */}
-          <div style={{ flex: "1 1 280px", display: "flex", flexDirection: "column" }}>
-            <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} />
+          <div style={{ flex: "1 2 340px", display: "flex", flexDirection: "column", borderLeft: "1px solid var(--color-border)", borderRight: isHost ? "1px solid var(--color-border)" : "none", paddingLeft: "24px", paddingRight: isHost ? "24px" : "0" }}>
+            <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} noBorder={true} />
           </div>
 
           {/* Host Controls */}
           {isHost && (
-            <div style={{ flex: "1 1 280px", display: "flex", flexDirection: "column" }}>
+            <div style={{ flex: "1 1 250px", display: "flex", flexDirection: "column" }}>
               <div
               style={{
-                background: "var(--color-surface)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-md)",
-                padding: "20px",
                 display: "flex",
                 flexDirection: "column",
                 gap: "12px",
+                width: "100%",
               }}
             >
               <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
@@ -2595,10 +2714,80 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   </svg>
                   <span>{room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}</span>
                 </button>
+                <button
+                  onClick={handleStartGame}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "transparent",
+                    border: "1px solid var(--border-default)",
+                    color: "var(--text-secondary)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = "var(--accent)";
+                    e.currentTarget.style.color = "var(--text-primary)";
+                    e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-default)";
+                    e.currentTarget.style.color = "var(--text-secondary)";
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                  </svg>
+                  <span>Reset Game</span>
+                </button>
+                <button
+                  onClick={handleReturnToLobby}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "transparent",
+                    border: "1px solid var(--border-default)",
+                    color: "var(--text-secondary)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = "var(--accent)";
+                    e.currentTarget.style.color = "var(--text-primary)";
+                    e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = "var(--border-default)";
+                    e.currentTarget.style.color = "var(--text-secondary)";
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                  </svg>
+                  <span>Return to Lobby</span>
+                </button>
               </div>
             </div>
-          )
-            </div>
+          </div>
           )}
         </div>
 
@@ -2941,110 +3130,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           </button>
                         )}
 
-                      {isHost && (
-                        <div style={{ display: "flex", gap: "10px" }}>
-                          <button
-                            onClick={handleStartGame}
-                            style={{
-                              padding: "10px 24px",
-                              borderRadius: "var(--radius-md)",
-                              background: "transparent",
-                              border: "1px solid var(--border-default)",
-                              color: "var(--text-secondary)",
-                              fontFamily: "var(--font-display)",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.borderColor = "var(--accent)";
-                              e.currentTarget.style.color = "var(--text-primary)";
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.borderColor = "var(--border-default)";
-                              e.currentTarget.style.color = "var(--text-secondary)";
-                            }}
-                          >
-                            Reset Game
-                          </button>
-                          <button
-                            onClick={handleReturnToLobby}
-                            style={{
-                              padding: "10px 24px",
-                              borderRadius: "var(--radius-md)",
-                              background: "transparent",
-                              border: "1px solid var(--border-default)",
-                              color: "var(--text-secondary)",
-                              fontFamily: "var(--font-display)",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.borderColor = "var(--accent)";
-                              e.currentTarget.style.color = "var(--text-primary)";
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.borderColor = "var(--border-default)";
-                              e.currentTarget.style.color = "var(--text-secondary)";
-                            }}
-                          >
-                            Return to Lobby
-                          </button>
-                        </div>
-                      )}
+
                     </>
                   )}
-                  {room.phase === "ended" && (
-                    isHost ? (
-                      <div style={{ display: "flex", gap: "12px" }}>
-                        <button
-                          onClick={handleStartGame}
-                          style={{
-                            padding: "12px 32px",
-                            borderRadius: "var(--radius-md)",
-                            background: "var(--accent)",
-                            color: "var(--accent-text-on)",
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 700,
-                            cursor: "pointer",
-                            border: "none",
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
-                          onMouseOut={(e) => (e.currentTarget.style.background = "var(--accent)")}
-                        >
-                          Play Again
-                        </button>
-                        <button
-                          onClick={handleReturnToLobby}
-                          style={{
-                            padding: "12px 32px",
-                            borderRadius: "var(--radius-md)",
-                            background: "transparent",
-                            border: "1px solid var(--border-default)",
-                            color: "var(--text-secondary)",
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 700,
-                            cursor: "pointer",
-                            transition: "all 0.15s ease",
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.borderColor = "var(--accent)";
-                            e.currentTarget.style.color = "var(--text-primary)";
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.borderColor = "var(--border-default)";
-                            e.currentTarget.style.color = "var(--text-secondary)";
-                          }}
-                        >
-                          Return to Lobby
-                        </button>
-                      </div>
-                    ) : (
-                      <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic" }}>
-                        Waiting for Host to restart the game...
-                      </div>
-                    )
+                  {room.phase === "ended" && !isHost && (
+                    <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic" }}>
+                      Waiting for Host to restart the game...
+                    </div>
                   )}
                 </div>
               </div>

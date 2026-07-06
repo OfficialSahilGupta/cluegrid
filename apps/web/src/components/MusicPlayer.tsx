@@ -25,9 +25,10 @@ export function parseSpotifyUrl(url: string): { type: "track" | "playlist" | "al
 
 interface MusicPlayerProps {
   onShowGatedUpsell: () => void;
+  noBorder?: boolean;
 }
 
-export function MusicPlayer({ onShowGatedUpsell }: MusicPlayerProps) {
+export function MusicPlayer({ onShowGatedUpsell, noBorder }: MusicPlayerProps) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"youtube" | "spotify">("youtube");
   const [ytUrl, setYtUrl] = useState("");
@@ -70,10 +71,10 @@ export function MusicPlayer({ onShowGatedUpsell }: MusicPlayerProps) {
     return (
       <div
         style={{
-          background: "var(--color-surface)",
-          border: "1px solid var(--color-border)",
-          borderRadius: "var(--radius-md)",
-          padding: "20px",
+          background: noBorder ? "transparent" : "var(--color-surface)",
+          border: noBorder ? "none" : "1px solid var(--color-border)",
+          borderRadius: noBorder ? "0" : "var(--radius-md)",
+          padding: noBorder ? "0" : "20px",
           textAlign: "left",
           position: "relative",
           cursor: "pointer",
@@ -95,10 +96,10 @@ export function MusicPlayer({ onShowGatedUpsell }: MusicPlayerProps) {
   return (
     <div
       style={{
-        background: "var(--color-surface)",
-        border: "1px solid var(--color-border)",
-        borderRadius: "var(--radius-md)",
-        padding: "16px",
+        background: noBorder ? "transparent" : "var(--color-surface)",
+        border: noBorder ? "none" : "1px solid var(--color-border)",
+        borderRadius: noBorder ? "0" : "var(--radius-md)",
+        padding: noBorder ? "0" : "16px",
         textAlign: "left",
       }}
     >
