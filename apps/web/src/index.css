@@ -23,21 +23,21 @@
   --accent-text-on-subtle: #00f0ff;
 
   /* Team colors */
-  --team-1: #ef959c;
+  --team-1: #F07167;
   --team-1-bg: rgba(239, 149, 156, 0.15);
-  --team-1-text: #ef959c;
+  --team-1-text: #F07167;
 
-  --team-2: #00f0ff;
-  --team-2-bg: rgba(0, 240, 255, 0.15);
-  --team-2-text: #00f0ff;
+  --team-2: #4A90E2;
+  --team-2-bg: rgba(59, 130, 246, 0.15);
+  --team-2-text: #4A90E2;
 
-  --team-3: #b2ef9b;
+  --team-3: #10b981;
   --team-3-bg: rgba(178, 239, 155, 0.15);
-  --team-3-text: #b2ef9b;
+  --team-3-text: #10b981;
 
-  --team-4: #e2a33d;
+  --team-4: #ff9100;
   --team-4-bg: rgba(226, 163, 61, 0.15);
-  --team-4-text: #e2a33d;
+  --team-4-text: #ff9100;
 
   /* Card states */
   --card-neutral-bg: rgba(6, 24, 28, 0.65);

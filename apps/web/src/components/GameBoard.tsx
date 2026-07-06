@@ -1147,7 +1147,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const [searchResults, setSearchResults] = useState<any | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
 
-  const renderGroupedPlayersCard = () => {
+  const renderGroupedPlayersCard = (side?: "left" | "right") => {
     const renderTeamSegment = (color: "red" | "blue" | "green" | "yellow", label: string) => {
       const teamObj = room.teams[color];
       const teamPlayers = room.players.filter((p) => p.team === color);
@@ -1313,7 +1313,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               )}
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", width: "100%", boxSizing: "border-box" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%", boxSizing: "border-box" }}>
               {/* Spymasters section */}
               <div>
                 <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
@@ -1462,6 +1462,62 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       );
     };
 
+
+    if (side) {
+      const isLeft = side === "left";
+      return (
+        <div
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-md)",
+            padding: "20px",
+            textAlign: "left",
+            width: "100%",
+          }}
+        >
+          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", fontWeight: 700, margin: "0 0 16px 0", color: isLeft ? "hsl(355,85%,58%)" : "var(--accent)" }}>
+            {isLeft ? `${t("teams.red", "Red")} ${t("teams.team", "Team")}` : `${t("teams.blue", "Blue")} & Other ${t("teams.team", "Teams")}`}
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+            {isLeft ? (
+              renderTeamSegment("red", `${t("teams.red")} ${t("teams.team")}`)
+            ) : (
+              <>
+                {renderTeamSegment("blue", `${t("teams.blue")} ${t("teams.team")}`)}
+                {room.teamCount > 2 && renderTeamSegment("green", `${t("teams.green")} ${t("teams.team")}`)}
+                {room.teamCount > 3 && renderTeamSegment("yellow", `${t("teams.yellow")} ${t("teams.team")}`)}
+                {(() => {
+                  const specs = room.players.filter((p) => !p.team);
+                  if (specs.length === 0) return null;
+                  const activePlayer = room.players.find((p) => p.id === activeSwitchPlayerId);
+                  const showPopover = activePlayer && !activePlayer.team;
+                  return (
+                    <div
+                      style={{
+                        borderLeft: "3px solid rgba(255,255,255,0.2)",
+                        paddingLeft: "12px",
+                        marginTop: "8px",
+                        position: "relative",
+                      }}
+                    >
+                      <h4 style={{ margin: "0 0 10px 0", fontFamily: "var(--font-display)", fontSize: "1.15rem", fontWeight: 700, color: "var(--color-text-muted)" }}>
+                        {t("roles.spectator", "Spectators")}
+                      </h4>
+                      <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px" }}>
+                        {specs.map((p) => renderPlayerRow(p))}
+                      </div>
+                      {showPopover && renderAssignPopover(activePlayer)}
+                    </div>
+                  );
+                })()}
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div
         style={{
@@ -1558,7 +1614,2600 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     );
   };
 
-  const renderSettingsCard = () => {
+  
+  const renderLobbyLayout = () => {
+    return (
+      <>
+        {/* Column 1 (Left): Consolidated Settings Card (Host Settings, Timer Action, Preferences) */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          {renderSettingsCard()}
+        </div>
+
+        {/* Column 2 (Center): Unified Room Players Card */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          {renderGroupedPlayersCard()}
+        </div>
+
+        {/* Column 3 (Right): Profiles & Actions */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+          
+          {/* User Profile Card / Statistics, Music Player, and Host Controls */}
+          {/* User Profile Circular Widget */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "8px",
+              padding: "16px",
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-md)",
+            }}
+          >
+            <div
+              onClick={() => setStatsExpanded(!statsExpanded)}
+              style={{
+                position: "relative",
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                background: "rgba(0, 0, 0, 0.2)",
+                border: statsExpanded ? "2px solid var(--accent)" : "2px solid var(--color-border)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: statsExpanded ? "0 0 12px rgba(232, 163, 61, 0.3)" : "0 4px 10px rgba(0,0,0,0.3)",
+                transition: "all 0.2s ease",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.borderColor = "var(--accent)";
+              }}
+              onMouseOut={(e) => {
+                if (!statsExpanded) e.currentTarget.style.borderColor = "var(--color-border)";
+              }}
+            >
+              {renderAvatar(user ? user.avatar : (localPlayer?.avatar || "s1_0_0"), 52)}
+              {user && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "2px",
+                    right: "2px",
+                    width: "16px",
+                    height: "16px",
+                    borderRadius: "50%",
+                    background: "var(--status-active-bg, #10b981)",
+                    border: "2px solid var(--color-surface)",
+                  }}
+                  title="Status: Active"
+                />
+              )}
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "4px", justifyContent: "center" }}>
+                {user ? user.username : "Guest"}
+                {user?.isSupporter && (
+                  <span style={{ fontSize: "0.7rem", background: "var(--accent-bg-subtle)", border: "1px solid var(--accent)", color: "var(--accent-text-on-subtle)", padding: "1px 4px", borderRadius: "8px", fontWeight: 700 }}>
+                    💎
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
+                {user ? "Online · Tap circle for stats" : "Gated · Tap circle to log in"}
+              </div>
+            </div>
+            {statsExpanded && (
+              <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "12px" }} className="scale-up">
+                {user ? (
+                  <>
+                    <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
+                          My Status
+                        </label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                          {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY"].map((st) => {
+                            const isSelected = (localPlayer?.status || "ACTIVE") === st;
+                            return (
+                              <button
+                                key={st}
+                                type="button"
+                                onClick={() => {
+                                  if (socket) {
+                                    socket.emit("update_status", {
+                                      roomCode: room.roomCode,
+                                      playerId,
+                                      status: st,
+                                    });
+                                  }
+                                }}
+                                style={{
+                                  padding: "6px 10px",
+                                  borderRadius: "4px",
+                                  border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                                  background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
+                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
+                                  fontWeight: 600,
+                                  fontSize: "0.75rem",
+                                  cursor: "pointer",
+                                  transition: "all 0.15s ease",
+                                }}
+                                onMouseOver={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.background = "var(--border-subtle)";
+                                  }
+                                }}
+                                onMouseOut={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.background = "var(--bg-surface-raised)";
+                                  }
+                                }}
+                              >
+                                {st}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      {!room.settings.roomLocked && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                          <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
+                            {room.gameMode === "coop" ? "Assign Team" : "Assign Team & Role"}
+                          </label>
+                          {room.gameMode === "coop" ? (
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                              <button
+                                onClick={() => handleJoinTeamRole("red", "operative")}
+                                style={{
+                                  padding: "8px",
+                                  fontSize: "0.75rem",
+                                  background: localPlayer?.team === "red" ? typeColors.red!.border : typeColors.red!.bg,
+                                  border: `1px solid ${typeColors.red!.border}`,
+                                  borderRadius: "4px",
+                                  color: localPlayer?.team === "red" ? "#fff" : typeColors.red!.text,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                Red Team
+                              </button>
+                              <button
+                                onClick={() => handleJoinTeamRole("blue", "operative")}
+                                style={{
+                                  padding: "8px",
+                                  fontSize: "0.75rem",
+                                  background: localPlayer?.team === "blue" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                  border: `1px solid ${typeColors.blue!.border}`,
+                                  borderRadius: "4px",
+                                  color: localPlayer?.team === "blue" ? "#fff" : typeColors.blue!.text,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                Blue Team
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                <button
+                                  onClick={() => handleJoinTeamRole("red", "spymaster")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? typeColors.red!.border : typeColors.red!.bg,
+                                    border: `1px solid ${typeColors.red!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.red!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Red Spy
+                                </button>
+                                <button
+                                  onClick={() => handleJoinTeamRole("red", "operative")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "red" && localPlayer?.role === "operative" ? typeColors.red!.border : typeColors.red!.bg,
+                                    border: `1px solid ${typeColors.red!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "red" && localPlayer?.role === "operative" ? "#fff" : typeColors.red!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Red Op
+                                </button>
+                              </div>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                <button
+                                  onClick={() => handleJoinTeamRole("blue", "spymaster")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                    border: `1px solid ${typeColors.blue!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.blue!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Blue Spy
+                                </button>
+                                <button
+                                  onClick={() => handleJoinTeamRole("blue", "operative")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                    border: `1px solid ${typeColors.blue!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? "#fff" : typeColors.blue!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Blue Op
+                                </button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 10px 0", color: "var(--text-primary)" }}>
+                      My Stats & History
+                    </h4>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Played</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesPlayed}</div>
+                      </div>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Won</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesWon}</div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ textAlign: "center", padding: "12px 0" }}>
+                    <button
+                      onClick={() => onOpenAuth()}
+                      style={{
+                        width: "100%",
+                        padding: "8px 12px",
+                        background: "var(--accent)",
+                        color: "var(--accent-text-on)",
+                        border: "none",
+                        borderRadius: "var(--radius-sm)",
+                        cursor: "pointer",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)",
+                      }}
+                    >
+                      Sign In / Sign Up
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          {/* Music Player */}
+          <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} />
+
+          {/* Host Controls & Actions */}
+          {isHost && (
+            <div
+              style={{
+                background: "var(--color-surface)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
+              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
+                Host Controls
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <button
+                  disabled={room.settings.roomLocked}
+                  onClick={() => {
+                    triggerHaptics([250, 50, 250]);
+                    playNavClick();
+                    if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "transparent",
+                    border: "1px solid var(--border-default)",
+                    color: "var(--text-primary)",
+                    fontWeight: 700,
+                    cursor: !room.settings.roomLocked ? "pointer" : "not-allowed",
+                    opacity: !room.settings.roomLocked ? 1 : 0.4,
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                >
+                  Randomize Teams
+                </button>
+                <button
+                  onClick={() => {
+                    triggerHaptics([200]);
+                    playNavClick();
+                    if (socket) socket.emit("toggle_room_lock", { roomCode: room.roomCode });
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "transparent",
+                    border: "1px solid var(--border-default)",
+                    color: "var(--text-primary)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                >
+                  {room.settings.roomLocked ? "Unlock Room" : "Lock Room"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Start Game & Lobby Actions */}
+          <div
+            style={{
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-md)",
+              padding: "20px",
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "12px",
+            }}
+          >
+            {localPlayer?.team && !room.settings.roomLocked && (
+              <button
+                onClick={() => handleJoinTeamRole(null, null)}
+                style={{
+                  padding: "12px 20px",
+                  borderRadius: "var(--radius-md)",
+                  background: "var(--bg-surface-raised)",
+                  border: "1px solid var(--border-default)",
+                  color: "var(--text-primary)",
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                }}
+              >
+                Spectate
+              </button>
+            )}
+
+            {isHost ? (
+              <button
+                onClick={handleStartGame}
+                style={{
+                  padding: "12px 32px",
+                  borderRadius: "var(--radius-md)",
+                  background: "var(--accent)",
+                  color: "var(--accent-text-on)",
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 700,
+                  fontSize: "1.05rem",
+                  cursor: "pointer",
+                  border: "none",
+                  boxShadow: "0 4px 16px rgba(232, 163, 61, 0.2)",
+                }}
+              >
+                Start Game
+              </button>
+            ) : (
+              <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", alignSelf: "center" }}>
+                Waiting for Host to start the game...
+              </div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  };
+
+  const renderGameplayLayout = () => {
+    return (
+      <>
+        
+        {/* Left Side: Game Board & Action forms */}
+        <div className="game-main-col" style={{ flex: "3 1 650px", display: "flex", flexDirection: "column", gap: "24px" }}>
+          {/* Lobby Preset Forms */}
+          {room.phase === "lobby" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              {/* Game Settings Card */}
+              {renderSettingsCard()}
+
+              {/* Room Players Card */}
+              {renderGroupedPlayersCard()}
+
+
+
+              {/* Lobby Actions */}
+              <div
+                style={{
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-md)",
+                  padding: "20px",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "12px",
+                }}
+              >
+                {localPlayer?.team && !room.settings.roomLocked && (
+                  <button
+                    onClick={() => handleJoinTeamRole(null, null)}
+                    style={{
+                      padding: "12px 20px",
+                      borderRadius: "var(--radius-md)",
+                      background: "var(--bg-surface-raised)",
+                      border: "1px solid var(--border-default)",
+                      color: "var(--text-primary)",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Spectate
+                  </button>
+                )}
+
+                {isHost ? (
+                  <button
+                    onClick={handleStartGame}
+                    style={{
+                      padding: "12px 32px",
+                      borderRadius: "var(--radius-md)",
+                      background: "var(--accent)",
+                      color: "var(--accent-text-on)",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 700,
+                      fontSize: "1.05rem",
+                      cursor: "pointer",
+                      border: "none",
+                      boxShadow: "0 4px 16px rgba(232, 163, 61, 0.2)",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = "var(--accent-hover)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = "var(--accent)";
+                    }}
+                  >
+                    Start Game
+                  </button>
+                ) : (
+                  <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", alignSelf: "center" }}>
+                    Waiting for Host to start the game...
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Active Game Layout */}
+          {(room.phase === "playing" || room.phase === "ended") && (
+            <div
+              id="game-board-container"
+              className={cameraWarpActive ? "camera-warp-active" : ""}
+              style={{ display: "flex", flexDirection: "column", gap: "24px", position: "relative" }}
+            >
+              {/* #10 Turn Handoff Torch Wipe */}
+              {handoffWipe && createPortal(
+                <div
+                  className="turn-handoff-overlay"
+                  style={{
+                    position: "fixed", inset: 0, zIndex: 200, pointerEvents: "none",
+                    background: `linear-gradient(105deg, ${handoffWipe.from} 0%, ${handoffWipe.to} 100%)`,
+                  }}
+                />,
+                document.body
+              )}
+              {/* Particle Canvas Background */}
+              <canvas ref={particleCanvasRef} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 1 }} />
+              {/* Neural Streams Overlay SVG */}
+              {neuralStreams.length > 0 && (
+                <svg
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    pointerEvents: "none",
+                    zIndex: 50,
+                  }}
+                >
+                  {neuralStreams.map((stream, idx) => (
+                    <path
+                      key={idx}
+                      d={`M ${stream.start.x} ${stream.start.y} Q ${(stream.start.x + stream.end.x)/2} ${(stream.start.y + stream.end.y)/2 - 50}, ${stream.end.x} ${stream.end.y}`}
+                      fill="none"
+                      stroke={room.turnState ? typeColors[room.turnState.activeTeam]?.light || "var(--accent)" : "var(--accent)"}
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      className="beam-line"
+                    />
+                  ))}
+                </svg>
+              )}
+              {/* #6 Radar Ping ring */}
+              {showRadarPing && (
+                <div
+                  className="radar-ring"
+                  style={{
+                    top: "50%", left: "50%", width: "80px", height: "80px",
+                    marginTop: "-40px", marginLeft: "-40px",
+                    border: `2px solid ${room.turnState ? typeColors[room.turnState.activeTeam]?.light ?? "var(--accent)" : "var(--accent)"}`,
+                  }}
+                />
+              )}
+              {/* Turn Banner */}
+              <div
+                id="clue-display-panel"
+                style={{
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-md)",
+                  padding: "20px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "16px",
+                  position: "relative",
+                  zIndex: 2,
+                }}
+              >
+                {room.phase === "playing" && room.turnState ? (
+                  <div style={{ textAlign: "left" }}>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        padding: "4px 10px",
+                        borderRadius: "4px",
+                        fontSize: "0.8rem",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        backgroundColor: typeColors[room.turnState.activeTeam]!.border,
+                        color: "#fff",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      {`${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team's Turn`}
+                    </span>
+                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, margin: 0 }}>
+                      {room.turnState.phase === "giving_clue" ? (
+                        room.gameMode === "coop"
+                          ? `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team is giving a clue to the other team...`
+                          : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Spymaster is giving clue...`
+                      ) : (
+                        <>
+                          Clue:{" "}
+                          <span style={{
+                            color: typeColors[room.turnState.activeTeam]!.light,
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            fontSize: "1.8rem",
+                            letterSpacing: "1px",
+                            textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
+                          }}>
+                            {typewriterText || room.turnState.clueWord || "[Secret Clue]"}
+                            {typewriterCursor && <span className="clue-cursor" />}
+                          </span>{" "}
+                          · Count:{" "}
+                          <span style={{
+                            color: typeColors[room.turnState.activeTeam]!.light,
+                            fontWeight: 800,
+                            fontSize: "1.8rem",
+                            textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
+                          }}>
+                            {room.turnState.clueCount !== null
+                              ? room.turnState.clueCount === -1
+                                ? "∞"
+                                : room.turnState.clueCount
+                              : "[Secret]"}
+                          </span>
+                        </>
+                      )}
+                    </h3>
+                    {room.turnState.phase === "guessing" && (
+                      <p style={{ margin: "4px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.9rem" }}>
+                        Guesses used: {room.turnState.guessesUsed} / {room.turnState.guessesAllowed === Infinity ? "Unlimited" : room.turnState.guessesAllowed}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ textAlign: "left" }}>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        padding: "4px 10px",
+                        borderRadius: "4px",
+                        fontSize: "0.8rem",
+                        fontWeight: 700,
+                        textTransform: "uppercase",
+                        backgroundColor: room.winner ? typeColors[room.winner]!.border : "var(--color-text-muted)",
+                        color: "#fff",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      Game Over
+                    </span>
+                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 700, margin: 0 }}>
+                      {room.winner ? `${formatTeamName(room.winner)} Team Wins!` : `No one wins!`}
+                    </h3>
+                  </div>
+                )}
+
+                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                  {room.phase === "playing" && room.turnState && (
+                    <>
+                      {((room.gameMode === "coop" &&
+                          localPlayer?.team === (room.turnState.activeTeam === "red" ? "blue" : "red")) ||
+                        (room.gameMode !== "coop" &&
+                          localPlayer?.team === room.turnState.activeTeam &&
+                          localPlayer?.role === "operative")) &&
+                        room.turnState.phase === "guessing" && (
+                          <button
+                            onClick={handleEndTurn}
+                            style={{
+                              padding: "10px 24px",
+                              borderRadius: "var(--radius-md)",
+                              background: "var(--accent)",
+                              border: "none",
+                              color: "var(--accent-text-on)",
+                              fontFamily: "var(--font-display)",
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              transition: "all 0.15s ease",
+                            }}
+                            onMouseOver={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
+                            onMouseOut={(e) => (e.currentTarget.style.background = "var(--accent)")}
+                          >
+                            End Turn
+                          </button>
+                        )}
+
+                      {isHost && (
+                        <div style={{ display: "flex", gap: "10px" }}>
+                          <button
+                            onClick={handleStartGame}
+                            style={{
+                              padding: "10px 24px",
+                              borderRadius: "var(--radius-md)",
+                              background: "transparent",
+                              border: "1px solid var(--border-default)",
+                              color: "var(--text-secondary)",
+                              fontFamily: "var(--font-display)",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              transition: "all 0.15s ease",
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.borderColor = "var(--accent)";
+                              e.currentTarget.style.color = "var(--text-primary)";
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.borderColor = "var(--border-default)";
+                              e.currentTarget.style.color = "var(--text-secondary)";
+                            }}
+                          >
+                            Reset Game
+                          </button>
+                          <button
+                            onClick={handleReturnToLobby}
+                            style={{
+                              padding: "10px 24px",
+                              borderRadius: "var(--radius-md)",
+                              background: "transparent",
+                              border: "1px solid var(--border-default)",
+                              color: "var(--text-secondary)",
+                              fontFamily: "var(--font-display)",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              transition: "all 0.15s ease",
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.borderColor = "var(--accent)";
+                              e.currentTarget.style.color = "var(--text-primary)";
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.borderColor = "var(--border-default)";
+                              e.currentTarget.style.color = "var(--text-secondary)";
+                            }}
+                          >
+                            Return to Lobby
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {room.phase === "ended" && (
+                    isHost ? (
+                      <div style={{ display: "flex", gap: "12px" }}>
+                        <button
+                          onClick={handleStartGame}
+                          style={{
+                            padding: "12px 32px",
+                            borderRadius: "var(--radius-md)",
+                            background: "var(--accent)",
+                            color: "var(--accent-text-on)",
+                            fontFamily: "var(--font-display)",
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            border: "none",
+                          }}
+                          onMouseOver={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
+                          onMouseOut={(e) => (e.currentTarget.style.background = "var(--accent)")}
+                        >
+                          Play Again
+                        </button>
+                        <button
+                          onClick={handleReturnToLobby}
+                          style={{
+                            padding: "12px 32px",
+                            borderRadius: "var(--radius-md)",
+                            background: "transparent",
+                            border: "1px solid var(--border-default)",
+                            color: "var(--text-secondary)",
+                            fontFamily: "var(--font-display)",
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            transition: "all 0.15s ease",
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.borderColor = "var(--accent)";
+                            e.currentTarget.style.color = "var(--text-primary)";
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.borderColor = "var(--border-default)";
+                            e.currentTarget.style.color = "var(--text-secondary)";
+                          }}
+                        >
+                          Return to Lobby
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic" }}>
+                        Waiting for Host to restart the game...
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+
+              {/* Cards remaining badges */}
+              {room.gameMode === "coop" ? (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "16px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {/* Co-op Cards Remaining */}
+                  <div
+                    style={{
+                      background: "var(--color-surface)",
+                      border: "2px solid hsl(0,85%,62%)",
+                      padding: "12px 24px",
+                      borderRadius: "var(--radius-md)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "12px",
+                        height: "12px",
+                        borderRadius: "50%",
+                        background: "hsl(0,85%,62%)",
+                      }}
+                    />
+                    <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
+                      Co-op Agents Remaining: {room.teams.red?.cardsRemaining} / {room.teams.red?.totalCards}
+                    </span>
+                  </div>
+
+                  {/* Co-op Turn Tokens Board */}
+                  <div
+                    style={{
+                      background: "var(--color-surface)",
+                      border: "2px solid hsl(355, 80%, 48%)",
+                      padding: "12px 24px",
+                      borderRadius: "var(--radius-md)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
+                    <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
+                      Mistake / Turn Tokens Used: {room.coopMistakesMade} / {room.coopMistakesAllowed}
+                    </span>
+                    <div style={{ display: "flex", gap: "4px" }}>
+                      {Array.from({ length: room.coopMistakesAllowed || 9 }).map((_, i) => {
+                        const used = i < room.coopMistakesMade;
+                        return (
+                          <div
+                            key={i}
+                            style={{
+                              width: "10px",
+                              height: "10px",
+                              borderRadius: "50%",
+                              background: used ? "hsl(355, 80%, 48%)" : "hsl(142, 70%, 42%)",
+                              opacity: used ? 0.4 : 1,
+                              boxShadow: used ? "none" : "0 0 8px hsl(142, 70%, 50%)",
+                            }}
+                            title={used ? "Token used" : "Token available"}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Turn Timer Countdown — only show when timer is active */}
+                  {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
+                    <div
+                      className={
+                        timerCount <= 5  ? "timer-danger-fast"
+                        : timerCount <= 10 ? "timer-danger-medium"
+                        : timerCount <= 20 ? "timer-danger-slow"
+                        : ""
+                      }
+                      style={{
+                        background: "var(--color-surface)",
+                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
+                        padding: "12px 24px",
+                        borderRadius: "var(--radius-md)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        transition: "border-color 0.5s ease",
+                      }}
+                    >
+                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
+                        {t("turn.timerLabel")}:{" "}
+                        <span style={{
+                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
+                          fontVariantNumeric: "tabular-nums",
+                          minWidth: "2.5ch",
+                          display: "inline-block",
+                          transition: "color 0.4s ease",
+                        }}>
+                          {timerCount}s
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "16px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {/* #8 Liquid Score Fill */}
+                  {activeTeams.map((team) => {
+                    const state = room.teams[team];
+                    const config = typeColors[team]!;
+                    if (!state) return null;
+                    const fillPct = state.totalCards > 0 ? (state.cardsRemaining / state.totalCards) * 100 : 0;
+
+                    return (
+                      <div
+                        key={team}
+                        style={{
+                          background: state.eliminated ? "rgba(0,0,0,0.4)" : "var(--color-surface)",
+                          border: `2px solid ${state.eliminated ? "rgba(255,255,255,0.05)" : config.border}`,
+                          padding: "12px 20px",
+                          borderRadius: "var(--radius-md)",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          opacity: state.eliminated ? 0.5 : 1,
+                          minWidth: "140px",
+                        }}
+                      >
+                        <div style={{ position: "relative", width: "10px", height: "44px", borderRadius: "5px", background: "rgba(255,255,255,0.08)", overflow: "hidden", flexShrink: 0 }}>
+                          <div
+                            className="score-liquid-fill"
+                            style={{
+                              position: "absolute", bottom: 0, left: 0, right: 0,
+                              height: `${fillPct}%`,
+                              background: `linear-gradient(to top, ${config.border}, ${config.light})`,
+                              borderRadius: "5px",
+                            }}
+                          />
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.06em", color: config.light }}>
+                            {formatTeamName(team)}
+                          </span>
+                          <span style={{ fontWeight: 800, fontFamily: "var(--font-display)", fontSize: "1.3rem", color: state.eliminated ? "var(--color-text-muted)" : "var(--text-primary)", lineHeight: 1 }}>
+                            {state.cardsRemaining}
+                            <span style={{ fontWeight: 400, fontSize: "0.75rem", color: "var(--text-secondary)", marginLeft: "3px" }}>/ {state.totalCards}</span>
+                          </span>
+                          {state.eliminated && <span style={{ fontSize: "0.6rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Eliminated</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {/* Turn Timer Countdown — only show when timer is active */}
+                  {room.phase === "playing" && (room.settings.timerMode && room.settings.timerMode !== "off") && (
+                    <div
+                      className={
+                        timerCount <= 5  ? "timer-danger-fast"
+                        : timerCount <= 10 ? "timer-danger-medium"
+                        : timerCount <= 20 ? "timer-danger-slow"
+                        : ""
+                      }
+                      style={{
+                        background: "var(--color-surface)",
+                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
+                        padding: "12px 24px",
+                        borderRadius: "var(--radius-md)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        transition: "border-color 0.5s ease",
+                      }}
+                    >
+                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
+                        {t("turn.timerLabel")}:{" "}
+                        <span style={{
+                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
+                          fontVariantNumeric: "tabular-nums",
+                          minWidth: "2.5ch",
+                          display: "inline-block",
+                          transition: "color 0.4s ease",
+                        }}>
+                          {timerCount}s
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Spymaster reaction bar */}
+              {room.phase === "playing" && localPlayer?.role === "spymaster" && (
+                <div
+                  style={{
+                    background: "var(--bg-surface-raised)",
+                    border: "1px solid var(--border-default)",
+                    borderLeft: "4px solid var(--accent)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "16px 20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "12px",
+                    textAlign: "left",
+                    marginTop: "20px",
+                  }}
+                >
+                  <div>
+                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1rem", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
+                      Spymaster Reactions Overlay
+                    </h4>
+                    <p style={{ margin: "2px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.8rem" }}>
+                      {cooldownRemaining > 0 ? `Rate limited: wait ${cooldownRemaining}s` : "Trigger a full-screen reaction"}
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                    {["facepalm", "fire", "skull", "party", "clap", "heart"].map((type) => (
+                      <button
+                        key={type}
+                        disabled={cooldownRemaining > 0}
+                        onClick={() => triggerReaction(type)}
+                        style={{
+                          border: "none",
+                          background: "none",
+                          padding: 0,
+                          cursor: cooldownRemaining > 0 ? "not-allowed" : "pointer",
+                          opacity: cooldownRemaining > 0 ? 0.5 : 1,
+                          transition: "transform 0.1s ease",
+                        }}
+                        onMouseOver={(e) => {
+                          if (cooldownRemaining === 0) e.currentTarget.style.transform = "scale(1.05)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = "scale(1)";
+                        }}
+                      >
+                        {renderCustomReaction(type, true)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Clue Submission Form */}
+              {room.phase === "playing" &&
+                room.turnState &&
+                room.turnState.phase === "giving_clue" &&
+                localPlayer?.team === room.turnState.activeTeam &&
+                (localPlayer?.role === "spymaster" || room.gameMode === "coop") && (
+                   <form
+                    onSubmit={handleGiveClue}
+                    className="fade-in"
+                    style={{
+                      background: "var(--bg-surface)",
+                      border: "1px solid var(--border-default)",
+                      borderRadius: "var(--radius-md)",
+                      padding: "24px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "16px",
+                      textAlign: "left",
+                    }}
+                  >
+                    <h4 style={{ color: "var(--text-primary)", fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, margin: 0 }}>
+                      {room.gameMode === "coop" ? "Give a Clue (Duet Mode)" : "Give a Clue"}
+                    </h4>
+                    {room.gameMode === "coop" && (
+                      <div style={{
+                        background: "linear-gradient(135deg, rgba(var(--team-accent-rgb,232,163,61),0.08), rgba(var(--team-accent-rgb,232,163,61),0.04))",
+                        border: "1px solid rgba(232,163,61,0.25)",
+                        borderRadius: "var(--radius-sm)",
+                        padding: "10px 14px",
+                        fontSize: "0.82rem",
+                        color: "var(--text-secondary)",
+                        lineHeight: 1.6,
+                      }}>
+                        💡 <strong style={{ color: "var(--accent)" }}>Duet Mode:</strong>{" "}
+                        You can see the <strong style={{ color: typeColors[localPlayer?.team === "red" ? "blue" : "red"]?.light }}>
+                          {localPlayer?.team === "red" ? "Blue" : "Red"} Team&apos;s cards
+                        </strong> on the board. Give a clue that points to those cards — your partner will guess them!
+                      </div>
+                    )}
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-end" }}>
+                      <div style={{ flex: 1, minWidth: "200px" }}>
+                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", marginBottom: "8px", fontWeight: 600 }}>
+                          Clue Word (Single word, no spaces)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. OCEAN"
+                          value={clueWord}
+                          onChange={(e) => setClueWord(e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "12px",
+                            borderRadius: "var(--radius-sm)",
+                            border: "1px solid var(--border-default)",
+                            background: "var(--bg-surface-raised)",
+                            color: "var(--text-primary)",
+                            fontFamily: "var(--font-display)",
+                            fontWeight: 600,
+                            letterSpacing: "0.05em",
+                          }}
+                        />
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
+                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", fontWeight: 600 }}>
+                          Count
+                        </label>
+                        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1].map((n) => {
+                            const isSelected = clueCount === n;
+                            return (
+                              <button
+                                key={n}
+                                type="button"
+                                onClick={() => setClueCount(n)}
+                                style={{
+                                  width: "36px",
+                                  height: "36px",
+                                  borderRadius: "50%",
+                                  border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
+                                  background: isSelected
+                                    ? "var(--accent)"
+                                    : "var(--bg-surface-raised)",
+                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-secondary)",
+                                  fontFamily: "var(--font-display)",
+                                  fontWeight: 700,
+                                  fontSize: "0.95rem",
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  boxShadow: isSelected ? "0 0 8px var(--accent)" : "none",
+                                  transition: "all 0.15s ease",
+                                }}
+                              >
+                                {n === -1 ? "∞" : n}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        style={{
+                          padding: "12px 32px",
+                          borderRadius: "var(--radius-sm)",
+                          border: "none",
+                          background: "var(--accent)",
+                          color: "var(--accent-text-on)",
+                          fontFamily: "var(--font-display)",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          boxShadow: "0 4px 12px rgba(232, 163, 61, 0.2)",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.background = "var(--accent-hover)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = "var(--accent)";
+                        }}
+                      >
+                        Send Clue
+                      </button>
+                    </div>
+                    {clueError && (
+                      <div style={{ color: "hsl(355,85%,58%)", fontSize: "0.85rem", fontWeight: 500, display: "flex", alignItems: "center", gap: "6px" }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        {clueError}
+                      </div>
+                    )}
+                  </form>
+                )}
+
+              {/* Card Board Grid */}
+              <div style={{ position: "relative", width: "100%" }}>
+                {/* #9 Ambient Particle Field canvas */}
+                <canvas
+                  ref={particleCanvasRef}
+                  width={800} height={600}
+                  style={{
+                    position: "absolute", inset: 0, width: "100%", height: "100%",
+                    pointerEvents: "none", zIndex: 0, borderRadius: "var(--radius-lg)", opacity: 0.55,
+                  }}
+                />
+                {isDealingAnimationActive && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: "-200px",
+                      top: "15%",
+                      width: "140px",
+                      height: "190px",
+                      background: "linear-gradient(135deg, #161b22, #0d1117)",
+                      border: "2px dashed var(--accent)",
+                      borderRadius: "var(--radius-md)",
+                      boxShadow: "0 15px 40px rgba(0,0,0,0.8), 0 0 25px rgba(232,163,61,0.25)",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      zIndex: 150,
+                      transform: "rotate(-10deg)",
+                      animation: "dossier-float 2.5s ease-in-out infinite, dossier-fade-out 0.5s ease 2s forwards",
+                      color: "var(--accent)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: -8,
+                        border: "1px solid rgba(232, 163, 61, 0.4)",
+                        borderRadius: "var(--radius-lg)",
+                        animation: "sparks-rotate 4s linear infinite",
+                        pointerEvents: "none",
+                      }}
+                    />
+                    <div style={{ fontSize: "2.5rem", marginBottom: "8px", filter: "drop-shadow(0 0 8px var(--accent))" }}>📁</div>
+                    <span style={{ fontFamily: "var(--font-display)", fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)" }}>
+                      Classified
+                    </span>
+                    <span style={{ fontSize: "0.55rem", opacity: 0.6, marginTop: "4px", color: "var(--text-secondary)" }}>
+                      DEALING...
+                    </span>
+                  </div>
+                )}
+                <div
+                  className={
+                    [
+                      room.phase === "ended"
+                        ? room.winner
+                          ? (localPlayer?.team && room.winner === localPlayer.team) || (!localPlayer?.team && room.winner === "red")
+                            ? "grid-victory-active"
+                            : "grid-defeat-active"
+                          : "grid-defeat-active"
+                        : "",
+                      "game-board-grid",
+                    ].filter(Boolean).join(" ")
+                  }
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${cols}, 1fr)`,
+                    gap: "clamp(4px, 1.5vw, 12px)",
+                    width: "100%",
+                    padding: "clamp(8px, 2vw, 16px)",
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(255,255,255,0.05)",
+                    borderRadius: "var(--radius-lg)",
+                  }}
+                >
+                  {board.map((card) => {
+                    let cardType = "unknown";
+                    if (room.gameMode === "coop" && localPlayer?.team) {
+                      if (card.revealed) {
+                        cardType = card.type || "unknown";
+                      } else {
+                        const opponentColor = localPlayer.team === "red" ? "blue" : "red";
+                        if (card.type === opponentColor || card.type === "assassin" || card.type === "neutral") {
+                          cardType = card.type || "unknown";
+                        } else {
+                          cardType = "unknown";
+                        }
+                      }
+                    } else {
+                      cardType = canSeeKey ? (card.type || "unknown") : (card.revealed ? card.type || "unknown" : "unknown");
+                    }
+                    const colors = typeColors[cardType] || typeColors["unknown"]!;
+
+                    const isGuessingTime = room.phase === "playing" && room.turnState?.phase === "guessing";
+                    const isMyTeamGuessing = localPlayer && room.turnState && localPlayer.team === room.turnState.activeTeam;
+                    const isOperative = localPlayer?.role === "operative";
+
+                    const isCoopActiveOp =
+                      room.gameMode === "coop" &&
+                      localPlayer?.team === (room.turnState?.activeTeam === "red" ? "blue" : "red") &&
+                      room.turnState?.phase === "guessing";
+
+                    const isActiveOperative =
+                      isCoopActiveOp ||
+                      (room.gameMode !== "coop" &&
+                        isGuessingTime &&
+                        isMyTeamGuessing &&
+                        isOperative);
+
+                    // In coop/duet mode: the active team player selects opponent-team cards (they see the opponent board)
+                    // In classic mode: spymaster selects their own team's cards as hint markers
+                    const isSpymasterClickable =
+                      room.phase === "playing" &&
+                      room.turnState?.phase === "giving_clue" &&
+                      localPlayer?.team === room.turnState?.activeTeam &&
+                      (room.gameMode === "coop"
+                        ? card.type === (localPlayer?.team === "red" ? "blue" : "red")
+                        : localPlayer?.role === "spymaster" && card.type === localPlayer?.team);
+
+                    const isInteractive = (isActiveOperative || isSpymasterClickable) && !card.revealed;
+                    const voters = room.players.filter((p) => (p.votedCardIds && p.votedCardIds.includes(card.id)) || p.votedCardId === card.id);
+
+                    const rowIndex = Math.floor(card.id / cols);
+                    const colIndex = card.id % cols;
+                    const startX = `-${180 + colIndex * 150}px`;
+                    const startY = `${100 - rowIndex * 120}px`;
+                    const animationDelay = `${card.id * 50}ms`;
+
+                    const dealAnimationStyles = isDealingAnimationActive ? {
+                      animation: "deal-card-fly 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275) both",
+                      animationDelay: animationDelay,
+                      "--start-x": startX,
+                      "--start-y": startY,
+                      "--start-rot": "-45deg",
+                      zIndex: 100 - card.id,
+                    } as React.CSSProperties : {};
+
+                    const isAssassinCard = assassinRevealedId === card.id;
+                    const shockwaveOffset = shockwaveCardOffsets[card.id];
+                    const cardClassName = [
+                      recentlyFlippedCardIds.includes(card.id) ? "card-flipped-active" : "",
+                      isAssassinCard ? "assassin-flip" : "",
+                      shockwaveOffset ? "shockwave-push" : "",
+                    ].filter(Boolean).join(" ");
+
+                    return (
+                      <button
+                        key={card.id}
+                        data-card-id={card.id}
+                        disabled={!isInteractive}
+                        onClick={() => handleCardClick(card.id)}
+                        className={[cardClassName, "game-board-card"].filter(Boolean).join(" ")}
+                        style={{
+                          background: colors.bg,
+                          border: clueSelectedCardIds.includes(card.id)
+                            ? `3px solid ${colors.light}`
+                            : `2px solid ${colors.border}`,
+                          borderRadius: "var(--radius-md)",
+                          padding: "clamp(10px, 3.5vw, 24px) clamp(4px, 1.5vw, 10px)",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          cursor: isInteractive ? "pointer" : "default",
+                          minHeight: "clamp(52px, 15vw, 100px)",
+                          position: "relative",
+                          perspective: "1000px",
+                          transformStyle: "preserve-3d",
+                          boxShadow: card.revealed
+                            ? "inset 0 2px 10px rgba(0,0,0,0.5)"
+                            : clueSelectedCardIds.includes(card.id)
+                              ? `0 0 14px ${colors.light}`
+                              : "0 4px 6px rgba(0,0,0,0.15)",
+                          transition: isDealingAnimationActive
+                            ? "none"
+                            : "transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.15s ease, border-color 0.15s ease",
+                          transform: shockwaveOffset ? `translate(var(--push-x), var(--push-y))` : undefined,
+                          "--push-x": shockwaveOffset ? `${shockwaveOffset.x}px` : "0px",
+                          "--push-y": shockwaveOffset ? `${shockwaveOffset.y}px` : "0px",
+                          ...dealAnimationStyles,
+                        } as React.CSSProperties}
+                        onMouseMove={(e) => {
+                          if (isInteractive) {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            const xc = ((x / rect.width) - 0.5) * 16;
+                            const yc = ((y / rect.height) - 0.5) * -16;
+                            e.currentTarget.style.transform = `perspective(1000px) rotateX(${yc}deg) rotateY(${xc}deg) scale(1.03)`;
+                            e.currentTarget.style.boxShadow = clueSelectedCardIds.includes(card.id)
+                              ? `0 0 24px ${colors.light}`
+                              : "0 12px 24px rgba(0,0,0,0.35)";
+                            e.currentTarget.style.borderColor = clueSelectedCardIds.includes(card.id)
+                              ? colors.light
+                              : "rgba(255,255,255,0.3)";
+                            e.currentTarget.style.setProperty('--glare-x', `${(x / rect.width) * 100}%`);
+                            e.currentTarget.style.setProperty('--glare-y', `${(y / rect.height) * 100}%`);
+                            e.currentTarget.style.setProperty('--glare-opacity', '0.15');
+                          }
+                        }}
+                        onMouseOut={(e) => {
+                          if (isInteractive) {
+                            e.currentTarget.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)";
+                            e.currentTarget.style.boxShadow = clueSelectedCardIds.includes(card.id)
+                              ? `0 0 14px ${colors.light}`
+                              : "0 4px 6px rgba(0,0,0,0.15)";
+                            e.currentTarget.style.borderColor = clueSelectedCardIds.includes(card.id)
+                              ? colors.light
+                              : colors.border;
+                            e.currentTarget.style.setProperty('--glare-opacity', '0');
+                          }
+                        }}
+                      >
+                        {/* Glare Overlay for 3D card */}
+                        <div
+                          style={{
+                            position: "absolute",
+                            inset: 0,
+                            borderRadius: "inherit",
+                            background: `radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 50%), rgba(255, 255, 255, var(--glare-opacity, 0)) 0%, rgba(255, 255, 255, 0) 65%)`,
+                            pointerEvents: "none",
+                            transition: "background 0.15s ease",
+                            zIndex: 1,
+                          }}
+                        />
+
+                        {(card.revealed || (canSeeKey && card.type === "assassin")) && !votedCardIds.includes(card.id) && (
+                          <span
+                            style={{
+                              position: "absolute",
+                              top: "6px",
+                              right: "8px",
+                              fontSize: "0.6rem",
+                              fontWeight: 700,
+                              textTransform: "uppercase",
+                              padding: "2px 6px",
+                              borderRadius: "4px",
+                              background: "rgba(0,0,0,0.4)",
+                              color: colors.text,
+                              letterSpacing: "0.05em",
+                              zIndex: 2,
+                            }}
+                          >
+                            {card.type === "assassin" ? "assassin" : ""}
+                            {card.revealed && (card.type === "assassin" ? " (REV)" : "REV")}
+                          </span>
+                        )}
+
+                        <span
+                          className="game-card-word"
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            fontSize: "clamp(0.65rem, 3.2vw, 1.25rem)",
+                            fontWeight: 800,
+                            letterSpacing: "0.04em",
+                            color: card.revealed ? colors.text : (lightMode ? "#1C1916" : "#FFFFFF"),
+                            textAlign: "center",
+                            wordBreak: "break-word",
+                            overflowWrap: "break-word",
+                            hyphens: "auto",
+                            lineHeight: 1.15,
+                            opacity: card.revealed && !canSeeKey ? 0.45 : 1,
+                            transform: "translateZ(20px)",
+                            display: "block",
+                            zIndex: 2,
+                            textShadow: !card.revealed ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
+                          }}
+                        >
+                          {card.word}
+                        </span>
+
+                        {/* Pointer Hand Icon in corner to Flip */}
+                        {votedCardIds.includes(card.id) && isActiveOperative && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (socket) {
+                                socket.emit("guess_card", {
+                                  roomCode: room.roomCode,
+                                  playerId,
+                                  cardId: card.id,
+                                });
+                              }
+                            }}
+                            style={{
+                              position: "absolute",
+                              top: "6px",
+                              right: "8px",
+                              background: "linear-gradient(135deg, var(--accent), #b87c24)",
+                              border: "1px solid var(--accent)",
+                              borderRadius: "50%",
+                              width: "28px",
+                              height: "28px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              color: "var(--accent-text-on)",
+                              cursor: "pointer",
+                              boxShadow: "0 0 10px rgba(232,163,61,0.5)",
+                              zIndex: 10,
+                              transition: "all 0.15s ease",
+                            }}
+                            onMouseOver={(e) => {
+                              e.currentTarget.style.transform = "scale(1.15)";
+                              e.currentTarget.style.boxShadow = "0 0 15px rgba(232,163,61,0.8)";
+                            }}
+                            onMouseOut={(e) => {
+                              e.currentTarget.style.transform = "none";
+                              e.currentTarget.style.boxShadow = "0 0 10px rgba(232,163,61,0.5)";
+                            }}
+                            title="Flip Card"
+                          >
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: "scaleX(-1)" }}>
+                              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                            </svg>
+                          </button>
+                        )}
+
+                        {/* Real-time Voter Avatars Overlay */}
+                        {voters.length > 0 && (
+                          <div
+                            style={{
+                              position: "absolute",
+                              bottom: "6px",
+                              left: "8px",
+                              display: "flex",
+                              gap: "4px",
+                              flexWrap: "wrap",
+                              zIndex: 4,
+                            }}
+                          >
+                            {voters.map((v, index) => {
+                              const delay = `${(index * 200) % 1000}ms`;
+                              return (
+                                <span
+                                  key={v.id}
+                                  title={v.displayName}
+                                  className="voter-badge-floating"
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "20px",
+                                    height: "20px",
+                                    borderRadius: "50%",
+                                    cursor: "default",
+                                    animation: "voter-badge-entry 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, avatar-float 3s ease-in-out infinite alternate",
+                                    animationDelay: `0s, ${delay}`,
+                                  }}
+                                >
+                                  {renderAvatar(v.avatar || v.displayName.charAt(0), 20)}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Side: Players & Scoped Room Chat */}
+        <div style={{ flex: "1 1 300px", display: "flex", flexDirection: "column", gap: "24px", minWidth: "260px" }}>
+          {/* User Profile Card / Statistics */}
+          {/* User Profile Circular Widget */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "8px",
+              padding: "16px",
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-md)",
+            }}
+          >
+            {/* Clickable Circle Container */}
+            <div
+              onClick={() => setStatsExpanded(!statsExpanded)}
+              style={{
+                position: "relative",
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                background: "rgba(0, 0, 0, 0.2)",
+                border: `2px solid ${statsExpanded ? "var(--accent)" : "var(--color-border)"}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: statsExpanded ? "0 0 12px rgba(232, 163, 61, 0.3)" : "0 4px 10px rgba(0,0,0,0.3)",
+                transition: "all 0.2s ease",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.borderColor = "var(--accent)";
+              }}
+              onMouseOut={(e) => {
+                if (!statsExpanded) e.currentTarget.style.borderColor = "var(--color-border)";
+              }}
+            >
+              {/* Avatar Image or Fallback */}
+              {renderAvatar(user ? user.avatar : (localPlayer?.avatar || "s1_0_0"), 52)}
+              
+              {/* Online indicator dot at bottom right */}
+              {user && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "2px",
+                    right: "2px",
+                    width: "16px",
+                    height: "16px",
+                    borderRadius: "50%",
+                    background: "var(--status-active-bg, #10b981)",
+                    border: "2px solid var(--color-surface)",
+                  }}
+                  title="Status: Active"
+                />
+              )}
+            </div>
+
+            {/* Username and Online/Offline state */}
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "4px", justifyContent: "center" }}>
+                {user ? user.username : "Guest"}
+                {user?.isSupporter && (
+                  <span style={{ fontSize: "0.7rem", background: "var(--accent-bg-subtle)", border: "1px solid var(--accent)", color: "var(--accent-text-on-subtle)", padding: "1px 4px", borderRadius: "8px", fontWeight: 700 }}>
+                    💎
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
+                {user ? "Online · Tap circle for stats" : "Gated · Tap circle to log in"}
+              </div>
+            </div>
+
+            {/* Stats list expands below */}
+            {statsExpanded && (
+              <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "12px" }} className="scale-up">
+                {user ? (
+                  <>
+                    {/* Profile Role & Status Settings */}
+                    <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                      {/* Status selector (single-line horizontal pill selection) */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
+                          My Status
+                        </label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                          {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY"].map((st) => {
+                            const isSelected = (localPlayer?.status || "ACTIVE") === st;
+                            return (
+                              <button
+                                key={st}
+                                type="button"
+                                onClick={() => {
+                                  if (socket) {
+                                    socket.emit("update_status", {
+                                      roomCode: room.roomCode,
+                                      playerId,
+                                      status: st,
+                                    });
+                                  }
+                                }}
+                                style={{
+                                  padding: "6px 10px",
+                                  borderRadius: "4px",
+                                  border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                                  background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
+                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
+                                  fontWeight: 600,
+                                  fontSize: "0.75rem",
+                                  cursor: "pointer",
+                                  transition: "all 0.15s ease",
+                                }}
+                                onMouseOver={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.background = "var(--border-subtle)";
+                                  }
+                                }}
+                                onMouseOut={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.background = "var(--bg-surface-raised)";
+                                  }
+                                }}
+                              >
+                                {st}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Team & Role Switcher */}
+                      {!room.settings.roomLocked && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                          <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
+                            {room.gameMode === "coop" ? "Assign Team" : "Assign Team & Role"}
+                          </label>
+                          {room.gameMode === "coop" ? (
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                              <button
+                                onClick={() => handleJoinTeamRole("red", "operative")}
+                                style={{
+                                  padding: "8px",
+                                  fontSize: "0.75rem",
+                                  background: localPlayer?.team === "red" ? typeColors.red!.border : typeColors.red!.bg,
+                                  border: `1px solid ${typeColors.red!.border}`,
+                                  borderRadius: "4px",
+                                  color: localPlayer?.team === "red" ? "#fff" : typeColors.red!.text,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                  Red Team
+                              </button>
+                              <button
+                                onClick={() => handleJoinTeamRole("blue", "operative")}
+                                style={{
+                                  padding: "8px",
+                                  fontSize: "0.75rem",
+                                  background: localPlayer?.team === "blue" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                  border: `1px solid ${typeColors.blue!.border}`,
+                                  borderRadius: "4px",
+                                  color: localPlayer?.team === "blue" ? "#fff" : typeColors.blue!.text,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                Blue Team
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                <button
+                                  onClick={() => handleJoinTeamRole("red", "spymaster")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? typeColors.red!.border : typeColors.red!.bg,
+                                    border: `1px solid ${typeColors.red!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.red!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Red Spy
+                                </button>
+                                <button
+                                  onClick={() => handleJoinTeamRole("red", "operative")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "red" && localPlayer?.role === "operative" ? typeColors.red!.border : typeColors.red!.bg,
+                                    border: `1px solid ${typeColors.red!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "red" && localPlayer?.role === "operative" ? "#fff" : typeColors.red!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Red Op
+                                </button>
+                              </div>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                <button
+                                  onClick={() => handleJoinTeamRole("blue", "spymaster")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                    border: `1px solid ${typeColors.blue!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.blue!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Blue Spy
+                                </button>
+                                <button
+                                  onClick={() => handleJoinTeamRole("blue", "operative")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                    border: `1px solid ${typeColors.blue!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? "#fff" : typeColors.blue!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Blue Op
+                                </button>
+                              </div>
+
+                              {room.teamCount > 2 && (
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("green", "spymaster")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? typeColors.green!.border : typeColors.green!.bg,
+                                      border: `1px solid ${typeColors.green!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.green!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Green Spy
+                                  </button>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("green", "operative")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "green" && localPlayer?.role === "operative" ? typeColors.green!.border : typeColors.green!.bg,
+                                      border: `1px solid ${typeColors.green!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "green" && localPlayer?.role === "operative" ? "#fff" : typeColors.green!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Green Op
+                                  </button>
+                                </div>
+                              )}
+
+                              {room.teamCount > 3 && (
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("yellow", "spymaster")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? typeColors.yellow!.border : typeColors.yellow!.bg,
+                                      border: `1px solid ${typeColors.yellow!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.yellow!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Yellow Spy
+                                  </button>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("yellow", "operative")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? typeColors.yellow!.border : typeColors.yellow!.bg,
+                                      border: `1px solid ${typeColors.yellow!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? "#fff" : typeColors.yellow!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Yellow Op
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          <button
+                            onClick={() => handleJoinTeamRole(null, null)}
+                            style={{
+                              padding: "6px",
+                              fontSize: "0.75rem",
+                              background: !localPlayer?.team ? "var(--accent)" : "transparent",
+                              border: "1px solid var(--accent)",
+                              borderRadius: "4px",
+                              color: !localPlayer?.team ? "var(--accent-text-on)" : "var(--accent)",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              marginTop: "2px",
+                            }}
+                          >
+                            Spectate
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 10px 0", color: "var(--text-primary)" }}>
+                      My Stats & History
+                    </h4>
+                    {/* Stats Grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Played</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesPlayed}</div>
+                      </div>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Won</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesWon}</div>
+                      </div>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Win Rate</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
+                          {user.stats.gamesPlayed > 0 ? ((user.stats.gamesWon / user.stats.gamesPlayed) * 100).toFixed(0) : 0}%
+                        </div>
+                      </div>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Accuracy</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
+                          {user.stats.totalGuesses > 0 ? ((user.stats.correctGuesses / user.stats.totalGuesses) * 100).toFixed(0) : 0}%
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Match History List */}
+                    <div>
+                      <h4 style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", marginBottom: "8px" }}>
+                        Recent Matches
+                      </h4>
+                      {user.matchHistory.length > 0 ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "150px", overflowY: "auto" }}>
+                          {user.matchHistory.slice(0, 5).map((m) => (
+                            <div
+                              key={m.id}
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                padding: "6px 8px",
+                                background: "var(--bg-surface-raised)",
+                                borderRadius: "4px",
+                                border: "1px solid var(--border-default)",
+                                fontSize: "0.8rem",
+                              }}
+                            >
+                              <span>Room: {m.roomCode} ({m.role.toUpperCase()})</span>
+                              <span
+                                style={{
+                                  fontSize: "0.7rem",
+                                  fontWeight: 700,
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                  background: m.won ? "hsl(142,70%,25%)" : "hsl(355,75%,30%)",
+                                  color: "#fff",
+                                }}
+                              >
+                                {m.won ? "WON" : "LOST"}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", fontStyle: "italic" }}>
+                          No matches played yet.
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ textAlign: "center", padding: "12px 0" }}>
+                    <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", margin: "0 0 12px 0", lineHeight: 1.4 }}>
+                      Track your wins, losses, guess accuracy, and match history across games!
+                    </p>
+                    <button
+                      onClick={() => onOpenAuth()}
+                      style={{
+                        width: "100%",
+                        padding: "8px 12px",
+                        background: "var(--accent)",
+                        color: "var(--accent-text-on)",
+                        border: "none",
+                        borderRadius: "var(--radius-sm)",
+                        cursor: "pointer",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)",
+                        transition: "background 0.2s ease",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = "var(--accent-hover)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "var(--accent)";
+                      }}
+                    >
+                      Sign In / Sign Up
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Music Player Widget (Gated personal audio player) */}
+          <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} />
+
+
+
+          {isHost && (
+            <div
+              style={{
+                background: "var(--color-surface)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
+              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
+                Host Controls
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <button
+                  disabled={room.settings.roomLocked}
+                  onClick={() => {
+                    triggerHaptics([250, 50, 250]);
+                    playNavClick();
+                    if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "transparent",
+                    border: "1px solid var(--border-default)",
+                    color: "var(--text-primary)",
+                    fontWeight: 700,
+                    cursor: !room.settings.roomLocked ? "pointer" : "not-allowed",
+                    opacity: !room.settings.roomLocked ? 1 : 0.4,
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                  onMouseOver={(e) => {
+                    if (!room.settings.roomLocked) {
+                      e.currentTarget.style.background = "var(--border-subtle)";
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="16 3 21 3 21 8" />
+                    <line x1="4" y1="20" x2="21" y2="3" />
+                    <polyline points="21 16 21 21 16 21" />
+                    <line x1="15" y1="15" x2="21" y2="21" />
+                    <line x1="4" y1="4" x2="9" y2="9" />
+                  </svg>
+                  <span>{t("settings.randomize", "Randomize Teams")}</span>
+                </button>
+                <button
+                  onClick={() => {
+                    triggerHaptics([250, 50, 250]);
+                    playSettingsToggle();
+                    if (socket) {
+                      socket.emit("update_settings", {
+                        roomCode: room.roomCode,
+                        settings: { roomLocked: !room.settings.roomLocked },
+                      });
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
+                    border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
+                    color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    {room.settings.roomLocked ? (
+                      <>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </>
+                    ) : (
+                      <>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                      </>
+                    )}
+                  </svg>
+                  <span>{room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* In lobby both are in the main column; in play phase show Room Players in sidebar */}
+          {room.phase !== "lobby" && renderGroupedPlayersCard()}
+
+
+        </div>
+      </>
+    );
+  };
+const renderSettingsCard = (side?: "left" | "right") => {
+    const isLeft = side === "left";
+    const isRight = side === "right";
+    if (side) {
+      return (
+        <div
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-md)",
+            padding: "24px",
+            textAlign: "left",
+            display: "flex",
+            flexDirection: "column",
+            gap: "24px",
+            width: "100%",
+          }}
+        >
+          {isLeft ? (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+                filter: isHost ? "none" : "blur(1.5px)",
+                pointerEvents: isHost ? "auto" : "none",
+                opacity: isHost ? 1 : 0.7,
+                transition: "all 0.3s ease",
+                position: "relative",
+              }}
+            >
+              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", margin: "0 0 4px 0", fontWeight: 700, color: "hsl(355,85%,58%)" }}>
+                Host Settings
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px", position: "relative" }}>
+                <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
+                  {t("settings.timerMode", "Timer Settings")}
+                </label>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <div style={{ position: "relative", width: "fit-content" }}>
+                    <button
+                      type="button"
+                      disabled={!isHost}
+                      onClick={() => { if (isHost) { playSettingsToggle(); setIsTimerModeDropdownOpen(!isTimerModeDropdownOpen); } }}
+                      style={{
+                        width: "fit-content",
+                        minWidth: "160px",
+                        padding: "7px 12px",
+                        borderRadius: "var(--radius-sm)",
+                        border: "1px solid var(--border-default)",
+                        background: "var(--bg-surface-raised)",
+                        color: "var(--text-primary)",
+                        fontFamily: "var(--font-display)",
+                        fontSize: "0.9rem",
+                        textAlign: "left",
+                        cursor: isHost ? "pointer" : "not-allowed",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        transition: "all 0.15s ease",
+                      }}
+                    >
+                      <span>
+                        {room.settings.timerMode === "off" || !room.settings.timerMode ? t("settings.timerOff", "Off") :
+                         room.settings.timerMode === "fast" ? t("settings.timerFast", "Fast (90s / 60s)") :
+                         room.settings.timerMode === "long" ? t("settings.timerLong", "Long (180s / 120s)") : t("settings.timerCustom", "Custom")}
+                      </span>
+                      <span style={{ fontSize: "0.8rem", opacity: 0.7 }}>
+                        {isTimerModeDropdownOpen ? "▲" : "▼"}
+                      </span>
+                    </button>
+
+                    {isTimerModeDropdownOpen && isHost && (
+                      <>
+                        <div
+                          style={{
+                            position: "fixed",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: "rgba(0, 0, 0, 0.15)",
+                            zIndex: 9998,
+                          }}
+                          onClick={() => setIsTimerModeDropdownOpen(false)}
+                        />
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: "calc(100% + 4px)",
+                            left: 0,
+                            width: "320px",
+                            background: "var(--color-surface)",
+                            border: "2px solid var(--accent)",
+                            borderRadius: "var(--radius-md)",
+                            padding: "16px",
+                            boxShadow: "0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(232, 163, 61, 0.15)",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "12px",
+                            zIndex: 9999,
+                          }}
+                          className="scale-up"
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "8px" }}>
+                            <span style={{ fontSize: "1.0rem", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "0.5px" }}>
+                              {t("settings.timerMode", "Timer Settings")}
+                            </span>
+                            <button
+                              onClick={() => setIsTimerModeDropdownOpen(false)}
+                              style={{
+                                background: "transparent",
+                                border: "none",
+                                color: "var(--text-secondary)",
+                                cursor: "pointer",
+                                fontSize: "1.1rem",
+                                padding: "0 4px",
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              ✕
+                            </button>
+                          </div>
+
+                          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            {[
+                              { value: "off", renderIcon: (c: string) => renderOffIcon(c), label: t("settings.timerOff", "Off"), desc: "No turn timer limit." },
+                              { value: "fast", renderIcon: (c: string) => renderFastIcon(c), label: t("settings.timerFast", "Fast (90s / 60s)"), desc: "Quick turns for high intensity." },
+                              { value: "long", renderIcon: (c: string) => renderLongIcon(c), label: t("settings.timerLong", "Long (180s / 120s)"), desc: "Relaxed pace for deeper planning." },
+                              { value: "custom", renderIcon: (c: string) => renderCustomIcon(c), label: t("settings.timerCustom", "Custom"), desc: "Fine-tune spymaster and operative limits." },
+                            ].map((opt) => {
+                              const isSelected = (room.settings.timerMode || "off") === opt.value;
+                              const iconColor = isSelected ? "var(--accent)" : "var(--text-secondary)";
+                              return (
+                                <button
+                                  key={opt.value}
+                                  onClick={() => {
+                                    if (socket && isHost) {
+                                      let extraSettings = {};
+                                      if (opt.value === "fast") {
+                                        extraSettings = { spymasterTimerSeconds: 90, firstClueExtraSeconds: 60, operativeTimerSeconds: 60 };
+                                      } else if (opt.value === "long") {
+                                        extraSettings = { spymasterTimerSeconds: 180, firstClueExtraSeconds: 120, operativeTimerSeconds: 120 };
+                                      } else if (opt.value === "off") {
+                                        extraSettings = { spymasterTimerSeconds: 0, firstClueExtraSeconds: 0, operativeTimerSeconds: 0 };
+                                      }
+                                      socket.emit("update_settings", {
+                                        roomCode: room.roomCode,
+                                        settings: { timerMode: opt.value, ...extraSettings },
+                                      });
+                                    }
+                                    playSettingsToggle();
+                                    setIsTimerModeDropdownOpen(false);
+                                  }}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "10px",
+                                    padding: "10px 12px",
+                                    background: isSelected ? "rgba(232, 163, 61, 0.08)" : "rgba(255,255,255,0.02)",
+                                    border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                                    borderRadius: "var(--radius-sm)",
+                                    cursor: "pointer",
+                                    textAlign: "left",
+                                    width: "100%",
+                                    transition: "all 0.15s ease",
+                                  }}
+                                  onMouseOver={(e) => {
+                                    if (!isSelected) {
+                                      e.currentTarget.style.background = "var(--border-subtle)";
+                                    }
+                                  }}
+                                  onMouseOut={(e) => {
+                                    if (!isSelected) {
+                                      e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                                    }
+                                  }}
+                                >
+                                  <span style={{ width: "30px", height: "24px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                                    {opt.renderIcon(iconColor)}
+                                  </span>
+                                  <div style={{ display: "flex", flexDirection: "column" }}>
+                                    <span style={{ fontSize: "0.85rem", fontWeight: 700, color: isSelected ? "var(--accent)" : "var(--text-primary)" }}>{opt.label}</span>
+                                    <span style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", marginTop: "2px" }}>{opt.desc}</span>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {room.settings.timerMode === "custom" && (
+                    <div style={{ display: "flex", gap: "10px", marginTop: "4px", width: "100%", maxWidth: "340px" }} className="scale-up">
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "4px" }}>Spymaster</div>
+                        <input
+                          type="number"
+                          disabled={!isHost}
+                          min="10"
+                          max="999"
+                          value={room.settings.spymasterTimerSeconds || 120}
+                          onChange={(e) => {
+                            const val = Math.max(10, Math.min(999, Number(e.target.value)));
+                            if (socket && isHost) {
+                              socket.emit("update_settings", {
+                                roomCode: room.roomCode,
+                                settings: { spymasterTimerSeconds: val },
+                              });
+                            }
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "6px 8px",
+                            borderRadius: "var(--radius-sm)",
+                            border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                            background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
+                            color: "var(--color-text)",
+                            fontSize: "0.82rem",
+                            outline: "none",
+                            textAlign: "center",
+                            opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
+                          }}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "4px" }}>First Clue +</div>
+                        <input
+                          type="number"
+                          disabled={!isHost}
+                          min="0"
+                          max="999"
+                          value={room.settings.firstClueExtraSeconds || 60}
+                          onChange={(e) => {
+                            const val = Math.max(0, Math.min(999, Number(e.target.value)));
+                            if (socket && isHost) {
+                              socket.emit("update_settings", {
+                                roomCode: room.roomCode,
+                                settings: { firstClueExtraSeconds: val },
+                              });
+                            }
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "6px 8px",
+                            borderRadius: "var(--radius-sm)",
+                            border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                            background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
+                            color: "var(--color-text)",
+                            fontSize: "0.82rem",
+                            outline: "none",
+                            textAlign: "center",
+                            opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
+                          }}
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginBottom: "4px" }}>Operative</div>
+                        <input
+                          type="number"
+                          disabled={!isHost}
+                          min="10"
+                          max="999"
+                          value={room.settings.operativeTimerSeconds || 60}
+                          onChange={(e) => {
+                            const val = Math.max(10, Math.min(999, Number(e.target.value)));
+                            if (socket && isHost) {
+                              socket.emit("update_settings", {
+                                roomCode: room.roomCode,
+                                settings: { operativeTimerSeconds: val },
+                              });
+                            }
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "6px 8px",
+                            borderRadius: "var(--radius-sm)",
+                            border: room.settings.timerMode === "custom" ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                            background: room.settings.timerMode === "custom" ? "var(--bg-surface-raised)" : "rgba(255,255,255,0.03)",
+                            color: "var(--color-text)",
+                            fontSize: "0.82rem",
+                            outline: "none",
+                            textAlign: "center",
+                            opacity: room.settings.timerMode === "custom" ? 1.0 : 0.6,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
+                  {t("settings.assassinRule", "Assassin Card Rule")}
+                </label>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: isHost ? "pointer" : "not-allowed" }}>
+                    <input
+                      type="radio"
+                      disabled={!isHost}
+                      name="eliminationRule"
+                      checked={room.settings.eliminationRule === "continue"}
+                      onChange={() => isHost && handleUpdateEliminationRule("continue")}
+                      style={{ cursor: isHost ? "pointer" : "not-allowed", accentColor: "var(--accent)" }}
+                    />
+                    <span style={{ fontSize: "0.9rem" }}>{t("settings.teamEliminatedContinue", "Team Eliminated, Continue (Default)")}</span>
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: isHost ? "pointer" : "not-allowed" }}>
+                    <input
+                      type="radio"
+                      disabled={!isHost}
+                      name="eliminationRule"
+                      checked={room.settings.eliminationRule === "game_end"}
+                      onChange={() => isHost && handleUpdateEliminationRule("game_end")}
+                      style={{ cursor: isHost ? "pointer" : "not-allowed", accentColor: "var(--accent)" }}
+                    />
+                    <span style={{ fontSize: "0.9rem" }}>{t("settings.gameEndsImmediately", "Game Ends Immediately")}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px", width: "100%" }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "8px",
+                  filter: isHost ? "none" : "blur(1.5px)",
+                  pointerEvents: isHost ? "auto" : "none",
+                  opacity: isHost ? 1 : 0.7,
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", margin: "0 0 4px 0", fontWeight: 700, color: "var(--accent)" }}>
+                  Timer Action
+                </h4>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
+                  {[
+                    { value: "auto", label: t("settings.timerActionAuto", "Auto End") },
+                    { value: "manual", label: t("settings.timerActionManual", "Manual End") },
+                  ].map((opt) => {
+                    const isSelected = (room.settings.timerAction || "manual") === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        disabled={!isHost}
+                        onClick={() => {
+                          playSettingsToggle();
+                          if (socket && isHost) {
+                            socket.emit("update_settings", {
+                              roomCode: room.roomCode,
+                              settings: { timerAction: opt.value },
+                            });
+                          }
+                        }}
+                        style={{
+                          padding: "10px 8px",
+                          borderRadius: "var(--radius-sm)",
+                          border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
+                          background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
+                          color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
+                          fontFamily: "var(--font-display)",
+                          fontWeight: 700,
+                          fontSize: "0.82rem",
+                          cursor: isHost ? "pointer" : "not-allowed",
+                          textAlign: "center",
+                          transition: "all 0.15s ease",
+                          boxShadow: isSelected ? "0 0 8px rgba(232,163,61,0.3)" : "none",
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", borderTop: "1px solid var(--border-subtle)", paddingTop: "20px" }}>
+                <label style={{ fontWeight: 600, color: "var(--color-text)", fontSize: "0.95rem" }}>
+                  {t("settings.preferences", "Preferences (Local Only)")}
+                </label>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%" }}>
+                  <label style={{ display: "inline-flex", alignItems: "center", gap: "10px", cursor: "pointer" }}>
+                    <div style={{ position: "relative", width: "42px", height: "22px" }}>
+                      <input
+                        type="checkbox"
+                        checked={soundEnabled}
+                        onChange={(e) => {
+                          const enabled = e.target.checked;
+                          setSoundEnabled(enabled);
+                          if (enabled) {
+                            const restoredVol = lastVolumeRef.current > 0 ? lastVolumeRef.current : 80;
+                            setSoundVolume(restoredVol);
+                            try {
+                              const AC = window.AudioContext || (window as any).webkitAudioContext;
+                              if (AC) {
+                                const ctx = new AC();
+                                const osc = ctx.createOscillator();
+                                const g = ctx.createGain();
+                                osc.type = 'sine';
+                                osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+                                g.gain.setValueAtTime(0.55 * (restoredVol / 100), ctx.currentTime);
+                                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+                                osc.connect(g); g.connect(ctx.destination);
+                                osc.start(); osc.stop(ctx.currentTime + 0.09);
+                              }
+                            } catch { /* ignore */ }
+                          } else {
+                            if (soundVolume > 0) {
+                              lastVolumeRef.current = soundVolume;
+                            }
+                            setSoundVolume(0);
+                          }
+                        }}
+                        style={{ opacity: 0, width: 0, height: 0, position: "absolute" }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          backgroundColor: soundEnabled ? "var(--accent)" : "var(--border-default)",
+                          borderRadius: "22px",
+                          transition: "all 0.2s ease",
+                          boxShadow: soundEnabled ? "0 0 8px rgba(232,163,61,0.4)" : "none",
+                        }}
+                      />
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "2px",
+                          left: soundEnabled ? "22px" : "2px",
+                          width: "18px",
+                          height: "18px",
+                          borderRadius: "50%",
+                          backgroundColor: "var(--color-surface)",
+                          transition: "all 0.2s cubic-bezier(0.1, 0.9, 0.2, 1.2)",
+                        }}
+                      />
+                    </div>
+                    <span style={{ fontSize: "0.85rem", color: "var(--text-secondary)" }}>Sound Effects</span>
+                  </label>
+
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginTop: "4px" }}>
+                    <span style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", width: "32px", textAlign: "right" }}>
+                      {soundVolume}%
+                    </span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={soundVolume}
+                      onChange={(e) => {
+                        const val = Number(e.target.value);
+                        setSoundVolume(val);
+                        if (val > 0) {
+                          setSoundEnabled(true);
+                          lastVolumeRef.current = val;
+                        } else {
+                          setSoundEnabled(false);
+                        }
+                      }}
+                      style={{
+                        flex: 1,
+                        height: "6px",
+                        borderRadius: "3px",
+                        background: "var(--border-default)",
+                        outline: "none",
+                        cursor: "pointer",
+                        accentColor: "var(--accent)",
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     return (
       <div
         style={{
@@ -4121,1696 +6770,27 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       </div>
 
       {/* ─── Main Content Split Layout ─── */}
-      <div
-        style={{
-          display: "flex",
-          gap: "24px",
-          flexDirection: "row",
-          flexWrap: "wrap",
-          width: "100%",
-          alignItems: "flex-start",
-        }}
+            <div
+        style={
+          room.phase === "lobby"
+            ? {
+                display: "grid",
+                gridTemplateColumns: "1fr minmax(360px, 1.3fr) 1fr",
+                gap: "24px",
+                width: "100%",
+                alignItems: "flex-start",
+              }
+            : {
+                display: "flex",
+                gap: "24px",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                width: "100%",
+                alignItems: "flex-start",
+              }
+        }
       >
-        {/* Left Side: Game Board & Action forms */}
-        <div className="game-main-col" style={{ flex: "3 1 650px", display: "flex", flexDirection: "column", gap: "24px" }}>
-          {/* Lobby Preset Forms */}
-          {room.phase === "lobby" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              {/* Game Settings Card */}
-              {renderSettingsCard()}
-
-              {/* Room Players Card */}
-              {renderGroupedPlayersCard()}
-
-
-
-              {/* Lobby Actions */}
-              <div
-                style={{
-                  background: "var(--color-surface)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "20px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "12px",
-                }}
-              >
-                {localPlayer?.team && !room.settings.roomLocked && (
-                  <button
-                    onClick={() => handleJoinTeamRole(null, null)}
-                    style={{
-                      padding: "12px 20px",
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--bg-surface-raised)",
-                      border: "1px solid var(--border-default)",
-                      color: "var(--text-primary)",
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    Spectate
-                  </button>
-                )}
-
-                {isHost ? (
-                  <button
-                    onClick={handleStartGame}
-                    style={{
-                      padding: "12px 32px",
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--accent)",
-                      color: "var(--accent-text-on)",
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 700,
-                      fontSize: "1.05rem",
-                      cursor: "pointer",
-                      border: "none",
-                      boxShadow: "0 4px 16px rgba(232, 163, 61, 0.2)",
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = "var(--accent-hover)";
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = "var(--accent)";
-                    }}
-                  >
-                    Start Game
-                  </button>
-                ) : (
-                  <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", alignSelf: "center" }}>
-                    Waiting for Host to start the game...
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Active Game Layout */}
-          {(room.phase === "playing" || room.phase === "ended") && (
-            <div
-              id="game-board-container"
-              className={cameraWarpActive ? "camera-warp-active" : ""}
-              style={{ display: "flex", flexDirection: "column", gap: "24px", position: "relative" }}
-            >
-              {/* #10 Turn Handoff Torch Wipe */}
-              {handoffWipe && createPortal(
-                <div
-                  className="turn-handoff-overlay"
-                  style={{
-                    position: "fixed", inset: 0, zIndex: 200, pointerEvents: "none",
-                    background: `linear-gradient(105deg, ${handoffWipe.from} 0%, ${handoffWipe.to} 100%)`,
-                  }}
-                />,
-                document.body
-              )}
-              {/* Particle Canvas Background */}
-              <canvas ref={particleCanvasRef} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 1 }} />
-              {/* Neural Streams Overlay SVG */}
-              {neuralStreams.length > 0 && (
-                <svg
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    pointerEvents: "none",
-                    zIndex: 50,
-                  }}
-                >
-                  {neuralStreams.map((stream, idx) => (
-                    <path
-                      key={idx}
-                      d={`M ${stream.start.x} ${stream.start.y} Q ${(stream.start.x + stream.end.x)/2} ${(stream.start.y + stream.end.y)/2 - 50}, ${stream.end.x} ${stream.end.y}`}
-                      fill="none"
-                      stroke={room.turnState ? typeColors[room.turnState.activeTeam]?.light || "var(--accent)" : "var(--accent)"}
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      className="beam-line"
-                    />
-                  ))}
-                </svg>
-              )}
-              {/* #6 Radar Ping ring */}
-              {showRadarPing && (
-                <div
-                  className="radar-ring"
-                  style={{
-                    top: "50%", left: "50%", width: "80px", height: "80px",
-                    marginTop: "-40px", marginLeft: "-40px",
-                    border: `2px solid ${room.turnState ? typeColors[room.turnState.activeTeam]?.light ?? "var(--accent)" : "var(--accent)"}`,
-                  }}
-                />
-              )}
-              {/* Turn Banner */}
-              <div
-                id="clue-display-panel"
-                style={{
-                  background: "var(--color-surface)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "20px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "16px",
-                  position: "relative",
-                  zIndex: 2,
-                }}
-              >
-                {room.phase === "playing" && room.turnState ? (
-                  <div style={{ textAlign: "left" }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        padding: "4px 10px",
-                        borderRadius: "4px",
-                        fontSize: "0.8rem",
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        backgroundColor: typeColors[room.turnState.activeTeam]!.border,
-                        color: "#fff",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      {`${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team's Turn`}
-                    </span>
-                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, margin: 0 }}>
-                      {room.turnState.phase === "giving_clue" ? (
-                        room.gameMode === "coop"
-                          ? `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team is giving a clue to the other team...`
-                          : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Spymaster is giving clue...`
-                      ) : (
-                        <>
-                          Clue:{" "}
-                          <span style={{
-                            color: typeColors[room.turnState.activeTeam]!.light,
-                            fontWeight: 800,
-                            textTransform: "uppercase",
-                            fontSize: "1.8rem",
-                            letterSpacing: "1px",
-                            textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
-                          }}>
-                            {typewriterText || room.turnState.clueWord || "[Secret Clue]"}
-                            {typewriterCursor && <span className="clue-cursor" />}
-                          </span>{" "}
-                          · Count:{" "}
-                          <span style={{
-                            color: typeColors[room.turnState.activeTeam]!.light,
-                            fontWeight: 800,
-                            fontSize: "1.8rem",
-                            textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
-                          }}>
-                            {room.turnState.clueCount !== null
-                              ? room.turnState.clueCount === -1
-                                ? "∞"
-                                : room.turnState.clueCount
-                              : "[Secret]"}
-                          </span>
-                        </>
-                      )}
-                    </h3>
-                    {room.turnState.phase === "guessing" && (
-                      <p style={{ margin: "4px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.9rem" }}>
-                        Guesses used: {room.turnState.guessesUsed} / {room.turnState.guessesAllowed === Infinity ? "Unlimited" : room.turnState.guessesAllowed}
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div style={{ textAlign: "left" }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        padding: "4px 10px",
-                        borderRadius: "4px",
-                        fontSize: "0.8rem",
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        backgroundColor: room.winner ? typeColors[room.winner]!.border : "var(--color-text-muted)",
-                        color: "#fff",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      Game Over
-                    </span>
-                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 700, margin: 0 }}>
-                      {room.winner ? `${formatTeamName(room.winner)} Team Wins!` : `No one wins!`}
-                    </h3>
-                  </div>
-                )}
-
-                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                  {room.phase === "playing" && room.turnState && (
-                    <>
-                      {((room.gameMode === "coop" &&
-                          localPlayer?.team === (room.turnState.activeTeam === "red" ? "blue" : "red")) ||
-                        (room.gameMode !== "coop" &&
-                          localPlayer?.team === room.turnState.activeTeam &&
-                          localPlayer?.role === "operative")) &&
-                        room.turnState.phase === "guessing" && (
-                          <button
-                            onClick={handleEndTurn}
-                            style={{
-                              padding: "10px 24px",
-                              borderRadius: "var(--radius-md)",
-                              background: "var(--accent)",
-                              border: "none",
-                              color: "var(--accent-text-on)",
-                              fontFamily: "var(--font-display)",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
-                            onMouseOut={(e) => (e.currentTarget.style.background = "var(--accent)")}
-                          >
-                            End Turn
-                          </button>
-                        )}
-
-                      {isHost && (
-                        <div style={{ display: "flex", gap: "10px" }}>
-                          <button
-                            onClick={handleStartGame}
-                            style={{
-                              padding: "10px 24px",
-                              borderRadius: "var(--radius-md)",
-                              background: "transparent",
-                              border: "1px solid var(--border-default)",
-                              color: "var(--text-secondary)",
-                              fontFamily: "var(--font-display)",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.borderColor = "var(--accent)";
-                              e.currentTarget.style.color = "var(--text-primary)";
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.borderColor = "var(--border-default)";
-                              e.currentTarget.style.color = "var(--text-secondary)";
-                            }}
-                          >
-                            Reset Game
-                          </button>
-                          <button
-                            onClick={handleReturnToLobby}
-                            style={{
-                              padding: "10px 24px",
-                              borderRadius: "var(--radius-md)",
-                              background: "transparent",
-                              border: "1px solid var(--border-default)",
-                              color: "var(--text-secondary)",
-                              fontFamily: "var(--font-display)",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.borderColor = "var(--accent)";
-                              e.currentTarget.style.color = "var(--text-primary)";
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.borderColor = "var(--border-default)";
-                              e.currentTarget.style.color = "var(--text-secondary)";
-                            }}
-                          >
-                            Return to Lobby
-                          </button>
-                        </div>
-                      )}
-                    </>
-                  )}
-                  {room.phase === "ended" && (
-                    isHost ? (
-                      <div style={{ display: "flex", gap: "12px" }}>
-                        <button
-                          onClick={handleStartGame}
-                          style={{
-                            padding: "12px 32px",
-                            borderRadius: "var(--radius-md)",
-                            background: "var(--accent)",
-                            color: "var(--accent-text-on)",
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 700,
-                            cursor: "pointer",
-                            border: "none",
-                          }}
-                          onMouseOver={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
-                          onMouseOut={(e) => (e.currentTarget.style.background = "var(--accent)")}
-                        >
-                          Play Again
-                        </button>
-                        <button
-                          onClick={handleReturnToLobby}
-                          style={{
-                            padding: "12px 32px",
-                            borderRadius: "var(--radius-md)",
-                            background: "transparent",
-                            border: "1px solid var(--border-default)",
-                            color: "var(--text-secondary)",
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 700,
-                            cursor: "pointer",
-                            transition: "all 0.15s ease",
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.borderColor = "var(--accent)";
-                            e.currentTarget.style.color = "var(--text-primary)";
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.borderColor = "var(--border-default)";
-                            e.currentTarget.style.color = "var(--text-secondary)";
-                          }}
-                        >
-                          Return to Lobby
-                        </button>
-                      </div>
-                    ) : (
-                      <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic" }}>
-                        Waiting for Host to restart the game...
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-
-              {/* Cards remaining badges */}
-              {room.gameMode === "coop" ? (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "16px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {/* Co-op Cards Remaining */}
-                  <div
-                    style={{
-                      background: "var(--color-surface)",
-                      border: "2px solid hsl(0,85%,62%)",
-                      padding: "12px 24px",
-                      borderRadius: "var(--radius-md)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: "12px",
-                        height: "12px",
-                        borderRadius: "50%",
-                        background: "hsl(0,85%,62%)",
-                      }}
-                    />
-                    <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
-                      Co-op Agents Remaining: {room.teams.red?.cardsRemaining} / {room.teams.red?.totalCards}
-                    </span>
-                  </div>
-
-                  {/* Co-op Turn Tokens Board */}
-                  <div
-                    style={{
-                      background: "var(--color-surface)",
-                      border: "2px solid hsl(355, 80%, 48%)",
-                      padding: "12px 24px",
-                      borderRadius: "var(--radius-md)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                    }}
-                  >
-                    <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
-                      Mistake / Turn Tokens Used: {room.coopMistakesMade} / {room.coopMistakesAllowed}
-                    </span>
-                    <div style={{ display: "flex", gap: "4px" }}>
-                      {Array.from({ length: room.coopMistakesAllowed || 9 }).map((_, i) => {
-                        const used = i < room.coopMistakesMade;
-                        return (
-                          <div
-                            key={i}
-                            style={{
-                              width: "10px",
-                              height: "10px",
-                              borderRadius: "50%",
-                              background: used ? "hsl(355, 80%, 48%)" : "hsl(142, 70%, 42%)",
-                              opacity: used ? 0.4 : 1,
-                              boxShadow: used ? "none" : "0 0 8px hsl(142, 70%, 50%)",
-                            }}
-                            title={used ? "Token used" : "Token available"}
-                          />
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Turn Timer Countdown — only show when timer is active */}
-                  {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
-                    <div
-                      className={
-                        timerCount <= 5  ? "timer-danger-fast"
-                        : timerCount <= 10 ? "timer-danger-medium"
-                        : timerCount <= 20 ? "timer-danger-slow"
-                        : ""
-                      }
-                      style={{
-                        background: "var(--color-surface)",
-                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
-                        padding: "12px 24px",
-                        borderRadius: "var(--radius-md)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        transition: "border-color 0.5s ease",
-                      }}
-                    >
-                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
-                        {t("turn.timerLabel")}:{" "}
-                        <span style={{
-                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
-                          fontVariantNumeric: "tabular-nums",
-                          minWidth: "2.5ch",
-                          display: "inline-block",
-                          transition: "color 0.4s ease",
-                        }}>
-                          {timerCount}s
-                        </span>
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "16px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {/* #8 Liquid Score Fill */}
-                  {activeTeams.map((team) => {
-                    const state = room.teams[team];
-                    const config = typeColors[team]!;
-                    if (!state) return null;
-                    const fillPct = state.totalCards > 0 ? (state.cardsRemaining / state.totalCards) * 100 : 0;
-
-                    return (
-                      <div
-                        key={team}
-                        style={{
-                          background: state.eliminated ? "rgba(0,0,0,0.4)" : "var(--color-surface)",
-                          border: `2px solid ${state.eliminated ? "rgba(255,255,255,0.05)" : config.border}`,
-                          padding: "12px 20px",
-                          borderRadius: "var(--radius-md)",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "12px",
-                          opacity: state.eliminated ? 0.5 : 1,
-                          minWidth: "140px",
-                        }}
-                      >
-                        <div style={{ position: "relative", width: "10px", height: "44px", borderRadius: "5px", background: "rgba(255,255,255,0.08)", overflow: "hidden", flexShrink: 0 }}>
-                          <div
-                            className="score-liquid-fill"
-                            style={{
-                              position: "absolute", bottom: 0, left: 0, right: 0,
-                              height: `${fillPct}%`,
-                              background: `linear-gradient(to top, ${config.border}, ${config.light})`,
-                              borderRadius: "5px",
-                            }}
-                          />
-                        </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                          <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.06em", color: config.light }}>
-                            {formatTeamName(team)}
-                          </span>
-                          <span style={{ fontWeight: 800, fontFamily: "var(--font-display)", fontSize: "1.3rem", color: state.eliminated ? "var(--color-text-muted)" : "var(--text-primary)", lineHeight: 1 }}>
-                            {state.cardsRemaining}
-                            <span style={{ fontWeight: 400, fontSize: "0.75rem", color: "var(--text-secondary)", marginLeft: "3px" }}>/ {state.totalCards}</span>
-                          </span>
-                          {state.eliminated && <span style={{ fontSize: "0.6rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Eliminated</span>}
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {/* Turn Timer Countdown — only show when timer is active */}
-                  {room.phase === "playing" && (room.settings.timerMode && room.settings.timerMode !== "off") && (
-                    <div
-                      className={
-                        timerCount <= 5  ? "timer-danger-fast"
-                        : timerCount <= 10 ? "timer-danger-medium"
-                        : timerCount <= 20 ? "timer-danger-slow"
-                        : ""
-                      }
-                      style={{
-                        background: "var(--color-surface)",
-                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
-                        padding: "12px 24px",
-                        borderRadius: "var(--radius-md)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        transition: "border-color 0.5s ease",
-                      }}
-                    >
-                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
-                        {t("turn.timerLabel")}:{" "}
-                        <span style={{
-                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
-                          fontVariantNumeric: "tabular-nums",
-                          minWidth: "2.5ch",
-                          display: "inline-block",
-                          transition: "color 0.4s ease",
-                        }}>
-                          {timerCount}s
-                        </span>
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Spymaster reaction bar */}
-              {room.phase === "playing" && localPlayer?.role === "spymaster" && (
-                <div
-                  style={{
-                    background: "var(--bg-surface-raised)",
-                    border: "1px solid var(--border-default)",
-                    borderLeft: "4px solid var(--accent)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "16px 20px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "12px",
-                    textAlign: "left",
-                    marginTop: "20px",
-                  }}
-                >
-                  <div>
-                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1rem", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
-                      Spymaster Reactions Overlay
-                    </h4>
-                    <p style={{ margin: "2px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.8rem" }}>
-                      {cooldownRemaining > 0 ? `Rate limited: wait ${cooldownRemaining}s` : "Trigger a full-screen reaction"}
-                    </p>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    {["facepalm", "fire", "skull", "party", "clap", "heart"].map((type) => (
-                      <button
-                        key={type}
-                        disabled={cooldownRemaining > 0}
-                        onClick={() => triggerReaction(type)}
-                        style={{
-                          border: "none",
-                          background: "none",
-                          padding: 0,
-                          cursor: cooldownRemaining > 0 ? "not-allowed" : "pointer",
-                          opacity: cooldownRemaining > 0 ? 0.5 : 1,
-                          transition: "transform 0.1s ease",
-                        }}
-                        onMouseOver={(e) => {
-                          if (cooldownRemaining === 0) e.currentTarget.style.transform = "scale(1.05)";
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.transform = "scale(1)";
-                        }}
-                      >
-                        {renderCustomReaction(type, true)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Clue Submission Form */}
-              {room.phase === "playing" &&
-                room.turnState &&
-                room.turnState.phase === "giving_clue" &&
-                localPlayer?.team === room.turnState.activeTeam &&
-                (localPlayer?.role === "spymaster" || room.gameMode === "coop") && (
-                   <form
-                    onSubmit={handleGiveClue}
-                    className="fade-in"
-                    style={{
-                      background: "var(--bg-surface)",
-                      border: "1px solid var(--border-default)",
-                      borderRadius: "var(--radius-md)",
-                      padding: "24px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "16px",
-                      textAlign: "left",
-                    }}
-                  >
-                    <h4 style={{ color: "var(--text-primary)", fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, margin: 0 }}>
-                      {room.gameMode === "coop" ? "Give a Clue (Duet Mode)" : "Give a Clue"}
-                    </h4>
-                    {room.gameMode === "coop" && (
-                      <div style={{
-                        background: "linear-gradient(135deg, rgba(var(--team-accent-rgb,232,163,61),0.08), rgba(var(--team-accent-rgb,232,163,61),0.04))",
-                        border: "1px solid rgba(232,163,61,0.25)",
-                        borderRadius: "var(--radius-sm)",
-                        padding: "10px 14px",
-                        fontSize: "0.82rem",
-                        color: "var(--text-secondary)",
-                        lineHeight: 1.6,
-                      }}>
-                        💡 <strong style={{ color: "var(--accent)" }}>Duet Mode:</strong>{" "}
-                        You can see the <strong style={{ color: typeColors[localPlayer?.team === "red" ? "blue" : "red"]?.light }}>
-                          {localPlayer?.team === "red" ? "Blue" : "Red"} Team&apos;s cards
-                        </strong> on the board. Give a clue that points to those cards — your partner will guess them!
-                      </div>
-                    )}
-                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-end" }}>
-                      <div style={{ flex: 1, minWidth: "200px" }}>
-                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", marginBottom: "8px", fontWeight: 600 }}>
-                          Clue Word (Single word, no spaces)
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g. OCEAN"
-                          value={clueWord}
-                          onChange={(e) => setClueWord(e.target.value)}
-                          style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "var(--radius-sm)",
-                            border: "1px solid var(--border-default)",
-                            background: "var(--bg-surface-raised)",
-                            color: "var(--text-primary)",
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 600,
-                            letterSpacing: "0.05em",
-                          }}
-                        />
-                      </div>
-
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
-                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", fontWeight: 600 }}>
-                          Count
-                        </label>
-                        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1].map((n) => {
-                            const isSelected = clueCount === n;
-                            return (
-                              <button
-                                key={n}
-                                type="button"
-                                onClick={() => setClueCount(n)}
-                                style={{
-                                  width: "36px",
-                                  height: "36px",
-                                  borderRadius: "50%",
-                                  border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
-                                  background: isSelected
-                                    ? "var(--accent)"
-                                    : "var(--bg-surface-raised)",
-                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-secondary)",
-                                  fontFamily: "var(--font-display)",
-                                  fontWeight: 700,
-                                  fontSize: "0.95rem",
-                                  cursor: "pointer",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: isSelected ? "0 0 8px var(--accent)" : "none",
-                                  transition: "all 0.15s ease",
-                                }}
-                              >
-                                {n === -1 ? "∞" : n}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      <button
-                        type="submit"
-                        style={{
-                          padding: "12px 32px",
-                          borderRadius: "var(--radius-sm)",
-                          border: "none",
-                          background: "var(--accent)",
-                          color: "var(--accent-text-on)",
-                          fontFamily: "var(--font-display)",
-                          fontWeight: 700,
-                          cursor: "pointer",
-                          boxShadow: "0 4px 12px rgba(232, 163, 61, 0.2)",
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.background = "var(--accent-hover)";
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.background = "var(--accent)";
-                        }}
-                      >
-                        Send Clue
-                      </button>
-                    </div>
-                    {clueError && (
-                      <div style={{ color: "hsl(355,85%,58%)", fontSize: "0.85rem", fontWeight: 500, display: "flex", alignItems: "center", gap: "6px" }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                        {clueError}
-                      </div>
-                    )}
-                  </form>
-                )}
-
-              {/* Card Board Grid */}
-              <div style={{ position: "relative", width: "100%" }}>
-                {/* #9 Ambient Particle Field canvas */}
-                <canvas
-                  ref={particleCanvasRef}
-                  width={800} height={600}
-                  style={{
-                    position: "absolute", inset: 0, width: "100%", height: "100%",
-                    pointerEvents: "none", zIndex: 0, borderRadius: "var(--radius-lg)", opacity: 0.55,
-                  }}
-                />
-                {isDealingAnimationActive && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      left: "-200px",
-                      top: "15%",
-                      width: "140px",
-                      height: "190px",
-                      background: "linear-gradient(135deg, #161b22, #0d1117)",
-                      border: "2px dashed var(--accent)",
-                      borderRadius: "var(--radius-md)",
-                      boxShadow: "0 15px 40px rgba(0,0,0,0.8), 0 0 25px rgba(232,163,61,0.25)",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      zIndex: 150,
-                      transform: "rotate(-10deg)",
-                      animation: "dossier-float 2.5s ease-in-out infinite, dossier-fade-out 0.5s ease 2s forwards",
-                      color: "var(--accent)",
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: -8,
-                        border: "1px solid rgba(232, 163, 61, 0.4)",
-                        borderRadius: "var(--radius-lg)",
-                        animation: "sparks-rotate 4s linear infinite",
-                        pointerEvents: "none",
-                      }}
-                    />
-                    <div style={{ fontSize: "2.5rem", marginBottom: "8px", filter: "drop-shadow(0 0 8px var(--accent))" }}>📁</div>
-                    <span style={{ fontFamily: "var(--font-display)", fontSize: "0.75rem", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: "var(--accent)" }}>
-                      Classified
-                    </span>
-                    <span style={{ fontSize: "0.55rem", opacity: 0.6, marginTop: "4px", color: "var(--text-secondary)" }}>
-                      DEALING...
-                    </span>
-                  </div>
-                )}
-                <div
-                  className={
-                    [
-                      room.phase === "ended"
-                        ? room.winner
-                          ? (localPlayer?.team && room.winner === localPlayer.team) || (!localPlayer?.team && room.winner === "red")
-                            ? "grid-victory-active"
-                            : "grid-defeat-active"
-                          : "grid-defeat-active"
-                        : "",
-                      "game-board-grid",
-                    ].filter(Boolean).join(" ")
-                  }
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: `repeat(${cols}, 1fr)`,
-                    gap: "clamp(4px, 1.5vw, 12px)",
-                    width: "100%",
-                    padding: "clamp(8px, 2vw, 16px)",
-                    background: "rgba(255,255,255,0.02)",
-                    border: "1px solid rgba(255,255,255,0.05)",
-                    borderRadius: "var(--radius-lg)",
-                  }}
-                >
-                  {board.map((card) => {
-                    let cardType = "unknown";
-                    if (room.gameMode === "coop" && localPlayer?.team) {
-                      if (card.revealed) {
-                        cardType = card.type || "unknown";
-                      } else {
-                        const opponentColor = localPlayer.team === "red" ? "blue" : "red";
-                        if (card.type === opponentColor || card.type === "assassin" || card.type === "neutral") {
-                          cardType = card.type || "unknown";
-                        } else {
-                          cardType = "unknown";
-                        }
-                      }
-                    } else {
-                      cardType = canSeeKey ? (card.type || "unknown") : (card.revealed ? card.type || "unknown" : "unknown");
-                    }
-                    const colors = typeColors[cardType] || typeColors["unknown"]!;
-
-                    const isGuessingTime = room.phase === "playing" && room.turnState?.phase === "guessing";
-                    const isMyTeamGuessing = localPlayer && room.turnState && localPlayer.team === room.turnState.activeTeam;
-                    const isOperative = localPlayer?.role === "operative";
-
-                    const isCoopActiveOp =
-                      room.gameMode === "coop" &&
-                      localPlayer?.team === (room.turnState?.activeTeam === "red" ? "blue" : "red") &&
-                      room.turnState?.phase === "guessing";
-
-                    const isActiveOperative =
-                      isCoopActiveOp ||
-                      (room.gameMode !== "coop" &&
-                        isGuessingTime &&
-                        isMyTeamGuessing &&
-                        isOperative);
-
-                    // In coop/duet mode: the active team player selects opponent-team cards (they see the opponent board)
-                    // In classic mode: spymaster selects their own team's cards as hint markers
-                    const isSpymasterClickable =
-                      room.phase === "playing" &&
-                      room.turnState?.phase === "giving_clue" &&
-                      localPlayer?.team === room.turnState?.activeTeam &&
-                      (room.gameMode === "coop"
-                        ? card.type === (localPlayer?.team === "red" ? "blue" : "red")
-                        : localPlayer?.role === "spymaster" && card.type === localPlayer?.team);
-
-                    const isInteractive = (isActiveOperative || isSpymasterClickable) && !card.revealed;
-                    const voters = room.players.filter((p) => (p.votedCardIds && p.votedCardIds.includes(card.id)) || p.votedCardId === card.id);
-
-                    const rowIndex = Math.floor(card.id / cols);
-                    const colIndex = card.id % cols;
-                    const startX = `-${180 + colIndex * 150}px`;
-                    const startY = `${100 - rowIndex * 120}px`;
-                    const animationDelay = `${card.id * 50}ms`;
-
-                    const dealAnimationStyles = isDealingAnimationActive ? {
-                      animation: "deal-card-fly 0.75s cubic-bezier(0.175, 0.885, 0.32, 1.275) both",
-                      animationDelay: animationDelay,
-                      "--start-x": startX,
-                      "--start-y": startY,
-                      "--start-rot": "-45deg",
-                      zIndex: 100 - card.id,
-                    } as React.CSSProperties : {};
-
-                    const isAssassinCard = assassinRevealedId === card.id;
-                    const shockwaveOffset = shockwaveCardOffsets[card.id];
-                    const cardClassName = [
-                      recentlyFlippedCardIds.includes(card.id) ? "card-flipped-active" : "",
-                      isAssassinCard ? "assassin-flip" : "",
-                      shockwaveOffset ? "shockwave-push" : "",
-                    ].filter(Boolean).join(" ");
-
-                    return (
-                      <button
-                        key={card.id}
-                        data-card-id={card.id}
-                        disabled={!isInteractive}
-                        onClick={() => handleCardClick(card.id)}
-                        className={[cardClassName, "game-board-card"].filter(Boolean).join(" ")}
-                        style={{
-                          background: colors.bg,
-                          border: clueSelectedCardIds.includes(card.id)
-                            ? `3px solid ${colors.light}`
-                            : `2px solid ${colors.border}`,
-                          borderRadius: "var(--radius-md)",
-                          padding: "clamp(10px, 3.5vw, 24px) clamp(4px, 1.5vw, 10px)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          cursor: isInteractive ? "pointer" : "default",
-                          minHeight: "clamp(52px, 15vw, 100px)",
-                          position: "relative",
-                          perspective: "1000px",
-                          transformStyle: "preserve-3d",
-                          boxShadow: card.revealed
-                            ? "inset 0 2px 10px rgba(0,0,0,0.5)"
-                            : clueSelectedCardIds.includes(card.id)
-                              ? `0 0 14px ${colors.light}`
-                              : "0 4px 6px rgba(0,0,0,0.15)",
-                          transition: isDealingAnimationActive
-                            ? "none"
-                            : "transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.15s ease, border-color 0.15s ease",
-                          transform: shockwaveOffset ? `translate(var(--push-x), var(--push-y))` : undefined,
-                          "--push-x": shockwaveOffset ? `${shockwaveOffset.x}px` : "0px",
-                          "--push-y": shockwaveOffset ? `${shockwaveOffset.y}px` : "0px",
-                          ...dealAnimationStyles,
-                        } as React.CSSProperties}
-                        onMouseMove={(e) => {
-                          if (isInteractive) {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            const x = e.clientX - rect.left;
-                            const y = e.clientY - rect.top;
-                            const xc = ((x / rect.width) - 0.5) * 16;
-                            const yc = ((y / rect.height) - 0.5) * -16;
-                            e.currentTarget.style.transform = `perspective(1000px) rotateX(${yc}deg) rotateY(${xc}deg) scale(1.03)`;
-                            e.currentTarget.style.boxShadow = clueSelectedCardIds.includes(card.id)
-                              ? `0 0 24px ${colors.light}`
-                              : "0 12px 24px rgba(0,0,0,0.35)";
-                            e.currentTarget.style.borderColor = clueSelectedCardIds.includes(card.id)
-                              ? colors.light
-                              : "rgba(255,255,255,0.3)";
-                            e.currentTarget.style.setProperty('--glare-x', `${(x / rect.width) * 100}%`);
-                            e.currentTarget.style.setProperty('--glare-y', `${(y / rect.height) * 100}%`);
-                            e.currentTarget.style.setProperty('--glare-opacity', '0.15');
-                          }
-                        }}
-                        onMouseOut={(e) => {
-                          if (isInteractive) {
-                            e.currentTarget.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)";
-                            e.currentTarget.style.boxShadow = clueSelectedCardIds.includes(card.id)
-                              ? `0 0 14px ${colors.light}`
-                              : "0 4px 6px rgba(0,0,0,0.15)";
-                            e.currentTarget.style.borderColor = clueSelectedCardIds.includes(card.id)
-                              ? colors.light
-                              : colors.border;
-                            e.currentTarget.style.setProperty('--glare-opacity', '0');
-                          }
-                        }}
-                      >
-                        {/* Glare Overlay for 3D card */}
-                        <div
-                          style={{
-                            position: "absolute",
-                            inset: 0,
-                            borderRadius: "inherit",
-                            background: `radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 50%), rgba(255, 255, 255, var(--glare-opacity, 0)) 0%, rgba(255, 255, 255, 0) 65%)`,
-                            pointerEvents: "none",
-                            transition: "background 0.15s ease",
-                            zIndex: 1,
-                          }}
-                        />
-
-                        {(card.revealed || (canSeeKey && card.type === "assassin")) && !votedCardIds.includes(card.id) && (
-                          <span
-                            style={{
-                              position: "absolute",
-                              top: "6px",
-                              right: "8px",
-                              fontSize: "0.6rem",
-                              fontWeight: 700,
-                              textTransform: "uppercase",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                              background: "rgba(0,0,0,0.4)",
-                              color: colors.text,
-                              letterSpacing: "0.05em",
-                              zIndex: 2,
-                            }}
-                          >
-                            {card.type === "assassin" ? "assassin" : ""}
-                            {card.revealed && (card.type === "assassin" ? " (REV)" : "REV")}
-                          </span>
-                        )}
-
-                        <span
-                          className="game-card-word"
-                          style={{
-                            fontFamily: "var(--font-display)",
-                            fontSize: "clamp(0.65rem, 3.2vw, 1.25rem)",
-                            fontWeight: 800,
-                            letterSpacing: "0.04em",
-                            color: card.revealed ? colors.text : (lightMode ? "#1C1916" : "#FFFFFF"),
-                            textAlign: "center",
-                            wordBreak: "break-word",
-                            overflowWrap: "break-word",
-                            hyphens: "auto",
-                            lineHeight: 1.15,
-                            opacity: card.revealed && !canSeeKey ? 0.45 : 1,
-                            transform: "translateZ(20px)",
-                            display: "block",
-                            zIndex: 2,
-                            textShadow: !card.revealed ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
-                          }}
-                        >
-                          {card.word}
-                        </span>
-
-                        {/* Pointer Hand Icon in corner to Flip */}
-                        {votedCardIds.includes(card.id) && isActiveOperative && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (socket) {
-                                socket.emit("guess_card", {
-                                  roomCode: room.roomCode,
-                                  playerId,
-                                  cardId: card.id,
-                                });
-                              }
-                            }}
-                            style={{
-                              position: "absolute",
-                              top: "6px",
-                              right: "8px",
-                              background: "linear-gradient(135deg, var(--accent), #b87c24)",
-                              border: "1px solid var(--accent)",
-                              borderRadius: "50%",
-                              width: "28px",
-                              height: "28px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              color: "var(--accent-text-on)",
-                              cursor: "pointer",
-                              boxShadow: "0 0 10px rgba(232,163,61,0.5)",
-                              zIndex: 10,
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.transform = "scale(1.15)";
-                              e.currentTarget.style.boxShadow = "0 0 15px rgba(232,163,61,0.8)";
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.transform = "none";
-                              e.currentTarget.style.boxShadow = "0 0 10px rgba(232,163,61,0.5)";
-                            }}
-                            title="Flip Card"
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: "scaleX(-1)" }}>
-                              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-                            </svg>
-                          </button>
-                        )}
-
-                        {/* Real-time Voter Avatars Overlay */}
-                        {voters.length > 0 && (
-                          <div
-                            style={{
-                              position: "absolute",
-                              bottom: "6px",
-                              left: "8px",
-                              display: "flex",
-                              gap: "4px",
-                              flexWrap: "wrap",
-                              zIndex: 4,
-                            }}
-                          >
-                            {voters.map((v, index) => {
-                              const delay = `${(index * 200) % 1000}ms`;
-                              return (
-                                <span
-                                  key={v.id}
-                                  title={v.displayName}
-                                  className="voter-badge-floating"
-                                  style={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    width: "20px",
-                                    height: "20px",
-                                    borderRadius: "50%",
-                                    cursor: "default",
-                                    animation: "voter-badge-entry 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, avatar-float 3s ease-in-out infinite alternate",
-                                    animationDelay: `0s, ${delay}`,
-                                  }}
-                                >
-                                  {renderAvatar(v.avatar || v.displayName.charAt(0), 20)}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right Side: Players & Scoped Room Chat */}
-        <div style={{ flex: "1 1 300px", display: "flex", flexDirection: "column", gap: "24px", minWidth: "260px" }}>
-          {/* User Profile Card / Statistics */}
-          {/* User Profile Circular Widget */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "8px",
-              padding: "16px",
-              background: "var(--color-surface)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-md)",
-            }}
-          >
-            {/* Clickable Circle Container */}
-            <div
-              onClick={() => setStatsExpanded(!statsExpanded)}
-              style={{
-                position: "relative",
-                width: "80px",
-                height: "80px",
-                borderRadius: "50%",
-                background: "rgba(0, 0, 0, 0.2)",
-                border: `2px solid ${statsExpanded ? "var(--accent)" : "var(--color-border)"}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                boxShadow: statsExpanded ? "0 0 12px rgba(232, 163, 61, 0.3)" : "0 4px 10px rgba(0,0,0,0.3)",
-                transition: "all 0.2s ease",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.borderColor = "var(--accent)";
-              }}
-              onMouseOut={(e) => {
-                if (!statsExpanded) e.currentTarget.style.borderColor = "var(--color-border)";
-              }}
-            >
-              {/* Avatar Image or Fallback */}
-              {renderAvatar(user ? user.avatar : (localPlayer?.avatar || "s1_0_0"), 52)}
-              
-              {/* Online indicator dot at bottom right */}
-              {user && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "2px",
-                    right: "2px",
-                    width: "16px",
-                    height: "16px",
-                    borderRadius: "50%",
-                    background: "var(--status-active-bg, #10b981)",
-                    border: "2px solid var(--color-surface)",
-                  }}
-                  title="Status: Active"
-                />
-              )}
-            </div>
-
-            {/* Username and Online/Offline state */}
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "4px", justifyContent: "center" }}>
-                {user ? user.username : "Guest"}
-                {user?.isSupporter && (
-                  <span style={{ fontSize: "0.7rem", background: "var(--accent-bg-subtle)", border: "1px solid var(--accent)", color: "var(--accent-text-on-subtle)", padding: "1px 4px", borderRadius: "8px", fontWeight: 700 }}>
-                    💎
-                  </span>
-                )}
-              </div>
-              <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
-                {user ? "Online · Tap circle for stats" : "Gated · Tap circle to log in"}
-              </div>
-            </div>
-
-            {/* Stats list expands below */}
-            {statsExpanded && (
-              <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "12px" }} className="scale-up">
-                {user ? (
-                  <>
-                    {/* Profile Role & Status Settings */}
-                    <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                      {/* Status selector (single-line horizontal pill selection) */}
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
-                          My Status
-                        </label>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                          {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY"].map((st) => {
-                            const isSelected = (localPlayer?.status || "ACTIVE") === st;
-                            return (
-                              <button
-                                key={st}
-                                type="button"
-                                onClick={() => {
-                                  if (socket) {
-                                    socket.emit("update_status", {
-                                      roomCode: room.roomCode,
-                                      playerId,
-                                      status: st,
-                                    });
-                                  }
-                                }}
-                                style={{
-                                  padding: "6px 10px",
-                                  borderRadius: "4px",
-                                  border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-                                  background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
-                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
-                                  fontWeight: 600,
-                                  fontSize: "0.75rem",
-                                  cursor: "pointer",
-                                  transition: "all 0.15s ease",
-                                }}
-                                onMouseOver={(e) => {
-                                  if (!isSelected) {
-                                    e.currentTarget.style.background = "var(--border-subtle)";
-                                  }
-                                }}
-                                onMouseOut={(e) => {
-                                  if (!isSelected) {
-                                    e.currentTarget.style.background = "var(--bg-surface-raised)";
-                                  }
-                                }}
-                              >
-                                {st}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Team & Role Switcher */}
-                      {!room.settings.roomLocked && (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                          <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
-                            {room.gameMode === "coop" ? "Assign Team" : "Assign Team & Role"}
-                          </label>
-                          {room.gameMode === "coop" ? (
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                              <button
-                                onClick={() => handleJoinTeamRole("red", "operative")}
-                                style={{
-                                  padding: "8px",
-                                  fontSize: "0.75rem",
-                                  background: localPlayer?.team === "red" ? typeColors.red!.border : typeColors.red!.bg,
-                                  border: `1px solid ${typeColors.red!.border}`,
-                                  borderRadius: "4px",
-                                  color: localPlayer?.team === "red" ? "#fff" : typeColors.red!.text,
-                                  fontWeight: 600,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                  Red Team
-                              </button>
-                              <button
-                                onClick={() => handleJoinTeamRole("blue", "operative")}
-                                style={{
-                                  padding: "8px",
-                                  fontSize: "0.75rem",
-                                  background: localPlayer?.team === "blue" ? typeColors.blue!.border : typeColors.blue!.bg,
-                                  border: `1px solid ${typeColors.blue!.border}`,
-                                  borderRadius: "4px",
-                                  color: localPlayer?.team === "blue" ? "#fff" : typeColors.blue!.text,
-                                  fontWeight: 600,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                Blue Team
-                              </button>
-                            </div>
-                          ) : (
-                            <>
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                                <button
-                                  onClick={() => handleJoinTeamRole("red", "spymaster")}
-                                  style={{
-                                    padding: "6px",
-                                    fontSize: "0.75rem",
-                                    background: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? typeColors.red!.border : typeColors.red!.bg,
-                                    border: `1px solid ${typeColors.red!.border}`,
-                                    borderRadius: "4px",
-                                    color: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.red!.text,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Red Spy
-                                </button>
-                                <button
-                                  onClick={() => handleJoinTeamRole("red", "operative")}
-                                  style={{
-                                    padding: "6px",
-                                    fontSize: "0.75rem",
-                                    background: localPlayer?.team === "red" && localPlayer?.role === "operative" ? typeColors.red!.border : typeColors.red!.bg,
-                                    border: `1px solid ${typeColors.red!.border}`,
-                                    borderRadius: "4px",
-                                    color: localPlayer?.team === "red" && localPlayer?.role === "operative" ? "#fff" : typeColors.red!.text,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Red Op
-                                </button>
-                              </div>
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                                <button
-                                  onClick={() => handleJoinTeamRole("blue", "spymaster")}
-                                  style={{
-                                    padding: "6px",
-                                    fontSize: "0.75rem",
-                                    background: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? typeColors.blue!.border : typeColors.blue!.bg,
-                                    border: `1px solid ${typeColors.blue!.border}`,
-                                    borderRadius: "4px",
-                                    color: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.blue!.text,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Blue Spy
-                                </button>
-                                <button
-                                  onClick={() => handleJoinTeamRole("blue", "operative")}
-                                  style={{
-                                    padding: "6px",
-                                    fontSize: "0.75rem",
-                                    background: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? typeColors.blue!.border : typeColors.blue!.bg,
-                                    border: `1px solid ${typeColors.blue!.border}`,
-                                    borderRadius: "4px",
-                                    color: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? "#fff" : typeColors.blue!.text,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Blue Op
-                                </button>
-                              </div>
-
-                              {room.teamCount > 2 && (
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                                  <button
-                                    onClick={() => handleJoinTeamRole("green", "spymaster")}
-                                    style={{
-                                      padding: "6px",
-                                      fontSize: "0.75rem",
-                                      background: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? typeColors.green!.border : typeColors.green!.bg,
-                                      border: `1px solid ${typeColors.green!.border}`,
-                                      borderRadius: "4px",
-                                      color: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.green!.text,
-                                      fontWeight: 600,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    Green Spy
-                                  </button>
-                                  <button
-                                    onClick={() => handleJoinTeamRole("green", "operative")}
-                                    style={{
-                                      padding: "6px",
-                                      fontSize: "0.75rem",
-                                      background: localPlayer?.team === "green" && localPlayer?.role === "operative" ? typeColors.green!.border : typeColors.green!.bg,
-                                      border: `1px solid ${typeColors.green!.border}`,
-                                      borderRadius: "4px",
-                                      color: localPlayer?.team === "green" && localPlayer?.role === "operative" ? "#fff" : typeColors.green!.text,
-                                      fontWeight: 600,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    Green Op
-                                  </button>
-                                </div>
-                              )}
-
-                              {room.teamCount > 3 && (
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                                  <button
-                                    onClick={() => handleJoinTeamRole("yellow", "spymaster")}
-                                    style={{
-                                      padding: "6px",
-                                      fontSize: "0.75rem",
-                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? typeColors.yellow!.border : typeColors.yellow!.bg,
-                                      border: `1px solid ${typeColors.yellow!.border}`,
-                                      borderRadius: "4px",
-                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.yellow!.text,
-                                      fontWeight: 600,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    Yellow Spy
-                                  </button>
-                                  <button
-                                    onClick={() => handleJoinTeamRole("yellow", "operative")}
-                                    style={{
-                                      padding: "6px",
-                                      fontSize: "0.75rem",
-                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? typeColors.yellow!.border : typeColors.yellow!.bg,
-                                      border: `1px solid ${typeColors.yellow!.border}`,
-                                      borderRadius: "4px",
-                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? "#fff" : typeColors.yellow!.text,
-                                      fontWeight: 600,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    Yellow Op
-                                  </button>
-                                </div>
-                              )}
-                            </>
-                          )}
-
-                          <button
-                            onClick={() => handleJoinTeamRole(null, null)}
-                            style={{
-                              padding: "6px",
-                              fontSize: "0.75rem",
-                              background: !localPlayer?.team ? "var(--accent)" : "transparent",
-                              border: "1px solid var(--accent)",
-                              borderRadius: "4px",
-                              color: !localPlayer?.team ? "var(--accent-text-on)" : "var(--accent)",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              marginTop: "2px",
-                            }}
-                          >
-                            Spectate
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 10px 0", color: "var(--text-primary)" }}>
-                      My Stats & History
-                    </h4>
-                    {/* Stats Grid */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
-                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Played</div>
-                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesPlayed}</div>
-                      </div>
-                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Won</div>
-                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesWon}</div>
-                      </div>
-                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Win Rate</div>
-                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
-                          {user.stats.gamesPlayed > 0 ? ((user.stats.gamesWon / user.stats.gamesPlayed) * 100).toFixed(0) : 0}%
-                        </div>
-                      </div>
-                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Accuracy</div>
-                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
-                          {user.stats.totalGuesses > 0 ? ((user.stats.correctGuesses / user.stats.totalGuesses) * 100).toFixed(0) : 0}%
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Match History List */}
-                    <div>
-                      <h4 style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", marginBottom: "8px" }}>
-                        Recent Matches
-                      </h4>
-                      {user.matchHistory.length > 0 ? (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "150px", overflowY: "auto" }}>
-                          {user.matchHistory.slice(0, 5).map((m) => (
-                            <div
-                              key={m.id}
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                padding: "6px 8px",
-                                background: "var(--bg-surface-raised)",
-                                borderRadius: "4px",
-                                border: "1px solid var(--border-default)",
-                                fontSize: "0.8rem",
-                              }}
-                            >
-                              <span>Room: {m.roomCode} ({m.role.toUpperCase()})</span>
-                              <span
-                                style={{
-                                  fontSize: "0.7rem",
-                                  fontWeight: 700,
-                                  padding: "2px 6px",
-                                  borderRadius: "4px",
-                                  background: m.won ? "hsl(142,70%,25%)" : "hsl(355,75%,30%)",
-                                  color: "#fff",
-                                }}
-                              >
-                                {m.won ? "WON" : "LOST"}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", fontStyle: "italic" }}>
-                          No matches played yet.
-                        </div>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <div style={{ textAlign: "center", padding: "12px 0" }}>
-                    <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", margin: "0 0 12px 0", lineHeight: 1.4 }}>
-                      Track your wins, losses, guess accuracy, and match history across games!
-                    </p>
-                    <button
-                      onClick={() => onOpenAuth()}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        background: "var(--accent)",
-                        color: "var(--accent-text-on)",
-                        border: "none",
-                        borderRadius: "var(--radius-sm)",
-                        cursor: "pointer",
-                        fontWeight: 700,
-                        fontSize: "0.85rem",
-                        boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)",
-                        transition: "background 0.2s ease",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.background = "var(--accent-hover)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.background = "var(--accent)";
-                      }}
-                    >
-                      Sign In / Sign Up
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Music Player Widget (Gated personal audio player) */}
-          <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} />
-
-
-
-          {isHost && (
-            <div
-              style={{
-                background: "var(--color-surface)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-md)",
-                padding: "20px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-              }}
-            >
-              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
-                Host Controls
-              </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <button
-                  disabled={room.settings.roomLocked}
-                  onClick={() => {
-                    triggerHaptics([250, 50, 250]);
-                    playNavClick();
-                    if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    background: "transparent",
-                    border: "1px solid var(--border-default)",
-                    color: "var(--text-primary)",
-                    fontWeight: 700,
-                    cursor: !room.settings.roomLocked ? "pointer" : "not-allowed",
-                    opacity: !room.settings.roomLocked ? 1 : 0.4,
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.85rem",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                  onMouseOver={(e) => {
-                    if (!room.settings.roomLocked) {
-                      e.currentTarget.style.background = "var(--border-subtle)";
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="16 3 21 3 21 8" />
-                    <line x1="4" y1="20" x2="21" y2="3" />
-                    <polyline points="21 16 21 21 16 21" />
-                    <line x1="15" y1="15" x2="21" y2="21" />
-                    <line x1="4" y1="4" x2="9" y2="9" />
-                  </svg>
-                  <span>{t("settings.randomize", "Randomize Teams")}</span>
-                </button>
-                <button
-                  onClick={() => {
-                    triggerHaptics([250, 50, 250]);
-                    playSettingsToggle();
-                    if (socket) {
-                      socket.emit("update_settings", {
-                        roomCode: room.roomCode,
-                        settings: { roomLocked: !room.settings.roomLocked },
-                      });
-                    }
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
-                    border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
-                    color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.85rem",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    {room.settings.roomLocked ? (
-                      <>
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      </>
-                    ) : (
-                      <>
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                      </>
-                    )}
-                  </svg>
-                  <span>{room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* In lobby both are in the main column; in play phase show Room Players in sidebar */}
-          {room.phase !== "lobby" && renderGroupedPlayersCard()}
-
-
-        </div>
+        {room.phase === "lobby" ? renderLobbyLayout() : renderGameplayLayout()}
       </div>
 
 
