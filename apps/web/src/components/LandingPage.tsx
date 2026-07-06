@@ -74,6 +74,8 @@ export function LandingPage({
   // Audio Context refs
   const audioCtxRef = useRef<AudioContext | null>(null);
   const clickNoiseBufferRef = useRef<AudioBuffer | null>(null);
+  const soundPlayedRef = useRef(false);
+  const soundSuccessRef = useRef(false);
 
   // Three.js animations state
   const threeStateRef = useRef<{
@@ -93,14 +95,18 @@ export function LandingPage({
 
   // Ensure Audio Setup
   const ensureAudio = () => {
-    if (typeof window === "undefined") return;
-    const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioCtxClass) return;
-    if (!audioCtxRef.current) {
-      audioCtxRef.current = new AudioCtxClass();
-    }
-    if (audioCtxRef.current.state === "suspended") {
-      audioCtxRef.current.resume();
+    try {
+      if (typeof window === "undefined") return;
+      const AudioCtxClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtxClass) return;
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioCtxClass();
+      }
+      if (audioCtxRef.current.state === "suspended") {
+        audioCtxRef.current.resume().catch(() => {});
+      }
+    } catch (e) {
+      console.warn("AudioContext initialization bypassed:", e);
     }
   };
 
@@ -149,6 +155,47 @@ export function LandingPage({
     oscGain.connect(ctx.destination);
     osc.start(now);
     osc.stop(now + 0.04);
+  };
+
+  const playMaterializeSound = () => {
+    try {
+      ensureAudio();
+      if (!sfxEnabled || !audioCtxRef.current) return;
+      const ctx = audioCtxRef.current;
+      if (ctx.state !== "running") return; // still suspended
+
+      const now = ctx.currentTime;
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc1.type = "sine";
+      osc2.type = "triangle";
+
+      // Sweeping frequencies upward for cyber chime effect
+      osc1.frequency.setValueAtTime(260, now);
+      osc1.frequency.exponentialRampToValueAtTime(780, now + 1.4);
+
+      osc2.frequency.setValueAtTime(520, now);
+      osc2.frequency.exponentialRampToValueAtTime(1560, now + 1.4);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(0.035, now + 0.4);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
+
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 1.7);
+      osc2.stop(now + 1.7);
+
+      soundSuccessRef.current = true;
+    } catch (e) {
+      console.warn("Materialize sound playback bypassed:", e);
+    }
   };
 
   // Radar sweep and encryption scrolling graph
@@ -395,6 +442,9 @@ export function LandingPage({
   useEffect(() => {
     const unlock = () => {
       ensureAudio();
+      if (!soundSuccessRef.current && soundPlayedRef.current) {
+        playMaterializeSound();
+      }
       document.removeEventListener("pointerdown", unlock);
       document.removeEventListener("keydown", unlock);
       document.removeEventListener("touchstart", unlock);
@@ -1079,6 +1129,10 @@ export function LandingPage({
       // Dynamic materialization entrance (voxelization, scanning sweep, opacity shimmer)
       if (materializeProgress < 1.0) {
         materializeProgress = Math.min(1.0, materializeProgress + 0.007);
+        if (!soundPlayedRef.current && allOps.some(op => op.userData.img)) {
+          soundPlayedRef.current = true;
+          playMaterializeSound();
+        }
         
         // Easing factor: easeOutCubic
         const tProgress = 1 - Math.pow(1 - materializeProgress, 3);
@@ -1322,6 +1376,8 @@ export function LandingPage({
 
   const handleReplayBriefing = () => {
     setShowWelcome(false);
+    soundPlayedRef.current = false;
+    soundSuccessRef.current = false;
     if (threeStateRef.current) {
       threeStateRef.current.entering = false;
       threeStateRef.current.dollyProgress = 0;
@@ -1372,10 +1428,13 @@ export function LandingPage({
         backgroundImage: `repeating-linear-gradient(to bottom, rgba(178,239,155,0.035) 0px, rgba(178,239,155,0.035) 1px, transparent 1px, transparent 3px)`
       }} />
 
-      {/* Left Column Advanced Decryption Center Panel (zIndex 2) */}
-      <div style={{ position: "fixed", top: "110px", left: "24px", zIndex: 2, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
+      {/* Left Column Advanced Decryption Center Panel (zIndex 5) */}
+      <div style={{ position: "fixed", top: "110px", left: "24px", zIndex: 5, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#1b9aaa", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", justifyContent: "space-between" }}>
-          <span>🔒 SIGNAL INTEL</span>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+            SIGNAL INTEL
+          </span>
           <span style={{ color: "#ef959c" }}>ONLINE</span>
         </div>
         
@@ -1402,8 +1461,8 @@ export function LandingPage({
         </div>
       </div>
 
-      {/* Right Column Cyber Surveillance Map HUD Panel (zIndex 2 - matching video!) */}
-      <div style={{ position: "fixed", top: "110px", right: "24px", zIndex: 2, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #ef959c", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
+      {/* Right Column Cyber Surveillance Map HUD Panel (zIndex 5) */}
+      <div style={{ position: "fixed", top: "110px", right: "24px", zIndex: 5, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #ef959c", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#ef959c", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span>🌐 ACTIVE SURVEILLANCE</span>
           <span style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "9.5px", color: "#ef959c" }}>
@@ -1430,17 +1489,17 @@ export function LandingPage({
         </div>
       </div>
 
-      {/* 3D WebGL Canvas container (zIndex 3) */}
+      {/* 3D WebGL Canvas container (zIndex 3 - fully visible but placed behind overlay HUD panels!) */}
       <div ref={mountRef} style={{ position: "fixed", inset: 0, zIndex: 3, pointerEvents: "none" }} />
 
-      {/* HUD Corners (zIndex 4) */}
-      <div className="hud-corner tl" style={{ position: "fixed", zIndex: 4, width: "34px", height: "34px", pointerEvents: "none", borderTop: "2px solid rgba(178,239,155,0.4)", borderLeft: "2px solid rgba(178,239,155,0.4)", top: "14px", left: "14px" }}></div>
-      <div className="hud-corner tr" style={{ position: "fixed", zIndex: 4, width: "34px", height: "34px", pointerEvents: "none", borderTop: "2px solid rgba(239,149,156,0.4)", borderRight: "2px solid rgba(239,149,156,0.4)", top: "14px", right: "14px" }}></div>
-      <div className="hud-corner bl" style={{ position: "fixed", zIndex: 4, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(239,149,156,0.4)", borderLeft: "2px solid rgba(239,149,156,0.4)", bottom: "14px", left: "14px" }}></div>
-      <div className="hud-corner br" style={{ position: "fixed", zIndex: 4, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(178,239,155,0.4)", borderRight: "2px solid rgba(178,239,155,0.4)", bottom: "14px", right: "14px" }}></div>
+      {/* HUD Corners (zIndex 5) */}
+      <div className="hud-corner tl" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderTop: "2px solid rgba(178,239,155,0.4)", borderLeft: "2px solid rgba(178,239,155,0.4)", top: "14px", left: "14px" }}></div>
+      <div className="hud-corner tr" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderTop: "2px solid rgba(239,149,156,0.4)", borderRight: "2px solid rgba(239,149,156,0.4)", top: "14px", right: "14px" }}></div>
+      <div className="hud-corner bl" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(239,149,156,0.4)", borderLeft: "2px solid rgba(239,149,156,0.4)", bottom: "14px", left: "14px" }}></div>
+      <div className="hud-corner br" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(178,239,155,0.4)", borderRight: "2px solid rgba(178,239,155,0.4)", bottom: "14px", right: "14px" }}></div>
 
-      {/* Top Header Logo (zIndex 5) */}
-      <div className="wordmark" style={{ position: "fixed", top: "24px", left: "24px", zIndex: 5, display: "flex", flexDirection: "column", gap: "6px" }}>
+      {/* Top Header Logo (zIndex 6) */}
+      <div className="wordmark" style={{ position: "fixed", top: "24px", left: "24px", zIndex: 6, display: "flex", flexDirection: "column", gap: "6px" }}>
         <div 
           onClick={() => setCurrentView("lobby")}
           style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
@@ -1470,27 +1529,20 @@ export function LandingPage({
       </div>
 
       {/* Navigation links */}
-      <nav className="nav-links" style={{ position: "fixed", top: "28px", right: "64px", zIndex: 5, display: "flex", alignItems: "center", gap: "16px", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
-        <button onClick={() => setCurrentView("features")} style={{ background: "none", border: "none", color: "#9AA29B", cursor: "pointer", transition: "color .2s ease", borderBottom: "2px dotted rgba(0,240,255,0.45)", paddingBottom: "2px" }} className="hover:text-[#00f0ff]">Features</button>
+      <nav className="nav-links" style={{ position: "fixed", top: "28px", right: "64px", zIndex: 6, display: "flex", alignItems: "center", gap: "16px", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+        <button onClick={() => setCurrentView("rules")} className="cyber-dotted-link">How to play</button>
         <span style={{ opacity: 0.35 }}>·</span>
-        <button onClick={() => setCurrentView("changelog")} style={{ background: "none", border: "none", color: "#9AA29B", cursor: "pointer", transition: "color .2s ease", borderBottom: "2px dotted rgba(0,240,255,0.45)", paddingBottom: "2px" }} className="hover:text-[#00f0ff]">Changelog</button>
+        <button onClick={() => setCurrentView("features")} className="cyber-dotted-link">Features</button>
         <span style={{ opacity: 0.35 }}>·</span>
-        <button onClick={() => setCurrentView("about")} style={{ background: "none", border: "none", color: "#9AA29B", cursor: "pointer", transition: "color .2s ease", borderBottom: "2px dotted rgba(0,240,255,0.45)", paddingBottom: "2px" }} className="hover:text-[#00f0ff]">About</button>
+        <button onClick={() => setCurrentView("changelog")} className="cyber-dotted-link">Changelog</button>
+        <span style={{ opacity: 0.35 }}>·</span>
+        <button onClick={() => setCurrentView("about")} className="cyber-dotted-link">About</button>
       </nav>
 
       {/* Bottom left indicators */}
       <button 
         onClick={() => setCurrentView("support")}
-        style={{
-          position: "fixed", bottom: "72px", left: "24px", zIndex: 5,
-          display: "inline-flex", alignItems: "center", gap: "8px",
-          background: "rgba(0,240,255,0.06)", border: "1.5px solid rgba(0,240,255,0.35)",
-          color: "#00f0ff", fontFamily: "'JetBrains Mono', monospace", fontSize: "11px", fontWeight: 700, letterSpacing: "0.08em",
-          padding: "8px 14px", borderRadius: "4px", cursor: "pointer",
-          transition: "all .2s ease",
-          boxShadow: "0 0 10px rgba(0,240,255,0.05)"
-        }}
-        className="hover:bg-[#00f0ff] hover:text-[#02080a]"
+        className="coffee-btn"
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
         <span>SUPPLY LINE : COFFEE</span>
@@ -1498,18 +1550,11 @@ export function LandingPage({
 
       <button 
         onClick={() => setShowReport(true)}
-        style={{
-          position: "fixed", bottom: "22px", left: "24px", zIndex: 5,
-          display: "inline-flex", alignItems: "center", gap: "7px",
-          background: "rgba(238,243,238,0.04)", border: "1px solid rgba(0,240,255,0.16)",
-          color: "#9AA29B", fontFamily: "'JetBrains Mono', monospace", fontSize: "11px", letterSpacing: "0.03em",
-          padding: "8px 14px 8px 12px", borderRadius: "20px", cursor: "pointer",
-          transition: "border-color .2s ease, color .2s ease"
-        }}
+        className="bug-btn"
       >
         <span className="fdot-wrap" style={{ position: "relative", width: "5px", height: "5px" }}>
-          <span className="fdot" style={{ position: "relative", width: "5px", height: "5px", borderRadius: "50%", background: "#00f0ff", boxShadow: "0 0 6px #00f0ff" }} />
-          <span className="fping" style={{ position: "absolute", inset: "-3px", borderRadius: "50%", border: "1px solid #00f0ff", opacity: 0.6 }} />
+          <span className="fdot" style={{ position: "relative", width: "5px", height: "5px", borderRadius: "50%", background: "#00f0ff", boxShadow: "0 0 6px #00f0ff", animation: "pulse 1.5s infinite" }} />
+          <span className="fping" style={{ position: "absolute", inset: "-3px", borderRadius: "50%", border: "1px solid #00f0ff", opacity: 0.6, animation: "pulse 1.5s infinite" }} />
         </span>
         Need a feature or found a bug?
       </button>
@@ -1641,9 +1686,7 @@ export function LandingPage({
           </button>
           <div style={{ fontSize: "11px", letterSpacing: "0.14em", color: "#9AA29B", textTransform: "uppercase" }}>No badge required · guest clearance</div>
           <div style={{ display: "flex", gap: "14px", alignItems: "center", fontSize: "11px", color: "#9AA29B" }}>
-            <button onClick={() => setCurrentView("rules")} style={{ background: "none", border: "none", color: "#9AA29B", cursor: "pointer", borderBottom: "2px dotted rgba(0,240,255,0.45)" }} className="hover:text-[#00f0ff]">How to play</button>
-            <span style={{ opacity: 0.35 }}>·</span>
-            <button onClick={() => setAuthOpen(true)} style={{ background: "none", border: "none", color: "#9AA29B", cursor: "pointer", borderBottom: "2px dotted rgba(0,240,255,0.45)" }} className="hover:text-[#00f0ff]">Already have an account? Sign in →</button>
+            <button onClick={() => setAuthOpen(true)} className="cyber-dotted-link">Already have an account? Sign in →</button>
           </div>
         </div>
       )}
@@ -1672,7 +1715,7 @@ export function LandingPage({
                       color: gameMode === "classic" ? "#00f0ff" : "#eef3ee", padding: "13px 10px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold"
                     }}
                   >
-                    Multi-Team (Max 4 Teams)
+                    Multi-Team
                   </button>
                   <button 
                     onClick={() => setGameMode("coop")}
@@ -1793,6 +1836,73 @@ export function LandingPage({
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.3; }
+        }
+        .cyber-dotted-link {
+          background: none;
+          border: none;
+          color: #9AA29B;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          border-bottom: 2px dotted rgba(0, 240, 255, 0.45);
+          padding-bottom: 2px;
+          font-family: inherit;
+          text-transform: uppercase;
+        }
+        .cyber-dotted-link:hover {
+          color: #00f0ff;
+          border-bottom: 2px solid #00f0ff;
+          text-shadow: 0 0 8px rgba(0, 240, 255, 0.65);
+        }
+        .coffee-btn {
+          position: fixed;
+          bottom: 72px;
+          left: 24px;
+          z-index: 6;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(0, 240, 255, 0.06);
+          border: 1.5px solid rgba(0, 240, 255, 0.35);
+          color: #00f0ff;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11px;
+          font-weight: 700;
+          letter-spacing: 0.08em;
+          padding: 8px 14px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          box-shadow: 0 0 10px rgba(0, 240, 255, 0.05);
+        }
+        .coffee-btn:hover {
+          background: #00f0ff;
+          color: #02080a;
+          border-color: #00f0ff;
+          box-shadow: 0 0 18px rgba(0, 240, 255, 0.35);
+        }
+        .bug-btn {
+          position: fixed;
+          bottom: 22px;
+          left: 24px;
+          z-index: 6;
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          background: rgba(238, 243, 238, 0.04);
+          border: 1px solid rgba(0, 240, 255, 0.16);
+          color: #9AA29B;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 11px;
+          letter-spacing: 0.03em;
+          padding: 8px 14px 8px 12px;
+          border-radius: 20px;
+          cursor: pointer;
+          transition: all 0.25s ease;
+        }
+        .bug-btn:hover {
+          color: #00f0ff;
+          border-color: #00f0ff;
+          box-shadow: 0 0 12px rgba(0, 240, 255, 0.15);
         }
       `}</style>
     </div>
