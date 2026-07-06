@@ -70,6 +70,11 @@ function startRoomTimer(room: RoomState, io: SocketIOServer) {
     }
   }
 
+  if (room.settings.timerAction === "manual") {
+    // Manual end: do not schedule server timeout that auto-expires the turn.
+    return;
+  }
+
   const timeoutId = setTimeout(() => {
     handleServerTimerExpiry(room.roomCode, io);
   }, limit * 1000);
@@ -1109,8 +1114,40 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
       } else {
         const isOpponent = player.team !== room.turnState.activeTeam;
         if (isOpponent) {
-          socket.emit("error_msg", "Only active Operatives on the playing team can end the turn.");
-          return;
+          // Calculate phase time limit to verify if timer is indeed up
+          let limit = 90;
+          if (room.settings.timerMode && room.settings.timerMode !== "off") {
+            let spyTime = 90;
+            let opTime = 60;
+            let extraTime = 60;
+            const mode = room.settings.timerMode;
+            if (mode === "fast") {
+              spyTime = 90;
+              opTime = 60;
+              extraTime = 60;
+            } else if (mode === "long") {
+              spyTime = 180;
+              opTime = 120;
+              extraTime = 120;
+            } else if (mode === "custom") {
+              spyTime = room.settings.spymasterTimerSeconds !== undefined ? room.settings.spymasterTimerSeconds : 90;
+              extraTime = room.settings.firstClueExtraSeconds !== undefined ? room.settings.firstClueExtraSeconds : 60;
+              opTime = room.settings.operativeTimerSeconds !== undefined ? room.settings.operativeTimerSeconds : 60;
+            }
+            limit = room.turnState.phase === "giving_clue" ? spyTime : opTime;
+            if (room.turnState.phase === "giving_clue" && room.turnState.turnNumber === 1) {
+              limit += extraTime;
+            }
+          }
+          const elapsed = (Date.now() - room.turnState.phaseStartedAt) / 1000;
+          const isTimeUp = elapsed >= limit;
+
+          if (isManualTimer && isTimeUp) {
+            // Allowed: Opponent ending turn because team's time is up!
+          } else {
+            socket.emit("error_msg", "Only active Operatives on the playing team can end the turn.");
+            return;
+          }
         } else {
           const isSpymasterAutoEnd = player.role === "spymaster" && room.turnState.phase === "giving_clue" && !isManualTimer;
           const isOperativeGuessEnd = player.role === "operative" && room.turnState.phase === "guessing";

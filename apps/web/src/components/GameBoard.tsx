@@ -2963,6 +2963,39 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           {timerCount}s
                         </span>
                       </span>
+                      {timerCount <= 0 && localPlayer && localPlayer.team !== room.turnState?.activeTeam && room.settings.timerAction === "manual" && (
+                        <button
+                          onClick={() => {
+                            if (socket) {
+                              socket.emit("end_turn", { roomCode: room.roomCode, playerId });
+                            }
+                          }}
+                          style={{
+                            background: "hsl(355, 85%, 58%)",
+                            border: "none",
+                            borderRadius: "var(--radius-sm)",
+                            color: "#fff",
+                            fontFamily: "var(--font-display)",
+                            fontWeight: 700,
+                            fontSize: "0.8rem",
+                            padding: "6px 12px",
+                            cursor: "pointer",
+                            boxShadow: "0 0 10px rgba(239, 68, 68, 0.4)",
+                            transition: "all 0.15s ease",
+                            marginLeft: "8px",
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background = "hsl(355, 90%, 65%)";
+                            e.currentTarget.style.transform = "scale(1.05)";
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = "hsl(355, 85%, 58%)";
+                            e.currentTarget.style.transform = "none";
+                          }}
+                        >
+                          CLAIM OPPONENT TURN
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -3053,6 +3086,39 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           {timerCount}s
                         </span>
                       </span>
+                      {timerCount <= 0 && localPlayer && localPlayer.team !== room.turnState?.activeTeam && room.settings.timerAction === "manual" && (
+                        <button
+                          onClick={() => {
+                            if (socket) {
+                              socket.emit("end_turn", { roomCode: room.roomCode, playerId });
+                            }
+                          }}
+                          style={{
+                            background: "hsl(355, 85%, 58%)",
+                            border: "none",
+                            borderRadius: "var(--radius-sm)",
+                            color: "#fff",
+                            fontFamily: "var(--font-display)",
+                            fontWeight: 700,
+                            fontSize: "0.8rem",
+                            padding: "6px 12px",
+                            cursor: "pointer",
+                            boxShadow: "0 0 10px rgba(239, 68, 68, 0.4)",
+                            transition: "all 0.15s ease",
+                            marginLeft: "8px",
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background = "hsl(355, 90%, 65%)";
+                            e.currentTarget.style.transform = "scale(1.05)";
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = "hsl(355, 85%, 58%)";
+                            e.currentTarget.style.transform = "none";
+                          }}
+                        >
+                          CLAIM OPPONENT TURN
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
