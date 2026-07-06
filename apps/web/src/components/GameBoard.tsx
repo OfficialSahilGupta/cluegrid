@@ -2037,140 +2037,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const renderGameplayLayout = () => {
     return (
       <>
-        
-        {/* Left Side: Game Board & Action forms */}
-        <div className="game-main-col" style={{ flex: "3 1 650px", display: "flex", flexDirection: "column", gap: "24px" }}>
-          {/* Lobby Preset Forms */}
-          {room.phase === "lobby" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              {/* Game Settings Card */}
-              {renderSettingsCard()}
+        {/* Room Players card rendered at the top, above Turn Banner */}
+        {room.phase !== "lobby" && (
+          <div style={{ width: "100%", boxSizing: "border-box" }}>
+            {renderGroupedPlayersCard()}
+          </div>
+        )}
 
-              {/* Room Players Card */}
-              {renderGroupedPlayersCard()}
-
-
-
-              {/* Lobby Actions */}
-              <div
-                style={{
-                  background: "var(--color-surface)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "20px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "12px",
-                }}
-              >
-                {localPlayer?.team && !room.settings.roomLocked && (
-                  <button
-                    onClick={() => handleJoinTeamRole(null, null)}
-                    style={{
-                      padding: "12px 20px",
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--bg-surface-raised)",
-                      border: "1px solid var(--border-default)",
-                      color: "var(--text-primary)",
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    Spectate
-                  </button>
-                )}
-
-                {isHost ? (
-                  <button
-                    onClick={handleStartGame}
-                    style={{
-                      padding: "12px 32px",
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--accent)",
-                      color: "var(--accent-text-on)",
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 700,
-                      fontSize: "1.05rem",
-                      cursor: "pointer",
-                      border: "none",
-                      boxShadow: "0 4px 16px rgba(232, 163, 61, 0.2)",
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = "var(--accent-hover)";
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = "var(--accent)";
-                    }}
-                  >
-                    Start Game
-                  </button>
-                ) : (
-                  <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", alignSelf: "center" }}>
-                    Waiting for Host to start the game...
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Active Game Layout */}
-          {(room.phase === "playing" || room.phase === "ended") && (
-            <div
-              id="game-board-container"
-              className={cameraWarpActive ? "camera-warp-active" : ""}
-              style={{ display: "flex", flexDirection: "column", gap: "24px", position: "relative" }}
-            >
-              {/* #10 Turn Handoff Torch Wipe */}
-              {handoffWipe && createPortal(
-                <div
-                  className="turn-handoff-overlay"
-                  style={{
-                    position: "fixed", inset: 0, zIndex: 200, pointerEvents: "none",
-                    background: `linear-gradient(105deg, ${handoffWipe.from} 0%, ${handoffWipe.to} 100%)`,
-                  }}
-                />,
-                document.body
-              )}
-              {/* Particle Canvas Background */}
-              <canvas ref={particleCanvasRef} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 1 }} />
-              {/* Neural Streams Overlay SVG */}
-              {neuralStreams.length > 0 && (
-                <svg
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    pointerEvents: "none",
-                    zIndex: 50,
-                  }}
-                >
-                  {neuralStreams.map((stream, idx) => (
-                    <path
-                      key={idx}
-                      d={`M ${stream.start.x} ${stream.start.y} Q ${(stream.start.x + stream.end.x)/2} ${(stream.start.y + stream.end.y)/2 - 50}, ${stream.end.x} ${stream.end.y}`}
-                      fill="none"
-                      stroke={room.turnState ? typeColors[room.turnState.activeTeam]?.light || "var(--accent)" : "var(--accent)"}
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      className="beam-line"
-                    />
-                  ))}
-                </svg>
-              )}
-              {/* #6 Radar Ping ring */}
-              {showRadarPing && (
-                <div
-                  className="radar-ring"
-                  style={{
-                    top: "50%", left: "50%", width: "80px", height: "80px",
-                    marginTop: "-40px", marginLeft: "-40px",
-                    border: `2px solid ${room.turnState ? typeColors[room.turnState.activeTeam]?.light ?? "var(--accent)" : "var(--accent)"}`,
-                  }}
-                />
-              )}
               {/* Turn Banner */}
               <div
                 id="clue-display-panel"
@@ -2186,89 +2059,294 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   gap: "16px",
                   position: "relative",
                   zIndex: 2,
+                  width: "100%",
+                  boxSizing: "border-box",
                 }}
               >
-                {room.phase === "playing" && room.turnState ? (
-                  <div style={{ textAlign: "left" }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        padding: "4px 10px",
-                        borderRadius: "4px",
-                        fontSize: "0.8rem",
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        backgroundColor: typeColors[room.turnState.activeTeam]!.border,
-                        color: "#fff",
-                        marginBottom: "8px",
-                      }}
-                    >
-                      {`${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team's Turn`}
-                    </span>
-                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, margin: 0 }}>
-                      {room.turnState.phase === "giving_clue" ? (
-                        room.gameMode === "coop"
-                          ? `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team is giving a clue to the other team...`
-                          : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Spymaster is giving clue...`
-                      ) : (
-                        <>
-                          Clue:{" "}
-                          <span style={{
-                            color: typeColors[room.turnState.activeTeam]!.light,
-                            fontWeight: 800,
-                            textTransform: "uppercase",
-                            fontSize: "1.8rem",
-                            letterSpacing: "1px",
-                            textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
-                          }}>
-                            {typewriterText || room.turnState.clueWord || "[Secret Clue]"}
-                            {typewriterCursor && <span className="clue-cursor" />}
-                          </span>{" "}
-                          · Count:{" "}
-                          <span style={{
-                            color: typeColors[room.turnState.activeTeam]!.light,
-                            fontWeight: 800,
-                            fontSize: "1.8rem",
-                            textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
-                          }}>
-                            {room.turnState.clueCount !== null
-                              ? room.turnState.clueCount === -1
-                                ? "∞"
-                                : room.turnState.clueCount
-                              : "[Secret]"}
-                          </span>
-                        </>
+                
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "left", flex: 1, minWidth: "280px" }}>
+                  {room.phase === "playing" && room.turnState ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          padding: "4px 10px",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          backgroundColor: typeColors[room.turnState.activeTeam]!.border,
+                          color: "#fff",
+                        }}
+                      >
+                        {`${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team's Turn`}
+                      </span>
+                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, margin: 0 }}>
+                        {room.turnState.phase === "giving_clue" ? (
+                          room.gameMode === "coop"
+                            ? `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team is giving a clue to the other team...`
+                            : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Spymaster is giving clue...`
+                        ) : (
+                          <>
+                            Clue:{" "}
+                            <span style={{
+                              color: typeColors[room.turnState.activeTeam]!.light,
+                              fontWeight: 800,
+                              textTransform: "uppercase",
+                              fontSize: "1.8rem",
+                              letterSpacing: "1px",
+                              textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
+                            }}>
+                              {typewriterText || room.turnState.clueWord || "[Secret Clue]"}
+                              {typewriterCursor && <span className="clue-cursor" />}
+                            </span>{" "}
+                            · Count:{" "}
+                            <span style={{
+                              color: typeColors[room.turnState.activeTeam]!.light,
+                              fontWeight: 800,
+                              fontSize: "1.8rem",
+                              textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
+                            }}>
+                              {room.turnState.clueCount !== null
+                                ? room.turnState.clueCount === -1
+                                  ? "∞"
+                                  : room.turnState.clueCount
+                                : "[Secret]"}
+                            </span>
+                          </>
+                        )}
+                      </h3>
+                      {room.turnState.phase === "guessing" && (
+                        <p style={{ margin: "4px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.9rem" }}>
+                          Guesses used: {room.turnState.guessesUsed} / {room.turnState.guessesAllowed === Infinity ? "Unlimited" : room.turnState.guessesAllowed}
+                        </p>
                       )}
-                    </h3>
-                    {room.turnState.phase === "guessing" && (
-                      <p style={{ margin: "4px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.9rem" }}>
-                        Guesses used: {room.turnState.guessesUsed} / {room.turnState.guessesAllowed === Infinity ? "Unlimited" : room.turnState.guessesAllowed}
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div style={{ textAlign: "left" }}>
-                    <span
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+                      <span
+                        style={{
+                          display: "inline-block",
+                          padding: "4px 10px",
+                          borderRadius: "4px",
+                          fontSize: "0.8rem",
+                          fontWeight: 700,
+                          textTransform: "uppercase",
+                          backgroundColor: room.winner ? typeColors[room.winner]!.border : "var(--color-text-muted)",
+                          color: "#fff",
+                        }}
+                      >
+                        Game Over
+                      </span>
+                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 700, margin: 0 }}>
+                        {room.winner ? `${formatTeamName(room.winner)} Team Wins!` : `No one wins!`}
+                      </h3>
+                    </div>
+                  )}
+
+                  
+                    {/* Integrated Scores & Timer Row */}
+                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", marginTop: "8px", width: "100%" }}>
+                      {/* Cards remaining badges */}
+              {room.gameMode === "coop" ? (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "16px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {/* Co-op Cards Remaining */}
+                  <div
+                    style={{
+                      background: "var(--color-surface)",
+                      border: "2px solid hsl(0,85%,62%)",
+                      padding: "6px 12px",
+                      borderRadius: "var(--radius-md)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
+                    <div
                       style={{
-                        display: "inline-block",
-                        padding: "4px 10px",
-                        borderRadius: "4px",
-                        fontSize: "0.8rem",
-                        fontWeight: 700,
-                        textTransform: "uppercase",
-                        backgroundColor: room.winner ? typeColors[room.winner]!.border : "var(--color-text-muted)",
-                        color: "#fff",
-                        marginBottom: "8px",
+                        width: "12px",
+                        height: "12px",
+                        borderRadius: "50%",
+                        background: "hsl(0,85%,62%)",
+                      }}
+                    />
+                    <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
+                      Co-op Agents Remaining: {room.teams.red?.cardsRemaining} / {room.teams.red?.totalCards}
+                    </span>
+                  </div>
+
+                  {/* Co-op Turn Tokens Board */}
+                  <div
+                    style={{
+                      background: "var(--color-surface)",
+                      border: "2px solid hsl(355, 80%, 48%)",
+                      padding: "6px 12px",
+                      borderRadius: "var(--radius-md)",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
+                    <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
+                      Mistake / Turn Tokens Used: {room.coopMistakesMade} / {room.coopMistakesAllowed}
+                    </span>
+                    <div style={{ display: "flex", gap: "4px" }}>
+                      {Array.from({ length: room.coopMistakesAllowed || 9 }).map((_, i) => {
+                        const used = i < room.coopMistakesMade;
+                        return (
+                          <div
+                            key={i}
+                            style={{
+                              width: "10px",
+                              height: "10px",
+                              borderRadius: "50%",
+                              background: used ? "hsl(355, 80%, 48%)" : "hsl(142, 70%, 42%)",
+                              opacity: used ? 0.4 : 1,
+                              boxShadow: used ? "none" : "0 0 8px hsl(142, 70%, 50%)",
+                            }}
+                            title={used ? "Token used" : "Token available"}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Turn Timer Countdown — only show when timer is active */}
+                  {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
+                    <div
+                      className={
+                        timerCount <= 5  ? "timer-danger-fast"
+                        : timerCount <= 10 ? "timer-danger-medium"
+                        : timerCount <= 20 ? "timer-danger-slow"
+                        : ""
+                      }
+                      style={{
+                        background: "var(--color-surface)",
+                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
+                        padding: "6px 12px",
+                        borderRadius: "var(--radius-md)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        transition: "border-color 0.5s ease",
                       }}
                     >
-                      Game Over
-                    </span>
-                    <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 700, margin: 0 }}>
-                      {room.winner ? `${formatTeamName(room.winner)} Team Wins!` : `No one wins!`}
-                    </h3>
-                  </div>
-                )}
+                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
+                        {t("turn.timerLabel")}:{" "}
+                        <span style={{
+                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
+                          fontVariantNumeric: "tabular-nums",
+                          minWidth: "2.5ch",
+                          display: "inline-block",
+                          transition: "color 0.4s ease",
+                        }}>
+                          {timerCount}s
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "16px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {/* #8 Liquid Score Fill */}
+                  {activeTeams.map((team) => {
+                    const state = room.teams[team];
+                    const config = typeColors[team]!;
+                    if (!state) return null;
+                    const fillPct = state.totalCards > 0 ? (state.cardsRemaining / state.totalCards) * 100 : 0;
 
+                    return (
+                      <div
+                        key={team}
+                        style={{
+                          background: state.eliminated ? "rgba(0,0,0,0.4)" : "var(--color-surface)",
+                          border: `2px solid ${state.eliminated ? "rgba(255,255,255,0.05)" : config.border}`,
+                          padding: "6px 12px",
+                          borderRadius: "var(--radius-md)",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                          opacity: state.eliminated ? 0.5 : 1,
+                          minWidth: "140px",
+                        }}
+                      >
+                        <div style={{ position: "relative", width: "10px", height: "28px", borderRadius: "5px", background: "rgba(255,255,255,0.08)", overflow: "hidden", flexShrink: 0 }}>
+                          <div
+                            className="score-liquid-fill"
+                            style={{
+                              position: "absolute", bottom: 0, left: 0, right: 0,
+                              height: `${fillPct}%`,
+                              background: `linear-gradient(to top, ${config.border}, ${config.light})`,
+                              borderRadius: "5px",
+                            }}
+                          />
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+                          <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.06em", color: config.light }}>
+                            {formatTeamName(team)}
+                          </span>
+                          <span style={{ fontWeight: 800, fontFamily: "var(--font-display)", fontSize: "1.1rem", color: state.eliminated ? "var(--color-text-muted)" : "var(--text-primary)", lineHeight: 1 }}>
+                            {state.cardsRemaining}
+                            <span style={{ fontWeight: 400, fontSize: "0.75rem", color: "var(--text-secondary)", marginLeft: "3px" }}>/ {state.totalCards}</span>
+                          </span>
+                          {state.eliminated && <span style={{ fontSize: "0.6rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Eliminated</span>}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {/* Turn Timer Countdown — only show when timer is active */}
+                  {room.phase === "playing" && (room.settings.timerMode && room.settings.timerMode !== "off") && (
+                    <div
+                      className={
+                        timerCount <= 5  ? "timer-danger-fast"
+                        : timerCount <= 10 ? "timer-danger-medium"
+                        : timerCount <= 20 ? "timer-danger-slow"
+                        : ""
+                      }
+                      style={{
+                        background: "var(--color-surface)",
+                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
+                        padding: "6px 12px",
+                        borderRadius: "var(--radius-md)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        transition: "border-color 0.5s ease",
+                      }}
+                    >
+                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
+                        {t("turn.timerLabel")}:{" "}
+                        <span style={{
+                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
+                          fontVariantNumeric: "tabular-nums",
+                          minWidth: "2.5ch",
+                          display: "inline-block",
+                          transition: "color 0.4s ease",
+                        }}>
+                          {timerCount}s
+                        </span>
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+                    </div>
+
+                </div>
                 <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
                   {room.phase === "playing" && room.turnState && (
                     <>
@@ -2406,203 +2484,143 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 </div>
               </div>
 
-              {/* Cards remaining badges */}
-              {room.gameMode === "coop" ? (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "16px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {/* Co-op Cards Remaining */}
-                  <div
+        
+        {/* Left Side: Game Board & Action forms */}
+        <div className="game-main-col" style={{ flex: "3 1 650px", display: "flex", flexDirection: "column", gap: "24px" }}>
+          {/* Lobby Preset Forms */}
+          {room.phase === "lobby" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+              {/* Game Settings Card */}
+              {renderSettingsCard()}
+
+              {/* Room Players Card */}
+              {renderGroupedPlayersCard()}
+
+
+
+              {/* Lobby Actions */}
+              <div
+                style={{
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-md)",
+                  padding: "20px",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "12px",
+                }}
+              >
+                {localPlayer?.team && !room.settings.roomLocked && (
+                  <button
+                    onClick={() => handleJoinTeamRole(null, null)}
                     style={{
-                      background: "var(--color-surface)",
-                      border: "2px solid hsl(0,85%,62%)",
-                      padding: "12px 24px",
+                      padding: "12px 20px",
                       borderRadius: "var(--radius-md)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
+                      background: "var(--bg-surface-raised)",
+                      border: "1px solid var(--border-default)",
+                      color: "var(--text-primary)",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 600,
+                      cursor: "pointer",
                     }}
                   >
-                    <div
-                      style={{
-                        width: "12px",
-                        height: "12px",
-                        borderRadius: "50%",
-                        background: "hsl(0,85%,62%)",
-                      }}
-                    />
-                    <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
-                      Co-op Agents Remaining: {room.teams.red?.cardsRemaining} / {room.teams.red?.totalCards}
-                    </span>
-                  </div>
+                    Spectate
+                  </button>
+                )}
 
-                  {/* Co-op Turn Tokens Board */}
-                  <div
+                {isHost ? (
+                  <button
+                    onClick={handleStartGame}
                     style={{
-                      background: "var(--color-surface)",
-                      border: "2px solid hsl(355, 80%, 48%)",
-                      padding: "12px 24px",
+                      padding: "12px 32px",
                       borderRadius: "var(--radius-md)",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
+                      background: "var(--accent)",
+                      color: "var(--accent-text-on)",
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 700,
+                      fontSize: "1.05rem",
+                      cursor: "pointer",
+                      border: "none",
+                      boxShadow: "0 4px 16px rgba(232, 163, 61, 0.2)",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.background = "var(--accent-hover)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.background = "var(--accent)";
                     }}
                   >
-                    <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
-                      Mistake / Turn Tokens Used: {room.coopMistakesMade} / {room.coopMistakesAllowed}
-                    </span>
-                    <div style={{ display: "flex", gap: "4px" }}>
-                      {Array.from({ length: room.coopMistakesAllowed || 9 }).map((_, i) => {
-                        const used = i < room.coopMistakesMade;
-                        return (
-                          <div
-                            key={i}
-                            style={{
-                              width: "10px",
-                              height: "10px",
-                              borderRadius: "50%",
-                              background: used ? "hsl(355, 80%, 48%)" : "hsl(142, 70%, 42%)",
-                              opacity: used ? 0.4 : 1,
-                              boxShadow: used ? "none" : "0 0 8px hsl(142, 70%, 50%)",
-                            }}
-                            title={used ? "Token used" : "Token available"}
-                          />
-                        );
-                      })}
-                    </div>
+                    Start Game
+                  </button>
+                ) : (
+                  <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", alignSelf: "center" }}>
+                    Waiting for Host to start the game...
                   </div>
+                )}
+              </div>
+            </div>
+          )}
 
-                  {/* Turn Timer Countdown — only show when timer is active */}
-                  {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
-                    <div
-                      className={
-                        timerCount <= 5  ? "timer-danger-fast"
-                        : timerCount <= 10 ? "timer-danger-medium"
-                        : timerCount <= 20 ? "timer-danger-slow"
-                        : ""
-                      }
-                      style={{
-                        background: "var(--color-surface)",
-                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
-                        padding: "12px 24px",
-                        borderRadius: "var(--radius-md)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        transition: "border-color 0.5s ease",
-                      }}
-                    >
-                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
-                        {t("turn.timerLabel")}:{" "}
-                        <span style={{
-                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
-                          fontVariantNumeric: "tabular-nums",
-                          minWidth: "2.5ch",
-                          display: "inline-block",
-                          transition: "color 0.4s ease",
-                        }}>
-                          {timerCount}s
-                        </span>
-                      </span>
-                    </div>
-                  )}
-                </div>
-              ) : (
+          {/* Active Game Layout */}
+          {(room.phase === "playing" || room.phase === "ended") && (
+            <div
+              id="game-board-container"
+              className={cameraWarpActive ? "camera-warp-active" : ""}
+              style={{ display: "flex", flexDirection: "column", gap: "24px", position: "relative" }}
+            >
+              {/* #10 Turn Handoff Torch Wipe */}
+              {handoffWipe && createPortal(
                 <div
+                  className="turn-handoff-overlay"
                   style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "16px",
-                    flexWrap: "wrap",
+                    position: "fixed", inset: 0, zIndex: 200, pointerEvents: "none",
+                    background: `linear-gradient(105deg, ${handoffWipe.from} 0%, ${handoffWipe.to} 100%)`,
                   }}
-                >
-                  {/* #8 Liquid Score Fill */}
-                  {activeTeams.map((team) => {
-                    const state = room.teams[team];
-                    const config = typeColors[team]!;
-                    if (!state) return null;
-                    const fillPct = state.totalCards > 0 ? (state.cardsRemaining / state.totalCards) * 100 : 0;
-
-                    return (
-                      <div
-                        key={team}
-                        style={{
-                          background: state.eliminated ? "rgba(0,0,0,0.4)" : "var(--color-surface)",
-                          border: `2px solid ${state.eliminated ? "rgba(255,255,255,0.05)" : config.border}`,
-                          padding: "12px 20px",
-                          borderRadius: "var(--radius-md)",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "12px",
-                          opacity: state.eliminated ? 0.5 : 1,
-                          minWidth: "140px",
-                        }}
-                      >
-                        <div style={{ position: "relative", width: "10px", height: "44px", borderRadius: "5px", background: "rgba(255,255,255,0.08)", overflow: "hidden", flexShrink: 0 }}>
-                          <div
-                            className="score-liquid-fill"
-                            style={{
-                              position: "absolute", bottom: 0, left: 0, right: 0,
-                              height: `${fillPct}%`,
-                              background: `linear-gradient(to top, ${config.border}, ${config.light})`,
-                              borderRadius: "5px",
-                            }}
-                          />
-                        </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                          <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.06em", color: config.light }}>
-                            {formatTeamName(team)}
-                          </span>
-                          <span style={{ fontWeight: 800, fontFamily: "var(--font-display)", fontSize: "1.3rem", color: state.eliminated ? "var(--color-text-muted)" : "var(--text-primary)", lineHeight: 1 }}>
-                            {state.cardsRemaining}
-                            <span style={{ fontWeight: 400, fontSize: "0.75rem", color: "var(--text-secondary)", marginLeft: "3px" }}>/ {state.totalCards}</span>
-                          </span>
-                          {state.eliminated && <span style={{ fontSize: "0.6rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Eliminated</span>}
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {/* Turn Timer Countdown — only show when timer is active */}
-                  {room.phase === "playing" && (room.settings.timerMode && room.settings.timerMode !== "off") && (
-                    <div
-                      className={
-                        timerCount <= 5  ? "timer-danger-fast"
-                        : timerCount <= 10 ? "timer-danger-medium"
-                        : timerCount <= 20 ? "timer-danger-slow"
-                        : ""
-                      }
-                      style={{
-                        background: "var(--color-surface)",
-                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
-                        padding: "12px 24px",
-                        borderRadius: "var(--radius-md)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        transition: "border-color 0.5s ease",
-                      }}
-                    >
-                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
-                        {t("turn.timerLabel")}:{" "}
-                        <span style={{
-                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
-                          fontVariantNumeric: "tabular-nums",
-                          minWidth: "2.5ch",
-                          display: "inline-block",
-                          transition: "color 0.4s ease",
-                        }}>
-                          {timerCount}s
-                        </span>
-                      </span>
-                    </div>
-                  )}
-                </div>
+                />,
+                document.body
               )}
+              {/* Particle Canvas Background */}
+              <canvas ref={particleCanvasRef} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 1 }} />
+              {/* Neural Streams Overlay SVG */}
+              {neuralStreams.length > 0 && (
+                <svg
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    pointerEvents: "none",
+                    zIndex: 50,
+                  }}
+                >
+                  {neuralStreams.map((stream, idx) => (
+                    <path
+                      key={idx}
+                      d={`M ${stream.start.x} ${stream.start.y} Q ${(stream.start.x + stream.end.x)/2} ${(stream.start.y + stream.end.y)/2 - 50}, ${stream.end.x} ${stream.end.y}`}
+                      fill="none"
+                      stroke={room.turnState ? typeColors[room.turnState.activeTeam]?.light || "var(--accent)" : "var(--accent)"}
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      className="beam-line"
+                    />
+                  ))}
+                </svg>
+              )}
+              {/* #6 Radar Ping ring */}
+              {showRadarPing && (
+                <div
+                  className="radar-ring"
+                  style={{
+                    top: "50%", left: "50%", width: "80px", height: "80px",
+                    marginTop: "-40px", marginLeft: "-40px",
+                    border: `2px solid ${room.turnState ? typeColors[room.turnState.activeTeam]?.light ?? "var(--accent)" : "var(--accent)"}`,
+                  }}
+                />
+              )}
+
+
+
 
               {/* Spymaster reaction bar */}
               {room.phase === "playing" && localPlayer?.role === "spymaster" && (
@@ -3713,8 +3731,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             </div>
           )}
 
-          {/* In lobby both are in the main column; in play phase show Room Players in sidebar */}
-          {room.phase !== "lobby" && renderGroupedPlayersCard()}
+          {/* Room Players card moved to the top of the gameplay area */}
 
 
         </div>
