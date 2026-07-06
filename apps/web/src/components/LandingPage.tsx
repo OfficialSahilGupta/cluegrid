@@ -10,6 +10,7 @@ interface LandingPageProps {
   handleCreateRoom: (options: { teamCount: number; gameMode: "classic" | "coop"; language: string }) => void;
   loading: boolean;
   children?: React.ReactNode;
+  isActiveRoom?: boolean;
 }
 
 export function LandingPage({
@@ -19,11 +20,16 @@ export function LandingPage({
   handleCreateRoom,
   loading,
   children,
+  isActiveRoom = false,
 }: LandingPageProps) {
   const { t } = useTranslation();
   const mountRef = useRef<HTMLDivElement>(null);
   const leftCanvasRef = useRef<HTMLCanvasElement>(null);
   const rightCanvasRef = useRef<HTMLCanvasElement>(null);
+  const isActiveRoomRef = useRef(isActiveRoom);
+  useEffect(() => {
+    isActiveRoomRef.current = isActiveRoom;
+  }, [isActiveRoom]);
 
   // States
   const [isPlayingBriefing, setIsPlayingBriefing] = useState(false); // Controlled by intro timeline
@@ -1128,10 +1134,16 @@ export function LandingPage({
 
       // Dynamic materialization entrance (voxelization, scanning sweep, opacity shimmer)
       if (materializeProgress < 1.0) {
-        materializeProgress = Math.min(1.0, materializeProgress + 0.007);
+        let step = 0.007;
+        if (isActiveRoomRef.current) {
+          step = allOps.every(op => op.userData.img) ? 1.0 : 0.0;
+        }
+        materializeProgress = Math.min(1.0, materializeProgress + step);
         if (!soundPlayedRef.current && allOps.some(op => op.userData.img)) {
           soundPlayedRef.current = true;
-          playMaterializeSound();
+          if (!isActiveRoomRef.current) {
+            playMaterializeSound();
+          }
         }
         
         // Easing factor: easeOutCubic
@@ -1254,7 +1266,9 @@ export function LandingPage({
         // Trigger briefing typing
         if (!briefingStarted) {
           briefingStarted = true;
-          setIsPlayingBriefing(true);
+          if (!isActiveRoomRef.current) {
+            setIsPlayingBriefing(true);
+          }
         }
       }
 
@@ -1263,7 +1277,7 @@ export function LandingPage({
       projRing2.rotation.y = -t * 0.6;
       platform.rotation.z = -t * 0.12;
 
-      emitterBeam.material.opacity = 0.08 + Math.abs(Math.sin(t * 4.5)) * 0.08;
+      emitterBeam.material.opacity = isActiveRoomRef.current ? 0.14 : (0.08 + Math.abs(Math.sin(t * 4.5)) * 0.08);
 
       particles.rotation.y = t * 0.01;
 
@@ -1416,7 +1430,7 @@ export function LandingPage({
   };
 
   return (
-    <div style={{ width: "100%", height: "100%", position: "fixed", inset: 0, zIndex: 1000, overflow: "hidden", color: "#eef3ee", fontFamily: "'JetBrains Mono', monospace", background: "#081619" }}>
+    <div style={{ width: "100%", height: "100%", position: "fixed", inset: 0, zIndex: isActiveRoom ? 1 : 1000, overflow: "hidden", color: "#eef3ee", fontFamily: "'JetBrains Mono', monospace", background: "#081619" }}>
       {/* Background Vignette & scanlines (zIndex 2) */}
       <div className="vignette" style={{
         position: "fixed", inset: 0, zIndex: 2, pointerEvents: "none",
@@ -1428,8 +1442,13 @@ export function LandingPage({
         backgroundImage: `repeating-linear-gradient(to bottom, rgba(178,239,155,0.035) 0px, rgba(178,239,155,0.035) 1px, transparent 1px, transparent 3px)`
       }} />
 
-      {/* Left Column Advanced Decryption Center Panel (zIndex 5) */}
-      <div style={{ position: "fixed", top: "110px", left: "24px", zIndex: 5, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
+      {/* 3D WebGL Canvas container (always visible) */}
+      <div ref={mountRef} style={{ position: "fixed", inset: 0, zIndex: 3, pointerEvents: "none" }} />
+
+      {!isActiveRoom && (
+        <>
+          {/* Left Column Advanced Decryption Center Panel (zIndex 5) */}
+          <div style={{ position: "fixed", top: "110px", left: "24px", zIndex: 5, width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#1b9aaa", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", justifyContent: "space-between" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
@@ -1489,14 +1508,11 @@ export function LandingPage({
         </div>
       </div>
 
-      {/* 3D WebGL Canvas container (zIndex 3 - fully visible but placed behind overlay HUD panels!) */}
-      <div ref={mountRef} style={{ position: "fixed", inset: 0, zIndex: 3, pointerEvents: "none" }} />
-
-      {/* HUD Corners (zIndex 5) */}
-      <div className="hud-corner tl" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderTop: "2px solid rgba(178,239,155,0.4)", borderLeft: "2px solid rgba(178,239,155,0.4)", top: "14px", left: "14px" }}></div>
-      <div className="hud-corner tr" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderTop: "2px solid rgba(239,149,156,0.4)", borderRight: "2px solid rgba(239,149,156,0.4)", top: "14px", right: "14px" }}></div>
-      <div className="hud-corner bl" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(239,149,156,0.4)", borderLeft: "2px solid rgba(239,149,156,0.4)", bottom: "14px", left: "14px" }}></div>
-      <div className="hud-corner br" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(178,239,155,0.4)", borderRight: "2px solid rgba(178,239,155,0.4)", bottom: "14px", right: "14px" }}></div>
+          {/* HUD Corners (zIndex 5) */}
+          <div className="hud-corner tl" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderTop: "2px solid rgba(178,239,155,0.4)", borderLeft: "2px solid rgba(178,239,155,0.4)", top: "14px", left: "14px" }}></div>
+          <div className="hud-corner tr" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderTop: "2px solid rgba(239,149,156,0.4)", borderRight: "2px solid rgba(239,149,156,0.4)", top: "14px", right: "14px" }}></div>
+          <div className="hud-corner bl" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(239,149,156,0.4)", borderLeft: "2px solid rgba(239,149,156,0.4)", bottom: "14px", left: "14px" }}></div>
+          <div className="hud-corner br" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(178,239,155,0.4)", borderRight: "2px solid rgba(178,239,155,0.4)", bottom: "14px", right: "14px" }}></div>
 
       {/* Top Header Logo (zIndex 6) */}
       <div className="wordmark" style={{ position: "fixed", top: "24px", left: "24px", zIndex: 6, display: "flex", flexDirection: "column", gap: "6px" }}>
@@ -1821,6 +1837,8 @@ export function LandingPage({
           )}
         </div>
       )}
+    </>
+  )}
 
       {/* Embedded CSS */}
       <style>{`
