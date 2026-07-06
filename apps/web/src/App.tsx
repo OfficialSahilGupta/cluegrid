@@ -3,16 +3,15 @@ import { io, Socket } from "socket.io-client";
 import type { RoomState } from "@cluegrid/shared";
 import { GameBoard } from "./components/GameBoard";
 import { useAuth } from "./context/AuthContext";
+import { useTranslation } from "react-i18next";
 import { RulesPage } from "./components/RulesPage";
 import { ChangelogPage } from "./components/ChangelogPage";
 import { AboutPage } from "./components/AboutPage";
 import { ManagementPanel } from "./components/ManagementPanel";
 import { AuthModal } from "./components/AuthModal";
 import { ProfileSettingsModal } from "./components/ProfileSettingsModal";
-import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./components/LanguageSwitcher";
 import { SupportPage } from "./components/SupportPage";
-import { GravityGrid } from "./components/GravityGrid";
 import { FeaturesPage } from "./components/FeaturesPage";
 import { FeedbackRobot } from "./components/FeedbackRobot";
 import { GatedUpsellModal } from "./components/GatedUpsellModal";
@@ -610,8 +609,16 @@ export default function App() {
         .mobile-nav-slide { animation: mobile-slide-down 0.22s cubic-bezier(0.16,1,0.3,1) both; }
       `}</style>
 
-      <GravityGrid lightMode={lightMode} />
-      <GlowOrbs />
+      {/* Background Vignette & scanlines */}
+      <div className="vignette" style={{
+        position: "fixed", inset: 0, zIndex: -1, pointerEvents: "none",
+        background: `radial-gradient(ellipse at center, rgba(0,0,0,0) 42%, rgba(3,10,12,0.75) 100%),
+                     linear-gradient(180deg, rgba(3,10,12,0.55) 0%, rgba(3,10,12,0) 16%, rgba(3,10,12,0) 78%, rgba(3,10,12,0.65) 100%)`
+      }} />
+      <div className="scanline" style={{
+        position: "fixed", inset: 0, zIndex: -1, pointerEvents: "none", opacity: 0.5,
+        backgroundImage: `repeating-linear-gradient(to bottom, rgba(178,239,155,0.035) 0px, rgba(178,239,155,0.035) 1px, transparent 1px, transparent 3px)`
+      }} />
 
       {/* Floating Global Navbar */}
       <header

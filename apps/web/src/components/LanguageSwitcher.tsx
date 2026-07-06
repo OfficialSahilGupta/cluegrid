@@ -41,11 +41,11 @@ export function LanguageSwitcher() {
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "6px",
+          gap: "8px",
           background: "var(--bg-surface-raised)",
           border: "1px solid var(--border-default)",
           borderRadius: "20px",
-          padding: "6px 12px",
+          padding: "6px 14px",
           cursor: "pointer",
           color: "var(--text-primary)",
           fontFamily: "var(--font-display)",
@@ -53,7 +53,7 @@ export function LanguageSwitcher() {
           fontSize: "0.85rem",
         }}
       >
-        <span>{currentLocale.flag}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
         <span>{currentLocale.code.toUpperCase()}</span>
         <span style={{ fontSize: "0.6rem", opacity: 0.7 }}>▼</span>
       </button>
@@ -139,7 +139,7 @@ export function LanguageSwitcher() {
                   }
                 }}
               >
-                <span style={{ fontSize: "1.1rem" }}>{locale.flag}</span>
+                <span style={{ fontSize: "0.8rem", color: "var(--accent)", fontWeight: 700, padding: "2px 6px", background: "rgba(0,240,255,0.06)", border: "1px solid rgba(0,240,255,0.2)", borderRadius: "3px", marginRight: "6px" }}>{locale.code.toUpperCase()}</span>
                 <span>{locale.name}</span>
                 <span
                   style={{

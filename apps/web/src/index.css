@@ -3,66 +3,66 @@
 /* ─── Design Tokens — Redacted Ink ──────────────────────────────────── */
 :root {
   /* Base surfaces */
-  --bg-page: #0E1116;
-  --bg-surface: #161B22;
-  --bg-surface-raised: #1C222B;
-  --border-subtle: rgba(214, 207, 194, 0.15);
-  --border-default: rgba(214, 207, 194, 0.25);
-  --header-bg: rgba(14, 17, 22, 0.92);
+  --bg-page: #081619;
+  --bg-surface: rgba(8, 22, 25, 0.76);
+  --bg-surface-raised: rgba(6, 24, 28, 0.85);
+  --border-subtle: rgba(0, 240, 255, 0.15);
+  --border-default: rgba(0, 240, 255, 0.3);
+  --header-bg: rgba(8, 22, 25, 0.94);
 
   /* Text colors */
-  --text-primary: #D6CFC2;
-  --text-secondary: #9C9486;
-  --text-muted: #6B6458;
+  --text-primary: #eef3ee;
+  --text-secondary: #9AA29B;
+  --text-muted: #636C65;
 
   /* Primary accent */
-  --accent: #E8A33D;
-  --accent-hover: #F2B65C;
-  --accent-text-on: #412402;
-  --accent-bg-subtle: rgba(232, 163, 61, 0.1);
-  --accent-text-on-subtle: #E8A33D;
+  --accent: #00f0ff;
+  --accent-hover: #4bf4ff;
+  --accent-text-on: #040b0d;
+  --accent-bg-subtle: rgba(0, 240, 255, 0.1);
+  --accent-text-on-subtle: #00f0ff;
 
   /* Team colors */
-  --team-1: #C44536;
-  --team-1-bg: #3A2018;
-  --team-1-text: #E08574;
+  --team-1: #ef959c;
+  --team-1-bg: rgba(239, 149, 156, 0.15);
+  --team-1-text: #ef959c;
 
-  --team-2: #2D6E8E;
-  --team-2-bg: #192834;
-  --team-2-text: #7FB8D9;
+  --team-2: #00f0ff;
+  --team-2-bg: rgba(0, 240, 255, 0.15);
+  --team-2-text: #00f0ff;
 
-  --team-3: #7A8C5C;
-  --team-3-bg: #232A1A;
-  --team-3-text: #B5C99A;
+  --team-3: #b2ef9b;
+  --team-3-bg: rgba(178, 239, 155, 0.15);
+  --team-3-text: #b2ef9b;
 
-  --team-4: #B08A3E;
-  --team-4-bg: #2E2412;
-  --team-4-text: #D9B86B;
+  --team-4: #e2a33d;
+  --team-4-bg: rgba(226, 163, 61, 0.15);
+  --team-4-text: #e2a33d;
 
   /* Card states */
-  --card-neutral-bg: #262B22;
-  --card-neutral-border: rgba(214, 207, 194, 0.3);
-  --card-neutral-text: #D6CFC2;
+  --card-neutral-bg: rgba(6, 24, 28, 0.65);
+  --card-neutral-border: rgba(0, 240, 255, 0.25);
+  --card-neutral-text: #eef3ee;
 
-  --card-assassin-bg: #2A1E3A;
-  --card-assassin-border: #6B4FA0;
-  --card-assassin-text: #C9B8E8;
-  --card-assassin-label-text: #9B7FD4;
+  --card-assassin-bg: rgba(239, 149, 156, 0.08);
+  --card-assassin-border: #ef959c;
+  --card-assassin-text: #ef959c;
+  --card-assassin-label-text: #ef959c;
 
   /* Status badges */
-  --status-active-bg: #1A2E25;
-  --status-active-text: #7FD9A8;
-  --status-afk-bg: #3A2A1A;
-  --status-afk-text: #E8A33D;
+  --status-active-bg: rgba(178, 239, 155, 0.15);
+  --status-active-text: #b2ef9b;
+  --status-afk-bg: rgba(226, 163, 61, 0.15);
+  --status-afk-text: #e2a33d;
 
   /* Spymaster-channel chat indicator */
-  --spymaster-channel-bg: #1A2733;
-  --spymaster-channel-text: #7FB8D9;
+  --spymaster-channel-bg: rgba(0, 240, 255, 0.1);
+  --spymaster-channel-text: #00f0ff;
 
   /* Grid lines and Glow orbs */
-  --grid-lines: rgba(214, 207, 194, 0.03);
-  --glow-1: rgba(196, 69, 54, 0.06);
-  --glow-2: rgba(45, 110, 142, 0.06);
+  --grid-lines: rgba(0, 240, 255, 0.04);
+  --glow-1: rgba(239, 149, 156, 0.05);
+  --glow-2: rgba(0, 240, 255, 0.05);
 
   /* Legacy compatibility maps */
   --color-bg: var(--bg-page);
@@ -73,8 +73,8 @@
   --color-text-muted: var(--text-secondary);
 
   /* Typography */
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-body:    "Inter", system-ui, sans-serif;
+  --font-display: "Big Shoulders Display", "Space Grotesk", system-ui, sans-serif;
+  --font-body:    "JetBrains Mono", monospace;
 
   /* Spacing */
   --radius-sm:   6px;

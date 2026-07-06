@@ -1070,19 +1070,19 @@ export function LandingPage({
 
     // Instantiate 4 ambient & active operatives (grouped closer in the center grid)
     const opC = createOperative(0, 0x1b9aaa, 0.92, true); // Vesper
-    opC.position.set(-2.5, 0, -0.8);
+    opC.position.set(-1.8, 0, -0.5);
     scene.add(opC);
 
     const opA = createOperative(1, 0xb2ef9b, 1.0, false); // Albion
-    opA.position.set(-1.0, 0, 0);
+    opA.position.set(-0.6, 0, 0);
     scene.add(opA);
 
     const opB = createOperative(2, 0xef959c, 1.0, false); // Lace
-    opB.position.set(1.0, 0, 0);
+    opB.position.set(0.6, 0, 0);
     scene.add(opB);
 
     const opD = createOperative(3, 0x9aa29b, 0.92, true); // Requiem
-    opD.position.set(2.5, 0, -0.8);
+    opD.position.set(1.8, 0, -0.5);
     scene.add(opD);
 
     agents.push(opA, opB);
