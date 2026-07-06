@@ -2037,6 +2037,571 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const renderGameplayLayout = () => {
     return (
       <>
+        {/* Top Horizontal Row: User Profile, Music Player, and Host Controls */}
+        <div style={{ display: "flex", gap: "24px", width: "100%", flexWrap: "wrap", alignItems: "stretch", marginBottom: "8px" }}>
+          {/* User Profile */}
+          <div style={{ flex: "1 1 280px", display: "flex", flexDirection: "column" }}>
+            {/* User Profile Card / Statistics */}
+          {/* User Profile Circular Widget */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "8px",
+              padding: "16px",
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-md)",
+            }}
+          >
+            {/* Clickable Circle Container */}
+            <div
+              onClick={() => setStatsExpanded(!statsExpanded)}
+              style={{
+                position: "relative",
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                background: "rgba(0, 0, 0, 0.2)",
+                border: `2px solid ${statsExpanded ? "var(--accent)" : "var(--color-border)"}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                boxShadow: statsExpanded ? "0 0 12px rgba(232, 163, 61, 0.3)" : "0 4px 10px rgba(0,0,0,0.3)",
+                transition: "all 0.2s ease",
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.borderColor = "var(--accent)";
+              }}
+              onMouseOut={(e) => {
+                if (!statsExpanded) e.currentTarget.style.borderColor = "var(--color-border)";
+              }}
+            >
+              {/* Avatar Image or Fallback */}
+              {renderAvatar(user ? user.avatar : (localPlayer?.avatar || "s1_0_0"), 52)}
+              
+              {/* Online indicator dot at bottom right */}
+              {user && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "2px",
+                    right: "2px",
+                    width: "16px",
+                    height: "16px",
+                    borderRadius: "50%",
+                    background: "var(--status-active-bg, #10b981)",
+                    border: "2px solid var(--color-surface)",
+                  }}
+                  title="Status: Active"
+                />
+              )}
+            </div>
+
+            {/* Username and Online/Offline state */}
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "4px", justifyContent: "center" }}>
+                {user ? user.username : "Guest"}
+                {user?.isSupporter && (
+                  <span style={{ fontSize: "0.7rem", background: "var(--accent-bg-subtle)", border: "1px solid var(--accent)", color: "var(--accent-text-on-subtle)", padding: "1px 4px", borderRadius: "8px", fontWeight: 700 }}>
+                    💎
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
+                {user ? "Online · Tap circle for stats" : "Gated · Tap circle to log in"}
+              </div>
+            </div>
+
+            {/* Stats list expands below */}
+            {statsExpanded && (
+              <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "12px" }} className="scale-up">
+                {user ? (
+                  <>
+                    {/* Profile Role & Status Settings */}
+                    <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                      {/* Status selector (single-line horizontal pill selection) */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
+                          My Status
+                        </label>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                          {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY"].map((st) => {
+                            const isSelected = (localPlayer?.status || "ACTIVE") === st;
+                            return (
+                              <button
+                                key={st}
+                                type="button"
+                                onClick={() => {
+                                  if (socket) {
+                                    socket.emit("update_status", {
+                                      roomCode: room.roomCode,
+                                      playerId,
+                                      status: st,
+                                    });
+                                  }
+                                }}
+                                style={{
+                                  padding: "6px 10px",
+                                  borderRadius: "4px",
+                                  border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
+                                  background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
+                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
+                                  fontWeight: 600,
+                                  fontSize: "0.75rem",
+                                  cursor: "pointer",
+                                  transition: "all 0.15s ease",
+                                }}
+                                onMouseOver={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.background = "var(--border-subtle)";
+                                  }
+                                }}
+                                onMouseOut={(e) => {
+                                  if (!isSelected) {
+                                    e.currentTarget.style.background = "var(--bg-surface-raised)";
+                                  }
+                                }}
+                              >
+                                {st}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Team & Role Switcher */}
+                      {!room.settings.roomLocked && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                          <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
+                            {room.gameMode === "coop" ? "Assign Team" : "Assign Team & Role"}
+                          </label>
+                          {room.gameMode === "coop" ? (
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                              <button
+                                onClick={() => handleJoinTeamRole("red", "operative")}
+                                style={{
+                                  padding: "8px",
+                                  fontSize: "0.75rem",
+                                  background: localPlayer?.team === "red" ? typeColors.red!.border : typeColors.red!.bg,
+                                  border: `1px solid ${typeColors.red!.border}`,
+                                  borderRadius: "4px",
+                                  color: localPlayer?.team === "red" ? "#fff" : typeColors.red!.text,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                  Red Team
+                              </button>
+                              <button
+                                onClick={() => handleJoinTeamRole("blue", "operative")}
+                                style={{
+                                  padding: "8px",
+                                  fontSize: "0.75rem",
+                                  background: localPlayer?.team === "blue" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                  border: `1px solid ${typeColors.blue!.border}`,
+                                  borderRadius: "4px",
+                                  color: localPlayer?.team === "blue" ? "#fff" : typeColors.blue!.text,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                Blue Team
+                              </button>
+                            </div>
+                          ) : (
+                            <>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                <button
+                                  onClick={() => handleJoinTeamRole("red", "spymaster")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? typeColors.red!.border : typeColors.red!.bg,
+                                    border: `1px solid ${typeColors.red!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.red!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Red Spy
+                                </button>
+                                <button
+                                  onClick={() => handleJoinTeamRole("red", "operative")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "red" && localPlayer?.role === "operative" ? typeColors.red!.border : typeColors.red!.bg,
+                                    border: `1px solid ${typeColors.red!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "red" && localPlayer?.role === "operative" ? "#fff" : typeColors.red!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Red Op
+                                </button>
+                              </div>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                <button
+                                  onClick={() => handleJoinTeamRole("blue", "spymaster")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                    border: `1px solid ${typeColors.blue!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.blue!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Blue Spy
+                                </button>
+                                <button
+                                  onClick={() => handleJoinTeamRole("blue", "operative")}
+                                  style={{
+                                    padding: "6px",
+                                    fontSize: "0.75rem",
+                                    background: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                    border: `1px solid ${typeColors.blue!.border}`,
+                                    borderRadius: "4px",
+                                    color: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? "#fff" : typeColors.blue!.text,
+                                    fontWeight: 600,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Blue Op
+                                </button>
+                              </div>
+
+                              {room.teamCount > 2 && (
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("green", "spymaster")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? typeColors.green!.border : typeColors.green!.bg,
+                                      border: `1px solid ${typeColors.green!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.green!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Green Spy
+                                  </button>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("green", "operative")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "green" && localPlayer?.role === "operative" ? typeColors.green!.border : typeColors.green!.bg,
+                                      border: `1px solid ${typeColors.green!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "green" && localPlayer?.role === "operative" ? "#fff" : typeColors.green!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Green Op
+                                  </button>
+                                </div>
+                              )}
+
+                              {room.teamCount > 3 && (
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("yellow", "spymaster")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? typeColors.yellow!.border : typeColors.yellow!.bg,
+                                      border: `1px solid ${typeColors.yellow!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.yellow!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Yellow Spy
+                                  </button>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("yellow", "operative")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? typeColors.yellow!.border : typeColors.yellow!.bg,
+                                      border: `1px solid ${typeColors.yellow!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? "#fff" : typeColors.yellow!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Yellow Op
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+
+                          <button
+                            onClick={() => handleJoinTeamRole(null, null)}
+                            style={{
+                              padding: "6px",
+                              fontSize: "0.75rem",
+                              background: !localPlayer?.team ? "var(--accent)" : "transparent",
+                              border: "1px solid var(--accent)",
+                              borderRadius: "4px",
+                              color: !localPlayer?.team ? "var(--accent-text-on)" : "var(--accent)",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                              marginTop: "2px",
+                            }}
+                          >
+                            Spectate
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 10px 0", color: "var(--text-primary)" }}>
+                      My Stats & History
+                    </h4>
+                    {/* Stats Grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Played</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesPlayed}</div>
+                      </div>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Won</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesWon}</div>
+                      </div>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Win Rate</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
+                          {user.stats.gamesPlayed > 0 ? ((user.stats.gamesWon / user.stats.gamesPlayed) * 100).toFixed(0) : 0}%
+                        </div>
+                      </div>
+                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
+                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Accuracy</div>
+                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
+                          {user.stats.totalGuesses > 0 ? ((user.stats.correctGuesses / user.stats.totalGuesses) * 100).toFixed(0) : 0}%
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Match History List */}
+                    <div>
+                      <h4 style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", marginBottom: "8px" }}>
+                        Recent Matches
+                      </h4>
+                      {user.matchHistory.length > 0 ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "150px", overflowY: "auto" }}>
+                          {user.matchHistory.slice(0, 5).map((m) => (
+                            <div
+                              key={m.id}
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                padding: "6px 8px",
+                                background: "var(--bg-surface-raised)",
+                                borderRadius: "4px",
+                                border: "1px solid var(--border-default)",
+                                fontSize: "0.8rem",
+                              }}
+                            >
+                              <span>Room: {m.roomCode} ({m.role.toUpperCase()})</span>
+                              <span
+                                style={{
+                                  fontSize: "0.7rem",
+                                  fontWeight: 700,
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                  background: m.won ? "hsl(142,70%,25%)" : "hsl(355,75%,30%)",
+                                  color: "#fff",
+                                }}
+                              >
+                                {m.won ? "WON" : "LOST"}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", fontStyle: "italic" }}>
+                          No matches played yet.
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <div style={{ textAlign: "center", padding: "12px 0" }}>
+                    <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", margin: "0 0 12px 0", lineHeight: 1.4 }}>
+                      Track your wins, losses, guess accuracy, and match history across games!
+                    </p>
+                    <button
+                      onClick={() => onOpenAuth()}
+                      style={{
+                        width: "100%",
+                        padding: "8px 12px",
+                        background: "var(--accent)",
+                        color: "var(--accent-text-on)",
+                        border: "none",
+                        borderRadius: "var(--radius-sm)",
+                        cursor: "pointer",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)",
+                        transition: "background 0.2s ease",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = "var(--accent-hover)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "var(--accent)";
+                      }}
+                    >
+                      Sign In / Sign Up
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Music Player Widget (Gated personal audio player) */}
+          </div>
+          
+          {/* Music Player */}
+          <div style={{ flex: "1 1 280px", display: "flex", flexDirection: "column" }}>
+            <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} />
+          </div>
+
+          {/* Host Controls */}
+          {isHost && (
+            <div style={{ flex: "1 1 280px", display: "flex", flexDirection: "column" }}>
+              <div
+              style={{
+                background: "var(--color-surface)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                padding: "20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
+              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
+                Host Controls
+              </h4>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <button
+                  disabled={room.settings.roomLocked}
+                  onClick={() => {
+                    triggerHaptics([250, 50, 250]);
+                    playNavClick();
+                    if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "transparent",
+                    border: "1px solid var(--border-default)",
+                    color: "var(--text-primary)",
+                    fontWeight: 700,
+                    cursor: !room.settings.roomLocked ? "pointer" : "not-allowed",
+                    opacity: !room.settings.roomLocked ? 1 : 0.4,
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                  onMouseOver={(e) => {
+                    if (!room.settings.roomLocked) {
+                      e.currentTarget.style.background = "var(--border-subtle)";
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = "transparent";
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="16 3 21 3 21 8" />
+                    <line x1="4" y1="20" x2="21" y2="3" />
+                    <polyline points="21 16 21 21 16 21" />
+                    <line x1="15" y1="15" x2="21" y2="21" />
+                    <line x1="4" y1="4" x2="9" y2="9" />
+                  </svg>
+                  <span>{t("settings.randomize", "Randomize Teams")}</span>
+                </button>
+                <button
+                  onClick={() => {
+                    triggerHaptics([250, 50, 250]);
+                    playSettingsToggle();
+                    if (socket) {
+                      socket.emit("update_settings", {
+                        roomCode: room.roomCode,
+                        settings: { roomLocked: !room.settings.roomLocked },
+                      });
+                    }
+                  }}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "var(--radius-sm)",
+                    background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
+                    border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
+                    color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontFamily: "var(--font-display)",
+                    fontSize: "0.85rem",
+                    transition: "all 0.2s ease",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "8px",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    {room.settings.roomLocked ? (
+                      <>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </>
+                    ) : (
+                      <>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                      </>
+                    )}
+                  </svg>
+                  <span>{room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}</span>
+                </button>
+              </div>
+            </div>
+          )
+            </div>
+          )}
+        </div>
+
         {/* Room Players card rendered at the top, above Turn Banner */}
         {room.phase !== "lobby" && (
           <div style={{ width: "100%", boxSizing: "border-box" }}>
@@ -2486,7 +3051,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
         
         {/* Left Side: Game Board & Action forms */}
-        <div className="game-main-col" style={{ flex: "3 1 650px", display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div className="game-main-col" style={{ width: "100%", display: "flex", flexDirection: "column", gap: "24px" }}>
           {/* Lobby Preset Forms */}
           {room.phase === "lobby" && (
             <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
@@ -3176,565 +3741,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           )}
         </div>
 
-        {/* Right Side: Players & Scoped Room Chat */}
-        <div style={{ flex: "1 1 300px", display: "flex", flexDirection: "column", gap: "24px", minWidth: "260px" }}>
-          {/* User Profile Card / Statistics */}
-          {/* User Profile Circular Widget */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "8px",
-              padding: "16px",
-              background: "var(--color-surface)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-md)",
-            }}
-          >
-            {/* Clickable Circle Container */}
-            <div
-              onClick={() => setStatsExpanded(!statsExpanded)}
-              style={{
-                position: "relative",
-                width: "80px",
-                height: "80px",
-                borderRadius: "50%",
-                background: "rgba(0, 0, 0, 0.2)",
-                border: `2px solid ${statsExpanded ? "var(--accent)" : "var(--color-border)"}`,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                boxShadow: statsExpanded ? "0 0 12px rgba(232, 163, 61, 0.3)" : "0 4px 10px rgba(0,0,0,0.3)",
-                transition: "all 0.2s ease",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.borderColor = "var(--accent)";
-              }}
-              onMouseOut={(e) => {
-                if (!statsExpanded) e.currentTarget.style.borderColor = "var(--color-border)";
-              }}
-            >
-              {/* Avatar Image or Fallback */}
-              {renderAvatar(user ? user.avatar : (localPlayer?.avatar || "s1_0_0"), 52)}
-              
-              {/* Online indicator dot at bottom right */}
-              {user && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: "2px",
-                    right: "2px",
-                    width: "16px",
-                    height: "16px",
-                    borderRadius: "50%",
-                    background: "var(--status-active-bg, #10b981)",
-                    border: "2px solid var(--color-surface)",
-                  }}
-                  title="Status: Active"
-                />
-              )}
-            </div>
-
-            {/* Username and Online/Offline state */}
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "4px", justifyContent: "center" }}>
-                {user ? user.username : "Guest"}
-                {user?.isSupporter && (
-                  <span style={{ fontSize: "0.7rem", background: "var(--accent-bg-subtle)", border: "1px solid var(--accent)", color: "var(--accent-text-on-subtle)", padding: "1px 4px", borderRadius: "8px", fontWeight: 700 }}>
-                    💎
-                  </span>
-                )}
-              </div>
-              <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
-                {user ? "Online · Tap circle for stats" : "Gated · Tap circle to log in"}
-              </div>
-            </div>
-
-            {/* Stats list expands below */}
-            {statsExpanded && (
-              <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "12px" }} className="scale-up">
-                {user ? (
-                  <>
-                    {/* Profile Role & Status Settings */}
-                    <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
-                      {/* Status selector (single-line horizontal pill selection) */}
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
-                          My Status
-                        </label>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-                          {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY"].map((st) => {
-                            const isSelected = (localPlayer?.status || "ACTIVE") === st;
-                            return (
-                              <button
-                                key={st}
-                                type="button"
-                                onClick={() => {
-                                  if (socket) {
-                                    socket.emit("update_status", {
-                                      roomCode: room.roomCode,
-                                      playerId,
-                                      status: st,
-                                    });
-                                  }
-                                }}
-                                style={{
-                                  padding: "6px 10px",
-                                  borderRadius: "4px",
-                                  border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-                                  background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
-                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
-                                  fontWeight: 600,
-                                  fontSize: "0.75rem",
-                                  cursor: "pointer",
-                                  transition: "all 0.15s ease",
-                                }}
-                                onMouseOver={(e) => {
-                                  if (!isSelected) {
-                                    e.currentTarget.style.background = "var(--border-subtle)";
-                                  }
-                                }}
-                                onMouseOut={(e) => {
-                                  if (!isSelected) {
-                                    e.currentTarget.style.background = "var(--bg-surface-raised)";
-                                  }
-                                }}
-                              >
-                                {st}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Team & Role Switcher */}
-                      {!room.settings.roomLocked && (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                          <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
-                            {room.gameMode === "coop" ? "Assign Team" : "Assign Team & Role"}
-                          </label>
-                          {room.gameMode === "coop" ? (
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                              <button
-                                onClick={() => handleJoinTeamRole("red", "operative")}
-                                style={{
-                                  padding: "8px",
-                                  fontSize: "0.75rem",
-                                  background: localPlayer?.team === "red" ? typeColors.red!.border : typeColors.red!.bg,
-                                  border: `1px solid ${typeColors.red!.border}`,
-                                  borderRadius: "4px",
-                                  color: localPlayer?.team === "red" ? "#fff" : typeColors.red!.text,
-                                  fontWeight: 600,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                  Red Team
-                              </button>
-                              <button
-                                onClick={() => handleJoinTeamRole("blue", "operative")}
-                                style={{
-                                  padding: "8px",
-                                  fontSize: "0.75rem",
-                                  background: localPlayer?.team === "blue" ? typeColors.blue!.border : typeColors.blue!.bg,
-                                  border: `1px solid ${typeColors.blue!.border}`,
-                                  borderRadius: "4px",
-                                  color: localPlayer?.team === "blue" ? "#fff" : typeColors.blue!.text,
-                                  fontWeight: 600,
-                                  cursor: "pointer",
-                                }}
-                              >
-                                Blue Team
-                              </button>
-                            </div>
-                          ) : (
-                            <>
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                                <button
-                                  onClick={() => handleJoinTeamRole("red", "spymaster")}
-                                  style={{
-                                    padding: "6px",
-                                    fontSize: "0.75rem",
-                                    background: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? typeColors.red!.border : typeColors.red!.bg,
-                                    border: `1px solid ${typeColors.red!.border}`,
-                                    borderRadius: "4px",
-                                    color: localPlayer?.team === "red" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.red!.text,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Red Spy
-                                </button>
-                                <button
-                                  onClick={() => handleJoinTeamRole("red", "operative")}
-                                  style={{
-                                    padding: "6px",
-                                    fontSize: "0.75rem",
-                                    background: localPlayer?.team === "red" && localPlayer?.role === "operative" ? typeColors.red!.border : typeColors.red!.bg,
-                                    border: `1px solid ${typeColors.red!.border}`,
-                                    borderRadius: "4px",
-                                    color: localPlayer?.team === "red" && localPlayer?.role === "operative" ? "#fff" : typeColors.red!.text,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Red Op
-                                </button>
-                              </div>
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                                <button
-                                  onClick={() => handleJoinTeamRole("blue", "spymaster")}
-                                  style={{
-                                    padding: "6px",
-                                    fontSize: "0.75rem",
-                                    background: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? typeColors.blue!.border : typeColors.blue!.bg,
-                                    border: `1px solid ${typeColors.blue!.border}`,
-                                    borderRadius: "4px",
-                                    color: localPlayer?.team === "blue" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.blue!.text,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Blue Spy
-                                </button>
-                                <button
-                                  onClick={() => handleJoinTeamRole("blue", "operative")}
-                                  style={{
-                                    padding: "6px",
-                                    fontSize: "0.75rem",
-                                    background: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? typeColors.blue!.border : typeColors.blue!.bg,
-                                    border: `1px solid ${typeColors.blue!.border}`,
-                                    borderRadius: "4px",
-                                    color: localPlayer?.team === "blue" && localPlayer?.role === "operative" ? "#fff" : typeColors.blue!.text,
-                                    fontWeight: 600,
-                                    cursor: "pointer",
-                                  }}
-                                >
-                                  Blue Op
-                                </button>
-                              </div>
-
-                              {room.teamCount > 2 && (
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                                  <button
-                                    onClick={() => handleJoinTeamRole("green", "spymaster")}
-                                    style={{
-                                      padding: "6px",
-                                      fontSize: "0.75rem",
-                                      background: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? typeColors.green!.border : typeColors.green!.bg,
-                                      border: `1px solid ${typeColors.green!.border}`,
-                                      borderRadius: "4px",
-                                      color: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.green!.text,
-                                      fontWeight: 600,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    Green Spy
-                                  </button>
-                                  <button
-                                    onClick={() => handleJoinTeamRole("green", "operative")}
-                                    style={{
-                                      padding: "6px",
-                                      fontSize: "0.75rem",
-                                      background: localPlayer?.team === "green" && localPlayer?.role === "operative" ? typeColors.green!.border : typeColors.green!.bg,
-                                      border: `1px solid ${typeColors.green!.border}`,
-                                      borderRadius: "4px",
-                                      color: localPlayer?.team === "green" && localPlayer?.role === "operative" ? "#fff" : typeColors.green!.text,
-                                      fontWeight: 600,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    Green Op
-                                  </button>
-                                </div>
-                              )}
-
-                              {room.teamCount > 3 && (
-                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                                  <button
-                                    onClick={() => handleJoinTeamRole("yellow", "spymaster")}
-                                    style={{
-                                      padding: "6px",
-                                      fontSize: "0.75rem",
-                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? typeColors.yellow!.border : typeColors.yellow!.bg,
-                                      border: `1px solid ${typeColors.yellow!.border}`,
-                                      borderRadius: "4px",
-                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.yellow!.text,
-                                      fontWeight: 600,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    Yellow Spy
-                                  </button>
-                                  <button
-                                    onClick={() => handleJoinTeamRole("yellow", "operative")}
-                                    style={{
-                                      padding: "6px",
-                                      fontSize: "0.75rem",
-                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? typeColors.yellow!.border : typeColors.yellow!.bg,
-                                      border: `1px solid ${typeColors.yellow!.border}`,
-                                      borderRadius: "4px",
-                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? "#fff" : typeColors.yellow!.text,
-                                      fontWeight: 600,
-                                      cursor: "pointer",
-                                    }}
-                                  >
-                                    Yellow Op
-                                  </button>
-                                </div>
-                              )}
-                            </>
-                          )}
-
-                          <button
-                            onClick={() => handleJoinTeamRole(null, null)}
-                            style={{
-                              padding: "6px",
-                              fontSize: "0.75rem",
-                              background: !localPlayer?.team ? "var(--accent)" : "transparent",
-                              border: "1px solid var(--accent)",
-                              borderRadius: "4px",
-                              color: !localPlayer?.team ? "var(--accent-text-on)" : "var(--accent)",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              marginTop: "2px",
-                            }}
-                          >
-                            Spectate
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 10px 0", color: "var(--text-primary)" }}>
-                      My Stats & History
-                    </h4>
-                    {/* Stats Grid */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
-                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Played</div>
-                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesPlayed}</div>
-                      </div>
-                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Won</div>
-                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>{user.stats.gamesWon}</div>
-                      </div>
-                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Win Rate</div>
-                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
-                          {user.stats.gamesPlayed > 0 ? ((user.stats.gamesWon / user.stats.gamesPlayed) * 100).toFixed(0) : 0}%
-                        </div>
-                      </div>
-                      <div style={{ background: "var(--bg-surface-raised)", padding: "8px", borderRadius: "4px", border: "1px solid var(--border-default)" }}>
-                        <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)" }}>Accuracy</div>
-                        <div style={{ fontSize: "1.2rem", fontWeight: 700 }}>
-                          {user.stats.totalGuesses > 0 ? ((user.stats.correctGuesses / user.stats.totalGuesses) * 100).toFixed(0) : 0}%
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Match History List */}
-                    <div>
-                      <h4 style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", marginBottom: "8px" }}>
-                        Recent Matches
-                      </h4>
-                      {user.matchHistory.length > 0 ? (
-                        <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "150px", overflowY: "auto" }}>
-                          {user.matchHistory.slice(0, 5).map((m) => (
-                            <div
-                              key={m.id}
-                              style={{
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                padding: "6px 8px",
-                                background: "var(--bg-surface-raised)",
-                                borderRadius: "4px",
-                                border: "1px solid var(--border-default)",
-                                fontSize: "0.8rem",
-                              }}
-                            >
-                              <span>Room: {m.roomCode} ({m.role.toUpperCase()})</span>
-                              <span
-                                style={{
-                                  fontSize: "0.7rem",
-                                  fontWeight: 700,
-                                  padding: "2px 6px",
-                                  borderRadius: "4px",
-                                  background: m.won ? "hsl(142,70%,25%)" : "hsl(355,75%,30%)",
-                                  color: "#fff",
-                                }}
-                              >
-                                {m.won ? "WON" : "LOST"}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", fontStyle: "italic" }}>
-                          No matches played yet.
-                        </div>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <div style={{ textAlign: "center", padding: "12px 0" }}>
-                    <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", margin: "0 0 12px 0", lineHeight: 1.4 }}>
-                      Track your wins, losses, guess accuracy, and match history across games!
-                    </p>
-                    <button
-                      onClick={() => onOpenAuth()}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        background: "var(--accent)",
-                        color: "var(--accent-text-on)",
-                        border: "none",
-                        borderRadius: "var(--radius-sm)",
-                        cursor: "pointer",
-                        fontWeight: 700,
-                        fontSize: "0.85rem",
-                        boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)",
-                        transition: "background 0.2s ease",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.background = "var(--accent-hover)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.background = "var(--accent)";
-                      }}
-                    >
-                      Sign In / Sign Up
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Music Player Widget (Gated personal audio player) */}
-          <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} />
-
-
-
-          {isHost && (
-            <div
-              style={{
-                background: "var(--color-surface)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-md)",
-                padding: "20px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-              }}
-            >
-              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
-                Host Controls
-              </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <button
-                  disabled={room.settings.roomLocked}
-                  onClick={() => {
-                    triggerHaptics([250, 50, 250]);
-                    playNavClick();
-                    if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    background: "transparent",
-                    border: "1px solid var(--border-default)",
-                    color: "var(--text-primary)",
-                    fontWeight: 700,
-                    cursor: !room.settings.roomLocked ? "pointer" : "not-allowed",
-                    opacity: !room.settings.roomLocked ? 1 : 0.4,
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.85rem",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                  onMouseOver={(e) => {
-                    if (!room.settings.roomLocked) {
-                      e.currentTarget.style.background = "var(--border-subtle)";
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="16 3 21 3 21 8" />
-                    <line x1="4" y1="20" x2="21" y2="3" />
-                    <polyline points="21 16 21 21 16 21" />
-                    <line x1="15" y1="15" x2="21" y2="21" />
-                    <line x1="4" y1="4" x2="9" y2="9" />
-                  </svg>
-                  <span>{t("settings.randomize", "Randomize Teams")}</span>
-                </button>
-                <button
-                  onClick={() => {
-                    triggerHaptics([250, 50, 250]);
-                    playSettingsToggle();
-                    if (socket) {
-                      socket.emit("update_settings", {
-                        roomCode: room.roomCode,
-                        settings: { roomLocked: !room.settings.roomLocked },
-                      });
-                    }
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
-                    border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
-                    color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.85rem",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    {room.settings.roomLocked ? (
-                      <>
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      </>
-                    ) : (
-                      <>
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                      </>
-                    )}
-                  </svg>
-                  <span>{room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Room Players card moved to the top of the gameplay area */}
-
-
-        </div>
       </>
     );
   };
