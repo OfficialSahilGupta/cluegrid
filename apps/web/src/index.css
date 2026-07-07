@@ -426,6 +426,15 @@ html.increased-fonts {
     grid-template-columns: 1fr !important;
     gap: 16px !important;
   }
+  .lobby-col-profile {
+    order: 1 !important;
+  }
+  .lobby-col-settings {
+    order: 2 !important;
+  }
+  .lobby-col-players {
+    order: 3 !important;
+  }
   .bug-btn,
   .coffee-btn {
     display: none !important;

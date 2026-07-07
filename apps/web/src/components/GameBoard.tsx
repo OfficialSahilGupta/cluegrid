@@ -1580,12 +1580,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     return (
       <>
         {/* Column 1 (Left): Consolidated Settings Card (Host Settings, Timer Action, Preferences) */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        <div className="lobby-col-settings" style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
           {renderSettingsCard()}
         </div>
 
         {/* Column 2 (Center): Unified Room Players Card & Action Controls */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <div className="lobby-col-players" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {renderGroupedPlayersCard()}
 
           {/* Action Row Card (Start Game & Spectate rendered side-by-side in one compact line) */}
@@ -1658,6 +1658,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
         {/* Column 3 (Right): Profiles & Actions (Unified in a single Card) */}
         <div
+          className="lobby-col-profile"
           style={{
             background: "var(--color-surface)",
             border: "1px solid var(--color-border)",
