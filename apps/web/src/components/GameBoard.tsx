@@ -1778,10 +1778,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     width: "16px",
                     height: "16px",
                     borderRadius: "50%",
-                    background: "var(--status-active-bg, #10b981)",
+                    background: (localPlayer?.connected !== false) ? "hsl(142,75%,45%)" : "hsl(355,85%,58%)",
                     border: "2px solid var(--color-surface)",
                   }}
-                  title="Status: Active"
+                  title={localPlayer?.connected !== false ? "Online" : "Offline"}
                 />
               )}
             </div>
@@ -1877,6 +1877,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                           {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY", "THINKING", "COOKING"].map((st) => {
                             const isSelected = (localPlayer?.status || "ACTIVE") === st;
+                            const teamColor = localPlayer?.team && typeColors[localPlayer.team]
+                              ? typeColors[localPlayer.team]!.border
+                              : "var(--color-text-muted)";
+                            const teamTextOn = localPlayer?.team && typeColors[localPlayer.team]
+                              ? "#fff"
+                              : "var(--color-surface)";
                             return (
                               <button
                                 key={st}
@@ -1893,9 +1899,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                 style={{
                                   padding: "6px 10px",
                                   borderRadius: "4px",
-                                  border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-                                  background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
-                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
+                                  border: isSelected ? `1px solid ${teamColor}` : "1px solid var(--border-default)",
+                                  background: isSelected ? teamColor : "var(--bg-surface-raised)",
+                                  color: isSelected ? teamTextOn : "var(--text-primary)",
                                   fontWeight: 600,
                                   fontSize: "0.75rem",
                                   cursor: "pointer",
@@ -2289,10 +2295,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     width: "16px",
                     height: "16px",
                     borderRadius: "50%",
-                    background: "var(--status-active-bg, #10b981)",
+                    background: (localPlayer?.connected !== false) ? "hsl(142,75%,45%)" : "hsl(355,85%,58%)",
                     border: "2px solid var(--color-surface)",
                   }}
-                  title="Status: Active"
+                  title={localPlayer?.connected !== false ? "Online" : "Offline"}
                 />
               )}
             </div>
@@ -2394,6 +2400,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                           {["ACTIVE", "BRB", "AFK", ".zZ", "FOCUS", "BUSY", "THINKING", "COOKING"].map((st) => {
                             const isSelected = (localPlayer?.status || "ACTIVE") === st;
+                            const teamColor = localPlayer?.team && typeColors[localPlayer.team]
+                              ? typeColors[localPlayer.team]!.border
+                              : "var(--color-text-muted)";
+                            const teamTextOn = localPlayer?.team && typeColors[localPlayer.team]
+                              ? "#fff"
+                              : "var(--color-surface)";
                             return (
                               <button
                                 key={st}
@@ -2410,9 +2422,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                 style={{
                                   padding: "6px 10px",
                                   borderRadius: "4px",
-                                  border: isSelected ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-                                  background: isSelected ? "var(--accent)" : "var(--bg-surface-raised)",
-                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-primary)",
+                                  border: isSelected ? `1px solid ${teamColor}` : "1px solid var(--border-default)",
+                                  background: isSelected ? teamColor : "var(--bg-surface-raised)",
+                                  color: isSelected ? teamTextOn : "var(--text-primary)",
                                   fontWeight: 600,
                                   fontSize: "0.75rem",
                                   cursor: "pointer",
@@ -3820,14 +3832,16 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           className="game-card-word"
                           style={{
                             fontFamily: "var(--font-display)",
-                            fontSize: "clamp(0.65rem, 3.2vw, 1.25rem)",
+                            fontSize: card.word.length > 9
+                              ? "clamp(0.6rem, 2.6vw, 0.95rem)"
+                              : card.word.length > 7
+                                ? "clamp(0.75rem, 3.2vw, 1.1rem)"
+                                : "clamp(0.9rem, 3.8vw, 1.25rem)",
                             fontWeight: 800,
                             letterSpacing: "0.04em",
                             color: card.revealed ? colors.text : (lightMode ? "#1C1916" : "#FFFFFF"),
                             textAlign: "center",
-                            wordBreak: "break-word",
-                            overflowWrap: "break-word",
-                            hyphens: "auto",
+                            whiteSpace: "nowrap",
                             lineHeight: 1.15,
                             opacity: card.revealed
                               ? showWordCardIds.includes(card.id)
@@ -3986,7 +4000,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         </strong> on the board. Give a clue that points to those cards — your partner will guess them!
                       </div>
                     )}
-                    <div style={{ display: "flex", gap: "16px", flexWrap: "nowrap", alignItems: "flex-end", width: "100%" }}>
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-end", width: "100%" }}>
                       <div style={{ flex: 1, minWidth: "200px" }}>
                         <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", marginBottom: "8px", fontWeight: 600, whiteSpace: "nowrap" }}>
                           Clue Word <span style={{ fontWeight: 400, color: "var(--color-text-muted)", fontSize: "0.75rem" }}>(Single word, no spaces)</span>
@@ -5550,8 +5564,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 fontWeight: 800,
                 padding: "1px 3px",
                 borderRadius: "3px",
-                background: getStatusStyle(p.status).bg,
-                color: getStatusStyle(p.status).text,
+                background: getStatusStyle(p.status, p.team).bg,
+                color: getStatusStyle(p.status, p.team).text,
                 textTransform: "uppercase",
                 pointerEvents: "none",
                 lineHeight: 1,
@@ -6265,7 +6279,13 @@ const renderSettingsCard = (side?: "left" | "right") => {
     return { title: `${formatTeamName(localPlayer.team)} Team Chat`, badgeColor: colorVal };
   };
 
-  const getStatusStyle = (status: string) => {
+  const getStatusStyle = (status: string, team?: string | null) => {
+    if (team && typeColors[team]) {
+      return {
+        bg: typeColors[team].bg,
+        text: typeColors[team].border,
+      };
+    }
     if (status === "ACTIVE" || !status) {
       return {
         bg: "var(--status-active-bg)",
@@ -6917,7 +6937,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
   };
 
   return (
-    <div className={`fade-in ${isAssassinShake ? "assassin-shake-active" : ""}`} style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", padding: "0 clamp(8px, 3vw, 20px)" }}>
+    <div className={`fade-in ${isAssassinShake ? "assassin-shake-active" : ""}`} style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", padding: "0 clamp(8px, 3vw, 20px) 24px", boxSizing: "border-box" }}>
       <style>{`
         @keyframes emoji-float-up {
           0% {

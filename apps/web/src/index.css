@@ -230,20 +230,16 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); line-height: 1.2; }
     padding: 4px !important;
     border-radius: 50% !important;
   }
+
+  .clue-count-dropdown {
+    left: auto !important;
+    right: 0 !important;
+  }
 }
 
 /* ── ≤480px breakpoint (small phones) ───────────────────────────── */
 @media (max-width: 480px) {
   body { font-size: 14px; }
-
-  /* ── Game grid: tighter gaps & smaller card padding on small screens ── */
-  .game-card-word {
-    font-size: clamp(0.5rem, 3.5vw, 0.85rem) !important;
-    word-break: break-word !important;
-    hyphens: auto !important;
-    line-height: 1.1 !important;
-    white-space: normal !important;
-  }
 
   /* Ensure the grid doesn't overflow on small screens */
   .game-board-grid {
