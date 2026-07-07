@@ -1139,7 +1139,7 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
               limit += extraTime;
             }
           }
-          const elapsed = (Date.now() - room.turnState.phaseStartedAt) / 1000;
+          const elapsed = room.turnState.phaseStartedAt ? (Date.now() - room.turnState.phaseStartedAt) / 1000 : 0;
           const isTimeUp = elapsed >= limit;
 
           if (isManualTimer && isTimeUp) {

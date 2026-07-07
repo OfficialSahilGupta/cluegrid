@@ -487,6 +487,7 @@ html.increased-fonts {
   gap: 16px;
   width: 320px;
   box-sizing: border-box;
+  overscroll-behavior: contain !important; /* Prevents scroll chaining to the background page layout */
 }
 
 .profile-popup-card.lobby-popup {
@@ -583,4 +584,13 @@ html.increased-fonts {
   border-color: var(--accent);
   box-shadow: 0 0 10px rgba(232, 163, 61, 0.25);
   background: rgba(232, 163, 61, 0.08);
+}
+
+/* ─── Profile Scroll Trapping Fix on Mobile ─── */
+@media (max-width: 768px) {
+  .profile-popup-content {
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding-right: 0 !important;
+  }
 }

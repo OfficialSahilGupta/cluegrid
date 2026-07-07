@@ -549,7 +549,7 @@ export default function App() {
           loading={loading}
           isActiveRoom={true}
         />
-        <div style={{ position: "fixed", inset: 0, zIndex: 10, overflowY: "auto", background: "transparent" }}>
+        <div id="game-board-viewport" style={{ position: "fixed", inset: 0, zIndex: 10, overflowY: "auto", background: "transparent" }}>
           <GameBoard
             room={room}
             playerId={playerId}

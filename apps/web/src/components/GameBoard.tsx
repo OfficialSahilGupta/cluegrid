@@ -7,6 +7,7 @@ import { Identicon } from "./Identicon.js";
 import { useTranslation } from "react-i18next";
 import { GatedUpsellModal } from "./GatedUpsellModal.js";
 import { MusicPlayer } from "./MusicPlayer.js";
+import { ProfileSettingsModal } from "./ProfileSettingsModal.js";
 import { ChatMessageBubble } from "./ChatMessageBubble.js";
 import { renderAvatar } from "../utils/avatar";
 
@@ -272,6 +273,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
   // Collapsible Stats Card state
   const [statsExpanded, setStatsExpanded] = useState(false);
+  const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
   const [spyWarningConfig, setSpyWarningConfig] = useState<{
     spyName: string;
     team: TeamIdentifier;
@@ -332,6 +334,22 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     localStorage.setItem("cluegrid_sound_enabled", String(soundEnabled));
     localStorage.setItem("cluegrid_sound_volume", String(soundVolume));
   });
+
+  // Lock body scroll when overlay popups are active to prevent background scrolling
+  useEffect(() => {
+    const viewport = document.getElementById("game-board-viewport");
+    if (statsExpanded || profileSettingsOpen) {
+      if (viewport) viewport.style.overflowY = "hidden";
+      document.body.style.overflow = "hidden";
+    } else {
+      if (viewport) viewport.style.overflowY = "auto";
+      document.body.style.overflow = "";
+    }
+    return () => {
+      if (viewport) viewport.style.overflowY = "auto";
+      document.body.style.overflow = "";
+    };
+  }, [statsExpanded, profileSettingsOpen]);
 
   useEffect(() => {
     const originalAC = window.AudioContext;
@@ -1746,6 +1764,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     background: "rgba(0, 0, 0, 0.4)",
                     backdropFilter: "blur(1.5px)",
                     zIndex: 9998,
+                    touchAction: "none",
                   }}
                   onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); }}
                 />
@@ -1773,9 +1792,37 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       ✕
                     </button>
                   </div>
-                  <div style={{ maxHeight: "360px", overflowY: "auto", paddingRight: "4px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div className="profile-popup-content" style={{ maxHeight: "360px", overflowY: "auto", paddingRight: "4px", display: "flex", flexDirection: "column", gap: "16px" }}>
                 {user ? (
                   <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setStatsExpanded(false);
+                        setProfileSettingsOpen(true);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 14px",
+                        background: "var(--accent)",
+                        color: "var(--accent-text-on)",
+                        border: "none",
+                        borderRadius: "var(--radius-sm)",
+                        cursor: "pointer",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        marginTop: "4px",
+                        marginBottom: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                        fontFamily: "var(--font-display)",
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                      <span>Edit Username & Avatar</span>
+                    </button>
                     <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
                       <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                         <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
@@ -1831,41 +1878,25 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             {room.gameMode === "coop" ? "Assign Team" : "Assign Team & Role"}
                           </label>
                           {room.gameMode === "coop" ? (
-                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                            <div style={getTeamButtonStyles("red", "operative", localPlayer?.team === "red" && localPlayer?.role === "operative")}>
                               <button
                                 onClick={() => handleJoinTeamRole("red", "operative")}
                                 style={{
-                                  padding: "8px",
-                                  fontSize: "0.75rem",
-                                  background: localPlayer?.team === "red" ? typeColors.red!.border : typeColors.red!.bg,
-                                  border: `1px solid ${typeColors.red!.border}`,
-                                  borderRadius: "4px",
-                                  color: localPlayer?.team === "red" ? "#fff" : typeColors.red!.text,
-                                  fontWeight: 600,
-                                  cursor: "pointer",
+                                  ...getTeamButtonStyles("red", "operative", localPlayer?.team === "red")
                                 }}
                               >
                                 Red Team
                               </button>
                               <button
                                 onClick={() => handleJoinTeamRole("blue", "operative")}
-                                style={{
-                                  padding: "8px",
-                                  fontSize: "0.75rem",
-                                  background: localPlayer?.team === "blue" ? typeColors.blue!.border : typeColors.blue!.bg,
-                                  border: `1px solid ${typeColors.blue!.border}`,
-                                  borderRadius: "4px",
-                                  color: localPlayer?.team === "blue" ? "#fff" : typeColors.blue!.text,
-                                  fontWeight: 600,
-                                  cursor: "pointer",
-                                }}
+                                style={getTeamButtonStyles("blue", "operative", localPlayer?.team === "blue" && localPlayer?.role === "operative")}
                               >
                                 Blue Team
                               </button>
                             </div>
                           ) : (
                             <>
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                              <div style={getTeamButtonStyles("red", "spymaster", localPlayer?.team === "red" && localPlayer?.role === "spymaster")}>
                                 <button
                                   onClick={() => handleJoinTeamRole("red", "spymaster")}
                                   style={{
@@ -1897,7 +1928,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                   Red Op
                                 </button>
                               </div>
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                              <div style={getTeamButtonStyles("blue", "spymaster", localPlayer?.team === "blue" && localPlayer?.role === "spymaster")}>
                                 <button
                                   onClick={() => handleJoinTeamRole("blue", "spymaster")}
                                   style={{
@@ -2165,6 +2196,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     background: "rgba(0, 0, 0, 0.4)",
                     backdropFilter: "blur(1.5px)",
                     zIndex: 9998,
+                    touchAction: "none",
                   }}
                   onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); }}
                 />
@@ -2192,9 +2224,37 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       ✕
                     </button>
                   </div>
-                  <div style={{ maxHeight: "360px", overflowY: "auto", paddingRight: "4px", display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <div className="profile-popup-content" style={{ maxHeight: "360px", overflowY: "auto", paddingRight: "4px", display: "flex", flexDirection: "column", gap: "16px" }}>
                 {user ? (
                   <>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setStatsExpanded(false);
+                        setProfileSettingsOpen(true);
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 14px",
+                        background: "var(--accent)",
+                        color: "var(--accent-text-on)",
+                        border: "none",
+                        borderRadius: "var(--radius-sm)",
+                        cursor: "pointer",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        marginTop: "4px",
+                        marginBottom: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                        fontFamily: "var(--font-display)",
+                      }}
+                    >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                      <span>Edit Username & Avatar</span>
+                    </button>
                     {/* Profile Role & Status Settings */}
                     <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "10px" }}>
                       {/* Status selector (single-line horizontal pill selection) */}
@@ -5865,6 +5925,44 @@ const renderSettingsCard = (side?: "left" | "right") => {
     setClueCount(null);
   };
 
+  const getTeamButtonStyles = (team: string, role: string, isSelected: boolean) => {
+    const isRed = team === "red";
+    const isBlue = team === "blue";
+    const isGreen = team === "green";
+    const isYellow = team === "yellow";
+    
+    let accentRgb = "154, 162, 155";
+    
+    if (isRed) {
+      accentRgb = "239, 149, 156";
+    } else if (isBlue) {
+      accentRgb = "0, 240, 255";
+    } else if (isGreen) {
+      accentRgb = "16, 185, 129";
+    } else if (isYellow) {
+      accentRgb = "245, 158, 11";
+    }
+    
+    return {
+      padding: "5px 8px",
+      fontSize: "0.72rem",
+      background: isSelected ? `rgba(${accentRgb}, 0.25)` : `rgba(${accentRgb}, 0.05)`,
+      border: isSelected ? `1.5px solid rgb(${accentRgb})` : `1px solid rgba(${accentRgb}, 0.25)`,
+      borderRadius: "4px",
+      color: isSelected ? "#fff" : `rgba(${accentRgb}, 0.85)`,
+      fontWeight: isSelected ? 700 : 600,
+      cursor: "pointer",
+      fontFamily: "var(--font-display)",
+      letterSpacing: "0.03em",
+      textTransform: "uppercase" as const,
+      boxShadow: isSelected ? `0 0 10px rgba(${accentRgb}, 0.15)` : "none",
+      transition: "all 0.15s ease",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+    };
+  };
+
   const handleCardClick = (cardId: number) => {
     const clickedCard = room.board.find((c) => c.id === cardId);
     if (clickedCard && clickedCard.revealed) {
@@ -7460,6 +7558,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
       )}
 
 
+      {profileSettingsOpen && (
+        <ProfileSettingsModal onClose={() => setProfileSettingsOpen(false)} />
+      )}
     </div>
   );
 }

@@ -217,14 +217,9 @@ router.post("/settings", async (req, res) => {
     ];
 
     if (avatar) {
-      const isStandard = registeredAvatars.includes(avatar);
       const isPremium = avatar.startsWith("s1_") || avatar.startsWith("s2_");
 
-      if (!isStandard && !isPremium) {
-        res.status(400).json({ success: false, error: "Invalid avatar selection" });
-        return;
-      }
-
+      // Standard avatars (non-premium) are accessible to all logged-in users
       if (isPremium && !isSupporter) {
         res.status(403).json({ success: false, error: "Premium avatars are restricted to supporters" });
         return;
