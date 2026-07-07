@@ -62,28 +62,6 @@ export async function initializeSchema() {
     `);
 
     await client.query(`
-      CREATE TABLE IF NOT EXISTS world_cities (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) UNIQUE NOT NULL
-      );
-    `);
-
-    const citiesRes = await client.query("SELECT COUNT(*) FROM world_cities");
-    if (Number(citiesRes.rows[0].count) === 0) {
-      const defaultCities = [
-        "Tokyo", "London", "Paris", "New York", "Cairo",
-        "Sydney", "Mumbai", "Rio de Janeiro", "Moscow", "Cape Town",
-        "Toronto", "Berlin", "Dubai", "Singapore", "Beijing",
-        "Rome", "Amsterdam", "San Francisco", "Buenos Aires", "Nairobi",
-        "Birgunj", "Kathmandu", "Pokhara", "Delhi", "Patna", "Chennai"
-      ];
-      for (const city of defaultCities) {
-        await client.query("INSERT INTO world_cities (name) VALUES ($1) ON CONFLICT DO NOTHING", [city]);
-      }
-      console.log("[postgres] seeded initial world cities");
-    }
-
-    await client.query(`
       CREATE TABLE IF NOT EXISTS user_stats (
         user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
         games_played INTEGER DEFAULT 0,

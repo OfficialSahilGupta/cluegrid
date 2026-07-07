@@ -1,7 +1,6 @@
 import { GRID_PRESETS, RoomState, TeamIdentifier, TeamState, TEAM_COLORS_BY_INDEX } from "@cluegrid/shared";
 import { sampleWords } from "@cluegrid/wordpacks";
 import { generateBoard } from "./engine.js";
-import { db, isDbConnected } from "./db.js";
 
 // Basic in-memory store for rooms in Phase 1
 const roomsStore = new Map<string, RoomState>();
@@ -43,7 +42,7 @@ function generateRoomCode(): string {
   return `${adj}-${anim}-${num}`;
 }
 
-async function getRandomCities(count: number): Promise<string[]> {
+function getRandomCities(count: number): string[] {
   const fallbackCities = [
     "Tokyo", "London", "Paris", "New York", "Cairo",
     "Sydney", "Mumbai", "Rio de Janeiro", "Moscow", "Cape Town",
@@ -51,16 +50,6 @@ async function getRandomCities(count: number): Promise<string[]> {
     "Rome", "Amsterdam", "San Francisco", "Buenos Aires", "Nairobi",
     "Birgunj", "Kathmandu", "Pokhara", "Delhi", "Patna", "Chennai"
   ];
-  if (isDbConnected) {
-    try {
-      const res = await db.query("SELECT name FROM world_cities ORDER BY RANDOM() LIMIT $1", [count]);
-      if (res.rows.length > 0) {
-        return res.rows.map((r: any) => r.name);
-      }
-    } catch (e) {
-      // fallback
-    }
-  }
   const shuffled = [...fallbackCities].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 }
@@ -85,7 +74,7 @@ export async function createRoom(
   // Duet/Coop mode uses independent dual-type boards with per-team assassins
   const board = generateBoard(teamCount, words, gameMode === "coop");
 
-  const cities = await getRandomCities(teamCount);
+  const cities = getRandomCities(teamCount);
 
   const teams = {} as Record<TeamIdentifier, TeamState>;
   preset.teamCardCounts.forEach((count, index) => {

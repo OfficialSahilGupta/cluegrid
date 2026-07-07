@@ -24,15 +24,6 @@ export function FeedbackRobot() {
       }
     } catch (err) {
       console.error("Error sending feedback to server:", err);
-      // Fallback: save to localStorage if server is down or unreachable
-      const feedbackList = JSON.parse(localStorage.getItem("cluegrid_feedback") || "[]");
-      feedbackList.push({
-        category,
-        description,
-        email,
-        timestamp: new Date().toISOString(),
-      });
-      localStorage.setItem("cluegrid_feedback", JSON.stringify(feedbackList));
     }
 
     setSubmitted(true);

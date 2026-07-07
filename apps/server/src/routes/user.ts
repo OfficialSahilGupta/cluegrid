@@ -298,41 +298,26 @@ async function verifyAdmin(req: express.Request, res: express.Response, next: ex
   }
 }
 
-// Admin Cities CRUD
+// Admin Cities (Static/Read-only fallback)
+const defaultCities = [
+  "Tokyo", "London", "Paris", "New York", "Cairo",
+  "Sydney", "Mumbai", "Rio de Janeiro", "Moscow", "Cape Town",
+  "Toronto", "Berlin", "Dubai", "Singapore", "Beijing",
+  "Rome", "Amsterdam", "San Francisco", "Buenos Aires", "Nairobi",
+  "Birgunj", "Kathmandu", "Pokhara", "Delhi", "Patna", "Chennai"
+];
+const staticCities = defaultCities.map((name, index) => ({ id: index + 1, name }));
+
 router.get("/admin/cities", verifyAdmin, async (req, res) => {
-  try {
-    const result = await db.query("SELECT * FROM world_cities ORDER BY name ASC");
-    res.json({ success: true, cities: result.rows });
-  } catch (e: any) {
-    res.status(500).json({ success: false, error: e.message });
-  }
+  res.json({ success: true, cities: staticCities });
 });
 
 router.post("/admin/cities", verifyAdmin, async (req, res) => {
-  try {
-    const { name } = req.body;
-    if (!name || name.trim() === "") {
-      res.status(400).json({ success: false, error: "City name required" });
-      return;
-    }
-    const result = await db.query(
-      "INSERT INTO world_cities (name) VALUES ($1) ON CONFLICT DO NOTHING RETURNING *",
-      [name.trim()]
-    );
-    res.json({ success: true, city: result.rows[0] });
-  } catch (e: any) {
-    res.status(500).json({ success: false, error: e.message });
-  }
+  res.status(403).json({ success: false, error: "Cities are now statically managed. Modifications are disabled." });
 });
 
 router.delete("/admin/cities/:id", verifyAdmin, async (req, res) => {
-  try {
-    const { id } = req.params;
-    await db.query("DELETE FROM world_cities WHERE id = $1", [id]);
-    res.json({ success: true });
-  } catch (e: any) {
-    res.status(500).json({ success: false, error: e.message });
-  }
+  res.status(403).json({ success: false, error: "Cities are now statically managed. Modifications are disabled." });
 });
 
 // Submit user feedback (Public)
