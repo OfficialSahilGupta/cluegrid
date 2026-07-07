@@ -573,6 +573,101 @@ export default function App() {
           />
         )}
 
+        {/* Guest Profile Entrance Modal */}
+        {!isJoined && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(3,11,14,0.95)",
+              backdropFilter: "blur(12px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "24px",
+              zIndex: 999999,
+            }}
+          >
+            <form
+              onSubmit={handleSaveProfile}
+              style={{
+                width: "min(420px, 100%)",
+                background: "rgba(6,24,28,0.96)",
+                border: "1.5px solid rgba(0,240,255,0.35)",
+                padding: "32px",
+                borderRadius: "var(--radius-lg)",
+                boxShadow: "0 20px 50px rgba(0,0,0,0.6)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "20px",
+              }}
+            >
+              <div style={{ textAlign: "center", marginBottom: "8px" }}>
+                <h2 style={{ fontFamily: "var(--font-display)", fontSize: "1.8rem", fontWeight: 800, color: "#00f0ff", margin: "0 0 6px 0", letterSpacing: "0.02em" }}>
+                  IDENTIFY YOURSELF
+                </h2>
+                <div style={{ fontSize: "0.82rem", color: "#9aa29b" }}>
+                  Entering secure decryption grid. Input alias badge.
+                </div>
+              </div>
+
+              {profileError && (
+                <div style={{ background: "rgba(239,149,156,0.1)", border: "1px solid #ef959c", color: "#ef959c", padding: "10px 12px", borderRadius: "6px", fontSize: "0.8rem" }}>
+                  {profileError}
+                </div>
+              )}
+
+              <div>
+                <label style={{ display: "block", fontSize: "11px", letterSpacing: "0.14em", textTransform: "uppercase", color: "#eef3ee", opacity: 0.8, marginBottom: "8px", fontWeight: 700 }}>
+                  Agent Alias
+                </label>
+                <input
+                  type="text"
+                  maxLength={15}
+                  value={tempName}
+                  onChange={(e) => setTempName(e.target.value)}
+                  placeholder="Enter alias..."
+                  style={{ width: "100%", background: "rgba(238,243,238,0.04)", border: "1.5px solid rgba(238,243,238,0.14)", borderRadius: "8px", color: "#eef3ee", fontSize: "14px", padding: "13px 14px", outline: "none", boxSizing: "border-box" }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "11px", letterSpacing: "0.14em", textTransform: "uppercase", color: "#eef3ee", opacity: 0.8, marginBottom: "8px", fontWeight: 700 }}>
+                  Select Avatar
+                </label>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "10px", maxHeight: "140px", overflowY: "auto", padding: "4px", background: "rgba(0,0,0,0.2)", borderRadius: "8px", border: "1px solid rgba(238,243,238,0.08)" }}>
+                  {["🕵️‍♂️", "🕵️‍♀️", "🥷", "👥", "👁️‍🗨️", "🛡️", "😀", "😎", "🧐", "🤖", "👽", "🦊", "🦁", "🐧", "🦉", "🚀", "🛸", "🔮"].map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => setTempAvatar(emoji)}
+                      style={{ fontSize: "1.5rem", padding: "8px 0", cursor: "pointer", background: tempAvatar === emoji ? "rgba(0,240,255,0.15)" : "transparent", border: tempAvatar === emoji ? "1px solid #00f0ff" : "1px solid transparent", borderRadius: "6px", transition: "all 0.15s" }}
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "8px" }}>
+                <button
+                  type="button"
+                  onClick={handleLeave}
+                  style={{ padding: "12px", borderRadius: "var(--radius-md)", border: "1.5px solid var(--border-default)", background: "transparent", color: "var(--text-primary)", fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-display)" }}
+                >
+                  Leave
+                </button>
+                <button
+                  type="submit"
+                  style={{ padding: "12px", borderRadius: "var(--radius-md)", border: "none", background: "#00f0ff", color: "#040b0d", fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-display)" }}
+                >
+                  Enter Room
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
         {/* Global Confirmation Dialog */}
         {globalConfirm && (
           <div
