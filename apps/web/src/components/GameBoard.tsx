@@ -1246,6 +1246,312 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       const activePlayer = room.players.find((p) => p.id === activeSwitchPlayerId);
       const showPopover = activePlayer && activePlayer.team === color;
 
+      if (room.phase === "lobby") {
+        // 1. Original simple layout style used in the game lobby
+        return (
+          <div
+            key={color}
+            style={{
+              borderLeft: `3px solid ${themeCol.border}`,
+              paddingLeft: "12px",
+              marginBottom: "4px",
+              flex: 1,
+              minWidth: "180px",
+              position: "relative",
+            }}
+          >
+            <h4
+              style={{
+                margin: "0 0 10px 0",
+                fontFamily: "var(--font-display)",
+                fontSize: "1.15rem",
+                fontWeight: 700,
+                color: themeCol.light,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span>{label}</span>
+              {isHost ? (
+                <input
+                  type="text"
+                  defaultValue={teamObj?.name || ""}
+                  placeholder="City Name"
+                  onBlur={(e) => {
+                    if (socket && e.target.value.trim() !== "") {
+                      socket.emit("rename_team", {
+                        roomCode: room.roomCode,
+                        teamColor: color,
+                        name: e.target.value.trim(),
+                      });
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && socket && e.currentTarget.value.trim() !== "") {
+                      socket.emit("rename_team", {
+                        roomCode: room.roomCode,
+                        teamColor: color,
+                        name: e.currentTarget.value.trim(),
+                      });
+                      e.currentTarget.blur();
+                    }
+                  }}
+                  style={{
+                    background: themeCol.bg,
+                    border: `1px solid ${themeCol.border}`,
+                    borderRadius: "12px",
+                    color: themeCol.text,
+                    padding: "3px 8px",
+                    fontSize: "0.75rem",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    width: "110px",
+                    textAlign: "center",
+                    outline: "none",
+                  }}
+                />
+              ) : (
+                teamObj?.name && (
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: 700,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      padding: "3px 8px",
+                      borderRadius: "12px",
+                      background: themeCol.bg,
+                      color: themeCol.text,
+                      border: `1px solid ${themeCol.border}`,
+                      display: "inline-block",
+                    }}
+                  >
+                    {teamObj.name}
+                  </span>
+                )
+              )}
+            </h4>
+
+            {room.gameMode === "coop" ? (
+              <div style={{ width: "100%", boxSizing: "border-box" }}>
+                <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
+                  Members
+                </div>
+                {teamPlayers.length > 0 ? (
+                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
+                    {teamPlayers.map((p) => renderPlayerRow(p))}
+                  </div>
+                ) : null}
+                {localPlayer?.team !== color && (
+                  !room.settings.roomLocked ? (
+                    <button
+                      onClick={() => handleJoinTeamRole(color, "operative")}
+                      style={{
+                        width: "100%",
+                        padding: "6px 8px",
+                        background: "transparent",
+                        border: "1px solid var(--accent)",
+                        color: "var(--accent)",
+                        borderRadius: "var(--radius-sm)",
+                        fontSize: "0.85rem",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        fontFamily: "var(--font-display)",
+                        transition: "all 0.15s ease",
+                        boxSizing: "border-box",
+                        textAlign: "center",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = "var(--accent)";
+                        e.currentTarget.style.color = "var(--accent-text-on)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "transparent";
+                        e.currentTarget.style.color = "var(--accent)";
+                      }}
+                    >
+                      + Join Team
+                    </button>
+                  ) : (
+                    <div style={{
+                      width: "100%",
+                      padding: "6px 8px",
+                      background: "rgba(255, 255, 255, 0.02)",
+                      border: "1px dashed var(--border-default)",
+                      color: "var(--text-muted)",
+                      borderRadius: "var(--radius-sm)",
+                      fontSize: "0.8rem",
+                      fontWeight: 500,
+                      fontFamily: "var(--font-display)",
+                      boxSizing: "border-box",
+                      textAlign: "center",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "6px",
+                      opacity: 0.6
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      <span>Locked</span>
+                    </div>
+                  )
+                )}
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%", boxSizing: "border-box" }}>
+                {/* Spymasters section */}
+                <div>
+                  <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
+                    Spymaster
+                  </div>
+                  {spymasters.length > 0 && (
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
+                      {spymasters.map((p) => renderPlayerRow(p))}
+                    </div>
+                  )}
+                  {!room.settings.roomLocked ? (
+                    (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") && (
+                      <button
+                        onClick={() => handleJoinTeamRole(color, "spymaster")}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          background: "transparent",
+                          border: `1px solid ${themeCol.border}`,
+                          color: themeCol.text,
+                          borderRadius: "var(--radius-sm)",
+                          fontSize: "0.85rem",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-display)",
+                          transition: "all 0.15s ease",
+                          boxSizing: "border-box",
+                          textAlign: "center",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.background = themeCol.border;
+                          e.currentTarget.style.color = "#fff";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = themeCol.text;
+                        }}
+                      >
+                        + JOIN TEAM
+                      </button>
+                    )
+                  ) : (
+                    spymasters.length === 0 && (
+                      <div style={{
+                        width: "100%",
+                        padding: "6px 8px",
+                        background: "rgba(255, 255, 255, 0.02)",
+                        border: "1px dashed var(--border-default)",
+                        color: "var(--text-muted)",
+                        borderRadius: "var(--radius-sm)",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        fontFamily: "var(--font-display)",
+                        boxSizing: "border-box",
+                        textAlign: "center",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                        opacity: 0.6
+                      }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <span>Locked</span>
+                      </div>
+                    )
+                  )}
+                </div>
+
+                {/* Operatives section */}
+                <div>
+                  <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
+                    Operatives
+                  </div>
+                  {operatives.length > 0 && (
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
+                      {operatives.map((p) => renderPlayerRow(p))}
+                    </div>
+                  )}
+                  {!room.settings.roomLocked ? (
+                    (!localPlayer || localPlayer.team !== color || localPlayer.role !== "operative") && (
+                      <button
+                        onClick={() => handleJoinTeamRole(color, "operative")}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          background: "transparent",
+                          border: `1px solid ${themeCol.border}`,
+                          color: themeCol.text,
+                          borderRadius: "var(--radius-sm)",
+                          fontSize: "0.85rem",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-display)",
+                          transition: "all 0.15s ease",
+                          boxSizing: "border-box",
+                          textAlign: "center",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.background = themeCol.border;
+                          e.currentTarget.style.color = "#fff";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = themeCol.text;
+                        }}
+                      >
+                        + JOIN TEAM
+                      </button>
+                    )
+                  ) : (
+                    operatives.length === 0 && (
+                      <div style={{
+                        width: "100%",
+                        padding: "6px 8px",
+                        background: "rgba(255, 255, 255, 0.02)",
+                        border: "1px dashed var(--border-default)",
+                        color: "var(--text-muted)",
+                        borderRadius: "var(--radius-sm)",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        fontFamily: "var(--font-display)",
+                        boxSizing: "border-box",
+                        textAlign: "center",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                        opacity: 0.6
+                      }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <span>Locked</span>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      // 2. Redesigned layout style (Capsule name headers, Watermark role cards) used in the gameplay phase
       const greenPillButtonStyle: React.CSSProperties = {
         background: "linear-gradient(180deg, #10b981 0%, #047857 100%)",
         border: "1.5px solid rgba(255, 255, 255, 0.45)",
@@ -1289,7 +1595,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         zIndex: 2,
       };
 
-      // Card style configurations aligned to the product theme variables
       const cardStyle = {
         bg: themeCol.bg,
         border: `2.5px solid ${themeCol.border}`,
@@ -1312,7 +1617,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             position: "relative",
           }}
         >
-          {/* 1. Team Name Bubble Capsule Header (with theme-aligned border color) */}
+          {/* Team Name Bubble Capsule Header */}
           <div
             style={{
               background: "linear-gradient(180deg, rgba(63, 63, 70, 0.95) 0%, rgba(39, 39, 42, 0.95) 100%)",
@@ -1383,9 +1688,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             )}
           </div>
 
-          {/* 2. Team Role Containers */}
+          {/* Team Role Containers */}
           {room.gameMode === "coop" ? (
-            /* CO-OP Mode: Unified Members Container */
+            /* CO-OP Mode */
             <div
               style={{
                 background: cardStyle.bg,
@@ -1403,7 +1708,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 gap: "12px",
               }}
             >
-              {/* Watermark */}
               <div
                 style={{
                   position: "absolute",
@@ -1461,7 +1765,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               )}
             </div>
           ) : (
-            /* COMPETITIVE Modes: Spymasters & Operatives Containers */
+            /* COMPETITIVE Modes */
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", boxSizing: "border-box" }}>
               
               {/* Spymasters Card */}
@@ -1482,7 +1786,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   gap: "12px",
                 }}
               >
-                {/* Watermark */}
                 <div
                   style={{
                     position: "absolute",
@@ -1560,7 +1863,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   gap: "12px",
                 }}
               >
-                {/* Watermark */}
                 <div
                   style={{
                     position: "absolute",
