@@ -1648,16 +1648,18 @@ export function LandingPage({
             <button
               onClick={() => { setCurrentView("support"); setIsMobileMenuOpen(false); }}
               className="cyber-dotted-link"
-              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%", color: "#ef959c" }}
+              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%", color: "#ef959c", display: "flex", alignItems: "center", gap: "6px" }}
             >
-              ☕ Supply Line: Coffee
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z"/><line x1="6" y1="2" x2="6" y2="4"/><line x1="10" y1="2" x2="10" y2="4"/><line x1="14" y1="2" x2="14" y2="4"/></svg>
+              <span>Supply Line: Coffee</span>
             </button>
             <button
               onClick={() => { setShowReport(true); setIsMobileMenuOpen(false); }}
               className="cyber-dotted-link"
-              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%", color: "#00f0ff" }}
+              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%", color: "#00f0ff", display: "flex", alignItems: "center", gap: "6px" }}
             >
-              🐛 Report Bug / Idea
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+              <span>Report Bug / Idea</span>
             </button>
           </div>
         </>
@@ -1798,13 +1800,13 @@ export function LandingPage({
 
       {/* CTA Wrap */}
       {showCTA && !showWelcome && currentView === "lobby" && (
-        <div style={{ position: "fixed", left: "50%", bottom: "100px", transform: "translateX(-50%)", zIndex: 6, display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+        <div className="landing-cta-wrap" style={{ position: "fixed", left: "50%", bottom: "100px", transform: "translateX(-50%)", zIndex: 6, display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
           <div style={{ width: "78px", height: "78px", borderRadius: "50%", border: "2px solid #00f0ff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 800, fontSize: "10px", letterSpacing: "0.08em", textAlign: "center", color: "#00f0ff", transform: "rotate(-18deg)", boxShadow: "0 0 22px rgba(0,240,255,0.25)" }}>
             CLEARANCE<br/>GRANTED
           </div>
           <button 
             onClick={handleEnterGuest}
-            style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 800, fontSize: "22px", letterSpacing: "0.06em", background: "#00f0ff", color: "#040b0d", border: "none", padding: "15px 36px", borderRadius: "2px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", boxShadow: "0 8px 30px rgba(0,240,255,0.25)", width: "min(320px, 90vw)", boxSizing: "border-box" }}
+            style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 800, fontSize: "18px", letterSpacing: "0.05em", background: "#00f0ff", color: "#040b0d", border: "none", padding: "11px 24px", borderRadius: "4px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 6px 20px rgba(0,240,255,0.2)", width: "min(260px, 85vw)", boxSizing: "border-box", transition: "all 0.2s ease" }}
           >
             ENTER AS GUEST <span style={{ transition: "transform .2s ease" }}>→</span>
           </button>
