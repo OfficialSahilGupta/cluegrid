@@ -1605,6 +1605,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
       const teamNameText = (teamObj?.name || label).toUpperCase();
 
+      // Check if this specific card contains the active popover player
+      const hasActiveCoopPopover = teamPlayers.some((p) => p.id === activeSwitchPlayerId);
+      const hasActiveSpyPopover = spymasters.some((p) => p.id === activeSwitchPlayerId);
+      const hasActiveOpPopover = operatives.some((p) => p.id === activeSwitchPlayerId);
+
       return (
         <div
           key={color}
@@ -1706,6 +1711,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
                 boxSizing: "border-box",
                 gap: "12px",
+                zIndex: hasActiveCoopPopover ? 30 : 1,
               }}
             >
               <div
@@ -1784,6 +1790,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
                   boxSizing: "border-box",
                   gap: "12px",
+                  zIndex: hasActiveSpyPopover ? 30 : 1,
                 }}
               >
                 <div
@@ -1861,6 +1868,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
                   boxSizing: "border-box",
                   gap: "12px",
+                  zIndex: hasActiveOpPopover ? 30 : 1,
                 }}
               >
                 <div
@@ -3361,7 +3369,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
         {/* Room Players card rendered at the top, above Turn Banner */}
         {room.phase !== "lobby" && (
-          <div style={{ width: "100%", boxSizing: "border-box" }}>
+          <div style={{ width: "100%", boxSizing: "border-box", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1 }}>
             {renderGroupedPlayersCard()}
           </div>
         )}
@@ -5910,6 +5918,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           alignItems: "center",
           cursor: canSwitch ? "pointer" : "default",
           margin: "4px",
+          zIndex: activeSwitchPlayerId === p.id ? 50 : 1,
         }}
       >
         {/* The Circle */}
