@@ -621,7 +621,7 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
     .catch((err) => console.error(err));
 
   // Explicitly notify all clients in the room to trigger start/reset animations
-  io.to(room.roomCode).emit("game_started");
+  io.to(`room:${room.roomCode}`).emit("game_started");
 
   startRoomTimer(room, io);
   broadcastRoomState(room, io);
@@ -774,6 +774,7 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
           `${player.displayName} (Spymaster) gave clue: "${trimmedClue}" (Count: ${effectiveClueCount === -1 ? "∞" : effectiveClueCount})`,
           {
             spymasterName: player.displayName,
+            spymasterAvatar: player.avatar,
             word: trimmedClue,
             count: effectiveClueCount,
           }
@@ -910,7 +911,13 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
 
           addGameLogEntry(io, room.roomCode, "reveal", guessingTeam,
             `${player.displayName} found "${card.word}" (Correct! — ${guessingTeam === "red" ? "Red" : "Blue"} agent)`,
-            { playerDisplayName: player.displayName, cardWord: card.word, cardType: coopType }
+            {
+              playerDisplayName: player.displayName,
+              playerTeam: player.team,
+              playerAvatar: player.avatar,
+              cardWord: card.word,
+              cardType: coopType
+            }
           );
 
           // Win check: has this team revealed all their agents?
@@ -929,7 +936,13 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
           player.guessesCount = (player.guessesCount || 0) + 1;
           addGameLogEntry(io, room.roomCode, "reveal", null,
             `${player.displayName} hit "${card.word}" — ASSASSIN! ${guessingTeam === "red" ? "Blue" : "Red"} Team wins!`,
-            { playerDisplayName: player.displayName, cardWord: card.word, cardType: "assassin" }
+            {
+              playerDisplayName: player.displayName,
+              playerTeam: player.team,
+              playerAvatar: player.avatar,
+              cardWord: card.word,
+              cardType: "assassin"
+            }
           );
           endGame(room, winner, io);
 
@@ -938,7 +951,13 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
           player.guessesCount = (player.guessesCount || 0) + 1;
           addGameLogEntry(io, room.roomCode, "reveal", null,
             `${player.displayName} guessed "${card.word}" — not their agent (Turn Ends)`,
-            { playerDisplayName: player.displayName, cardWord: card.word, cardType: coopType ?? "neutral" }
+            {
+              playerDisplayName: player.displayName,
+              playerTeam: player.team,
+              playerAvatar: player.avatar,
+              cardWord: card.word,
+              cardType: coopType ?? "neutral"
+            }
           );
           advanceTurn(room, io);
         }
@@ -982,6 +1001,8 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
           `${player.displayName} guessed "${card.word}" (Correct!)`,
           {
             playerDisplayName: player.displayName,
+            playerTeam: player.team,
+            playerAvatar: player.avatar,
             cardWord: card.word,
             cardType,
           }
@@ -1009,6 +1030,8 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
           `${player.displayName} guessed "${card.word}" (Neutral - Turn Ends)`,
           {
             playerDisplayName: player.displayName,
+            playerTeam: player.team,
+            playerAvatar: player.avatar,
             cardWord: card.word,
             cardType,
           }
@@ -1029,6 +1052,8 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
           `${player.displayName} guessed "${card.word}" (ASSASSIN! - Team Eliminated)`,
           {
             playerDisplayName: player.displayName,
+            playerTeam: player.team,
+            playerAvatar: player.avatar,
             cardWord: card.word,
             cardType,
           }
@@ -1080,6 +1105,8 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
           `${player.displayName} guessed "${card.word}" (Other Team's Card - Turn Ends)`,
           {
             playerDisplayName: player.displayName,
+            playerTeam: player.team,
+            playerAvatar: player.avatar,
             cardWord: card.word,
             cardType,
           }
@@ -1168,6 +1195,20 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
         room.turnState.phase = "guessing";
         advanceTurn(room, io);
       } else if (room.turnState.phase === "guessing") {
+        addGameLogEntry(
+          io,
+          room.roomCode,
+          "reveal",
+          player.team,
+          `${player.displayName} ended the turn.`,
+          {
+            playerDisplayName: player.displayName,
+            playerTeam: player.team,
+            playerAvatar: player.avatar,
+            cardWord: "pass",
+            cardType: "pass",
+          }
+        );
         advanceTurn(room, io);
       } else {
         socket.emit("error_msg", "Cannot end turn now.");
