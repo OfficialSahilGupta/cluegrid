@@ -1750,22 +1750,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); }}
                 />
                 <div
-                  style={{
-                    position: "absolute",
-                    top: "0",
-                    right: "calc(100% + 16px)",
-                    width: "320px",
-                    background: "var(--color-surface)",
-                    border: "2px solid var(--accent)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "20px",
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(232, 163, 61, 0.15)",
-                    zIndex: 9999,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "16px",
-                  }}
-                  className="scale-up"
+                  className="profile-popup-card scale-up lobby-popup"
+                  style={{}}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--color-border)", paddingBottom: "8px" }}>
@@ -2039,7 +2025,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   onClick={() => {
                     triggerHaptics([200]);
                     playNavClick();
-                    if (socket) socket.emit("toggle_room_lock", { roomCode: room.roomCode });
+                    if (socket) {
+                      socket.emit("update_settings", {
+                        roomCode: room.roomCode,
+                        settings: { roomLocked: !room.settings.roomLocked },
+                      });
+                    }
                   }}
                   style={{
                     width: "100%",
@@ -2178,22 +2169,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); }}
                 />
                 <div
-                  style={{
-                    position: "absolute",
-                    top: "0",
-                    left: "calc(100% + 16px)",
-                    width: "320px",
-                    background: "var(--color-surface)",
-                    border: "2px solid var(--accent)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "20px",
-                    boxShadow: "0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(232, 163, 61, 0.15)",
-                    zIndex: 9999,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "16px",
-                  }}
-                  className="scale-up"
+                  className="profile-popup-card scale-up gameplay-popup"
+                  style={{}}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--color-border)", paddingBottom: "8px" }}>
