@@ -4062,7 +4062,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     gap: "clamp(4px, 1.5vw, 12px)",
                     width: "100%",
                     padding: "clamp(8px, 2vw, 16px)",
-                    background: "rgba(4, 11, 13, 0.75)",
+                    background: room.phase === "ended" ? "var(--bg-surface-solid)" : "rgba(4, 11, 13, 0.75)",
                     backdropFilter: "blur(8px)",
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: "var(--radius-lg)",
@@ -7796,18 +7796,17 @@ const renderSettingsCard = (side?: "left" | "right") => {
         }
         @keyframes grid-victory-tilt {
           0% { transform: perspective(1200px) rotateX(0deg) scale(1); }
-          100% { transform: perspective(1200px) rotateX(10deg) translateY(-5px) scale(0.98); }
+          100% { transform: perspective(1200px) rotateX(0deg) scale(1); }
         }
 
         /* Defeat Grid Style */
         .grid-defeat-active {
           animation: grid-defeat-tilt 1s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-          opacity: 0.65;
           filter: grayscale(0.4) brightness(0.8);
         }
         @keyframes grid-defeat-tilt {
-          0% { transform: perspective(1200px) rotateX(0deg) translateY(0) scale(1); }
-          100% { transform: perspective(1200px) rotateX(-12deg) translateY(10px) scale(0.95); }
+          0% { transform: perspective(1200px) rotateX(0deg) scale(1); }
+          100% { transform: perspective(1200px) rotateX(0deg) scale(1); }
         }
         /* ─── Phase 2 Animations ─── */
         @keyframes camera-warp-in {
