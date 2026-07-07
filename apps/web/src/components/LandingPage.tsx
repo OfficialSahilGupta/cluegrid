@@ -1166,30 +1166,20 @@ export function LandingPage({
 
     // Load character sheet asset asynchronously
     const textureLoader = new THREE.TextureLoader();
-    textureLoader.load("/spy-characters.png", (texture: any) => {
+    textureLoader.load("/spy-characters.webp", (texture: any) => {
       const img = texture.image;
       allOps.forEach((op, i) => {
-        op.userData.img = img;
-        
-        // Draw the character fully on the canvas right away
-        const d = op.userData;
-        const canvas = d.canvas;
-        const sctx = d.sctx;
-        const w = canvas.width;
-        const h = canvas.height;
-        sctx.clearRect(0, 0, w, h);
-        
-        const tempCanvas = document.createElement("canvas");
-        tempCanvas.width = 256;
-        tempCanvas.height = 512;
-        const tctx = tempCanvas.getContext("2d")!;
+        // Pre-chroma-key character image
+        const charCanvas = document.createElement("canvas");
+        charCanvas.width = 256;
+        charCanvas.height = 512;
+        const charCtx = charCanvas.getContext("2d")!;
         const srcW = img.width / 4;
         const srcH = img.height;
         const srcX = i * srcW;
-        tctx.drawImage(img, srcX, 0, srcW, srcH, 0, 0, 256, 512);
-        
-        // White background chroma keying
-        const imgData = tctx.getImageData(0, 0, 256, 512);
+        charCtx.drawImage(img, srcX, 0, srcW, srcH, 0, 0, 256, 512);
+
+        const imgData = charCtx.getImageData(0, 0, 256, 512);
         const pix = imgData.data;
         for (let p = 0; p < pix.length; p += 4) {
           const r = pix[p]!;
@@ -1203,38 +1193,40 @@ export function LandingPage({
             pix[p+3] = Math.max(0, Math.floor(pix[p+3]! * factor));
           }
         }
-        tctx.putImageData(imgData, 0, 0);
-        
-        sctx.imageSmoothingEnabled = false;
-        sctx.drawImage(tempCanvas, 0, 0, 256, 512, 0, 0, w, h);
-        
-        // Mask edges
-        sctx.globalCompositeOperation = "destination-in";
-        const gradV = sctx.createLinearGradient(0, 0, 0, h);
-        gradV.addColorStop(0, "rgba(0,0,0,0)");
-        gradV.addColorStop(0.1, "rgba(0,0,0,1)");
-        gradV.addColorStop(0.85, "rgba(0,0,0,1)");
-        gradV.addColorStop(1, "rgba(0,0,0,0)");
-        sctx.fillStyle = gradV;
-        sctx.fillRect(0, 0, w, h);
+        charCtx.putImageData(imgData, 0, 0);
 
-        const gradH = sctx.createLinearGradient(0, 0, w, 0);
-        gradH.addColorStop(0, "rgba(0,0,0,0)");
-        gradH.addColorStop(0.12, "rgba(0,0,0,1)");
-        gradH.addColorStop(0.88, "rgba(0,0,0,1)");
-        gradH.addColorStop(1, "rgba(0,0,0,0)");
-        sctx.fillStyle = gradH;
-        sctx.fillRect(0, 0, w, h);
-        sctx.globalCompositeOperation = "source-over";
+        // Pre-render holographic wireframe silhouette
+        const silhouetteCanvas = document.createElement("canvas");
+        silhouetteCanvas.width = 256;
+        silhouetteCanvas.height = 512;
+        const silCtx = silhouetteCanvas.getContext("2d")!;
+        silCtx.drawImage(charCanvas, 0, 0);
+        silCtx.globalCompositeOperation = "source-in";
+        silCtx.fillStyle = "rgba(0, 240, 255, 0.85)";
+        silCtx.fillRect(0, 0, 256, 512);
+
+        // Add cyber wireframe scan lines to silhouette
+        silCtx.globalCompositeOperation = "source-atop";
+        silCtx.strokeStyle = "rgba(0, 240, 255, 0.35)";
+        silCtx.lineWidth = 1.0;
+        for (let y = 0; y < 512; y += 4) {
+          silCtx.beginPath();
+          silCtx.moveTo(0, y);
+          silCtx.lineTo(256, y);
+          silCtx.stroke();
+        }
+
+        op.userData.img = img;
+        op.userData.charCanvas = charCanvas;
+        op.userData.silhouetteCanvas = silhouetteCanvas;
+        op.userData.finalRenderDone = false;
         
-        d.mat.map.needsUpdate = true;
-        d.mat.opacity = 1.0;
-        d.groundGlow.material.opacity = 0.12;
-        d.namePlateSprite.material.opacity = 0.9;
-        op.scale.set(1, 1, 1);
-        op.position.y = 0;
+        op.userData.mat.opacity = 0;
+        op.userData.groundGlow.material.opacity = 0;
+        op.userData.namePlateSprite.material.opacity = 0;
       });
-      materializeProgress = 1.0;
+      // Start materialization progress animation from 0
+      materializeProgress = 0.0;
     });
 
     let introTime = 0.0;
@@ -1284,58 +1276,75 @@ export function LandingPage({
         
         allOps.forEach((op, i) => {
           const d = op.userData;
-          if (!d.img) return;
+          if (!d.img || !d.charCanvas || !d.silhouetteCanvas) return;
           
           const canvas = d.canvas;
           const sctx = d.sctx;
-          const img = d.img;
           const w = canvas.width;
           const h = canvas.height;
           
           sctx.clearRect(0, 0, w, h);
           
-          // Smoothly increase voxelization resolution based on progress
-          const resScale = 0.03 + 0.97 * Math.pow(tProgress, 2.5);
-          const tempW = Math.max(8, Math.floor(256 * resScale));
-          const tempH = Math.max(16, Math.floor(512 * resScale));
-          
-          const tempCanvas = document.createElement("canvas");
-          tempCanvas.width = tempW;
-          tempCanvas.height = tempH;
-          const tctx = tempCanvas.getContext("2d")!;
-          
-          const srcW = img.width / 4;
-          const srcH = img.height;
-          const srcX = i * srcW;
-          
-          tctx.drawImage(img, srcX, 0, srcW, srcH, 0, 0, tempW, tempH);
-          
-          // White background chroma keying
-          const imgData = tctx.getImageData(0, 0, tempW, tempH);
-          const pix = imgData.data;
-          for (let p = 0; p < pix.length; p += 4) {
-            const r = pix[p]!;
-            const g = pix[p+1]!;
-            const b = pix[p+2]!;
-            if (r > 240 && g > 240 && b > 240) {
-              pix[p+3] = 0;
-            } else if (r > 210 && g > 210 && b > 210) {
-              const maxVal = Math.max(r, g, b);
-              const factor = (240 - maxVal) / 30;
-              pix[p+3] = Math.max(0, Math.floor(pix[p+3]! * factor));
+          // Upward wipe Y coordinate (solidifies from bottom 512 to top 0)
+          const wipeY = 512 * (1.0 - tProgress);
+
+          // 1. Draw the holographic wireframe silhouette above the wipe line
+          if (wipeY > 0) {
+            sctx.drawImage(d.silhouetteCanvas, 0, 0, 256, wipeY, 0, 0, w, wipeY);
+          }
+
+          // 2. Draw the fully textured opaque character below the wipe line
+          if (wipeY < 512) {
+            sctx.drawImage(d.charCanvas, 0, wipeY, 256, 512 - wipeY, 0, wipeY, w, 512 - wipeY);
+          }
+
+          // 3. Holographic digital artifacting, scanlines, and glitching along the transition line
+          if (tProgress > 0 && tProgress < 1.0) {
+            // Bright cyan materialization line
+            sctx.fillStyle = "rgba(0, 255, 255, 0.95)";
+            sctx.fillRect(0, wipeY - 2, w, 4);
+
+            // Blocky pixelation and glitching fragments (erratic horizontal shifts)
+            if (Math.random() < 0.75) {
+              const glitchH = Math.random() * 15 + 5;
+              const glitchY = wipeY - glitchH / 2 + (Math.random() * 10 - 5);
+              const glitchW = Math.random() * 60 + 15;
+              const glitchX = Math.random() * (w - glitchW);
+              // Draw cyan glitch block
+              sctx.fillStyle = Math.random() < 0.4 ? "rgba(0, 240, 255, 0.8)" : "rgba(255, 255, 255, 0.9)";
+              sctx.fillRect(glitchX, glitchY, glitchW, glitchH);
+
+              // Draw shifted piece of character texture
+              const shiftX = Math.random() * 30 - 15;
+              sctx.drawImage(
+                d.charCanvas,
+                Math.max(0, Math.floor(glitchX)),
+                Math.max(0, Math.floor(glitchY)),
+                Math.floor(glitchW),
+                Math.floor(glitchH),
+                glitchX + shiftX,
+                glitchY,
+                glitchW,
+                glitchH
+              );
+            }
+
+            // Erratic horizontal scanlines near the wipe line
+            for (let s = 0; s < 3; s++) {
+              if (Math.random() < 0.6) {
+                const scanLineY = wipeY + (Math.random() * 40 - 20);
+                sctx.fillStyle = "rgba(0, 240, 255, 0.4)";
+                sctx.fillRect(0, scanLineY, w, 1.5);
+              }
             }
           }
-          tctx.putImageData(imgData, 0, 0);
-          
-          sctx.imageSmoothingEnabled = false;
-          sctx.drawImage(tempCanvas, 0, 0, tempW, tempH, 0, 0, w, h);
-          
-          // Scanlines
+
+          // Scanline animation overlay
           const scanY = (t * 240) % h;
-          sctx.fillStyle = "rgba(0, 240, 255, 0.45)";
-          sctx.fillRect(0, scanY, w, 4.5);
+          sctx.fillStyle = "rgba(0, 240, 255, 0.25)";
+          sctx.fillRect(0, scanY, w, 3.0);
           
-          // Mask edges
+          // Mask edges (fade out at boundaries)
           sctx.globalCompositeOperation = "destination-in";
           const gradV = sctx.createLinearGradient(0, 0, 0, 512);
           gradV.addColorStop(0, "rgba(0,0,0,0)");
@@ -1360,15 +1369,49 @@ export function LandingPage({
           const targetY = Math.sin(t * 0.8 + op.position.x) * 0.02;
           op.position.y = -0.22 * (1.0 - tProgress) + targetY;
           
-          d.mat.opacity = tProgress * (0.75 + 0.25 * Math.random());
+          d.mat.opacity = tProgress * (0.85 + 0.15 * Math.random());
           d.groundGlow.material.opacity = tProgress * 0.12;
           d.namePlateSprite.material.opacity = tProgress * 0.9;
           
-          // Set correct group scale
           op.scale.set(1, 1, 1);
           op.scale.y = 0.1 + 0.9 * tProgress;
         });
       } else {
+        // Ensure final clean render is drawn on the operative canvases once
+        allOps.forEach((op) => {
+          const d = op.userData;
+          if (d.charCanvas && !d.finalRenderDone) {
+            const canvas = d.canvas;
+            const sctx = d.sctx;
+            const w = canvas.width;
+            const h = canvas.height;
+            sctx.clearRect(0, 0, w, h);
+            sctx.drawImage(d.charCanvas, 0, 0, 256, 512, 0, 0, w, h);
+            
+            // Mask edges
+            sctx.globalCompositeOperation = "destination-in";
+            const gradV = sctx.createLinearGradient(0, 0, 0, 512);
+            gradV.addColorStop(0, "rgba(0,0,0,0)");
+            gradV.addColorStop(0.1, "rgba(0,0,0,1)");
+            gradV.addColorStop(0.85, "rgba(0,0,0,1)");
+            gradV.addColorStop(1, "rgba(0,0,0,0)");
+            sctx.fillStyle = gradV;
+            sctx.fillRect(0, 0, 256, 512);
+
+            const gradH = sctx.createLinearGradient(0, 0, 256, 0);
+            gradH.addColorStop(0, "rgba(0,0,0,0)");
+            gradH.addColorStop(0.12, "rgba(0,0,0,1)");
+            gradH.addColorStop(0.88, "rgba(0,0,0,1)");
+            gradH.addColorStop(1, "rgba(0,0,0,0)");
+            sctx.fillStyle = gradH;
+            sctx.fillRect(0, 0, 256, 512);
+            sctx.globalCompositeOperation = "source-over";
+            
+            d.mat.map.needsUpdate = true;
+            d.finalRenderDone = true;
+          }
+        });
+
         // Static standing characters (no animations)
         state.agents.forEach((op) => {
           const d = op.userData;
@@ -1407,6 +1450,23 @@ export function LandingPage({
       emitterBeam.material.opacity = isActiveRoomRef.current ? 0.14 : (0.08 + Math.abs(Math.sin(t * 4.5)) * 0.08);
 
       particles.rotation.y = t * 0.01;
+
+      // Animate ambient dust particles upward like glowing digital embers
+      const pCount = 180;
+      const positions = particles.geometry.attributes.position.array as Float32Array;
+      for (let i = 0; i < pCount; i++) {
+        // Move Y position upwards
+        positions[i * 3 + 1] = (positions[i * 3 + 1] || 0) + delta * 0.4;
+        // Subtle drift
+        positions[i * 3] = (positions[i * 3] || 0) + Math.sin(t * 1.5 + i) * 0.004;
+        // Reset at threshold height (5.5) back to bottom
+        if (positions[i * 3 + 1]! > 5.5) {
+          positions[i * 3 + 1] = 0;
+          positions[i * 3] = (Math.random() - 0.5) * 22;
+          positions[i * 3 + 2] = (Math.random() - 0.5) * 12;
+        }
+      }
+      particles.geometry.attributes.position.needsUpdate = true;
 
       // Letter tiles scrolling
       state.letterTiles.forEach((spr) => {

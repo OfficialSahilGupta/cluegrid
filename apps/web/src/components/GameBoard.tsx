@@ -3819,7 +3819,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             style={{
                               position: "absolute",
                               inset: 0,
-                              backgroundImage: 'url("/spy-characters.png")',
+                              backgroundImage: 'url("/spy-characters.webp")',
                               backgroundSize: '480% 320%',
                               backgroundPosition: `${
                                 card.type === "red" ? 66.666 :
