@@ -4,11 +4,11 @@
 :root {
   /* Base surfaces */
   --bg-page: #081619;
-  --bg-surface: rgba(8, 22, 25, 0.76);
-  --bg-surface-raised: rgba(6, 24, 28, 0.85);
+  --bg-surface: rgba(8, 22, 25, 0.95);
+  --bg-surface-raised: rgba(6, 24, 28, 0.98);
   --border-subtle: rgba(0, 240, 255, 0.15);
   --border-default: rgba(0, 240, 255, 0.3);
-  --header-bg: rgba(8, 22, 25, 0.94);
+  --header-bg: rgba(8, 22, 25, 0.99);
 
   /* Text colors */
   --text-primary: #eef3ee;
@@ -91,7 +91,7 @@ html[data-theme="light"] {
   --bg-surface-raised: #EBE8E0;
   --border-subtle: rgba(28, 25, 22, 0.1);
   --border-default: rgba(28, 25, 22, 0.2);
-  --header-bg: rgba(244, 241, 234, 0.92);
+  --header-bg: rgba(244, 241, 234, 0.99);
 
   /* Text colors */
   --text-primary: #1C1916;
@@ -392,7 +392,7 @@ html.increased-fonts {
 .game-main-split-layout {
   display: grid;
   grid-template-columns: 1fr minmax(320px, 1.3fr) 1fr;
-  gap: 24px;
+  gap: 12px;
 }
 
 /* Default in front of WebGL Canvas (which is zIndex: 4) */
@@ -413,14 +413,14 @@ html.increased-fonts {
   .hud-side-panel-left,
   .hud-side-panel-right {
     z-index: 2 !important;
-    opacity: 0.75;
+    opacity: 0.95;
   }
 }
 
 @media (max-width: 1024px) {
   .game-main-split-layout {
     grid-template-columns: 1fr !important;
-    gap: 16px !important;
+    gap: 8px !important;
   }
   .lobby-col-profile {
     order: 1 !important;

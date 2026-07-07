@@ -43,8 +43,8 @@ export function SupportPage() {
         style={{
           display: "flex",
           flexDirection: "column",
-          gap: "14px",
-          background: "rgba(6,24,28,0.4)",
+          gap: "10px",
+          background: "var(--bg-surface-raised)",
           border: "1.5px solid rgba(0,240,255,0.2)",
           borderRadius: "6px",
           padding: "20px",

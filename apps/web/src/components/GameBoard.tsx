@@ -1246,36 +1246,92 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       const activePlayer = room.players.find((p) => p.id === activeSwitchPlayerId);
       const showPopover = activePlayer && activePlayer.team === color;
 
+      const greenPillButtonStyle: React.CSSProperties = {
+        background: "linear-gradient(180deg, #10b981 0%, #047857 100%)",
+        border: "1.5px solid rgba(255, 255, 255, 0.45)",
+        borderRadius: "9999px",
+        color: "#FFFFFF",
+        fontFamily: "var(--font-display)",
+        fontWeight: 800,
+        fontSize: "0.9rem",
+        letterSpacing: "0.06em",
+        textTransform: "uppercase",
+        padding: "9px 18px",
+        cursor: "pointer",
+        boxShadow: "0 6px 14px rgba(0, 0, 0, 0.35)",
+        width: "100%",
+        boxSizing: "border-box",
+        textAlign: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 2,
+        transition: "all 0.15s ease",
+      };
+
+      const lockedButtonStyle: React.CSSProperties = {
+        background: "rgba(0,0,0,0.35)",
+        border: "1.5px dashed rgba(255,255,255,0.25)",
+        borderRadius: "9999px",
+        color: "rgba(255,255,255,0.55)",
+        fontFamily: "var(--font-display)",
+        fontWeight: 700,
+        fontSize: "0.85rem",
+        padding: "8px 18px",
+        width: "100%",
+        boxSizing: "border-box",
+        textAlign: "center",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: "6px",
+        opacity: 0.8,
+        zIndex: 2,
+      };
+
+      // Card style configurations aligned to the product theme variables
+      const cardStyle = {
+        bg: themeCol.bg,
+        border: `2.5px solid ${themeCol.border}`,
+        watermarkSpy: "👁️‍🗨️",
+        watermarkOp: "🕵️‍♂️",
+        watermarkMem: "👥",
+      };
+
+      const teamNameText = (teamObj?.name || label).toUpperCase();
+
       return (
         <div
           key={color}
           style={{
-            borderLeft: `3px solid ${themeCol.border}`,
-            paddingLeft: "12px",
-            marginBottom: "4px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "12px",
             flex: 1,
-            minWidth: "180px",
+            minWidth: "240px",
             position: "relative",
           }}
         >
-          <h4
+          {/* 1. Team Name Bubble Capsule Header (with theme-aligned border color) */}
+          <div
             style={{
-              margin: "0 0 10px 0",
-              fontFamily: "var(--font-display)",
-              fontSize: "1.15rem",
-              fontWeight: 700,
-              color: themeCol.light,
+              background: "linear-gradient(180deg, rgba(63, 63, 70, 0.95) 0%, rgba(39, 39, 42, 0.95) 100%)",
+              border: `2.5px solid ${themeCol.border}`,
+              padding: "8px 24px",
+              borderRadius: "9999px",
               display: "flex",
-              justifyContent: "space-between",
+              justifyContent: "center",
               alignItems: "center",
+              width: "100%",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.35)",
+              boxSizing: "border-box",
             }}
           >
-            <span>{label}</span>
             {isHost ? (
               <input
                 type="text"
                 defaultValue={teamObj?.name || ""}
-                placeholder="City Name"
+                placeholder={label.toUpperCase()}
                 onBlur={(e) => {
                   if (socket && e.target.value.trim() !== "") {
                     socket.emit("rename_team", {
@@ -1296,101 +1352,105 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   }
                 }}
                 style={{
-                  background: themeCol.bg,
-                  border: `1px solid ${themeCol.border}`,
-                  borderRadius: "12px",
-                  color: themeCol.text,
-                  padding: "3px 8px",
-                  fontSize: "0.75rem",
-                  fontWeight: 700,
+                  background: "transparent",
+                  border: "none",
+                  color: "#FFFFFF",
+                  padding: "0",
+                  fontSize: "1.1rem",
+                  fontWeight: 900,
                   textTransform: "uppercase",
-                  letterSpacing: "0.05em",
-                  width: "110px",
+                  letterSpacing: "0.08em",
+                  width: "100%",
                   textAlign: "center",
                   outline: "none",
+                  fontFamily: "var(--font-display)",
                 }}
               />
             ) : (
-              teamObj?.name && (
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    padding: "3px 8px",
-                    borderRadius: "12px",
-                    background: themeCol.bg,
-                    color: themeCol.text,
-                    border: `1px solid ${themeCol.border}`,
-                    display: "inline-block",
-                  }}
-                >
-                  {teamObj.name}
-                </span>
-              )
+              <span
+                style={{
+                  fontSize: "1.1rem",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  color: "#FFFFFF",
+                  fontFamily: "var(--font-display)",
+                  textAlign: "center",
+                }}
+              >
+                {teamNameText}
+              </span>
             )}
-          </h4>
+          </div>
 
+          {/* 2. Team Role Containers */}
           {room.gameMode === "coop" ? (
-            <div style={{ width: "100%", boxSizing: "border-box" }}>
-              <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "8px" }}>
-                Members
+            /* CO-OP Mode: Unified Members Container */
+            <div
+              style={{
+                background: cardStyle.bg,
+                border: cardStyle.border,
+                borderRadius: "var(--radius-lg)",
+                padding: "16px",
+                minHeight: "150px",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                position: "relative",
+                overflow: "hidden",
+                boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
+                boxSizing: "border-box",
+                gap: "12px",
+              }}
+            >
+              {/* Watermark */}
+              <div
+                style={{
+                  position: "absolute",
+                  left: "12px",
+                  bottom: "6px",
+                  fontSize: "100px",
+                  lineHeight: 1,
+                  opacity: 0.1,
+                  pointerEvents: "none",
+                  userSelect: "none",
+                  zIndex: 1,
+                }}
+              >
+                {cardStyle.watermarkMem}
               </div>
-              {teamPlayers.length > 0 ? (
-                <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
-                  {teamPlayers.map((p) => renderPlayerRow(p))}
+
+              <div style={{ zIndex: 2 }}>
+                <div style={{ fontSize: "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: "8px" }}>
+                  Members
                 </div>
-              ) : null}
+                {teamPlayers.length > 0 ? (
+                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "4px" }}>
+                    {teamPlayers.map((p) => renderPlayerRow(p))}
+                  </div>
+                ) : (
+                  <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No members active</div>
+                )}
+              </div>
+
               {localPlayer?.team !== color && (
                 !room.settings.roomLocked ? (
                   <button
                     onClick={() => handleJoinTeamRole(color, "operative")}
-                    style={{
-                      width: "100%",
-                      padding: "6px 8px",
-                      background: "transparent",
-                      border: "1px solid var(--accent)",
-                      color: "var(--accent)",
-                      borderRadius: "var(--radius-sm)",
-                      fontSize: "0.85rem",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      fontFamily: "var(--font-display)",
-                      transition: "all 0.15s ease",
-                      boxSizing: "border-box",
-                      textAlign: "center",
-                    }}
+                    style={greenPillButtonStyle}
                     onMouseOver={(e) => {
-                      e.currentTarget.style.background = "var(--accent)";
-                      e.currentTarget.style.color = "var(--accent-text-on)";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                      e.currentTarget.style.filter = "brightness(1.1)";
                     }}
                     onMouseOut={(e) => {
-                      e.currentTarget.style.background = "transparent";
-                      e.currentTarget.style.color = "var(--accent)";
+                      e.currentTarget.style.transform = "translateY(0)";
+                      e.currentTarget.style.filter = "brightness(1)";
                     }}
                   >
-                    + Join Team
+                    Join Team
                   </button>
                 ) : (
-                  <div style={{
-                    width: "100%",
-                    padding: "6px 8px",
-                    background: "rgba(255, 255, 255, 0.02)",
-                    border: "1px dashed var(--border-default)",
-                    color: "var(--text-muted)",
-                    borderRadius: "var(--radius-sm)",
-                    fontSize: "0.8rem",
-                    fontWeight: 500,
-                    fontFamily: "var(--font-display)",
-                    boxSizing: "border-box",
-                    textAlign: "center",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "6px",
-                    opacity: 0.6
-                  }}>
+                  <div style={lockedButtonStyle}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -1401,68 +1461,77 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               )}
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%", boxSizing: "border-box" }}>
-              {/* Spymasters section */}
-              <div>
-                <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
-                  Spymaster
+            /* COMPETITIVE Modes: Spymasters & Operatives Containers */
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", boxSizing: "border-box" }}>
+              
+              {/* Spymasters Card */}
+              <div
+                style={{
+                  background: cardStyle.bg,
+                  border: cardStyle.border,
+                  borderRadius: "var(--radius-lg)",
+                  padding: "16px",
+                  minHeight: "150px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
+                  boxSizing: "border-box",
+                  gap: "12px",
+                }}
+              >
+                {/* Watermark */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "12px",
+                    bottom: "6px",
+                    fontSize: "100px",
+                    lineHeight: 1,
+                    opacity: 0.1,
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    zIndex: 1,
+                  }}
+                >
+                  {cardStyle.watermarkSpy}
                 </div>
-                {spymasters.length > 0 && (
-                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
-                    {spymasters.map((p) => renderPlayerRow(p))}
+
+                <div style={{ zIndex: 2 }}>
+                  <div style={{ fontSize: "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: "8px" }}>
+                    Spymasters
                   </div>
-                )}
+                  {spymasters.length > 0 ? (
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "4px" }}>
+                      {spymasters.map((p) => renderPlayerRow(p))}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Spymaster deployed</div>
+                  )}
+                </div>
+
                 {!room.settings.roomLocked ? (
                   (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") && (
                     <button
                       onClick={() => handleJoinTeamRole(color, "spymaster")}
-                      style={{
-                        width: "100%",
-                        padding: "6px 8px",
-                        background: "transparent",
-                        border: `1px solid ${themeCol.border}`,
-                        color: themeCol.text,
-                        borderRadius: "var(--radius-sm)",
-                        fontSize: "0.85rem",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        fontFamily: "var(--font-display)",
-                        transition: "all 0.15s ease",
-                        boxSizing: "border-box",
-                        textAlign: "center",
-                      }}
+                      style={greenPillButtonStyle}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.background = themeCol.border;
-                        e.currentTarget.style.color = "#fff";
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                        e.currentTarget.style.filter = "brightness(1.1)";
                       }}
                       onMouseOut={(e) => {
-                        e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.color = themeCol.text;
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.filter = "brightness(1)";
                       }}
                     >
-                      + JOIN TEAM
+                      Join Spymasters
                     </button>
                   )
                 ) : (
                   spymasters.length === 0 && (
-                    <div style={{
-                      width: "100%",
-                      padding: "6px 8px",
-                      background: "rgba(255, 255, 255, 0.02)",
-                      border: "1px dashed var(--border-default)",
-                      color: "var(--text-muted)",
-                      borderRadius: "var(--radius-sm)",
-                      fontSize: "0.8rem",
-                      fontWeight: 500,
-                      fontFamily: "var(--font-display)",
-                      boxSizing: "border-box",
-                      textAlign: "center",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px",
-                      opacity: 0.6
-                    }}>
+                    <div style={lockedButtonStyle}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -1473,67 +1542,74 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 )}
               </div>
 
-              {/* Operatives section */}
-              <div>
-                <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
-                  Operatives
+              {/* Operatives Card */}
+              <div
+                style={{
+                  background: cardStyle.bg,
+                  border: cardStyle.border,
+                  borderRadius: "var(--radius-lg)",
+                  padding: "16px",
+                  minHeight: "150px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
+                  boxSizing: "border-box",
+                  gap: "12px",
+                }}
+              >
+                {/* Watermark */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "12px",
+                    bottom: "6px",
+                    fontSize: "100px",
+                    lineHeight: 1,
+                    opacity: 0.1,
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    zIndex: 1,
+                  }}
+                >
+                  {cardStyle.watermarkOp}
                 </div>
-                {operatives.length > 0 && (
-                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
-                    {operatives.map((p) => renderPlayerRow(p))}
+
+                <div style={{ zIndex: 2 }}>
+                  <div style={{ fontSize: "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: "8px" }}>
+                    Operatives
                   </div>
-                )}
+                  {operatives.length > 0 ? (
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "4px" }}>
+                      {operatives.map((p) => renderPlayerRow(p))}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Operatives deployed</div>
+                  )}
+                </div>
+
                 {!room.settings.roomLocked ? (
                   (!localPlayer || localPlayer.team !== color || localPlayer.role !== "operative") && (
                     <button
                       onClick={() => handleJoinTeamRole(color, "operative")}
-                      style={{
-                        width: "100%",
-                        padding: "6px 8px",
-                        background: "transparent",
-                        border: `1px solid ${themeCol.border}`,
-                        color: themeCol.text,
-                        borderRadius: "var(--radius-sm)",
-                        fontSize: "0.85rem",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        fontFamily: "var(--font-display)",
-                        transition: "all 0.15s ease",
-                        boxSizing: "border-box",
-                        textAlign: "center",
-                      }}
+                      style={greenPillButtonStyle}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.background = themeCol.border;
-                        e.currentTarget.style.color = "#fff";
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                        e.currentTarget.style.filter = "brightness(1.1)";
                       }}
                       onMouseOut={(e) => {
-                        e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.color = themeCol.text;
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.filter = "brightness(1)";
                       }}
                     >
-                      + JOIN TEAM
+                      Join Operatives
                     </button>
                   )
                 ) : (
                   operatives.length === 0 && (
-                    <div style={{
-                      width: "100%",
-                      padding: "6px 8px",
-                      background: "rgba(255, 255, 255, 0.02)",
-                      border: "1px dashed var(--border-default)",
-                      color: "var(--text-muted)",
-                      borderRadius: "var(--radius-sm)",
-                      fontSize: "0.8rem",
-                      fontWeight: 500,
-                      fontFamily: "var(--font-display)",
-                      boxSizing: "border-box",
-                      textAlign: "center",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px",
-                      opacity: 0.6
-                    }}>
+                    <div style={lockedButtonStyle}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -1543,9 +1619,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   )
                 )}
               </div>
+
             </div>
           )}
-          
         </div>
       );
     };
