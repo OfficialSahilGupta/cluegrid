@@ -1538,7 +1538,7 @@ export function LandingPage({
             CLUE<span style={{ color: "#00f0ff" }}>GRID</span>.GAMES
           </span>
         </div>
-        <div className="tag" style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "11px", letterSpacing: "0.16em", textTransform: "uppercase", color: "#9AA29B" }}>
+        <div className="tag" style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "clamp(9px, 2.5vw, 11px)", letterSpacing: "0.06em", textTransform: "uppercase", color: "#9AA29B", whiteSpace: "nowrap" }}>
           <span className="dot" style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#ef959c", boxShadow: "0 0 8px #ef959c", animation: "pulse 1.5s infinite" }} />
           Classified briefing — live feed
         </div>
@@ -1696,11 +1696,11 @@ export function LandingPage({
           </div>
           <button 
             onClick={handleEnterGuest}
-            style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 800, fontSize: "22px", letterSpacing: "0.06em", background: "#00f0ff", color: "#040b0d", border: "none", padding: "15px 36px", borderRadius: "2px", cursor: "pointer", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 8px 30px rgba(0,240,255,0.25)" }}
+            style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 800, fontSize: "22px", letterSpacing: "0.06em", background: "#00f0ff", color: "#040b0d", border: "none", padding: "15px 36px", borderRadius: "2px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", boxShadow: "0 8px 30px rgba(0,240,255,0.25)", width: "min(320px, 90vw)", boxSizing: "border-box" }}
           >
             ENTER AS GUEST <span style={{ transition: "transform .2s ease" }}>→</span>
           </button>
-          <div style={{ fontSize: "11px", letterSpacing: "0.14em", color: "#9AA29B", textTransform: "uppercase" }}>No badge required · guest clearance</div>
+          <div style={{ fontSize: "11px", letterSpacing: "0.14em", color: "#9AA29B", textTransform: "uppercase", textAlign: "center", width: "100%", padding: "0 10px", boxSizing: "border-box" }}>No badge required · guest clearance</div>
           <div style={{ display: "flex", gap: "14px", alignItems: "center", fontSize: "11px", color: "#9AA29B" }}>
             <button onClick={() => setAuthOpen(true)} className="cyber-dotted-link">Already have an account? Sign in →</button>
           </div>
