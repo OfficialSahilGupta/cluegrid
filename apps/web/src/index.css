@@ -594,3 +594,29 @@ html.increased-fonts {
     padding-right: 0 !important;
   }
 }
+
+/* Responsive styling for the player role assign popover card */
+@media (min-width: 769px) {
+  .assign-popover-card {
+    position: absolute !important;
+    top: 60px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 290px !important;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.85) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .assign-popover-card {
+    position: fixed !important;
+    top: 50% !important;
+    left: 58% !important; /* Shifted to the right */
+    transform: translate(-35%, -50%) !important; /* Shifted translate center point to the right */
+    width: 290px !important;
+    max-width: 90vw !important;
+    margin: 0 !important;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.95) !important;
+    z-index: 10000 !important;
+  }
+}

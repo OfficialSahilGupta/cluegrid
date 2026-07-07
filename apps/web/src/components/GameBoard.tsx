@@ -309,6 +309,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
   // Active Switching Player State
   const [activeSwitchPlayerId, setActiveSwitchPlayerId] = useState<string | null>(null);
+  const [isMobileViewport, setIsMobileViewport] = useState(typeof window !== "undefined" ? window.innerWidth <= 768 : false);
+  useEffect(() => {
+    const handleResize = () => setIsMobileViewport(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   const [votedCardIds, setVotedCardIds] = useState<number[]>([]);
   const [showWordCardIds, setShowWordCardIds] = useState<number[]>([]);
   const [clueSelectedCardIds, setClueSelectedCardIds] = useState<number[]>([]);
@@ -335,6 +341,43 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     localStorage.setItem("cluegrid_sound_volume", String(soundVolume));
   });
 
+  // Close player assign popover when clicking outside or scrolling
+  useEffect(() => {
+    if (!activeSwitchPlayerId) return;
+
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".assign-popover-card") && !target.closest(".player-row-wrapper")) {
+        setActiveSwitchPlayerId(null);
+        
+      }
+    };
+
+    const handleScrollClose = () => {
+      setActiveSwitchPlayerId(null);
+      
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("touchstart", handleOutsideClick);
+    window.addEventListener("scroll", handleScrollClose, { passive: true });
+    
+    // Also listen to main page container scroll if any
+    const viewport = document.getElementById("game-board-viewport");
+    if (viewport) {
+      viewport.addEventListener("scroll", handleScrollClose, { passive: true });
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("touchstart", handleOutsideClick);
+      window.removeEventListener("scroll", handleScrollClose);
+      if (viewport) {
+        viewport.removeEventListener("scroll", handleScrollClose);
+      }
+    };
+  }, [activeSwitchPlayerId]);
+
   // Lock body scroll when overlay popups are active to prevent background scrolling
   useEffect(() => {
     const viewport = document.getElementById("game-board-viewport");
@@ -350,6 +393,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       document.body.style.overflow = "";
     };
   }, [statsExpanded, profileSettingsOpen]);
+
+
 
   useEffect(() => {
     const originalAC = window.AudioContext;
@@ -1589,6 +1634,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             })()}
           </div>
         )}
+
       </div>
     );
   };
@@ -4153,7 +4199,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                             gap: "12px",
                             zIndex: 9999,
                           }}
-                          className="scale-up"
+                          className="scale-up assign-popover-card"
                         >
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "8px" }}>
                             <span style={{ fontSize: "1.0rem", fontWeight: 700, color: "var(--text-primary)", letterSpacing: "0.5px" }}>
@@ -5054,26 +5100,14 @@ const renderSettingsCard = (side?: "left" | "right") => {
   const renderAssignPopover = (p: Player) => {
     return (
       <>
-        {/* Transparent click catcher background */}
+
+        {/* Popover content positioned absolute nested on desktop, fixed centered portal on mobile */}
         <div
           style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: "transparent",
-            zIndex: 9998,
-          }}
-          onClick={() => setActiveSwitchPlayerId(null)}
-        />
-        {/* Popover content absolute positioned directly inside the player row relative frame */}
-        <div
-          style={{
-            position: "absolute",
-            top: "60px",
+            position: isMobileViewport ? "fixed" : "absolute",
+            top: isMobileViewport ? "50%" : "60px",
             left: "50%",
-            transform: "translateX(-50%)",
+            transform: isMobileViewport ? "translate(-50%, -50%)" : "translateX(-50%)",
             background: "var(--color-surface)",
             border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-md)",
@@ -5083,9 +5117,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
             display: "flex",
             flexDirection: "column",
             gap: "14px",
-            zIndex: 9999,
+            zIndex: 10000,
           }}
-          className="scale-up"
+          className="scale-up assign-popover-card"
         >
           <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)", textTransform: "uppercase", textAlign: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "8px" }}>
             {t("game.assign", "Assign")} {p.displayName}
@@ -5422,6 +5456,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
     return (
       <div
         key={p.id}
+        className="player-row-wrapper"
         style={{
           position: "relative",
           display: "inline-flex",
@@ -5544,7 +5579,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
         >
           {p.displayName}
         </span>
-        {activeSwitchPlayerId === p.id && renderAssignPopover(p)}
+        {!isMobileViewport && activeSwitchPlayerId === p.id && renderAssignPopover(p)}
       </div>
     );
   };
@@ -7678,6 +7713,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
       {profileSettingsOpen && (
         <ProfileSettingsModal onClose={() => setProfileSettingsOpen(false)} />
       )}
+      {isMobileViewport && activeSwitchPlayerId && (() => {
+        const activePlayer = room.players.find(p => p.id === activeSwitchPlayerId);
+        return activePlayer ? createPortal(renderAssignPopover(activePlayer), document.body) : null;
+      })()}
     </div>
   );
 }
