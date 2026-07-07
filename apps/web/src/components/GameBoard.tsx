@@ -1584,27 +1584,100 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           {renderSettingsCard()}
         </div>
 
-        {/* Column 2 (Center): Unified Room Players Card */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+        {/* Column 2 (Center): Unified Room Players Card & Action Controls */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           {renderGroupedPlayersCard()}
+
+          {/* Action Row Card (Start Game & Spectate rendered side-by-side in one compact line) */}
+          <div
+            style={{
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border)",
+              borderRadius: "var(--radius-md)",
+              padding: "12px 18px",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              width: "100%",
+              boxSizing: "border-box",
+            }}
+          >
+            {/* Start Game Action Container */}
+            <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
+              {isHost ? (
+                <button
+                  onClick={handleStartGame}
+                  style={{
+                    width: "100%",
+                    padding: "9px 18px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "var(--accent)",
+                    color: "var(--accent-text-on)",
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    cursor: "pointer",
+                    border: "none",
+                    boxShadow: "0 3px 10px rgba(232, 163, 61, 0.18)",
+                  }}
+                >
+                  Start Game
+                </button>
+              ) : (
+                <div style={{ color: "var(--color-text-muted)", fontSize: "0.78rem", fontStyle: "italic", textAlign: "center", width: "100%" }}>
+                  Waiting for Host...
+                </div>
+              )}
+            </div>
+
+            {/* Spectate Action Container */}
+            {localPlayer?.team && !room.settings.roomLocked && (
+              <div style={{ flex: 1, display: "flex", alignItems: "center" }}>
+                <button
+                  onClick={() => handleJoinTeamRole(null, null)}
+                  style={{
+                    width: "100%",
+                    padding: "9px 18px",
+                    borderRadius: "var(--radius-sm)",
+                    background: "var(--bg-surface-raised)",
+                    border: "1px solid var(--border-default)",
+                    color: "var(--text-primary)",
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 600,
+                    fontSize: "0.85rem",
+                    cursor: "pointer",
+                    textAlign: "center",
+                  }}
+                >
+                  Spectate
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Column 3 (Right): Profiles & Actions */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-          
-          {/* User Profile Card / Statistics, Music Player, and Host Controls */}
-          {/* User Profile Circular Widget */}
+        {/* Column 3 (Right): Profiles & Actions (Unified in a single Card) */}
+        <div
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-md)",
+            padding: "24px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "28px",
+            boxSizing: "border-box",
+          }}
+        >
+          {/* User Profile Container (No individual borders) */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               gap: "8px",
-              padding: "16px",
-              background: "var(--color-surface)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-md)",
               position: "relative",
+              width: "100%",
             }}
           >
             <div
@@ -1915,20 +1988,19 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         )}
           </div>
           
-          {/* Music Player */}
-          <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} />
+          {/* Music Player (Border removed as it is inside the unified container) */}
+          <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} noBorder={true} />
 
-          {/* Host Controls & Actions */}
+          {/* Host Controls & Actions (Borders removed as it is inside the unified container) */}
           {isHost && (
             <div
               style={{
-                background: "var(--color-surface)",
-                border: "1px solid var(--color-border)",
-                borderRadius: "var(--radius-md)",
-                padding: "20px",
                 display: "flex",
                 flexDirection: "column",
                 gap: "12px",
+                width: "100%",
+                borderTop: "1px solid var(--color-border)",
+                paddingTop: "20px",
               }}
             >
               <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
@@ -1991,60 +2063,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             </div>
           )}
 
-          {/* Start Game & Lobby Actions */}
-          <div
-            style={{
-              background: "var(--color-surface)",
-              border: "1px solid var(--color-border)",
-              borderRadius: "var(--radius-md)",
-              padding: "20px",
-              display: "flex",
-              justifyContent: "flex-end",
-              gap: "12px",
-            }}
-          >
-            {localPlayer?.team && !room.settings.roomLocked && (
-              <button
-                onClick={() => handleJoinTeamRole(null, null)}
-                style={{
-                  padding: "12px 20px",
-                  borderRadius: "var(--radius-md)",
-                  background: "var(--bg-surface-raised)",
-                  border: "1px solid var(--border-default)",
-                  color: "var(--text-primary)",
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                Spectate
-              </button>
-            )}
-
-            {isHost ? (
-              <button
-                onClick={handleStartGame}
-                style={{
-                  padding: "12px 32px",
-                  borderRadius: "var(--radius-md)",
-                  background: "var(--accent)",
-                  color: "var(--accent-text-on)",
-                  fontFamily: "var(--font-display)",
-                  fontWeight: 700,
-                  fontSize: "1.05rem",
-                  cursor: "pointer",
-                  border: "none",
-                  boxShadow: "0 4px 16px rgba(232, 163, 61, 0.2)",
-                }}
-              >
-                Start Game
-              </button>
-            ) : (
-              <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", alignSelf: "center" }}>
-                Waiting for Host to start the game...
-              </div>
-            )}
-          </div>
         </div>
       </>
     );
@@ -3180,22 +3198,22 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
 
 
-              {/* Lobby Actions */}
-              <div
-                style={{
-                  background: "var(--color-surface)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "20px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "12px",
-                }}
-              >
-                {localPlayer?.team && !room.settings.roomLocked && (
+              {/* Spectate Action Card (Rendered in its own separate container) */}
+              {localPlayer?.team && !room.settings.roomLocked && (
+                <div
+                  style={{
+                    background: "var(--color-surface)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "16px 20px",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
                   <button
                     onClick={() => handleJoinTeamRole(null, null)}
                     style={{
+                      width: "100%",
                       padding: "12px 20px",
                       borderRadius: "var(--radius-md)",
                       background: "var(--bg-surface-raised)",
@@ -3204,16 +3222,32 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       fontFamily: "var(--font-display)",
                       fontWeight: 600,
                       cursor: "pointer",
+                      textAlign: "center",
                     }}
                   >
-                    Spectate
+                    Spectate (Join Spectators)
                   </button>
-                )}
+                </div>
+              )}
 
+              {/* Start Game Action Card (Rendered in its own separate container) */}
+              <div
+                style={{
+                  background: "var(--color-surface)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "var(--radius-md)",
+                  padding: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "stretch",
+                  gap: "12px",
+                }}
+              >
                 {isHost ? (
                   <button
                     onClick={handleStartGame}
                     style={{
+                      width: "100%",
                       padding: "12px 32px",
                       borderRadius: "var(--radius-md)",
                       background: "var(--accent)",
@@ -3235,7 +3269,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Start Game
                   </button>
                 ) : (
-                  <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", alignSelf: "center" }}>
+                  <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", textAlign: "center", width: "100%" }}>
                     Waiting for Host to start the game...
                   </div>
                 )}
