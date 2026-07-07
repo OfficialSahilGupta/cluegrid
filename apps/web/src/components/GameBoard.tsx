@@ -6708,9 +6708,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
                               position: "absolute",
                               bottom: "-5px",
                               background: badgeBg,
-                              padding: "1px 5px",
-                              borderRadius: "5px",
-                              fontSize: "8px",
+                              padding: "1px 6px",
+                              borderRadius: "6px",
+                              fontSize: "10.5px",
                               fontWeight: 800,
                               color: "#FFFFFF",
                               whiteSpace: "nowrap",
@@ -6727,9 +6727,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
                         {/* Banner Strip */}
                         <div style={{
                           flex: 1,
-                          height: "38px",
+                          height: "40px",
                           background: bannerBg,
-                          borderRadius: "19px",
+                          borderRadius: "20px",
                           display: "flex",
                           alignItems: "center",
                           padding: "0 12px 0 16px",
@@ -6738,14 +6738,14 @@ const renderSettingsCard = (side?: "left" | "right") => {
                           {/* Clue Word Card */}
                           <div style={{
                             flex: 1,
-                            height: "26px",
+                            height: "28px",
                             background: "#FFFFFF",
-                            borderRadius: "5px",
+                            borderRadius: "6px",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: 800,
-                            fontSize: "13px",
+                            fontSize: "14.5px",
                             color: "#000000",
                             textTransform: "uppercase",
                             letterSpacing: "0.05em",
@@ -6762,15 +6762,15 @@ const renderSettingsCard = (side?: "left" | "right") => {
                           {/* Clue Count Badge */}
                           {countStr && (
                             <div style={{
-                              width: "26px",
-                              height: "26px",
+                              width: "28px",
+                              height: "28px",
                               borderRadius: "50%",
                               background: "#FFFFFF",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
                               fontWeight: 800,
-                              fontSize: "13px",
+                              fontSize: "14.5px",
                               color: "#000000",
                               marginLeft: "8px",
                               flexShrink: 0,
@@ -6837,9 +6837,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
                                       position: "absolute",
                                       bottom: "-3px",
                                       background: guessPlayerBadgeBg,
-                                      padding: "1px 4px",
-                                      borderRadius: "3px",
-                                      fontSize: "6.5px",
+                                      padding: "1px 5px",
+                                      borderRadius: "4px",
+                                      fontSize: "9px",
                                       fontWeight: 800,
                                       color: "#FFFFFF",
                                       whiteSpace: "nowrap",
@@ -6855,23 +6855,23 @@ const renderSettingsCard = (side?: "left" | "right") => {
                                 
                                 {/* Guess Pill */}
                                 <div style={{
-                                  height: "20px",
+                                  height: "25px",
                                   background: pillBg,
                                   color: pillText,
-                                  borderRadius: "10px",
-                                  padding: isPass ? "0 8px 0 10px" : "0 10px 0 10px",
+                                  borderRadius: "12.5px",
+                                  padding: isPass ? "0 10px 0 14px" : "0 14px 0 14px",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
                                   fontWeight: 800,
-                                  fontSize: "9.5px",
+                                  fontSize: "12px",
                                   textTransform: "uppercase",
                                   letterSpacing: "0.02em",
                                   fontFamily: "Outfit, Inter, sans-serif",
                                   boxShadow: "0 1.5px 3px rgba(0,0,0,0.15)",
                                 }}>
                                   {isPass ? (
-                                    <span style={{ fontSize: "11px", fontWeight: "bold" }}>✔</span>
+                                    <span style={{ fontSize: "14px", fontWeight: "bold" }}>✔</span>
                                   ) : (
                                     guessWord
                                   )}
