@@ -1877,26 +1877,42 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
                             {room.gameMode === "coop" ? "Assign Team" : "Assign Team & Role"}
                           </label>
-                          {room.gameMode === "coop" ? (
-                            <div style={getTeamButtonStyles("red", "operative", localPlayer?.team === "red" && localPlayer?.role === "operative")}>
+                                                    {room.gameMode === "coop" ? (
+                            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                               <button
                                 onClick={() => handleJoinTeamRole("red", "operative")}
                                 style={{
-                                  ...getTeamButtonStyles("red", "operative", localPlayer?.team === "red")
+                                  padding: "8px",
+                                  fontSize: "0.75rem",
+                                  background: localPlayer?.team === "red" ? typeColors.red!.border : typeColors.red!.bg,
+                                  border: `1px solid ${typeColors.red!.border}`,
+                                  borderRadius: "4px",
+                                  color: localPlayer?.team === "red" ? "#fff" : typeColors.red!.text,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
                                 }}
                               >
                                 Red Team
                               </button>
                               <button
                                 onClick={() => handleJoinTeamRole("blue", "operative")}
-                                style={getTeamButtonStyles("blue", "operative", localPlayer?.team === "blue" && localPlayer?.role === "operative")}
+                                style={{
+                                  padding: "8px",
+                                  fontSize: "0.75rem",
+                                  background: localPlayer?.team === "blue" ? typeColors.blue!.border : typeColors.blue!.bg,
+                                  border: `1px solid ${typeColors.blue!.border}`,
+                                  borderRadius: "4px",
+                                  color: localPlayer?.team === "blue" ? "#fff" : typeColors.blue!.text,
+                                  fontWeight: 600,
+                                  cursor: "pointer",
+                                }}
                               >
                                 Blue Team
                               </button>
                             </div>
                           ) : (
                             <>
-                              <div style={getTeamButtonStyles("red", "spymaster", localPlayer?.team === "red" && localPlayer?.role === "spymaster")}>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                                 <button
                                   onClick={() => handleJoinTeamRole("red", "spymaster")}
                                   style={{
@@ -1928,7 +1944,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                   Red Op
                                 </button>
                               </div>
-                              <div style={getTeamButtonStyles("blue", "spymaster", localPlayer?.team === "blue" && localPlayer?.role === "spymaster")}>
+                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                                 <button
                                   onClick={() => handleJoinTeamRole("blue", "spymaster")}
                                   style={{
@@ -1960,9 +1976,76 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                   Blue Op
                                 </button>
                               </div>
+                              {room.teamCount > 2 && (
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("green", "spymaster")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? typeColors.green!.border : typeColors.green!.bg,
+                                      border: `1px solid ${typeColors.green!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "green" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.green!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Green Spy
+                                  </button>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("green", "operative")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "green" && localPlayer?.role === "operative" ? typeColors.green!.border : typeColors.green!.bg,
+                                      border: `1px solid ${typeColors.green!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "green" && localPlayer?.role === "operative" ? "#fff" : typeColors.green!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Green Op
+                                  </button>
+                                </div>
+                              )}
+                              {room.teamCount > 3 && (
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("yellow", "spymaster")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? typeColors.yellow!.border : typeColors.yellow!.bg,
+                                      border: `1px solid ${typeColors.yellow!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "spymaster" ? "#fff" : typeColors.yellow!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Yellow Spy
+                                  </button>
+                                  <button
+                                    onClick={() => handleJoinTeamRole("yellow", "operative")}
+                                    style={{
+                                      padding: "6px",
+                                      fontSize: "0.75rem",
+                                      background: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? typeColors.yellow!.border : typeColors.yellow!.bg,
+                                      border: `1px solid ${typeColors.yellow!.border}`,
+                                      borderRadius: "4px",
+                                      color: localPlayer?.team === "yellow" && localPlayer?.role === "operative" ? "#fff" : typeColors.yellow!.text,
+                                      fontWeight: 600,
+                                      cursor: "pointer",
+                                    }}
+                                  >
+                                    Yellow Op
+                                  </button>
+                                </div>
+                              )}
                             </>
-                          )}
-                        </div>
+                          )}</div>
                       )}
                     </div>
                     <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 10px 0", color: "var(--text-primary)" }}>
@@ -2313,7 +2396,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           <label style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--color-text-muted)", textTransform: "uppercase" }}>
                             {room.gameMode === "coop" ? "Assign Team" : "Assign Team & Role"}
                           </label>
-                          {room.gameMode === "coop" ? (
+                                                    {room.gameMode === "coop" ? (
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                               <button
                                 onClick={() => handleJoinTeamRole("red", "operative")}
@@ -2328,7 +2411,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                   cursor: "pointer",
                                 }}
                               >
-                                  Red Team
+                                Red Team
                               </button>
                               <button
                                 onClick={() => handleJoinTeamRole("blue", "operative")}
@@ -2412,7 +2495,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                   Blue Op
                                 </button>
                               </div>
-
                               {room.teamCount > 2 && (
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                                   <button
@@ -2447,7 +2529,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                   </button>
                                 </div>
                               )}
-
                               {room.teamCount > 3 && (
                                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
                                   <button
@@ -2483,25 +2564,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                 </div>
                               )}
                             </>
-                          )}
-
-                          <button
-                            onClick={() => handleJoinTeamRole(null, null)}
-                            style={{
-                              padding: "6px",
-                              fontSize: "0.75rem",
-                              background: !localPlayer?.team ? "var(--accent)" : "transparent",
-                              border: "1px solid var(--accent)",
-                              borderRadius: "4px",
-                              color: !localPlayer?.team ? "var(--accent-text-on)" : "var(--accent)",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              marginTop: "2px",
-                            }}
-                          >
-                            Spectate
-                          </button>
-                        </div>
+                          )}</div>
                       )}
                     </div>
 
