@@ -3387,9 +3387,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     alignItems: "center",
                     justifyContent: "space-between",
                     flexWrap: "wrap",
-                    gap: "12px",
+                    gap: "24px",
                     textAlign: "left",
                     marginTop: "20px",
+                    width: "100%",
+                    boxSizing: "border-box",
                   }}
                 >
                   <div>
@@ -3400,7 +3402,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       {cooldownRemaining > 0 ? `Rate limited: wait ${cooldownRemaining}s` : "Trigger a full-screen reaction"}
                     </p>
                   </div>
-                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
                     {["facepalm", "fire", "skull", "party", "clap", "heart"].map((type) => (
                       <button
                         key={type}
@@ -3716,8 +3718,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             }}
                           />
                         </div>
-                        <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
-                          <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.06em", color: config.light }}>
+                        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "8px" }}>
+                          <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.06em", color: config.light }}>
                             {formatTeamName(team)}
                           </span>
                           <span style={{ fontWeight: 800, fontFamily: "var(--font-display)", fontSize: "1.1rem", color: state.eliminated ? "var(--color-text-muted)" : "var(--text-primary)", lineHeight: 1 }}>
