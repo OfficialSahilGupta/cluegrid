@@ -521,6 +521,18 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         setIsDealingAnimationActive(true);
         const cardCount = room.board ? room.board.length : 25;
         playCardDealCascade(cardCount);
+
+        // Smoothly scroll down to the card deck grid container
+        const viewportEl = document.getElementById("game-board-viewport");
+        const boardEl = document.getElementById("game-board-container");
+        if (viewportEl && boardEl) {
+          viewportEl.scrollTo({
+            top: boardEl.offsetTop - 30, // offset a bit for a clean spacing margin
+            behavior: "smooth",
+          });
+        } else if (boardEl) {
+          boardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       }, 50);
 
       endTimer = setTimeout(() => {
