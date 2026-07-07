@@ -3,6 +3,21 @@ import { useTranslation } from "react-i18next";
 
 declare const THREE: any;
 
+function getFlagImgUrl(code: string): string {
+  const mapping: Record<string, string> = {
+    "en": "gb", "de": "de", "ar": "sa", "pt-BR": "br", "fr": "fr", "tr": "tr",
+    "ne": "np", "hi": "in", "ja": "jp", "cs": "cz", "it": "it", "pl": "pl",
+    "uk": "ua", "he": "il", "sr": "rs", "ko": "kr", "ro": "ro", "id": "id",
+    "da": "dk", "pt": "pt", "ca": "es", "sv": "se", "mk": "mk", "et": "ee",
+    "eo": "un", "be": "by", "es": "es", "nl": "nl", "sk": "sk", "af": "za",
+    "ar-LB": "lb", "bg": "bg", "hr": "hr", "fi": "fi", "el": "gr", "hu": "hu",
+    "is": "is", "lt": "lt", "lv": "lv", "no": "no", "ru": "ru", "sl": "si",
+    "th": "th", "fil": "ph", "fa": "ir", "zh": "cn", "sq": "al", "ka": "ge", "vi": "vn"
+  };
+  const country = mapping[code] || "us";
+  return `https://flagcdn.com/w40/${country}.png`;
+}
+
 const ALL_LANGUAGES = [
   { code: "en", name: "English", flag: "🇬🇧" },
   { code: "de", name: "Deutsch", flag: "🇩🇪" },
@@ -1999,8 +2014,13 @@ export function LandingPage({
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     style={{ width: "100%", textAlign: "left", background: "rgba(238,243,238,0.04)", border: "1.5px solid rgba(238,243,238,0.14)", borderRadius: "8px", color: "#eef3ee", fontSize: "14px", padding: "13px 14px", cursor: "pointer", outline: "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}
                   >
-                    <span>
-                      {ALL_LANGUAGES.find(l => l.code === lang)?.flag} {ALL_LANGUAGES.find(l => l.code === lang)?.name}
+                    <span style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                      <img 
+                        src={getFlagImgUrl(lang)} 
+                        alt="" 
+                        style={{ width: "20px", height: "14px", objectFit: "cover", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.15)" }} 
+                      />
+                      <span>{ALL_LANGUAGES.find(l => l.code === lang)?.name}</span>
                     </span>
                     <span style={{ color: "#9AA29B", transition: "transform 0.2s", transform: isDropdownOpen ? "rotate(180deg)" : "none" }}>▾</span>
                   </button>
@@ -2030,7 +2050,11 @@ export function LandingPage({
                               }
                             }}
                           >
-                            <span>{l.flag}</span>
+                            <img 
+                              src={getFlagImgUrl(l.code)} 
+                              alt="" 
+                              style={{ width: "20px", height: "14px", objectFit: "cover", borderRadius: "2px", border: "1px solid rgba(255,255,255,0.15)" }} 
+                            />
                             <span>{l.name}</span>
                           </div>
                         ))}
