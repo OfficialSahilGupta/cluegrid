@@ -952,62 +952,48 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   };
 
   const playClueSentSound = () => {
-    playOperativeAlertSound();
+    if (!soundEnabled) return;
+    try {
+      const audio = new Audio("/cluegrid-music-effects/spy-clue-given.mp3");
+      audio.volume = 0.5;
+      audio.play().catch((err) => console.log("Audio play failed:", err));
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  const playEndTurnSound = () => {
+    if (!soundEnabled) return;
+    try {
+      const audio = new Audio("/cluegrid-music-effects/end-turn.mp3");
+      audio.volume = 0.5;
+      audio.play().catch((err) => console.log("Audio play failed:", err));
+    } catch (e) {
+      // ignore
+    }
   };
 
   const playCardFlipSound = (cardType: string) => {
     if (!soundEnabled) return;
     try {
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContextClass) return;
-      const audioCtx = new AudioContextClass();
-
-      const playTone = (freq: number, duration: number, delay: number, type: OscillatorType = "sine", gainVal = 0.5) => {
-        setTimeout(() => {
-          try {
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            
-            gainNode.gain.setValueAtTime(gainVal, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-          } catch {
-            // ignore
-          }
-        }, delay);
-      };
-
       const myTeam = localPlayer?.team;
+      let src = "";
 
       if (cardType === "assassin") {
-        // Deep low base drone for tragic weight
-        playTone(73.42, 2.2, 0, "sine", 0.6);     // D2 low base
-        
-        // Melancholic, sorrowful minor key melody (D-minor to diminished 5th resolving to sad lingering E)
-        playTone(293.66, 0.45, 0, "triangle", 0.5);    // D4
-        playTone(349.23, 0.45, 350, "triangle", 0.5);  // F4
-        playTone(440.00, 0.45, 700, "triangle", 0.5);  // A4
-        playTone(415.30, 0.50, 1050, "triangle", 0.5); // G#4 (tragic dissonant shift)
-        playTone(349.23, 0.50, 1450, "triangle", 0.5); // F4
-        playTone(329.63, 0.90, 1850, "triangle", 0.5); // E4 (lingering sad resolution)
+        src = "/cluegrid-music-effects/black-card-flip.mp3";
       } else if (cardType === "neutral") {
-        // 2. White/neutral card flipped: Soft neutral double beep
-        playTone(329.63, 0.08, 0, "sine", 0.4); // E4
-        playTone(329.63, 0.08, 100, "sine", 0.4); // E4
+        src = "/cluegrid-music-effects/wrong-card-flip.mp3";
       } else if (myTeam && cardType === myTeam) {
-        // 1. Our own team card flipped: Joyful major chime
-        playTone(523.25, 0.15, 0, "sine", 0.5); // C5
-        playTone(783.99, 0.25, 100, "sine", 0.5); // G5
+        src = "/cluegrid-music-effects/correct-card-flip.mp3";
       } else {
-        // Opponent card flipped: A clean, bouncy warning beep (professional double-tone rise)
-        playTone(392.00, 0.10, 0, "sine", 0.4);   // G4
-        playTone(587.33, 0.18, 80, "sine", 0.4);  // D5
+        // opponent team card
+        src = "/cluegrid-music-effects/wrong-card-flip.mp3";
+      }
+
+      if (src) {
+        const audio = new Audio(src);
+        audio.volume = 0.5;
+        audio.play().catch((err) => console.log("Audio play failed:", err));
       }
     } catch (e) {
       // ignore
@@ -1104,7 +1090,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     }, 100);
   };
 
-  // Listen for Spymaster giving a clue to play a alert sound
+  // Listen for Spymaster giving a clue or end turn to play sounds
   useEffect(() => {
     if (room.turnState && room.phase === "playing") {
       const prevTurnState = prevTurnStateRef.current;
@@ -1115,6 +1101,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         playClueSentSound();
         triggerNeuralStreams();
       }
+
+      if (prevTurnState && room.turnState.activeTeam !== prevTurnState.activeTeam) {
+        playEndTurnSound();
+      }
     }
     prevTurnStateRef.current = room.turnState;
   }, [room.turnState, room.phase]);
@@ -1123,18 +1113,19 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   useEffect(() => {
     if (!room.board || room.board.length === 0) return;
 
-    if (room.phase === "playing" && prevBoardRef.current.length > 0) {
+    if ((room.phase === "playing" || room.phase === "ended") && prevBoardRef.current.length > 0) {
       room.board.forEach((card) => {
         const prevCard = prevBoardRef.current.find((c) => c.id === card.id);
         if (card.revealed && prevCard && !prevCard.revealed) {
           // Play flip sound with full volume
           playCardFlipSound(card.type);
           
-          // Trigger flip animation class (matches 2s animation duration)
+          // Trigger flip animation class (matches sound effect duration)
+          const duration = card.type === "assassin" ? 1800 : (localPlayer?.team && card.type === localPlayer.team ? 1200 : 800);
           setRecentlyFlippedCardIds((prev) => [...prev, card.id]);
           setTimeout(() => {
             setRecentlyFlippedCardIds((prev) => prev.filter((id) => id !== card.id));
-          }, 2000);
+          }, duration);
 
           if (card.type === "assassin") {
             setAssassinRevealedId(card.id);
@@ -1178,10 +1169,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   // Listen for Victory transition to play fanfare sound
   useEffect(() => {
     if (room.winner && !prevWinnerRef.current) {
-      playVictorySound();
+      const isAssassinRevealed = room.board && room.board.some((c) => c.type === "assassin" && c.revealed);
+      if (!isAssassinRevealed) {
+        playVictorySound();
+      }
     }
     prevWinnerRef.current = room.winner || null;
-  }, [room.winner, soundEnabled]);
+  }, [room.winner, soundEnabled, room.board]);
 
   // Listen for turn/phase transitions to play the relief sound for active Spymasters
   useEffect(() => {
@@ -4144,6 +4138,29 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       shockwaveOffset ? "shockwave-push" : "",
                     ].filter(Boolean).join(" ");
 
+                    const happyImages = ["happy-1.png", "happy-2.png", "happy-3.png", "happy-4.png", "happy-5.png", "happy-6.png", "happy-7.png"];
+                    const sadImages = ["sad-1.png", "sad-2.png", "sad-3.png", "sad-4.png", "sad-5.png"];
+                    const getDeterministicIndex = (str: string, max: number) => {
+                      let hash = 0;
+                      for (let i = 0; i < str.length; i++) {
+                        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                      }
+                      return Math.abs(hash) % max;
+                    };
+
+                    let revealedCharacterUrl = "";
+                    if (card.revealed && card.type) {
+                      if (["red", "blue", "green", "yellow"].includes(card.type)) {
+                        const idx = getDeterministicIndex(card.word, happyImages.length);
+                        revealedCharacterUrl = `/game-board-card/teams-card/${happyImages[idx]}`;
+                      } else if (card.type === "neutral") {
+                        const idx = getDeterministicIndex(card.word, sadImages.length);
+                        revealedCharacterUrl = `/game-board-card/whilte-flips/${sadImages[idx]}`;
+                      } else if (card.type === "assassin") {
+                        revealedCharacterUrl = `/game-board-card/black-card/assassin-card.png`;
+                      }
+                    }
+
                     return (
                       <button
                         key={card.id}
@@ -4179,6 +4196,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           "--push-x": shockwaveOffset ? `${shockwaveOffset.x}px` : "0px",
                           "--push-y": shockwaveOffset ? `${shockwaveOffset.y}px` : "0px",
                           overflow: "hidden",
+                          animationDuration: recentlyFlippedCardIds.includes(card.id)
+                            ? `${card.type === "assassin" ? 1.8 : (localPlayer?.team && card.type === localPlayer.team ? 1.2 : 0.8)}s`
+                            : undefined,
                           ...dealAnimationStyles,
                         } as React.CSSProperties}
                         onMouseMove={(e) => {
@@ -4226,21 +4246,16 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           }}
                         />
 
-                        {/* Character Image Overlay for Flipped/Revealed Team Cards */}
-                        {card.revealed && card.type && ["red", "blue", "green", "yellow"].includes(card.type) && (
+                        {/* Character Image Overlay for Flipped/Revealed Cards (Covers entire card) */}
+                        {revealedCharacterUrl && (
                           <div
                             style={{
                               position: "absolute",
                               inset: 0,
-                              backgroundImage: 'url("/spy-characters.webp")',
-                              backgroundSize: '480% 320%',
-                              backgroundPosition: `${
-                                card.type === "red" ? 66.666 :
-                                card.type === "blue" ? 33.333 :
-                                card.type === "green" ? 0 : 100
-                              }% 1%`,
-                              opacity: showWordCardIds.includes(card.id) ? 0.08 : 0.85,
-                              mixBlendMode: "luminosity",
+                              backgroundImage: `url("${revealedCharacterUrl}")`,
+                              backgroundSize: "cover",
+                              backgroundPosition: "center",
+                              opacity: showWordCardIds.includes(card.id) ? 0.08 : 0.95,
                               pointerEvents: "none",
                               zIndex: 1,
                               borderRadius: "inherit",
