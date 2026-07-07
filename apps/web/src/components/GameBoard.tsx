@@ -249,27 +249,27 @@ function playReactionSound(emoji: string) {
 }
 
 const getTeamBgColor = (team: string | null | undefined) => {
-  if (team === "red") return "#E25C47";
-  if (team === "blue") return "#5EA9E9";
-  if (team === "green") return "#5EB346";
-  if (team === "yellow") return "#F4D03F";
-  return "#A6ACAF";
+  if (team === "red" || team === "team-1") return "var(--team-1-bg)";
+  if (team === "blue" || team === "team-2") return "var(--team-2-bg)";
+  if (team === "green" || team === "team-3") return "var(--team-3-bg)";
+  if (team === "yellow" || team === "team-4") return "var(--team-4-bg)";
+  return "var(--bg-surface-raised)";
 };
 
 const getTeamDarkColor = (team: string | null | undefined) => {
-  if (team === "red") return "#78281F";
-  if (team === "blue") return "#1B4E7A";
-  if (team === "green") return "#1E8449";
-  if (team === "yellow") return "#7D6608";
-  return "#333333";
+  if (team === "red" || team === "team-1") return "var(--team-1)";
+  if (team === "blue" || team === "team-2") return "var(--team-2)";
+  if (team === "green" || team === "team-3") return "var(--team-3)";
+  if (team === "yellow" || team === "team-4") return "var(--team-4)";
+  return "var(--border-default)";
 };
 
 const getTeamAvatarBorderColor = (team: string | null | undefined) => {
-  if (team === "red") return "#FFE5B4";
-  if (team === "blue") return "#D2E8F9";
-  if (team === "green") return "#D4EFDF";
-  if (team === "yellow") return "#FCF3CF";
-  return "#EAEDED";
+  if (team === "red" || team === "team-1") return "var(--team-1)";
+  if (team === "blue" || team === "team-2") return "var(--team-2)";
+  if (team === "green" || team === "team-3") return "var(--team-3)";
+  if (team === "yellow" || team === "team-4") return "var(--team-4)";
+  return "var(--border-default)";
 };
 
 interface GameBoardProps {
@@ -7173,7 +7173,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                   const count = clue.details?.count;
                   const countStr = count === -1 ? "∞" : count !== undefined ? String(count) : "";
                   
-                  const bannerBg = getTeamBgColor(clueTeam);
+                  const bannerBg = getTeamDarkColor(clueTeam);
                   const badgeBg = getTeamDarkColor(clueTeam);
                   const avatarBorder = getTeamAvatarBorderColor(clueTeam);
 
@@ -7187,17 +7187,17 @@ const renderSettingsCard = (side?: "left" | "right") => {
                             {renderAvatar(spymasterAvatar, 44)}
                             <div style={{
                               position: "absolute",
-                              bottom: "-5px",
+                              bottom: "-12px",
                               background: badgeBg,
-                              padding: "1px 5px",
+                              padding: "3px 9px",
                               borderRadius: "5px",
-                              fontSize: "8px",
-                              fontWeight: 800,
+                              fontSize: "13px",
+                              fontWeight: 900,
                               color: "#FFFFFF",
                               whiteSpace: "nowrap",
-                              boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                              boxShadow: "0 2px 5px rgba(0,0,0,0.35)",
                               fontFamily: "var(--font-display), var(--font-sans)",
-                              border: "1px solid rgba(255,255,255,0.12)",
+                              border: "1.5px solid rgba(255,255,255,0.2)",
                               textShadow: "0 0.5px 1px rgba(0,0,0,0.5)"
                             }}>
                               {spymasterName}
@@ -7226,7 +7226,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: 800,
-                            fontSize: "13px",
+                            fontSize: "16px",
                             color: "#000000",
                             textTransform: "uppercase",
                             letterSpacing: "0.05em",
@@ -7282,25 +7282,30 @@ const renderSettingsCard = (side?: "left" | "right") => {
                             
                             const isPass = guessCardType === "pass" || guessWord.toLowerCase() === "pass";
                             
-                            let pillBg = "#A6ACAF";
-                            let pillText = "#000000";
+                            let pillBg = "var(--bg-surface-raised)";
+                            let pillText = "var(--text-secondary)";
                             
                             if (isPass) {
-                              pillBg = "#5EB346";
-                              pillText = "#000000";
+                              pillBg = "var(--team-3)";
+                              pillText = "#FFFFFF";
                             } else {
                               if (guessCardType === "red") {
-                                pillBg = "#E25C47";
+                                pillBg = "var(--team-1)";
+                                pillText = "#FFFFFF";
                               } else if (guessCardType === "blue") {
-                                pillBg = "#5EA9E9";
+                                pillBg = "var(--team-2)";
+                                pillText = "#FFFFFF";
                               } else if (guessCardType === "green") {
-                                pillBg = "#5EB346";
+                                pillBg = "var(--team-3)";
+                                pillText = "#FFFFFF";
                               } else if (guessCardType === "yellow") {
-                                pillBg = "#F4D03F";
+                                pillBg = "var(--team-4)";
+                                pillText = "#FFFFFF";
                               } else if (guessCardType === "neutral") {
-                                pillBg = "#DFD0B8";
+                                pillBg = "var(--card-neutral-bg)";
+                                pillText = "var(--text-primary)";
                               } else if (guessCardType === "assassin") {
-                                pillBg = "#1A1A1A";
+                                pillBg = "var(--card-assassin-bg)";
                                 pillText = "#FFFFFF";
                               }
                             }
@@ -7316,11 +7321,11 @@ const renderSettingsCard = (side?: "left" | "right") => {
                                     {renderAvatar(guessPlayerAvatar, 28)}
                                     <div style={{
                                       position: "absolute",
-                                      bottom: "-3px",
+                                      bottom: "-8px",
                                       background: guessPlayerBadgeBg,
-                                      padding: "1px 4px",
+                                      padding: "2px 6px",
                                       borderRadius: "3px",
-                                      fontSize: "6.5px",
+                                      fontSize: "11px",
                                       fontWeight: 800,
                                       color: "#FFFFFF",
                                       whiteSpace: "nowrap",
@@ -7336,23 +7341,23 @@ const renderSettingsCard = (side?: "left" | "right") => {
                                 
                                 {/* Guess Pill */}
                                 <div style={{
-                                  height: "20px",
+                                  height: "26px",
                                   background: pillBg,
                                   color: pillText,
-                                  borderRadius: "10px",
-                                  padding: isPass ? "0 8px 0 10px" : "0 10px 0 10px",
+                                  borderRadius: "13px",
+                                  padding: isPass ? "0 12px 0 14px" : "0 14px 0 14px",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
                                   fontWeight: 800,
-                                  fontSize: "9.5px",
+                                  fontSize: "13px",
                                   textTransform: "uppercase",
                                   letterSpacing: "0.02em",
                                   fontFamily: "Outfit, Inter, sans-serif",
                                   boxShadow: "0 1.5px 3px rgba(0,0,0,0.15)",
                                 }}>
                                   {isPass ? (
-                                    <span style={{ fontSize: "11px", fontWeight: "bold" }}>✔</span>
+                                    <span style={{ fontSize: "13px", fontWeight: "bold" }}>✔</span>
                                   ) : (
                                     guessWord
                                   )}
