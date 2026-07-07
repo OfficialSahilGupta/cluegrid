@@ -6703,7 +6703,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                         {/* Avatar and Name Badge */}
                         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 2, marginRight: "-8px", width: "50px", flexShrink: 0 }}>
                           <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "50px", height: "50px" }}>
-                            {renderAvatar(spymasterAvatar, 44, { border: `3px solid ${avatarBorder}`, background: "var(--bg-surface-raised)", boxShadow: "0 2px 5px rgba(0,0,0,0.25)" })}
+                            {renderAvatar(spymasterAvatar, 44)}
                             <div style={{
                               position: "absolute",
                               bottom: "-5px",
@@ -6832,7 +6832,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                                 {/* Small Avatar & Name Badge */}
                                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 2, marginRight: "-4px", width: "32px", flexShrink: 0 }}>
                                   <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "32px", height: "32px" }}>
-                                    {renderAvatar(guessPlayerAvatar, 28, { border: `1.5px solid ${guessPlayerAvatarBorder}`, background: "var(--bg-surface-raised)", boxShadow: "0 1.5px 3px rgba(0,0,0,0.2)" })}
+                                    {renderAvatar(guessPlayerAvatar, 28)}
                                     <div style={{
                                       position: "absolute",
                                       bottom: "-3px",
