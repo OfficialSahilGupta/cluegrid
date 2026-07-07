@@ -248,7 +248,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
   // Clue Form state
   const [clueWord, setClueWord] = useState("");
-  const [clueCount, setClueCount] = useState<number>(1);
+  const [clueCount, setClueCount] = useState<number | null>(null);
   const [clueError, setClueError] = useState<string | null>(null);
   const [neuralStreams, setNeuralStreams] = useState<{ start: { x: number; y: number }; end: { x: number; y: number } }[]>([]);
   const [assassinRevealedId, setAssassinRevealedId] = useState<number | null>(null);
@@ -2753,7 +2753,65 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           </div>
         )}
 
-              {/* Turn Banner */}
+              {/* Spymaster reaction bar */}
+              {room.phase === "playing" && localPlayer?.role === "spymaster" && (
+                <div
+                  style={{
+                    background: "var(--bg-surface-raised)",
+                    border: "1px solid var(--border-default)",
+                    borderLeft: "4px solid var(--accent)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "16px 20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap",
+                    gap: "12px",
+                    textAlign: "left",
+                    marginTop: "20px",
+                  }}
+                >
+                  <div>
+                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1rem", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
+                      Spymaster Reactions Overlay
+                    </h4>
+                    <p style={{ margin: "2px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.8rem" }}>
+                      {cooldownRemaining > 0 ? `Rate limited: wait ${cooldownRemaining}s` : "Trigger a full-screen reaction"}
+                    </p>
+                  </div>
+                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                    {["facepalm", "fire", "skull", "party", "clap", "heart"].map((type) => (
+                      <button
+                        key={type}
+                        disabled={cooldownRemaining > 0}
+                        onClick={() => triggerReaction(type)}
+                        style={{
+                          border: "none",
+                          background: "none",
+                          padding: 0,
+                          cursor: cooldownRemaining > 0 ? "not-allowed" : "pointer",
+                          opacity: cooldownRemaining > 0 ? 0.5 : 1,
+                          transition: "transform 0.1s ease",
+                        }}
+                        onMouseOver={(e) => {
+                          if (cooldownRemaining === 0) e.currentTarget.style.transform = "scale(1.05)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = "scale(1)";
+                        }}
+                      >
+                        {renderCustomReaction(type, true)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              
+
+
+              
+        {/* Turn Banner */}
               <div
                 id="clue-display-panel"
                 style={{
@@ -3162,8 +3220,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 </div>
               </div>
 
-        
-        {/* Left Side: Game Board & Action forms */}
+              {/* Left Side: Game Board & Action forms */}
         <div className="game-main-col" style={{ width: "100%", display: "flex", flexDirection: "column", gap: "24px" }}>
           {/* Lobby Preset Forms */}
           {room.phase === "lobby" && (
@@ -3316,194 +3373,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
 
 
-              {/* Spymaster reaction bar */}
-              {room.phase === "playing" && localPlayer?.role === "spymaster" && (
-                <div
-                  style={{
-                    background: "var(--bg-surface-raised)",
-                    border: "1px solid var(--border-default)",
-                    borderLeft: "4px solid var(--accent)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "16px 20px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "12px",
-                    textAlign: "left",
-                    marginTop: "20px",
-                  }}
-                >
-                  <div>
-                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1rem", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
-                      Spymaster Reactions Overlay
-                    </h4>
-                    <p style={{ margin: "2px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.8rem" }}>
-                      {cooldownRemaining > 0 ? `Rate limited: wait ${cooldownRemaining}s` : "Trigger a full-screen reaction"}
-                    </p>
-                  </div>
-                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    {["facepalm", "fire", "skull", "party", "clap", "heart"].map((type) => (
-                      <button
-                        key={type}
-                        disabled={cooldownRemaining > 0}
-                        onClick={() => triggerReaction(type)}
-                        style={{
-                          border: "none",
-                          background: "none",
-                          padding: 0,
-                          cursor: cooldownRemaining > 0 ? "not-allowed" : "pointer",
-                          opacity: cooldownRemaining > 0 ? 0.5 : 1,
-                          transition: "transform 0.1s ease",
-                        }}
-                        onMouseOver={(e) => {
-                          if (cooldownRemaining === 0) e.currentTarget.style.transform = "scale(1.05)";
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.transform = "scale(1)";
-                        }}
-                      >
-                        {renderCustomReaction(type, true)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Clue Submission Form */}
-              {room.phase === "playing" &&
-                room.turnState &&
-                room.turnState.phase === "giving_clue" &&
-                localPlayer?.team === room.turnState.activeTeam &&
-                (localPlayer?.role === "spymaster" || room.gameMode === "coop") && (
-                   <form
-                    onSubmit={handleGiveClue}
-                    className="fade-in"
-                    style={{
-                      background: "var(--bg-surface)",
-                      border: "1px solid var(--border-default)",
-                      borderRadius: "var(--radius-md)",
-                      padding: "24px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "16px",
-                      textAlign: "left",
-                    }}
-                  >
-                    <h4 style={{ color: "var(--text-primary)", fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, margin: 0 }}>
-                      {room.gameMode === "coop" ? "Give a Clue (Duet Mode)" : "Give a Clue"}
-                    </h4>
-                    {room.gameMode === "coop" && (
-                      <div style={{
-                        background: "linear-gradient(135deg, rgba(var(--team-accent-rgb,232,163,61),0.08), rgba(var(--team-accent-rgb,232,163,61),0.04))",
-                        border: "1px solid rgba(232,163,61,0.25)",
-                        borderRadius: "var(--radius-sm)",
-                        padding: "10px 14px",
-                        fontSize: "0.82rem",
-                        color: "var(--text-secondary)",
-                        lineHeight: 1.6,
-                      }}>
-                        💡 <strong style={{ color: "var(--accent)" }}>Duet Mode:</strong>{" "}
-                        You can see the <strong style={{ color: typeColors[localPlayer?.team === "red" ? "blue" : "red"]?.light }}>
-                          {localPlayer?.team === "red" ? "Blue" : "Red"} Team&apos;s cards
-                        </strong> on the board. Give a clue that points to those cards — your partner will guess them!
-                      </div>
-                    )}
-                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-end" }}>
-                      <div style={{ flex: 1, minWidth: "200px" }}>
-                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", marginBottom: "8px", fontWeight: 600 }}>
-                          Clue Word (Single word, no spaces)
-                        </label>
-                        <input
-                          type="text"
-                          placeholder="e.g. OCEAN"
-                          value={clueWord}
-                          onChange={(e) => setClueWord(e.target.value)}
-                          style={{
-                            width: "100%",
-                            padding: "12px",
-                            borderRadius: "var(--radius-sm)",
-                            border: "1px solid var(--border-default)",
-                            background: "var(--bg-surface-raised)",
-                            color: "var(--text-primary)",
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 600,
-                            letterSpacing: "0.05em",
-                          }}
-                        />
-                      </div>
-
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px", flex: 1 }}>
-                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", fontWeight: 600 }}>
-                          Count
-                        </label>
-                        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1].map((n) => {
-                            const isSelected = clueCount === n;
-                            return (
-                              <button
-                                key={n}
-                                type="button"
-                                onClick={() => setClueCount(n)}
-                                style={{
-                                  width: "36px",
-                                  height: "36px",
-                                  borderRadius: "50%",
-                                  border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
-                                  background: isSelected
-                                    ? "var(--accent)"
-                                    : "var(--bg-surface-raised)",
-                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-secondary)",
-                                  fontFamily: "var(--font-display)",
-                                  fontWeight: 700,
-                                  fontSize: "0.95rem",
-                                  cursor: "pointer",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: isSelected ? "0 0 8px var(--accent)" : "none",
-                                  transition: "all 0.15s ease",
-                                }}
-                              >
-                                {n === -1 ? "∞" : n}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      <button
-                        type="submit"
-                        style={{
-                          padding: "12px 32px",
-                          borderRadius: "var(--radius-sm)",
-                          border: "none",
-                          background: "var(--accent)",
-                          color: "var(--accent-text-on)",
-                          fontFamily: "var(--font-display)",
-                          fontWeight: 700,
-                          cursor: "pointer",
-                          boxShadow: "0 4px 12px rgba(232, 163, 61, 0.2)",
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.background = "var(--accent-hover)";
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.background = "var(--accent)";
-                        }}
-                      >
-                        Send Clue
-                      </button>
-                    </div>
-                    {clueError && (
-                      <div style={{ color: "hsl(355,85%,58%)", fontSize: "0.85rem", fontWeight: 500, display: "flex", alignItems: "center", gap: "6px" }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                        {clueError}
-                      </div>
-                    )}
-                  </form>
-                )}
-
+              
               {/* Card Board Grid */}
               <div style={{ position: "relative", width: "100%" }}>
                 {/* #9 Ambient Particle Field canvas */}
@@ -3772,7 +3642,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                               zIndex: 2,
                             }}
                           >
-                            {card.type === "assassin" ? "assassin" : ""}
+                            {card.type === "assassin" ? "black" : ""}
                             {card.revealed && (card.type === "assassin" ? " (REV)" : "REV")}
                           </span>
                         )}
@@ -3897,6 +3767,159 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   })}
                 </div>
               </div>
+
+
+
+        
+
+                            {/* Clue Submission Form */}
+              {room.phase === "playing" &&
+                room.turnState &&
+                room.turnState.phase === "giving_clue" &&
+                localPlayer?.team === room.turnState.activeTeam &&
+                (localPlayer?.role === "spymaster" || room.gameMode === "coop") && (
+                   <form
+                    onSubmit={handleGiveClue}
+                    className="fade-in"
+                    style={{
+                      background: "var(--bg-surface)",
+                      border: "1px solid var(--border-default)",
+                      borderRadius: "var(--radius-md)",
+                      padding: "24px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "16px",
+                      textAlign: "left",
+                      marginTop: "-8px", /* Tighten gap with cards grid */
+                      maxWidth: "600px",
+                      width: "100%",
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <h4 style={{ color: "var(--text-primary)", fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, margin: 0 }}>
+                      {room.gameMode === "coop" ? "Give a Clue (Duet Mode)" : "Give a Clue"}
+                    </h4>
+                    {room.gameMode === "coop" && (
+                      <div style={{
+                        background: "linear-gradient(135deg, rgba(var(--team-accent-rgb,232,163,61),0.08), rgba(var(--team-accent-rgb,232,163,61),0.04))",
+                        border: "1px solid rgba(232,163,61,0.25)",
+                        borderRadius: "var(--radius-sm)",
+                        padding: "10px 14px",
+                        fontSize: "0.82rem",
+                        color: "var(--text-secondary)",
+                        lineHeight: 1.6,
+                      }}>
+                        💡 <strong style={{ color: "var(--accent)" }}>Duet Mode:</strong>{" "}
+                        You can see the <strong style={{ color: typeColors[localPlayer?.team === "red" ? "blue" : "red"]?.light }}>
+                          {localPlayer?.team === "red" ? "Blue" : "Red"} Team&apos;s cards
+                        </strong> on the board. Give a clue that points to those cards — your partner will guess them!
+                      </div>
+                    )}
+                    <div style={{ display: "flex", gap: "16px", flexWrap: "nowrap", alignItems: "flex-end", width: "100%" }}>
+                      <div style={{ flex: 1, minWidth: "200px" }}>
+                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", marginBottom: "8px", fontWeight: 600, whiteSpace: "nowrap" }}>
+                          Clue Word <span style={{ fontWeight: 400, color: "var(--color-text-muted)", fontSize: "0.75rem" }}>(Single word, no spaces)</span>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g. OCEAN"
+                          value={clueWord}
+                          onChange={(e) => setClueWord(e.target.value)}
+                          style={{
+                            width: "100%",
+                            padding: "12px",
+                            borderRadius: "var(--radius-sm)",
+                            border: "1px solid var(--border-default)",
+                            background: "var(--bg-surface-raised)",
+                            color: "var(--text-primary)",
+                            fontFamily: "var(--font-display)",
+                            fontWeight: 600,
+                            letterSpacing: "0.05em",
+                          }}
+                        />
+                      </div>
+
+                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", fontWeight: 600 }}>
+                          Count
+                        </label>
+                        <div className="clue-count-selector-container">
+                          <button
+                            type="button"
+                            className={`clue-count-trigger-btn ${clueCount !== null ? "active" : ""}`}
+                          >
+                            {clueCount === -1 ? "∞" : clueCount === null ? "-" : clueCount}
+                          </button>
+                          <div className="clue-count-dropdown">
+                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1].map((n) => {
+                              const isSelected = clueCount === n;
+                              return (
+                                <button
+                                  key={n}
+                                  type="button"
+                                  onClick={() => setClueCount(n)}
+                                  style={{
+                                    width: "36px",
+                                    height: "36px",
+                                    borderRadius: "50%",
+                                    border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
+                                    background: isSelected
+                                      ? "var(--accent)"
+                                      : "var(--bg-surface-raised)",
+                                    color: isSelected ? "var(--accent-text-on)" : "var(--text-secondary)",
+                                    fontFamily: "var(--font-display)",
+                                    fontWeight: 700,
+                                    fontSize: "0.95rem",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    boxShadow: isSelected ? "0 0 8px var(--accent)" : "none",
+                                    transition: "all 0.15s ease",
+                                  }}
+                                >
+                                  {n === -1 ? "∞" : n}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        style={{
+                          padding: "12px 32px",
+                          borderRadius: "var(--radius-sm)",
+                          border: "none",
+                          background: "var(--accent)",
+                          color: "var(--accent-text-on)",
+                          fontFamily: "var(--font-display)",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          boxShadow: "0 4px 12px rgba(232, 163, 61, 0.2)",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.background = "var(--accent-hover)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = "var(--accent)";
+                        }}
+                      >
+                        Send Clue
+                      </button>
+                    </div>
+                    {clueError && (
+                      <div style={{ color: "hsl(355,85%,58%)", fontSize: "0.85rem", fontWeight: 500, display: "flex", alignItems: "center", gap: "6px" }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        {clueError}
+                      </div>
+                    )}
+                  </form>
+                )}
+
             </div>
           )}
         </div>
@@ -5825,6 +5848,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
       setClueError("Clue must be a single word");
       return;
     }
+    if (clueCount === null) {
+      setClueError("Please select a clue count");
+      return;
+    }
 
     if (socket) {
       socket.emit("give_clue", {
@@ -5835,6 +5862,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
       });
     }
     setClueWord("");
+    setClueCount(null);
   };
 
   const handleCardClick = (cardId: number) => {
