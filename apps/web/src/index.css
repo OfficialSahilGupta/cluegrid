@@ -413,7 +413,7 @@ html.increased-fonts {
 }
 
 /* Push side panels behind WebGL Canvas (zIndex 4) ONLY when they start touching the character bodies */
-@media (max-width: 1500px) {
+@media (max-width: 1280px) {
   .hud-side-panel-left,
   .hud-side-panel-right {
     z-index: 2 !important;
@@ -433,12 +433,11 @@ html.increased-fonts {
 }
 
 @media (max-width: 768px) {
-  .hud-side-panel-left,
-  .hud-side-panel-right {
-    display: none !important;
-  }
   .nav-links {
     display: none !important;
+  }
+  .landing-hamburger {
+    display: flex !important;
   }
   .wordmark {
     left: 16px !important;

@@ -68,11 +68,17 @@ export const SUPPORTED_LOCALES: { code: string; name: string; flag: string }[] =
 /**
  * Dynamically loads a locale JSON file. Falls back to English if not found.
  */
+// Declare locales using Vite's static analyzer glob import
+const locales = import.meta.glob("../../packages/i18n/locales/*.json");
+
 async function loadLocale(lng: string): Promise<Record<string, unknown>> {
   try {
-    // Dynamic import from @cluegrid/i18n package locales
-    const mod = await import(`../../packages/i18n/locales/${lng}.json`);
-    return mod.default?.ui || mod.ui || mod.default || mod;
+    const key = `../../packages/i18n/locales/${lng}.json`;
+    if (locales[key]) {
+      const mod = (await locales[key]()) as any;
+      return mod.default?.ui || mod.ui || mod.default || mod;
+    }
+    throw new Error(`Locale ${lng} not found in glob map`);
   } catch {
     console.warn(`[i18n] Locale "${lng}" not found, falling back to English.`);
     return en.ui as unknown as Record<string, unknown>;

@@ -37,6 +37,7 @@ export function LandingPage({
   const [isWiping, setIsWiping] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showReport, setShowReport] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Room config state
   const [gameMode, setGameMode] = useState<"classic" | "coop">("classic");
@@ -1554,6 +1555,113 @@ export function LandingPage({
         <span style={{ opacity: 0.35 }}>·</span>
         <button onClick={() => setCurrentView("about")} className="cyber-dotted-link">About</button>
       </nav>
+
+      {/* Hamburger button for mobile */}
+      <button
+        className="landing-hamburger"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        style={{
+          position: "fixed",
+          top: "24px",
+          right: "24px",
+          zIndex: 999,
+          background: "rgba(8, 22, 25, 0.8)",
+          border: "1px solid rgba(0, 240, 255, 0.4)",
+          borderRadius: "4px",
+          width: "38px",
+          height: "38px",
+          display: "none",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          color: "#00f0ff",
+          boxShadow: "0 0 10px rgba(0, 240, 255, 0.2)",
+        }}
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      {/* Mobile Menu Dropdown Panel */}
+      {isMobileMenuOpen && (
+        <>
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(3, 10, 12, 0.6)",
+              backdropFilter: "blur(4px)",
+              zIndex: 997,
+            }}
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <div
+            className="mobile-menu-animate"
+            style={{
+              position: "fixed",
+              top: "72px",
+              right: "24px",
+              width: "180px",
+              background: "#081619",
+              border: "1.5px solid #00f0ff",
+              borderRadius: "8px",
+              padding: "16px 12px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              zIndex: 998,
+              boxShadow: "0 15px 35px rgba(0,0,0,0.6), 0 0 15px rgba(0,240,255,0.15)",
+            }}
+          >
+            <button
+              onClick={() => { setCurrentView("rules"); setIsMobileMenuOpen(false); }}
+              className="cyber-dotted-link"
+              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%" }}
+            >
+              How to play
+            </button>
+            <button
+              onClick={() => { setCurrentView("features"); setIsMobileMenuOpen(false); }}
+              className="cyber-dotted-link"
+              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%" }}
+            >
+              Features
+            </button>
+            <button
+              onClick={() => { setCurrentView("changelog"); setIsMobileMenuOpen(false); }}
+              className="cyber-dotted-link"
+              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%" }}
+            >
+              Changelog
+            </button>
+            <button
+              onClick={() => { setCurrentView("about"); setIsMobileMenuOpen(false); }}
+              className="cyber-dotted-link"
+              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%" }}
+            >
+              About
+            </button>
+            <div style={{ height: "1px", background: "rgba(238,243,238,0.1)", margin: "4px 0" }} />
+            <button
+              onClick={() => { setCurrentView("support"); setIsMobileMenuOpen(false); }}
+              className="cyber-dotted-link"
+              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%", color: "#ef959c" }}
+            >
+              ☕ Supply Line: Coffee
+            </button>
+            <button
+              onClick={() => { setShowReport(true); setIsMobileMenuOpen(false); }}
+              className="cyber-dotted-link"
+              style={{ textAlign: "left", padding: "8px 6px", fontSize: "11.5px", width: "100%", color: "#00f0ff" }}
+            >
+              🐛 Report Bug / Idea
+            </button>
+          </div>
+        </>
+      )}
 
       {/* Bottom left indicators */}
       <button 
