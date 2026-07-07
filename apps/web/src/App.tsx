@@ -578,14 +578,18 @@ export default function App() {
           <div
             style={{
               position: "fixed",
-              inset: 0,
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
               background: "rgba(3,11,14,0.95)",
               backdropFilter: "blur(12px)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              padding: "24px",
               zIndex: 999999,
+              boxSizing: "border-box",
+              padding: "16px",
             }}
           >
             <form
@@ -600,6 +604,8 @@ export default function App() {
                 display: "flex",
                 flexDirection: "column",
                 gap: "20px",
+                margin: 0,
+                boxSizing: "border-box",
               }}
             >
               <div style={{ textAlign: "center", marginBottom: "8px" }}>
