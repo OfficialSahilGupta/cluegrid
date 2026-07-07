@@ -2,7 +2,6 @@
 agy-images/
 node_modules/
 /node_modules
-html-files/
 
 # Build outputs
 dist/
@@ -37,3 +36,8 @@ coverage/
 *.njsproj
 *.sln
 *.swp
+
+# Local multimedia and temporary HTML assets
+html-files/
+cluegrid-landing.mp4
+
