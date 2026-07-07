@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { Socket } from "socket.io-client";
 import { getWordPack } from "@cluegrid/wordpacks";
@@ -247,6 +247,30 @@ function playReactionSound(emoji: string) {
     // ignore
   }
 }
+
+const getTeamBgColor = (team: string | null | undefined) => {
+  if (team === "red") return "#E25C47";
+  if (team === "blue") return "#5EA9E9";
+  if (team === "green") return "#5EB346";
+  if (team === "yellow") return "#F4D03F";
+  return "#A6ACAF";
+};
+
+const getTeamDarkColor = (team: string | null | undefined) => {
+  if (team === "red") return "#78281F";
+  if (team === "blue") return "#1B4E7A";
+  if (team === "green") return "#1E8449";
+  if (team === "yellow") return "#7D6608";
+  return "#333333";
+};
+
+const getTeamAvatarBorderColor = (team: string | null | undefined) => {
+  if (team === "red") return "#FFE5B4";
+  if (team === "blue") return "#D2E8F9";
+  if (team === "green") return "#D4EFDF";
+  if (team === "yellow") return "#FCF3CF";
+  return "#EAEDED";
+};
 
 interface GameBoardProps {
   room: RoomState;
@@ -5951,6 +5975,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
     };
 
     const handleGameStarted = () => {
+      setGameLog([]);
       // Allow DOM to mount the playing cards first
       setTimeout(() => {
         setIsDealingAnimationActive(true);
@@ -6621,107 +6646,256 @@ const renderSettingsCard = (side?: "left" | "right") => {
         )}
 
         {/* TAB CONTENT: Game Log */}
-        {activeTab === "log" && (
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "calc(100% - 44px)" }}>
-            {/* Log events list */}
-            <div
-              ref={logScrollContainerRef}
-              style={{
-                flex: 1,
-                overflowY: "auto",
-                display: "flex",
-                flexDirection: "column",
-                gap: "8px",
-                paddingRight: "4px",
-                marginBottom: "12px",
-              }}
-            >
-              {gameLog.filter((entry) => entry.type === "clue" || entry.type === "reveal" || entry.type === "role_change").map((entry) => {
-                const timeStr = new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const styles = getLogEntryStyle(entry);
-                const isReveal = entry.type === "reveal";
-                const isRoleChange = entry.type === "role_change";
+        {activeTab === "log" && (() => {
+          const clueGroups: Array<{ clue: GameLogEntry; guesses: GameLogEntry[] }> = [];
+          let currentClueGroup: { clue: GameLogEntry; guesses: GameLogEntry[] } | null = null;
+          
+          for (const entry of gameLog) {
+            if (entry.type === "clue") {
+              if (currentClueGroup) {
+                clueGroups.push(currentClueGroup);
+              }
+              currentClueGroup = { clue: entry, guesses: [] };
+            } else if (entry.type === "reveal") {
+              if (currentClueGroup) {
+                currentClueGroup.guesses.push(entry);
+              }
+            }
+          }
+          
+          if (currentClueGroup) {
+            clueGroups.push(currentClueGroup);
+          }
 
-                return (
-                  <div
-                    key={entry.id}
-                    style={{
-                      padding: "8px 12px",
-                      borderRadius: "var(--radius-sm)",
-                      fontSize: "0.85rem",
-                      border: "1px solid var(--border-default)",
-                      background: "var(--bg-surface-raised)",
-                      textAlign: "left",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                      flexWrap: "wrap",
-                      ...styles,
-                    }}
-                  >
-                    <span style={{ opacity: 0.5, fontSize: "0.7rem", fontFamily: "var(--font-mono)" }}>
-                      {timeStr}
-                    </span>
+          return (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "calc(100% - 44px)" }}>
+              {/* Log events list */}
+              <div
+                ref={logScrollContainerRef}
+                style={{
+                  flex: 1,
+                  overflowY: "auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px",
+                  paddingRight: "6px",
+                  paddingLeft: "4px",
+                  marginBottom: "12px",
+                }}
+              >
+                {clueGroups.map((group, idx) => {
+                  const { clue, guesses } = group;
+                  const clueTeam = clue.team;
+                  const spymasterName = clue.details?.spymasterName || clue.message.split(" ")[0] || "Spymaster";
+                  const spymasterAvatar = clue.details?.spymasterAvatar || "🕵️‍♂️";
+                  const word = clue.details?.word || "";
+                  const count = clue.details?.count;
+                  const countStr = count === -1 ? "∞" : count !== undefined ? String(count) : "";
+                  
+                  const bannerBg = getTeamBgColor(clueTeam);
+                  const badgeBg = getTeamDarkColor(clueTeam);
+                  const avatarBorder = getTeamAvatarBorderColor(clueTeam);
 
-                    {isReveal ? (
-                      <>
-                        <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>
-                          {entry.details?.playerDisplayName || "Player"}
-                        </span>
-                        <span style={{ color: "var(--color-text-muted)", marginLeft: "4px", marginRight: "4px" }}>
-                          :
-                        </span>
-                        <span
-                          style={{
-                            background: typeColors[entry.details?.cardType || "unknown"]?.bg || "rgba(255,255,255,0.05)",
-                            border: `1px solid ${typeColors[entry.details?.cardType || "unknown"]?.border || "rgba(255,255,255,0.15)"}`,
-                            color: typeColors[entry.details?.cardType || "unknown"]?.text || "#fff",
-                            borderRadius: "3px",
-                            padding: "2px 6px",
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 700,
-                            fontSize: "0.75rem",
+                  return (
+                    <div key={`clue-group-${clue.id || idx}`} style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
+                      {/* Clue Banner */}
+                      <div style={{ display: "flex", alignItems: "center", position: "relative", width: "100%" }}>
+                        {/* Avatar and Name Badge */}
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 2, marginRight: "-8px", width: "50px", flexShrink: 0 }}>
+                          <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "50px", height: "50px" }}>
+                            {renderAvatar(spymasterAvatar, 44, { border: `3px solid ${avatarBorder}`, background: "var(--bg-surface-raised)", boxShadow: "0 2px 5px rgba(0,0,0,0.25)" })}
+                            <div style={{
+                              position: "absolute",
+                              bottom: "-5px",
+                              background: badgeBg,
+                              padding: "1px 5px",
+                              borderRadius: "5px",
+                              fontSize: "8px",
+                              fontWeight: 800,
+                              color: "#FFFFFF",
+                              whiteSpace: "nowrap",
+                              boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                              fontFamily: "var(--font-display), var(--font-sans)",
+                              border: "1px solid rgba(255,255,255,0.12)",
+                              textShadow: "0 0.5px 1px rgba(0,0,0,0.5)"
+                            }}>
+                              {spymasterName}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Banner Strip */}
+                        <div style={{
+                          flex: 1,
+                          height: "38px",
+                          background: bannerBg,
+                          borderRadius: "19px",
+                          display: "flex",
+                          alignItems: "center",
+                          padding: "0 12px 0 16px",
+                          boxShadow: "0 3px 8px rgba(0,0,0,0.18)"
+                        }}>
+                          {/* Clue Word Card */}
+                          <div style={{
+                            flex: 1,
+                            height: "26px",
+                            background: "#FFFFFF",
+                            borderRadius: "5px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: 800,
+                            fontSize: "13px",
+                            color: "#000000",
                             textTransform: "uppercase",
-                            letterSpacing: "0.02em",
-                          }}
-                        >
-                          {entry.details?.cardWord || "Word"}
-                        </span>
-                      </>
-                    ) : isRoleChange ? (
-                      <span style={{ color: "var(--text-primary)", fontWeight: 700 }}>
-                        {entry.message}
-                      </span>
-                    ) : (
-                      <>
-                        <span style={{ color: typeColors[entry.team || "unknown"]?.light || "#fff", fontWeight: 700 }}>
-                          {entry.details?.spymasterName || "Spymaster"}
-                        </span>
-                        <span style={{ color: "var(--color-text-muted)" }}>:</span>
-                        <span style={{ color: "var(--text-primary)", fontWeight: 700, background: "rgba(255,255,255,0.08)", padding: "2px 8px", borderRadius: "4px" }}>
-                          {entry.details?.word || "Word"}{" "}
-                          {entry.details?.count !== undefined
-                            ? entry.details.count === -1
-                              ? "∞"
-                              : entry.details.count
-                            : ""}
-                        </span>
-                      </>
-                    )}
+                            letterSpacing: "0.05em",
+                            fontFamily: "Outfit, Inter, sans-serif",
+                            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.12)",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            padding: "0 8px"
+                          }}>
+                            {word}
+                          </div>
+                          
+                          {/* Clue Count Badge */}
+                          {countStr && (
+                            <div style={{
+                              width: "26px",
+                              height: "26px",
+                              borderRadius: "50%",
+                              background: "#FFFFFF",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: 800,
+                              fontSize: "13px",
+                              color: "#000000",
+                              marginLeft: "8px",
+                              flexShrink: 0,
+                              boxShadow: "inset 0 1px 2px rgba(0,0,0,0.12)",
+                              fontFamily: "Outfit, Inter, sans-serif"
+                            }}>
+                              {countStr}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Guesses Row */}
+                      {guesses.length > 0 && (
+                        <div style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: "10px 12px",
+                          paddingLeft: "16px",
+                          width: "100%"
+                        }}>
+                          {guesses.map((guess, gIdx) => {
+                            const guessPlayerName = guess.details?.playerDisplayName || guess.message.split(" ")[0] || "Player";
+                            const guessPlayerAvatar = guess.details?.playerAvatar || "🕵️‍♂️";
+                            const guessPlayerTeam = guess.details?.playerTeam || clueTeam;
+                            const guessWord = guess.details?.cardWord || "";
+                            const guessCardType = guess.details?.cardType || "unknown";
+                            
+                            const isPass = guessCardType === "pass" || guessWord.toLowerCase() === "pass";
+                            
+                            let pillBg = "#A6ACAF";
+                            let pillText = "#000000";
+                            
+                            if (isPass) {
+                              pillBg = "#5EB346";
+                              pillText = "#000000";
+                            } else {
+                              if (guessCardType === "red") {
+                                pillBg = "#E25C47";
+                              } else if (guessCardType === "blue") {
+                                pillBg = "#5EA9E9";
+                              } else if (guessCardType === "green") {
+                                pillBg = "#5EB346";
+                              } else if (guessCardType === "yellow") {
+                                pillBg = "#F4D03F";
+                              } else if (guessCardType === "neutral") {
+                                pillBg = "#DFD0B8";
+                              } else if (guessCardType === "assassin") {
+                                pillBg = "#1A1A1A";
+                                pillText = "#FFFFFF";
+                              }
+                            }
+                            
+                            const guessPlayerBadgeBg = getTeamDarkColor(guessPlayerTeam);
+                            const guessPlayerAvatarBorder = getTeamAvatarBorderColor(guessPlayerTeam);
+
+                            return (
+                              <div key={`guess-${guess.id || gIdx}`} style={{ display: "flex", alignItems: "center", position: "relative" }}>
+                                {/* Small Avatar & Name Badge */}
+                                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 2, marginRight: "-4px", width: "32px", flexShrink: 0 }}>
+                                  <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "32px", height: "32px" }}>
+                                    {renderAvatar(guessPlayerAvatar, 28, { border: `1.5px solid ${guessPlayerAvatarBorder}`, background: "var(--bg-surface-raised)", boxShadow: "0 1.5px 3px rgba(0,0,0,0.2)" })}
+                                    <div style={{
+                                      position: "absolute",
+                                      bottom: "-3px",
+                                      background: guessPlayerBadgeBg,
+                                      padding: "1px 4px",
+                                      borderRadius: "3px",
+                                      fontSize: "6.5px",
+                                      fontWeight: 800,
+                                      color: "#FFFFFF",
+                                      whiteSpace: "nowrap",
+                                      boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                                      fontFamily: "var(--font-display), var(--font-sans)",
+                                      border: "0.5px solid rgba(255,255,255,0.1)",
+                                      textShadow: "0 0.5px 1px rgba(0,0,0,0.5)"
+                                    }}>
+                                      {guessPlayerName}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                {/* Guess Pill */}
+                                <div style={{
+                                  height: "20px",
+                                  background: pillBg,
+                                  color: pillText,
+                                  borderRadius: "10px",
+                                  padding: isPass ? "0 8px 0 10px" : "0 10px 0 10px",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  fontWeight: 800,
+                                  fontSize: "9.5px",
+                                  textTransform: "uppercase",
+                                  letterSpacing: "0.02em",
+                                  fontFamily: "Outfit, Inter, sans-serif",
+                                  boxShadow: "0 1.5px 3px rgba(0,0,0,0.15)",
+                                }}>
+                                  {isPass ? (
+                                    <span style={{ fontSize: "11px", fontWeight: "bold" }}>✔</span>
+                                  ) : (
+                                    guessWord
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {clueGroups.length === 0 && (
+                  <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-text-muted)", fontSize: "0.9rem", fontStyle: "italic", textAlign: "center" }}>
+                    Log is empty. Start the game and submit clues to see history!
                   </div>
-                );
-              })}
+                )}
 
-              {gameLog.length === 0 && (
-                <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-text-muted)", fontSize: "0.9rem", fontStyle: "italic", textAlign: "center" }}>
-                  Log is empty. Start the game to begin recording events!
-                </div>
-              )}
-
-              <div ref={logEndRef} />
+                <div ref={logEndRef} />
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     );
   };
