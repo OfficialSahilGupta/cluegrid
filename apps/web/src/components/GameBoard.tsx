@@ -4154,30 +4154,31 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         style={{
                           background: colors.bg,
                           border: clueSelectedCardIds.includes(card.id)
-                            ? `3px solid ${colors.light}`
+                            ? `3.5px solid ${colors.light}`
                             : `2px solid ${colors.border}`,
-                          borderRadius: "var(--radius-md)",
-                          padding: "clamp(10px, 3.5vw, 24px) clamp(4px, 1.5vw, 10px)",
+                          borderRadius: "var(--radius-lg)",
+                          padding: 0,
                           display: "flex",
                           flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
+                          alignItems: "stretch",
+                          justifyContent: "stretch",
                           cursor: (isInteractive || card.revealed) ? "pointer" : "default",
-                          minHeight: "clamp(52px, 15vw, 100px)",
+                          minHeight: "clamp(80px, 18vw, 130px)",
                           position: "relative",
                           perspective: "1000px",
                           transformStyle: "preserve-3d",
                           boxShadow: card.revealed
-                            ? "inset 0 2px 10px rgba(0,0,0,0.5)"
+                            ? "inset 0 4px 12px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.2)"
                             : clueSelectedCardIds.includes(card.id)
-                              ? `0 0 14px ${colors.light}`
-                              : "0 4px 6px rgba(0,0,0,0.15)",
+                              ? `0 0 20px ${colors.light}`
+                              : "0 8px 16px rgba(0,0,0,0.25)",
                           transition: isDealingAnimationActive
                             ? "none"
                             : "transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.15s ease, border-color 0.15s ease",
                           transform: shockwaveOffset ? `translate(var(--push-x), var(--push-y))` : undefined,
                           "--push-x": shockwaveOffset ? `${shockwaveOffset.x}px` : "0px",
                           "--push-y": shockwaveOffset ? `${shockwaveOffset.y}px` : "0px",
+                          overflow: "hidden",
                           ...dealAnimationStyles,
                         } as React.CSSProperties}
                         onMouseMove={(e) => {
@@ -4189,22 +4190,22 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             const yc = ((y / rect.height) - 0.5) * -16;
                             e.currentTarget.style.transform = `perspective(1000px) rotateX(${yc}deg) rotateY(${xc}deg) scale(1.03)`;
                             e.currentTarget.style.boxShadow = clueSelectedCardIds.includes(card.id)
-                              ? `0 0 24px ${colors.light}`
-                              : "0 12px 24px rgba(0,0,0,0.35)";
+                              ? `0 0 28px ${colors.light}`
+                              : "0 16px 32px rgba(0,0,0,0.45)";
                             e.currentTarget.style.borderColor = clueSelectedCardIds.includes(card.id)
                               ? colors.light
-                              : "rgba(255,255,255,0.3)";
+                              : "rgba(255,255,255,0.45)";
                             e.currentTarget.style.setProperty('--glare-x', `${(x / rect.width) * 100}%`);
                             e.currentTarget.style.setProperty('--glare-y', `${(y / rect.height) * 100}%`);
-                            e.currentTarget.style.setProperty('--glare-opacity', '0.15');
+                            e.currentTarget.style.setProperty('--glare-opacity', '0.18');
                           }
                         }}
                         onMouseOut={(e) => {
                           if (isInteractive) {
                             e.currentTarget.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)";
                             e.currentTarget.style.boxShadow = clueSelectedCardIds.includes(card.id)
-                              ? `0 0 14px ${colors.light}`
-                              : "0 4px 6px rgba(0,0,0,0.15)";
+                              ? `0 0 20px ${colors.light}`
+                              : "0 8px 16px rgba(0,0,0,0.25)";
                             e.currentTarget.style.borderColor = clueSelectedCardIds.includes(card.id)
                               ? colors.light
                               : colors.border;
@@ -4221,7 +4222,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             background: `radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 50%), rgba(255, 255, 255, var(--glare-opacity, 0)) 0%, rgba(255, 255, 255, 0) 65%)`,
                             pointerEvents: "none",
                             transition: "background 0.15s ease",
-                            zIndex: 1,
+                            zIndex: 3,
                           }}
                         />
 
@@ -4248,145 +4249,202 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           />
                         )}
 
-                        {(card.revealed || (canSeeKey && card.type === "assassin")) && !votedCardIds.includes(card.id) && (
-                          <span
-                            style={{
-                              position: "absolute",
-                              top: "6px",
-                              right: "8px",
-                              fontSize: "0.6rem",
-                              fontWeight: 700,
-                              textTransform: "uppercase",
-                              padding: "2px 6px",
-                              borderRadius: "4px",
-                              background: "rgba(0,0,0,0.4)",
-                              color: colors.text,
-                              letterSpacing: "0.05em",
-                              zIndex: 2,
-                            }}
-                          >
-                            {card.type === "assassin" ? "black" : ""}
-                            {card.revealed && (card.type === "assassin" ? " (REV)" : "REV")}
-                          </span>
-                        )}
-
-                        <span
-                          className="game-card-word"
+                        {/* 1. TOP Identity Section */}
+                        <div
                           style={{
-                            fontFamily: "var(--font-display)",
-                            fontSize: card.word.length > 9
-                              ? "clamp(0.6rem, 2.6vw, 0.95rem)"
-                              : card.word.length > 7
-                                ? "clamp(0.75rem, 3.2vw, 1.1rem)"
-                                : "clamp(0.9rem, 3.8vw, 1.25rem)",
-                            fontWeight: 800,
-                            letterSpacing: "0.04em",
-                            color: card.revealed ? colors.text : (lightMode ? "#1C1916" : "#FFFFFF"),
-                            textAlign: "center",
-                            whiteSpace: "nowrap",
-                            lineHeight: 1.15,
-                            opacity: card.revealed
-                              ? showWordCardIds.includes(card.id)
-                                ? 1
-                                : 0
-                              : canSeeKey
-                                ? 0.45
-                                : 1,
-                            transform: "translateZ(20px)",
-                            display: "block",
-                            zIndex: 2,
-                            textShadow: !card.revealed ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
-                            transition: "opacity 0.25s ease",
+                            flex: 1,
+                            width: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            position: "relative",
+                            padding: "8px",
+                            borderBottom: `1.5px solid ${colors.border}`,
+                            background: card.revealed ? "rgba(0,0,0,0.15)" : "transparent",
+                            boxSizing: "border-box",
                           }}
                         >
-                          {card.word}
-                        </span>
-
-                        {/* Pointer Hand Icon in corner to Flip */}
-                        {votedCardIds.includes(card.id) && isActiveOperative && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (socket) {
-                                socket.emit("guess_card", {
-                                  roomCode: room.roomCode,
-                                  playerId,
-                                  cardId: card.id,
-                                });
-                              }
-                            }}
-                            style={{
-                              position: "absolute",
-                              top: "6px",
-                              right: "8px",
-                              background: "linear-gradient(135deg, var(--accent), #b87c24)",
-                              border: "1px solid var(--accent)",
-                              borderRadius: "50%",
-                              width: "28px",
-                              height: "28px",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              color: "var(--accent-text-on)",
-                              cursor: "pointer",
-                              boxShadow: "0 0 10px rgba(232,163,61,0.5)",
-                              zIndex: 10,
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseOver={(e) => {
-                              e.currentTarget.style.transform = "scale(1.15)";
-                              e.currentTarget.style.boxShadow = "0 0 15px rgba(232,163,61,0.8)";
-                            }}
-                            onMouseOut={(e) => {
-                              e.currentTarget.style.transform = "none";
-                              e.currentTarget.style.boxShadow = "0 0 10px rgba(232,163,61,0.5)";
-                            }}
-                            title="Flip Card"
-                          >
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: "scaleX(-1)" }}>
-                              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
-                            </svg>
-                          </button>
-                        )}
-
-                        {/* Real-time Voter Avatars Overlay */}
-                        {voters.length > 0 && (
+                          {/* Ghosted Watermark Icon inside Top Section */}
                           <div
                             style={{
                               position: "absolute",
-                              bottom: "6px",
-                              left: "8px",
-                              display: "flex",
-                              gap: "4px",
-                              flexWrap: "wrap",
-                              zIndex: 4,
+                              left: "50%",
+                              top: "50%",
+                              transform: "translate(-50%, -50%)",
+                              fontSize: "44px",
+                              lineHeight: 1,
+                              opacity: 0.08,
+                              pointerEvents: "none",
+                              userSelect: "none",
+                              zIndex: 0,
                             }}
                           >
-                            {voters.map((v, index) => {
-                              const delay = `${(index * 200) % 1000}ms`;
-                              return (
-                                <span
-                                  key={v.id}
-                                  title={v.displayName}
-                                  className="voter-badge-floating"
-                                  style={{
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    width: "20px",
-                                    height: "20px",
-                                    borderRadius: "50%",
-                                    cursor: "default",
-                                    animation: "voter-badge-entry 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, avatar-float 3s ease-in-out infinite alternate",
-                                    animationDelay: `0s, ${delay}`,
-                                  }}
-                                >
-                                  {renderAvatar(v.avatar || v.displayName.charAt(0), 20)}
-                                </span>
-                              );
-                            })}
+                            {cardType === "red" ? "🎯" :
+                             cardType === "blue" ? "🛡️" :
+                             cardType === "green" ? "🌿" :
+                             cardType === "yellow" ? "⚡" :
+                             cardType === "neutral" ? "📁" :
+                             cardType === "assassin" ? "💀" : "❓"}
                           </div>
-                        )}
+
+                          {/* Reveal Status Badge (top right) */}
+                          {(card.revealed || (canSeeKey && card.type === "assassin")) && !votedCardIds.includes(card.id) && (
+                            <span
+                              style={{
+                                position: "absolute",
+                                top: "6px",
+                                right: "8px",
+                                fontSize: "0.55rem",
+                                fontWeight: 800,
+                                textTransform: "uppercase",
+                                padding: "2px 6px",
+                                borderRadius: "4px",
+                                background: "rgba(0,0,0,0.45)",
+                                color: colors.text,
+                                border: "0.5px solid rgba(255,255,255,0.1)",
+                                letterSpacing: "0.06em",
+                                zIndex: 2,
+                              }}
+                            >
+                              {card.type === "assassin" ? "black" : ""}
+                              {card.revealed && (card.type === "assassin" ? " (REV)" : "REV")}
+                            </span>
+                          )}
+
+                          {/* Pointer Hand Icon in corner to Flip */}
+                          {votedCardIds.includes(card.id) && isActiveOperative && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (socket) {
+                                  socket.emit("guess_card", {
+                                    roomCode: room.roomCode,
+                                    playerId,
+                                    cardId: card.id,
+                                  });
+                                }
+                              }}
+                              style={{
+                                position: "absolute",
+                                top: "6px",
+                                right: "8px",
+                                background: "linear-gradient(135deg, var(--accent), #b87c24)",
+                                border: "1px solid var(--accent)",
+                                borderRadius: "50%",
+                                width: "28px",
+                                height: "28px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                color: "var(--accent-text-on)",
+                                cursor: "pointer",
+                                boxShadow: "0 0 10px rgba(232,163,61,0.5)",
+                                zIndex: 10,
+                                transition: "all 0.15s ease",
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.transform = "scale(1.15)";
+                                e.currentTarget.style.boxShadow = "0 0 15px rgba(232,163,61,0.8)";
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.transform = "none";
+                                e.currentTarget.style.boxShadow = "0 0 10px rgba(232,163,61,0.5)";
+                              }}
+                              title="Flip Card"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: "scaleX(-1)" }}>
+                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+                              </svg>
+                            </button>
+                          )}
+
+                          {/* Real-time Voter Avatars Overlay (floats above divider inside top section) */}
+                          {voters.length > 0 && (
+                            <div
+                              style={{
+                                position: "absolute",
+                                bottom: "6px",
+                                left: "8px",
+                                display: "flex",
+                                gap: "4px",
+                                flexWrap: "wrap",
+                                zIndex: 4,
+                              }}
+                            >
+                              {voters.map((v, index) => {
+                                const delay = `${(index * 200) % 1000}ms`;
+                                return (
+                                  <span
+                                    key={v.id}
+                                    title={v.displayName}
+                                    className="voter-badge-floating"
+                                    style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      width: "20px",
+                                      height: "20px",
+                                      borderRadius: "50%",
+                                      cursor: "default",
+                                      animation: "voter-badge-entry 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, avatar-float 3s ease-in-out infinite alternate",
+                                      animationDelay: `0s, ${delay}`,
+                                    }}
+                                  >
+                                    {renderAvatar(v.avatar || v.displayName.charAt(0), 20)}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* 2. BOTTOM Word Capsule Section */}
+                        <div
+                          style={{
+                            width: "100%",
+                            padding: "10px 10px",
+                            background: lightMode ? "rgba(0, 0, 0, 0.05)" : "rgba(0, 0, 0, 0.35)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            zIndex: 2,
+                            boxSizing: "border-box",
+                          }}
+                        >
+                          <span
+                            className="game-card-word"
+                            style={{
+                              fontFamily: "var(--font-display)",
+                              fontSize: card.word.length > 9
+                                ? "clamp(0.6rem, 2.6vw, 0.95rem)"
+                                : card.word.length > 7
+                                  ? "clamp(0.75rem, 3.2vw, 1.1rem)"
+                                  : "clamp(0.9rem, 3.8vw, 1.25rem)",
+                              fontWeight: 900,
+                              letterSpacing: "0.05em",
+                              color: card.revealed
+                                ? colors.text
+                                : (lightMode ? "#1C1916" : "#FFFFFF"),
+                              textAlign: "center",
+                              whiteSpace: "nowrap",
+                              lineHeight: 1.15,
+                              opacity: card.revealed
+                                ? showWordCardIds.includes(card.id)
+                                  ? 1
+                                  : 0
+                                : canSeeKey
+                                  ? 0.45
+                                  : 1,
+                              transform: "translateZ(20px)",
+                              display: "block",
+                              zIndex: 2,
+                              textShadow: !card.revealed ? "0 1px 2px rgba(0,0,0,0.5)" : "none",
+                              transition: "opacity 0.25s ease",
+                            }}
+                          >
+                            {card.word}
+                          </span>
+                        </div>
                       </button>
                     );
                   })}
@@ -4410,22 +4468,19 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       background: "var(--bg-surface)",
                       border: "1px solid var(--border-default)",
                       borderRadius: "var(--radius-md)",
-                      padding: "24px",
+                      padding: "28px 32px",
                       display: "flex",
                       flexDirection: "column",
                       gap: "16px",
                       textAlign: "left",
                       marginTop: "-8px", /* Tighten gap with cards grid */
-                      maxWidth: "600px",
+                      maxWidth: "700px",
                       width: "100%",
                       marginLeft: "auto",
                       marginRight: "auto",
                       boxSizing: "border-box",
                     }}
                   >
-                    <h4 style={{ color: "var(--text-primary)", fontFamily: "var(--font-display)", fontSize: "1.2rem", fontWeight: 700, margin: 0 }}>
-                      {room.gameMode === "coop" ? "Give a Clue (Duet Mode)" : "Give a Clue"}
-                    </h4>
                     {room.gameMode === "coop" && (
                       <div style={{
                         background: "linear-gradient(135deg, rgba(var(--team-accent-rgb,232,163,61),0.08), rgba(var(--team-accent-rgb,232,163,61),0.04))",
@@ -4435,6 +4490,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         fontSize: "0.82rem",
                         color: "var(--text-secondary)",
                         lineHeight: 1.6,
+                        marginBottom: "12px",
                       }}>
                         💡 <strong style={{ color: "var(--accent)" }}>Duet Mode:</strong>{" "}
                         You can see the <strong style={{ color: typeColors[localPlayer?.team === "red" ? "blue" : "red"]?.light }}>
@@ -4442,95 +4498,115 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         </strong> on the board. Give a clue that points to those cards — your partner will guess them!
                       </div>
                     )}
-                    <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-end", width: "100%" }}>
-                      <div style={{ flex: 1, minWidth: "200px" }}>
-                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", marginBottom: "8px", fontWeight: 600, whiteSpace: "nowrap" }}>
-                          Clue Word <span style={{ fontWeight: 400, color: "var(--color-text-muted)", fontSize: "0.75rem" }}>(Single word, no spaces)</span>
-                        </label>
+                    <div style={{ display: "flex", gap: "14px", alignItems: "center", width: "100%", flexWrap: "wrap" }}>
+                      <div style={{ flex: 1, minWidth: "220px" }}>
                         <input
                           type="text"
-                          placeholder="e.g. OCEAN"
+                          placeholder="GIVE YOUR CLUE"
                           value={clueWord}
                           onChange={(e) => setClueWord(e.target.value)}
                           style={{
                             width: "100%",
-                            padding: "12px",
-                            borderRadius: "var(--radius-sm)",
+                            padding: "16px 24px",
+                            borderRadius: "9999px",
                             border: "1px solid var(--border-default)",
                             background: "var(--bg-surface-raised)",
                             color: "var(--text-primary)",
                             fontFamily: "var(--font-display)",
-                            fontWeight: 600,
-                            letterSpacing: "0.05em",
+                            fontWeight: 700,
+                            fontSize: "1.1rem",
+                            letterSpacing: "0.06em",
+                            outline: "none",
+                            boxSizing: "border-box",
                           }}
                         />
                       </div>
 
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        <label style={{ display: "block", color: "var(--text-primary)", fontSize: "0.85rem", fontWeight: 600 }}>
-                          Count
-                        </label>
-                        <div className="clue-count-selector-container">
-                          <button
-                            type="button"
-                            className={`clue-count-trigger-btn ${clueCount !== null ? "active" : ""}`}
-                          >
-                            {clueCount === -1 ? "∞" : clueCount === null ? "-" : clueCount}
-                          </button>
-                          <div className="clue-count-dropdown">
-                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1].map((n) => {
-                              const isSelected = clueCount === n;
-                              return (
-                                <button
-                                  key={n}
-                                  type="button"
-                                  onClick={() => setClueCount(n)}
-                                  style={{
-                                    width: "36px",
-                                    height: "36px",
-                                    borderRadius: "50%",
-                                    border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
-                                    background: isSelected
-                                      ? "var(--accent)"
-                                      : "var(--bg-surface-raised)",
-                                    color: isSelected ? "var(--accent-text-on)" : "var(--text-secondary)",
-                                    fontFamily: "var(--font-display)",
-                                    fontWeight: 700,
-                                    fontSize: "0.95rem",
-                                    cursor: "pointer",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    boxShadow: isSelected ? "0 0 8px var(--accent)" : "none",
-                                    transition: "all 0.15s ease",
-                                  }}
-                                >
-                                  {n === -1 ? "∞" : n}
-                                </button>
-                              );
-                            })}
-                          </div>
+                      {/* Count Selector Trigger (-) */}
+                      <div className="clue-count-selector-container">
+                        <button
+                          type="button"
+                          className={`clue-count-trigger-btn ${clueCount !== null ? "active" : ""}`}
+                          style={{
+                            width: "52px",
+                            height: "52px",
+                            borderRadius: "50%",
+                            border: "1.5px solid var(--border-default)",
+                            background: "var(--bg-surface-raised)",
+                            color: "var(--accent)",
+                            fontFamily: "var(--font-display)",
+                            fontWeight: 800,
+                            fontSize: "1.25rem",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                            transition: "all 0.15s ease",
+                          }}
+                        >
+                          {clueCount === -1 ? "∞" : clueCount === null ? "-" : clueCount}
+                        </button>
+                        <div className="clue-count-dropdown">
+                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1].map((n) => {
+                            const isSelected = clueCount === n;
+                            return (
+                              <button
+                                key={n}
+                                type="button"
+                                onClick={() => setClueCount(n)}
+                                style={{
+                                  width: "36px",
+                                  height: "36px",
+                                  borderRadius: "50%",
+                                  border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
+                                  background: isSelected
+                                    ? "var(--accent)"
+                                    : "var(--bg-surface-raised)",
+                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-secondary)",
+                                  fontFamily: "var(--font-display)",
+                                  fontWeight: 700,
+                                  fontSize: "0.95rem",
+                                  cursor: "pointer",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  boxShadow: isSelected ? "0 0 8px var(--accent)" : "none",
+                                  transition: "all 0.15s ease",
+                                }}
+                              >
+                                {n === -1 ? "∞" : n}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
 
+                      {/* Custom design Send Clue button */}
                       <button
                         type="submit"
                         style={{
-                          padding: "12px 32px",
-                          borderRadius: "var(--radius-sm)",
-                          border: "none",
-                          background: "var(--accent)",
-                          color: "var(--accent-text-on)",
+                          padding: "16px 36px",
+                          borderRadius: "9999px",
+                          border: "1.5px solid rgba(255, 255, 255, 0.2)",
+                          background: "linear-gradient(180deg, #10b981 0%, #047857 100%)",
+                          color: "#FFFFFF",
                           fontFamily: "var(--font-display)",
-                          fontWeight: 700,
+                          fontWeight: 800,
+                          fontSize: "1rem",
+                          letterSpacing: "0.06em",
+                          textTransform: "uppercase",
                           cursor: "pointer",
-                          boxShadow: "0 4px 12px rgba(232, 163, 61, 0.2)",
+                          boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                          transition: "all 0.15s ease",
                         }}
                         onMouseOver={(e) => {
-                          e.currentTarget.style.background = "var(--accent-hover)";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                          e.currentTarget.style.filter = "brightness(1.1)";
                         }}
                         onMouseOut={(e) => {
-                          e.currentTarget.style.background = "var(--accent)";
+                          e.currentTarget.style.transform = "none";
+                          e.currentTarget.style.filter = "brightness(1)";
                         }}
                       >
                         Send Clue
