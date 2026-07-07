@@ -7154,7 +7154,20 @@ const renderSettingsCard = (side?: "left" | "right") => {
   };
 
   return (
-    <div className={`fade-in ${isAssassinShake ? "assassin-shake-active" : ""}`} style={{ width: "100%", maxWidth: "1200px", margin: "0 auto", padding: "0 clamp(8px, 3vw, 20px) 24px", boxSizing: "border-box" }}>
+    <div
+      className={`fade-in ${isAssassinShake ? "assassin-shake-active" : ""}`}
+      style={{
+        width: "100%",
+        maxWidth: isChatFloatingOpen && !isMobileViewport ? "1600px" : "1200px",
+        margin: "0 auto",
+        paddingTop: 0,
+        paddingBottom: "24px",
+        paddingLeft: "clamp(8px, 3vw, 20px)",
+        paddingRight: isChatFloatingOpen && !isMobileViewport ? "416px" : "clamp(8px, 3vw, 20px)",
+        boxSizing: "border-box",
+        transition: "max-width 0.3s ease, padding-right 0.3s ease",
+      }}
+    >
       <style>{`
         @keyframes emoji-float-up {
           0% {
