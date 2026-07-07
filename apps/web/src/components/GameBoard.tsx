@@ -4468,13 +4468,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       background: "var(--bg-surface)",
                       border: "1px solid var(--border-default)",
                       borderRadius: "var(--radius-md)",
-                      padding: "28px 32px",
+                      padding: "16px 24px",
                       display: "flex",
                       flexDirection: "column",
                       gap: "16px",
                       textAlign: "left",
                       marginTop: "-8px", /* Tighten gap with cards grid */
-                      maxWidth: "700px",
+                      maxWidth: "600px",
                       width: "100%",
                       marginLeft: "auto",
                       marginRight: "auto",
@@ -4499,7 +4499,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       </div>
                     )}
                     <div style={{ display: "flex", gap: "14px", alignItems: "center", width: "100%", flexWrap: "wrap" }}>
-                      <div style={{ flex: 1, minWidth: "220px" }}>
+                      <div style={{ flex: "2 1 300px" }}>
                         <input
                           type="text"
                           placeholder="GIVE YOUR CLUE"
@@ -4507,17 +4507,18 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           onChange={(e) => setClueWord(e.target.value)}
                           style={{
                             width: "100%",
-                            padding: "16px 24px",
+                            padding: "12px 20px",
                             borderRadius: "9999px",
                             border: "1px solid var(--border-default)",
                             background: "var(--bg-surface-raised)",
                             color: "var(--text-primary)",
                             fontFamily: "var(--font-display)",
                             fontWeight: 700,
-                            fontSize: "1.1rem",
+                            fontSize: "1.05rem",
                             letterSpacing: "0.06em",
                             outline: "none",
                             boxSizing: "border-box",
+                            textAlign: "center",
                           }}
                         />
                       </div>
@@ -4528,15 +4529,15 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           type="button"
                           className={`clue-count-trigger-btn ${clueCount !== null ? "active" : ""}`}
                           style={{
-                            width: "52px",
-                            height: "52px",
+                            width: "44px",
+                            height: "44px",
                             borderRadius: "50%",
                             border: "1.5px solid var(--border-default)",
                             background: "var(--bg-surface-raised)",
                             color: "var(--accent)",
                             fontFamily: "var(--font-display)",
                             fontWeight: 800,
-                            fontSize: "1.25rem",
+                            fontSize: "1.1rem",
                             cursor: "pointer",
                             display: "flex",
                             alignItems: "center",
@@ -4586,14 +4587,14 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       <button
                         type="submit"
                         style={{
-                          padding: "16px 36px",
+                          padding: "12px 28px",
                           borderRadius: "9999px",
                           border: "1.5px solid rgba(255, 255, 255, 0.2)",
                           background: "linear-gradient(180deg, #10b981 0%, #047857 100%)",
                           color: "#FFFFFF",
                           fontFamily: "var(--font-display)",
                           fontWeight: 800,
-                          fontSize: "1rem",
+                          fontSize: "0.9rem",
                           letterSpacing: "0.06em",
                           textTransform: "uppercase",
                           cursor: "pointer",
