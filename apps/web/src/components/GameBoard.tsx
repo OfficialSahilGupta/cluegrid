@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Socket } from "socket.io-client";
+import { getWordPack } from "@cluegrid/wordpacks";
 import type { RoomState, CardState, TeamIdentifier, PlayerRole, ChatMessage, GameLogEntry, Player } from "@cluegrid/shared";
 import { useAuth } from "../context/AuthContext.js";
 import { Identicon } from "./Identicon.js";
@@ -60,8 +61,25 @@ const ALL_LANGUAGES = [
   { code: "zh", name: "中文", flag: "🇨🇳" },
   { code: "sq", name: "Shqip", flag: "🇦🇱" },
   { code: "ka", name: "ქართული", flag: "🇬🇪" },
-  { code: "vi", name: "Tiếng Việt", flag: "🇻🇳" },
+  { code: "vi", name: "Tiếng Việt", flag: "🇻🇳" }
 ];
+
+function getTranslatedCardWord(word: string, roomLanguage: string, uiLanguage: string): string {
+  try {
+    const sourcePack = getWordPack(roomLanguage || "en");
+    const idx = sourcePack.indexOf(word.toUpperCase());
+    if (idx !== -1) {
+      const targetPack = getWordPack(uiLanguage || "en");
+      const targetWord = targetPack[idx];
+      if (targetWord) {
+        return targetWord;
+      }
+    }
+  } catch (e) {
+    // fallback
+  }
+  return word;
+}
 
 // ─── Design Colors per Team ──────────────────────────────────────────────────
 const teamColorPresets = [
@@ -5826,9 +5844,22 @@ const renderSettingsCard = (side?: "left" | "right") => {
     };
   }, [isSearchOpen]);
 
-  // Synchronize room language setting when navbar language is selected
+  const hostInitialSyncRef = useRef(false);
+
+  // Synchronize player's local UI language to match the room's language on initial join
   useEffect(() => {
-    if (!socket || !room || !isHost) return;
+    if (!room?.language || !i18n) return;
+    if (!hostInitialSyncRef.current) {
+      if (i18n.language !== room.language) {
+        i18n.changeLanguage(room.language);
+      }
+      hostInitialSyncRef.current = true;
+    }
+  }, [room?.language, i18n]);
+
+  // Synchronize room language setting when navbar language is explicitly changed by host
+  useEffect(() => {
+    if (!socket || !room || !isHost || !hostInitialSyncRef.current) return;
     if (room.language !== i18n.language) {
       socket.emit("update_settings", {
         roomCode: room.roomCode,

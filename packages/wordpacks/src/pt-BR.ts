@@ -1,59 +1,41 @@
 /**
- * Brazilian Portuguese word list for ClueGrid.
- * 200+ common nouns in Portuguese (Brazil) suitable for a word-deduction game.
+ * WARNING: These words need native-speaker review before going live.
+ * Do not rely on machine translation for gameplay words.
+ *
+ * Portuguese (Brazil) word list for ClueGrid.
+ * Curated list of common nouns suitable for word deduction.
  */
 export const PT_BR_WORDS: readonly string[] = [
-  // Natureza & Ar Livre
-  "MONTANHA", "RIO", "FLORESTA", "DESERTO", "OCEANO", "ILHA", "CÂNION", "GELEIRA",
-  "VULCÃO", "CAVERNA", "VALE", "PÂNTANO", "SELVA", "DESPENHADEIRO", "RECAPE", "DUNA",
-  "PRADO", "CACHOEIRA", "GÊISER", "LAGUNA", "TUNDRA", "SAVANA", "PLANALTO",
-  // Animais
-  "TUBARÃO", "ÁGUIA", "LEÃO", "LOBO", "URSO", "FALCÃO", "COBRA", "PANTERA",
-  "BALEIA", "CARANGUEJO", "MARIPOSA", "PAPAGAIO", "LULA", "BISÃO", "LINCE", "LONTRA",
-  "GARÇA", "VEADO", "FOCA", "CORVO", "RAPOSA", "CORUJA", "ALCE", "PINGUIM",
-  "ESCORPIÃO", "BESOURO", "PÍTON", "BÚFALO", "CAMALEÃO", "MORSA",
-  // Objetos & Ferramentas
-  "ÂNCORA", "BIGORNA", "FLECHA", "MACHADO", "BARRIL", "SINO", "LÂMINA", "PARAFUSO",
-  "PONTE", "ESCOVA", "BALDE", "CANHÃO", "CORRENTE", "CHAMINÉ", "RELÓGIO",
-  "BÚSSOLA", "COROA", "CRISTAL", "ADAGA", "TAMBOR", "CERCA", "FRASCO", "PORTÃO",
-  "MARTELO", "GANCHO", "CHIFRE", "JARRO", "CHAVE", "LANTERNA", "FECHADURA",
-  "ESPELHO", "REDE", "AGULHA", "ORBE", "TUBO", "PRISMA", "POLIA", "BOMBA",
-  "CORDA", "VELA", "ESCUDO", "PENEIRA", "ESPINHO", "MOLA", "CAJADO", "SELO",
-  "ESTÁTUA", "ESPADA", "TOCHA", "ARMADILHA", "COFRE", "VAGÃO", "RODA", "APITO",
-  "FIO", "CHAVE DE FENDA", "TÁBUA", "PÁ", "CINZEL", "PISTÃO",
-  // Lugares & Estruturas
-  "ABADIA", "ARENA", "SÓTÃO", "BANCO", "CELEIRO", "BAZAR", "BÚNKER", "CASTELO",
-  "PORÃO", "CAPELA", "CIDADELA", "COLÔNIA", "CHALÉ", "DOCA", "MASMORRA",
-  "FÁBRICA", "FAZENDA", "FORTALEZA", "PORTO", "HOSPITAL", "HOTEL", "FAROL",
-  "MANSÃO", "MERCADO", "MINA", "MUSEU", "PALÁCIO", "PÍER", "PORTO", "PRISÃO",
-  "PIRÂMIDE", "RANCHO", "RUÍNAS", "ESCOLA", "SANTUÁRIO", "ESTÁBULO", "ESTAÇÃO",
-  "TEMPLO", "TORRE", "TÚNEL", "VILA", "ARMAZÉM", "POÇO",
-  // Comida & Bebida
-  "MAÇÃ", "BACON", "PÃO", "MANTEIGA", "BOLO", "DOCE", "QUEIJO", "CEREJA",
-  "CHOCOLATE", "CIDRA", "CAFÉ", "CREME", "OVO", "UVA", "MEL", "GELEIA",
-  "LIMÃO", "LIMA", "BORDO", "MELÃO", "LEITE", "HORTELÃ", "COGUMELO", "MOSTARDA",
-  "AZEITONA", "CEBOLA", "LARANJA", "PÊSSEGO", "PIMENTA", "PEPINO", "AMEIXA", "BATATA",
-  "ABÓBORA", "ARROZ", "SAL", "MOLHO", "ESPECIARIA", "BIFE", "AÇÚCAR", "CHÁ",
-  "TOMATE", "BAUNILHA", "VINAGRE", "NOZ", "VINHO", "LEVEDURA",
-  // Pessoas & Sociedade
-  "AGENTE", "ARQUEIRO", "ARTISTA", "BARÃO", "CAPITÃO", "CHEFE", "CORONEL",
-  "DETETIVE", "DIPLOMAT", "MÉDICO", "DUQUE", "ANCIÃO", "IMPERADOR", "ENGENHEIRO",
-  "EXPLORADOR", "GENERAL", "GUARDA", "HERALDO", "CAÇADOR", "JUIZ", "CAVALEIRO",
-  "ADVOGADO", "MERCADOR", "MONGE", "NAVEGADOR", "NOBRE", "ENFERMEIRO", "PILOTO",
-  "PIRATA", "POETA", "PADRE", "PRÍNCIPE", "RAINHA", "RANGER", "MARINHEIRO",
-  "ERUDITO", "ESCOTEIRO", "SENADOR", "XERIFE", "SOLDADO", "CIRURGIÃO", "LADRÃO",
-  "VILÃO", "MAGO",
-  // Abstrato & Conceitos
-  "ABISMO", "IDADE", "ALIANÇA", "EMBOSCADA", "EQUILÍBRIO", "SANGUE", "VÍNCULO",
-  "FRONTEIRA", "CAOS", "CÓDIGO", "CONTRATO", "CRISE", "MALDIÇÃO", "AMANHECER",
-  "MORTE", "DECRETO", "RUÍNA", "CREPÚSCULO", "ECO", "IMPÉRIO", "ENIGMA",
-  "EXÍLIO", "DESTINO", "CHAMA", "GEADA", "FANTASMA", "GLÓRIA", "TÚMULO", "HONRA",
-  "ILUSÃO", "FERRO", "LENDA", "LUZ", "ELO", "MÁSCARA", "MISSÃO", "NOITE",
-  "JURAMENTO", "ORDEM", "ORIGEM", "PACTO", "PAZ", "FANTASMA", "PRAGA", "VENENO",
-  "PODER", "PROFECIA", "BUSCA", "RELÍQUIA", "FENDA", "RITUAL", "RUNA", "CORRIDA",
-  "SOMBRA", "SILÊNCIO", "FUMAÇA", "ALMA", "FONTE", "TEMPESTADE", "GOLPE", "TRONO",
-  "MARÉ", "TEMPO", "RASTRO", "JULGAMENTO", "VERDADE", "UNIÃO", "VÉU", "VAZIO",
-  "GUERRA", "VENTO", "ZONA"
+  "MONTANHA",
+  "RIO",
+  "FLORESTA",
+  "OCEANO",
+  "ILHA",
+  "LEÃO",
+  "ÁGUIA",
+  "TUBARÃO",
+  "RELÓGIO",
+  "COROA",
+  "CHAVE",
+  "FECHADURA",
+  "ESCUDO",
+  "ESPADA",
+  "CASTELO",
+  "TORRE",
+  "ESCOLA",
+  "HOSPITAL",
+  "MAÇÃ",
+  "PÃO",
+  "LEITE",
+  "CHÁ",
+  "OURO",
+  "PRATA",
+  "FERRO",
+  "SOL",
+  "LUA",
+  "ESTRELA",
+  "FOGO",
+  "ÁGUA"
 ] as const;
 
 export type PtBrWord = (typeof PT_BR_WORDS)[number];

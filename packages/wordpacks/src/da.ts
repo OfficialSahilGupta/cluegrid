@@ -1,59 +1,41 @@
 /**
+ * WARNING: These words need native-speaker review before going live.
+ * Do not rely on machine translation for gameplay words.
+ *
  * Danish word list for ClueGrid.
- * 200+ common nouns in Danish suitable for a word-deduction game.
+ * Curated list of common nouns suitable for word deduction.
  */
 export const DA_WORDS: readonly string[] = [
-  // Natur & Udendørs
-  "BJERG", "FLOD", "SKOV", "ORKEN", "HAV", "O", "KLOFT", "GLETCHER",
-  "VULKAN", "GROTTE", "DAL", "SUMP", "JUNGLE", "KLINT", "REB", "KLIT",
-  "ENG", "VANDFALD", "GEYSER", "LAGUNE", "TUNDRA", "SAVANNE", "PLATEAU",
-  // Dyr
-  "HAJ", "ORN", "LOVE", "ULV", "BJORN", "FALK", "KOBRA", "PANTER",
-  "HVAL", "KRABBE", "MOL", "PAPEGOJE", "BLAKSPRUTTE", "BISON", "LYNX", "ODDE",
-  "HEJRE", "HJORTE", "SAL", "RAVN", "RAV", "UGLE", "ELG", "PINGVIN",
-  "SKORPION", "BILLE", "PYTHON", "BUFFEL", "KAMALEON", "MORSE",
-  // Genstande & Værktøj
-  "ANKER", "AMBOLT", "PIL", "OKSE", "TONDE", "KLOKKE", "BLAD", "BOLT",
-  "BRO", "BORSTE", "SPAND", "KANON", "KADE", "SKORSTEN", "UR",
-  "KOMPAS", "KRONE", "KRYSTAL", "DOLK", "TROMLE", "HEGN", "FLASKE", "PORT",
-  "HAMMER", "KROG", "HORN", "KRUKKE", "NOGLE", "LANTERNE", "LAS",
-  "SPEJL", "NET", "NAL", "KUGLE", "ROR", "PRISME", "REMSKIVE", "PUMPE",
-  "REB", "SEJL", "SKJOLD", "SIGTE", "SPIG", "FJEDER", "STAV", "STEMPEL",
-  "STATUE", "SVAERD", "FAKKEL", "FAELDE", "BOKS", "VOGN", "HJUL", "FLOJTE",
-  "TRAD", "SKRUENOGLE", "PLANKE", "SKOVL", "MEJSEL", "PISTON",
-  // Steder & Bygninger
-  "KLOSTER", "ARENA", "LOFT", "BANK", "LADE", "BASAR", "BUNKER", "SLOT",
-  "KAELDER", "KAPEL", "CITADEL", "KOLONI", "HYTTE", "DOK", "FANGEKAELDER",
-  "FABRIK", "GARD", "FAESTNING", "HAVN", "HOSPITAL", "HOTEL", "FYRTARN",
-  "MANSION", "MARKED", "MINE", "MUSEUM", "PALADS", "MOLE", "HAVN", "FAENGSEL",
-  "PYRAMIDE", "RANCH", "RUINER", "SKOLE", "HELLIGDOM", "STALD", "STATION",
-  "TEMPEL", "TARN", "TUNNEL", "LANDSBY", "LAGER", "BROND",
-  // Mad & Drikke
-  "AEBLE", "BACON", "BROD", "SMOR", "KAGE", "SLIK", "OST", "KIRSEBAER",
-  "CHOKOLADE", "CIDER", "KAFFE", "FLODE", "AEG", "DRUE", "HONNING", "SYLTETOJ",
-  "CITRON", "LIME", "AHORN", "MELON", "MAELK", "MYNTE", "SVAMP", "SENNEP",
-  "OLIVEN", "LOG", "APPELSIN", "FERSKEN", "PEBER", "AGURK", "BLOMME", "KARTOFFEL",
-  "GRAESKAR", "RIS", "SALT", "SOVS", "KRYDDERI", "STEAK", "SUKKER", "TE",
-  "TOMAT", "VANILJE", "EDDIKE", "VALNOD", "VIN", "GAER",
-  // Mennesker & Samfund
-  "AGENT", "BUESKYTTE", "KUNSTNER", "BARON", "KAPTAJN", "KOK", "OBERST",
-  "DETEKTIV", "DIPLOMAT", "LAEGE", "HERTUG", "AELDRE", "KEJSER", "INGENIOR",
-  "OPDAGELSESREJSENDE", "GENERAL", "VAGT", "HERALD", "JAEGER", "DOMMER", "RIDDER",
-  "ADVOKAT", "KOBMAND", "MUNK", "NAVIGATOR", "ADELIG", "SYGEPLEJERSKE", "PILOT",
-  "PIRAT", "DIGTER", "PRAEST", "PRINS", "DRONNING", "RANGER", "SOMAND",
-  "LAERD", "SPEJDER", "SENATOR", "SHERIF", "SOLDAT", "KIRURG", "TYV",
-  "SKURK", "TROLDMAND",
-  // Abstrakte & Begreber
-  "AFGRUND", "ALDER", "ALIANSE", "BAGHOLD", "BALANCE", "BLOD", "BAND",
-  "GRAENSE", "KAOS", "KODE", "KONTRAKT", "KRISE", "FORBANDELSE", "GRY",
-  "DOD", "DEKRET", "UNDERGANG", "EKKO", "IMPERIUM", "GADE",
-  "EKSIL", "SKAEBNE", "FLAMME", "FROST", "SPOGELSE", "ARE", "GRAV", "AERE",
-  "ILLUSION", "JERN", "LEGENDE", "LYS", "LINK", "MASKE", "MISSION", "NAT",
-  "ED", "ORDNUNG", "OPRINDELSE", "PAGT", "FRED", "FANTOM", "PEST", "GIFT",
-  "MAGT", "PROFETI", "QUEST", "RELIKVIE", "RIFT", "RITUAL", "RUNE", "ANGREB",
-  "SKYGGE", "STILHED", "ROG", "SJAEL", "KILDE", "STORM", "SLAG", "TRONE",
-  "TIDEVAND", "TID", "SPOR", "RETSSAG", "SANDHED", "UNION", "SLOR", "TOMRUM",
-  "KRIG", "UR", "VIND", "ZONE"
+  "BJERG",
+  "FLOD",
+  "SKOV",
+  "HAV",
+  "Ø",
+  "LØVE",
+  "ØRN",
+  "HAJ",
+  "UR",
+  "KRONE",
+  "NØGLE",
+  "LÅS",
+  "SKJOLD",
+  "SVÆRD",
+  "SLOT",
+  "TÅRN",
+  "SKOLE",
+  "HOSPITAL",
+  "ÆBLE",
+  "BRØD",
+  "MÆLK",
+  "TE",
+  "GULD",
+  "SØLV",
+  "JERN",
+  "SOL",
+  "MÅNE",
+  "STJERNE",
+  "ILD",
+  "VAND"
 ] as const;
 
 export type DaWord = (typeof DA_WORDS)[number];

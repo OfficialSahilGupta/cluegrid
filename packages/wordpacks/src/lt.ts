@@ -1,41 +1,41 @@
 /**
+ * WARNING: These words need native-speaker review before going live.
+ * Do not rely on machine translation for gameplay words.
+ *
  * Lithuanian word list for ClueGrid.
- * 260+ common nouns suitable for a word-deduction game.
+ * Curated list of common nouns suitable for word deduction.
  */
 export const LT_WORDS: readonly string[] = [
-  "KALNAS", "UPĖ", "MIŠKAS", "DYKUMA", "VANDENYNAS", "SALA", "SLĖNIS", "KANJONAS",
-  "LEDYNAS", "UGNIKALNIS", "URVAS", "PELKĖ", "DŽUNGLĖS", "UOLA", "RIFAS", "KOPA",
-  "PIEVA", "KRIOKLYS", "EŽERAS", "ŽVAIGŽDĖ", "SAULĖ", "MĖNULIS", "DEBESIS", "LIETUS",
-  "VĖJAS", "UGNIS", "ŽEMĖ", "AKMUO", "MEDIS", "GĖLĖ", "ŽOLĖ", "LAPAS",
-  "SĖKLA", "SMĖLIS", "BANGA", "LIŪTAS", "TIGRAS", "LOKYS", "VILKAS", "LAPĖ",
-  "ELNIAS", "BRIEDIS", "TRIUŠIS", "PELĖ", "VOVERĖ", "DRAMBLYS", "KUPRANUGARIS", "BEDŽIONĖ",
-  "ŽIRAFA", "KENGŪRA", "ARKLYS", "KARVĖ", "AVIS", "KIAULĖ", "ŠUO", "KATĖ",
-  "ERELIS", "SAKALAS", "PELĖDA", "PAPŪGA", "PINGVINAS", "ANTIS", "ŽUVIS", "RYKLYS",
-  "BANGINIS", "DELFINAS", "AŠTUONKOJIS", "KRABAS", "PAUKŠTIS", "VORAS", "BITĖ", "DRUGELIS",
-  "SKRUZDĖLĖ", "KĖDĖ", "STALAS", "LOVA", "LANGAS", "DURYS", "RAKTAS", "SPYNA",
-  "LAIKRODIS", "VEIDRODIS", "LEMPA", "ŽVAKĖ", "KNYGA", "RAŠIKLIS", "PIEŠTUKAS", "POPIERIUS",
-  "TELEFONAS", "KOMPIUTERIS", "FOTOAPARATAS", "TELEVIZORIUS", "RADIJAS", "VARPAS", "BŪGNAS", "GITARA",
-  "PIANINAS", "SMUIKAS", "VIRVĖ", "GRANDINĖ", "PLAKTUKAS", "VINIS", "ATSUKTUVAS", "KIRVIS",
-  "PJŪKLAS", "KASTUVAS", "ŠLOTA", "ŠEPETYS", "KIBIRAS", "ŠAUKŠTAS", "ŠAKUTĖ", "PEILIS",
-  "LĖKŠTĖ", "STIKLINĖ", "BUTELIS", "PUODELIS", "DUBUO", "ŽIRKLĖS", "ADATA", "SIŪLAS",
-  "NAMAS", "MOKYKLA", "LIGONINĖ", "BIBLIOTEKA", "MUZIEJUS", "VIEŠBUTIS", "RESTORANAS", "BANKAS",
-  "BIURAS", "PARDUOTUVĖ", "TURGUS", "GAMYKLA", "STOTIS", "UOSTAS", "PILIS", "BAŽNYČIA",
-  "BOKŠTAS", "TILTAS", "TUNELIS", "KELIAS", "GATVĖ", "PARKAS", "SODAS", "ŪKIS",
-  "KALĖJIMAS", "TEATRAS", "RŪMAI", "DUONA", "PIENAS", "SŪRIS", "SVIESTAS", "KIAUŠINIS",
-  "MĖSA", "RYŽIAI", "MAKARONAI", "BULVĖ", "POMIDORAS", "SVOGŪNAS", "ČESNAKAS", "MORKA",
-  "OBOLYS", "BANANAS", "APELSINAS", "CITRINA", "VYNUOGĖ", "BRAŠKĖ", "VYŠNIA", "PERSIKAS",
-  "CUKRUS", "DRUSKA", "PIPIRAI", "MEDUS", "VANDUO", "ARBATA", "KAVA", "SULTYS",
-  "ALUS", "VYNAS", "GYDYTOJAS", "SESELĖ", "MOKYTOJAS", "MOKINYS", "PILOTAS", "VAIRUOTOJAS",
-  "JŪREIVIS", "KARYS", "POLICININKAS", "GAISRININKAS", "KARALIUS", "KARALIENĖ", "PRINCAS", "AKTORIUS",
-  "DAINININKAS", "MENININKAS", "RAŠYTOJAS", "VIRĖJAS", "KEPĖJAS", "ŪKININKAS", "TEISININKAS", "TEISĖJAS",
-  "KUNIGAS", "DRAUGAS", "ŠEIMA", "TĖVAS", "MOTINA", "VAIKAS", "BROLIS", "SESUO",
-  "VYRAS", "MOTERIS", "GALVA", "PLAUKAI", "AKIS", "AUSIS", "NOSIS", "BURNA",
-  "DANTIS", "RANKA", "KOJA", "ŠIRDIS", "KRAUJAS", "KŪNAS", "SIELA", "AUKSAS",
-  "SIDABRAS", "GELEŽIS", "VARIS", "STIKLAS", "PLASTIKAS", "MEDIENA", "METALAS", "SPALVA",
-  "RYTAS", "DIENA", "VAKARAS", "NAKTIS", "SAVAITĖ", "MĖNESIS", "METAI", "PAVASARIS",
-  "VASARA", "RUDUO", "ŽIEMA", "RIBA", "KARAS", "TAIKA", "PERGALĖ", "PRALAIMĖJIMAS",
-  "ŽAIDIMAS", "KAMUOLYS", "SKYDAS", "STRĖLĖ", "KARDAS", "KAPAS", "VĖLIAVA", "ŽEMĖLAPIS",
-  "KOMPASAS", "KARŪNA", "SOSTAS", "SKULPTŪRA", "KRISTALAS", "DEIMANTAS"
+  "KALNAS",
+  "UPĖ",
+  "MIŠKAS",
+  "VANDENYNAS",
+  "SALA",
+  "LIŪTAS",
+  "ERELIS",
+  "RYKLYS",
+  "LAIKRODIS",
+  "KARŪNA",
+  "RAKTAS",
+  "SPYNA",
+  "SKYDAS",
+  "KARDAS",
+  "PILIS",
+  "BOKŠTAS",
+  "MOKYKLA",
+  "LIGONINĖ",
+  "OBUOLYS",
+  "DUONA",
+  "PIENAS",
+  "ARBATA",
+  "AUKSAS",
+  "SIDABRAS",
+  "GELEŽIS",
+  "SAULĖ",
+  "MĖNULIS",
+  "ŽVAIGŽDĖ",
+  "UGNIS",
+  "VANDUO"
 ] as const;
 
 export type LtWord = (typeof LT_WORDS)[number];

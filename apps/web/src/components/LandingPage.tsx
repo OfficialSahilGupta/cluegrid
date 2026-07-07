@@ -3,6 +3,58 @@ import { useTranslation } from "react-i18next";
 
 declare const THREE: any;
 
+const ALL_LANGUAGES = [
+  { code: "en", name: "English", flag: "🇬🇧" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "ar", name: "العربية", flag: "🇸🇦" },
+  { code: "pt-BR", name: "Português (Brasil)", flag: "🇧🇷" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "tr", name: "Türkçe", flag: "🇹🇷" },
+  { code: "ne", name: "नेपाली", flag: "🇳🇵" },
+  { code: "hi", name: "हिन्दी", flag: "🇮🇳" },
+  { code: "ja", name: "日本語", flag: "🇯🇵" },
+  { code: "cs", name: "Čeština", flag: "🇨🇿" },
+  { code: "it", name: "Italiano", flag: "🇮🇹" },
+  { code: "pl", name: "Polski", flag: "🇵🇱" },
+  { code: "uk", name: "Українська", flag: "🇺🇦" },
+  { code: "he", name: "עברית", flag: "🇮🇱" },
+  { code: "sr", name: "Српски", flag: "🇷🇸" },
+  { code: "ko", name: "한국어", flag: "🇰🇷" },
+  { code: "ro", name: "Română", flag: "🇷🇴" },
+  { code: "id", name: "Bahasa Indonesia", flag: "🇮🇩" },
+  { code: "da", name: "Dansk", flag: "🇩🇰" },
+  { code: "pt", name: "Português", flag: "🇵🇹" },
+  { code: "ca", name: "Català", flag: "🇪🇸" },
+  { code: "sv", name: "Svenska", flag: "🇸🇪" },
+  { code: "mk", name: "Македонски", flag: "🇲🇰" },
+  { code: "et", name: "Eesti", flag: "🇪🇪" },
+  { code: "eo", name: "Esperanto", flag: "🌌" },
+  { code: "be", name: "Беларуская", flag: "🇧🇾" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "nl", name: "Nederlands", flag: "🇳🇱" },
+  { code: "sk", name: "Slovenčina", flag: "🇸🇰" },
+  { code: "af", name: "Afrikaans", flag: "🇿🇦" },
+  { code: "ar-LB", name: "العربية (لبنان)", flag: "🇱🇧" },
+  { code: "bg", name: "Български", flag: "🇧🇬" },
+  { code: "hr", name: "Hrvatski", flag: "🇭🇷" },
+  { code: "fi", name: "Suomi", flag: "🇫🇮" },
+  { code: "el", name: "Ελληνικά", flag: "🇬🇷" },
+  { code: "hu", name: "Magyar", flag: "🇭🇺" },
+  { code: "is", name: "Íslenska", flag: "🇮🇸" },
+  { code: "lt", name: "Lietuvių", flag: "🇱🇹" },
+  { code: "lv", name: "Latviešu", flag: "🇱🇻" },
+  { code: "no", name: "Norsk", flag: "🇳🇴" },
+  { code: "ru", name: "Русский", flag: "🇷🇺" },
+  { code: "sl", name: "Slovenščina", flag: "🇸🇮" },
+  { code: "th", name: "ไทย", flag: "🇹🇭" },
+  { code: "fil", name: "Filipino", flag: "🇵🇭" },
+  { code: "fa", name: "فارسی", flag: "🇮🇷" },
+  { code: "zh", name: "中文", flag: "🇨🇳" },
+  { code: "sq", name: "Shqip", flag: "🇦🇱" },
+  { code: "ka", name: "ქართული", flag: "🇬🇪" },
+  { code: "vi", name: "Tiếng Việt", flag: "🇻🇳" }
+];
+
 interface LandingPageProps {
   currentView: string;
   setCurrentView: (view: "lobby" | "rules" | "features" | "changelog" | "about" | "admin" | "support") => void;
@@ -43,6 +95,7 @@ export function LandingPage({
   const [gameMode, setGameMode] = useState<"classic" | "coop">("classic");
   const [selectedTeams, setSelectedTeams] = useState<number>(2);
   const [lang, setLang] = useState<string>("en");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Feedback State
   const [reportType, setReportType] = useState<"bug" | "idea" | "other">("bug");
@@ -1100,9 +1153,73 @@ export function LandingPage({
     const textureLoader = new THREE.TextureLoader();
     textureLoader.load("/spy-characters.png", (texture: any) => {
       const img = texture.image;
-      allOps.forEach((op) => {
+      allOps.forEach((op, i) => {
         op.userData.img = img;
+        
+        // Draw the character fully on the canvas right away
+        const d = op.userData;
+        const canvas = d.canvas;
+        const sctx = d.sctx;
+        const w = canvas.width;
+        const h = canvas.height;
+        sctx.clearRect(0, 0, w, h);
+        
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = 256;
+        tempCanvas.height = 512;
+        const tctx = tempCanvas.getContext("2d")!;
+        const srcW = img.width / 4;
+        const srcH = img.height;
+        const srcX = i * srcW;
+        tctx.drawImage(img, srcX, 0, srcW, srcH, 0, 0, 256, 512);
+        
+        // White background chroma keying
+        const imgData = tctx.getImageData(0, 0, 256, 512);
+        const pix = imgData.data;
+        for (let p = 0; p < pix.length; p += 4) {
+          const r = pix[p]!;
+          const g = pix[p+1]!;
+          const b = pix[p+2]!;
+          if (r > 240 && g > 240 && b > 240) {
+            pix[p+3] = 0;
+          } else if (r > 210 && g > 210 && b > 210) {
+            const maxVal = Math.max(r, g, b);
+            const factor = (240 - maxVal) / 30;
+            pix[p+3] = Math.max(0, Math.floor(pix[p+3]! * factor));
+          }
+        }
+        tctx.putImageData(imgData, 0, 0);
+        
+        sctx.imageSmoothingEnabled = false;
+        sctx.drawImage(tempCanvas, 0, 0, 256, 512, 0, 0, w, h);
+        
+        // Mask edges
+        sctx.globalCompositeOperation = "destination-in";
+        const gradV = sctx.createLinearGradient(0, 0, 0, h);
+        gradV.addColorStop(0, "rgba(0,0,0,0)");
+        gradV.addColorStop(0.1, "rgba(0,0,0,1)");
+        gradV.addColorStop(0.85, "rgba(0,0,0,1)");
+        gradV.addColorStop(1, "rgba(0,0,0,0)");
+        sctx.fillStyle = gradV;
+        sctx.fillRect(0, 0, w, h);
+
+        const gradH = sctx.createLinearGradient(0, 0, w, 0);
+        gradH.addColorStop(0, "rgba(0,0,0,0)");
+        gradH.addColorStop(0.12, "rgba(0,0,0,1)");
+        gradH.addColorStop(0.88, "rgba(0,0,0,1)");
+        gradH.addColorStop(1, "rgba(0,0,0,0)");
+        sctx.fillStyle = gradH;
+        sctx.fillRect(0, 0, w, h);
+        sctx.globalCompositeOperation = "source-over";
+        
+        d.mat.map.needsUpdate = true;
+        d.mat.opacity = 1.0;
+        d.groundGlow.material.opacity = 0.12;
+        d.namePlateSprite.material.opacity = 0.9;
+        op.scale.set(1, 1, 1);
+        op.position.y = 0;
       });
+      materializeProgress = 1.0;
     });
 
     let introTime = 0.0;
@@ -1237,26 +1354,20 @@ export function LandingPage({
           op.scale.y = 0.1 + 0.9 * tProgress;
         });
       } else {
-        // Stabilized standing animations
-        state.agents.forEach((op, idx) => {
+        // Static standing characters (no animations)
+        state.agents.forEach((op) => {
           const d = op.userData;
-          const activeSide = idx === 0 ? "A" : "B";
-          const isSpeaking = state.currentSpeaker === activeSide;
-          const targetSpeak = isSpeaking ? 1 : 0;
-          d.speaking += (targetSpeak - d.speaking) * 0.08;
-
-          op.position.y = Math.sin(t * 0.5 + op.position.x) * 0.015 + d.speaking * Math.sin(t * 2.8) * 0.016;
+          op.position.y = 0;
           d.mat.rotation = 0;
           d.mat.opacity = 1.0;
           d.groundGlow.material.opacity = 0.12;
           d.namePlateSprite.material.opacity = 0.9;
           op.scale.set(1, 1, 1);
-          op.scale.setScalar(1 + d.speaking * 0.025);
         });
 
         ambientAgents.forEach((op) => {
           const d = op.userData;
-          op.position.y = Math.sin(t * 1.0 + op.position.x) * 0.038;
+          op.position.y = 0;
           d.mat.rotation = 0;
           d.mat.opacity = 1.0;
           d.groundGlow.material.opacity = 0.12;
@@ -1883,18 +1994,49 @@ export function LandingPage({
               <div style={{ marginBottom: "22px" }}>
                 <div style={{ fontSize: "11.5px", letterSpacing: "0.14em", textTransform: "uppercase", color: "#eef3ee", opacity: 0.85, marginBottom: "10px", fontWeight: 700 }}>Gameplay Word Pack Language</div>
                 <div style={{ position: "relative" }}>
-                  <select 
-                    value={lang}
-                    onChange={(e) => setLang(e.target.value)}
-                    style={{ width: "100%", background: "rgba(238,243,238,0.04)", border: "1.5px solid rgba(238,243,238,0.14)", borderRadius: "8px", color: "#eef3ee", fontSize: "14px", padding: "13px 14px", cursor: "pointer", outline: "none", appearance: "none" }}
+                  <button
+                    type="button"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    style={{ width: "100%", textAlign: "left", background: "rgba(238,243,238,0.04)", border: "1.5px solid rgba(238,243,238,0.14)", borderRadius: "8px", color: "#eef3ee", fontSize: "14px", padding: "13px 14px", cursor: "pointer", outline: "none", display: "flex", justifyContent: "space-between", alignItems: "center" }}
                   >
-                    <option value="en" style={{ color: "#040b0d" }}>🇬🇧 English</option>
-                    <option value="es" style={{ color: "#040b0d" }}>🇪🇸 Spanish</option>
-                    <option value="fr" style={{ color: "#040b0d" }}>🇫🇷 French</option>
-                    <option value="de" style={{ color: "#040b0d" }}>🇩🇪 German</option>
-                    <option value="hi" style={{ color: "#040b0d" }}>🇮🇳 Hindi</option>
-                  </select>
-                  <span style={{ position: "absolute", right: "14px", top: "50%", transform: "translateY(-50%)", color: "#9AA29B", pointerEvents: "none" }}>▾</span>
+                    <span>
+                      {ALL_LANGUAGES.find(l => l.code === lang)?.flag} {ALL_LANGUAGES.find(l => l.code === lang)?.name}
+                    </span>
+                    <span style={{ color: "#9AA29B", transition: "transform 0.2s", transform: isDropdownOpen ? "rotate(180deg)" : "none" }}>▾</span>
+                  </button>
+                  {isDropdownOpen && (
+                    <>
+                      <div 
+                        onClick={() => setIsDropdownOpen(false)} 
+                        style={{ position: "fixed", inset: 0, zIndex: 9998 }} 
+                      />
+                      <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "rgba(6,24,28,0.98)", border: "1.5px solid rgba(0,240,255,0.35)", borderRadius: "8px", maxHeight: "220px", overflowY: "auto", zIndex: 9999, boxShadow: "0 8px 32px rgba(0,0,0,0.6)", padding: "4px" }}>
+                        {ALL_LANGUAGES.map((l) => (
+                          <div
+                            key={l.code}
+                            onClick={() => {
+                              setLang(l.code);
+                              setIsDropdownOpen(false);
+                            }}
+                            style={{ padding: "10px 12px", cursor: "pointer", borderRadius: "6px", color: lang === l.code ? "#00f0ff" : "#eef3ee", background: lang === l.code ? "rgba(0,240,255,0.08)" : "transparent", transition: "background 0.2s, color 0.2s", display: "flex", alignItems: "center", gap: "8px", fontSize: "14px" }}
+                            onMouseEnter={(e) => {
+                              if (lang !== l.code) {
+                                e.currentTarget.style.background = "rgba(238,243,238,0.04)";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              if (lang !== l.code) {
+                                e.currentTarget.style.background = "transparent";
+                              }
+                            }}
+                          >
+                            <span>{l.flag}</span>
+                            <span>{l.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 

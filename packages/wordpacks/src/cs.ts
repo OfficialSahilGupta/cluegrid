@@ -1,59 +1,41 @@
 /**
+ * WARNING: These words need native-speaker review before going live.
+ * Do not rely on machine translation for gameplay words.
+ *
  * Czech word list for ClueGrid.
- * 200+ common nouns in Czech suitable for a word-deduction game.
+ * Curated list of common nouns suitable for word deduction.
  */
 export const CS_WORDS: readonly string[] = [
-  // Příroda & Venkov
-  "HORA", "REKA", "LES", "POUST", "OCEAN", "OSTROV", "KANON", "LEDOVEC",
-  "SOPKA", "JESKYNE", "UDOLI", "BAZINA", "DZUNGLE", "UTES", "DUNA",
-  "LOUKA", "VODOPAD", "GEYZIR", "LAGUNA", "TUNDRA", "SAVANA", "PLOSINA",
-  // Zvířata
-  "ZRALOK", "OREL", "LEV", "VLK", "MEDVED", "SOKOL", "KOBRA", "PANTER",
-  "VELRYBA", "KRAB", "MURA", "PAPOUSEK", "KRAKEN", "BIZON", "RYS", "VYDRA",
-  "VOLAVKA", "JELEN", "TULEN", "KRKAVEC", "LISKA", "SOVA", "LOS", "TUCNÁK",
-  "SKORPION", "BROUK", "KRAJTA", "BUVOL", "CHAMELEON", "MROZ",
-  // Nástroje & Předměty
-  "KOTVA", "KOVADLINA", "SIP", "SEKERA", "SUD", "ZVON", "CEPEL", "SROUB",
-  "MOST", "KARTAC", "KYBL", "DELO", "RETEZ", "KOMIN", "HODINY",
-  "KOMPAS", "KORUNA", "KRYSTAL", "DYKA", "BUBEN", "PLOT", "LAHEV", "BRANA",
-  "KLADIVO", "HAK", "ROH", "DZBAN", "KLIC", "LUCERNA", "ZAMEK",
-  "ZRCADLO", "SIT", "JEHLA", "KOULE", "TRUBKA", "HRANOL", "KLADKA", "CERPADLO",
-  "LANO", "PLACHTA", "STIT", "SITO", "HREBIK", "PRUZINA", "HUL", "RAZITKO",
-  "SOCHA", "MEC", "POCHODEN", "PAST", "TREZOR", "VUZ", "KOLO", "PISTALKA",
-  "DRAT", "KLIC", "PRKNO", "LOPATA", "DLATO", "PISTON",
-  // Místa & Budovy
-  "OPATSTVI", "ARENA", "PUDA", "BANKA", "STODOLA", "BAZAR", "BUNKR", "HRAD",
-  "SKLEP", "KAPLE", "CITADELA", "KOLONIE", "CHATA", "DOK", "ZALAR",
-  "TOVARNA", "FARMA", "PEVNOST", "PRISTAV", "NEMOCNICE", "HOTEL", "MAJAK",
-  "VILA", "TRH", "DUL", "MUZEUM", "PALAC", "MOLO", "PRISTAV", "VEZENI",
-  "PYRAMIDA", "RANC", "ZRICENINA", "SKOLA", "SVATYNE", "STAJ", "NADRAZI",
-  "CHRAM", "VEZ", "TUNEL", "VESNICE", "SKLADISTE", "STUDNA",
-  // Jídlo & Pití
-  "JABLKO", "SLANINA", "CHLEB", "MASLO", "DORT", "SLADKOST", "SYR", "TRESEN",
-  "COKOLADA", "SAJDR", "KAVA", "SMETANA", "VEJCE", "HROZNO", "MED", "DZEM",
-  "CITRON", "LIMETKA", "JAVOR", "MELOUN", "MLEKO", "MATA", "HOUBA", "HORCICE",
-  "OLIVA", "CIBULE", "POMERANC", "BROSKEV", "PEPR", "OKURKA", "SVESTKA", "BRAMBORA",
-  "DYNE", "RYZE", "SUL", "OMACKA", "KORENI", "STEAK", "CUKR", "CAJ",
-  "RAJCE", "VANILKA", "OCET", "ORECH", "VINO", "DROZDI",
-  // Lidé & Společnost
-  "AGENT", "STRELEC", "UMELEC", "BARON", "KAPITAN", "KUCHAR", "PLUKOVNIK",
-  "DETEKTIV", "DIPLOMAT", "LEKAR", "VEVODA", "STARSI", "CISAR", "INZENYR",
-  "OBJEVITEL", "GENERAL", "STRAZ", "HEROLD", "LOVEC", "SOUDCE", "RYTIR",
-  "PRAVNIK", "OBCHODNIK", "MNICH", "NAVIGATOR", "SLECHTIC", "SESTRA", "PILOT",
-  "PIRAT", "BASNIK", "KNEZ", "PRINC", "KRALOVNA", "HRANICAR", "NAMORNIK",
-  "UCENEC", "SKAUT", "SENATOR", "SERIF", "VOJAK", "CHIRURG", "ZLODEJ",
-  "PADOUCH", "KOUZELNIK",
-  // Abstrakta & Pojmy
-  "PROPAST", "VEK", "ALIANCE", "LECKA", "ROVNOVÁHA", "KREV", "POUTO",
-  "HRANICE", "CHAOS", "KOD", "SMLOUVA", "KRIZE", "PROKLETI", "USVIT",
-  "SMRT", "DEKRET", "ZKAZA", "OZVENA", "RISE", "HADANKA",
-  "VYHNANSTVI", "OSUD", "PLAMEN", "MRAZ", "DUCH", "SLAVA", "HROB", "CEST",
-  "ILUZE", "ZELEZO", "LEGENDA", "SVETLO", "SPOJENI", "MASKA", "MISE", "NOC",
-  "PRISAHA", "RAD", "PUVOD", "PAKT", "MIR", "FANTOM", "MOR", "JED", "MOC",
-  "PROROCTVI", "UKOL", "RELIKVIE", "TRHLINA", "RITUAL", "RUNA", "UTOK",
-  "STIN", "TICHO", "KOUR", "DUSE", "ZDROJ", "BOURE", "RANA", "TRUN", "PRILIV",
-  "CAS", "STOPA", "SOUD", "PRAVDA", "UNIE", "ZAVOJ", "PRAZDNOTA", "VALKA",
-  "VNDR", "ZONA"
+  "HORA",
+  "ŘEKA",
+  "LES",
+  "OCEÁN",
+  "OSTROV",
+  "LEV",
+  "OREL",
+  "ŽRALOK",
+  "HODINY",
+  "KORUNA",
+  "KLÍČ",
+  "ZÁMEK",
+  "ŠTÍT",
+  "MEČ",
+  "HRAD",
+  "VĚŽ",
+  "ŠKOLA",
+  "NEMOCNICE",
+  "JABLKO",
+  "CHLÉB",
+  "MLÉKO",
+  "ČAJ",
+  "ZLATO",
+  "STŘÍBRO",
+  "ŽELEZO",
+  "SLUNCE",
+  "MĚSÍC",
+  "HVĚZDA",
+  "OHEŇ",
+  "VODA"
 ] as const;
 
 export type CsWord = (typeof CS_WORDS)[number];

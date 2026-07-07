@@ -1,59 +1,41 @@
 /**
+ * WARNING: These words need native-speaker review before going live.
+ * Do not rely on machine translation for gameplay words.
+ *
  * French word list for ClueGrid.
- * 200+ common nouns in French suitable for a word-deduction game.
+ * Curated list of common nouns suitable for word deduction.
  */
 export const FR_WORDS: readonly string[] = [
-  // Nature & Plein air
-  "MONTAGNE", "RIVIERE", "FORET", "DESERT", "OCEAN", "ILE", "CANYON", "GLACIER",
-  "VOLCAN", "GROTTE", "VALLEE", "MARAIS", "JUNGLE", "FALAISE", "RECIF", "DUNE",
-  "PRAIRIE", "CASCADE", "GEYSER", "LAGON", "TOUNDRA", "SAVANE", "PLATEAU",
-  // Animaux
-  "REQUIN", "AIGLE", "LION", "LOUP", "OURS", "FAUCON", "COBRA", "PANTHERE",
-  "BALEINE", "CRABE", "PAPILLON", "PERROQUET", "CALMAR", "BISON", "LYNX", "LOUTRE",
-  "HERON", "CERF", "PHOQUE", "CORBEAU", "RENARD", "HIBOU", "ELAN", "MANCHOT",
-  "SCORPION", "COCCINELLE", "PYTHON", "BUFFLE", "CAMELEON", "MORSE",
-  // Objets & Outils
-  "ANCRE", "ENCLUME", "FLECHE", "HACHE", "TONNEAU", "CLOCHE", "LAME", "BOULON",
-  "PONT", "BROSSE", "SEAU", "CANON", "CHAINE", "CHEMINEE", "HORLOGE",
-  "BOUSSOLE", "COURONNE", "CRISTAL", "POIGNARD", "TAMBOUR", "CLOTURE", "FLACON",
-  "PORTE", "MARTEAU", "CROCHET", "CORNE", "JARRE", "CLE", "LANTERNE", "SERRURE",
-  "MIROIR", "FILET", "AIGUILLE", "ORBE", "TUYAU", "PRISME", "POULIE", "POMPE",
-  "CORDE", "VOILE", "BOUCLIER", "TAMIS", "POINTE", "RESSORT", "BATON", "TIMBRE",
-  "STATUE", "EPEE", "TORCHE", "PIEGE", "COFFRE", "WAGON", "ROUE", "SIFFLET",
-  "FIL", "CLE", "PLANCHE", "PELLE", "CISEAU", "PISTON",
-  // Lieux & Structures
-  "ABBAYE", "ARENE", "GRENIER", "BANQUE", "GRANGE", "BAZAR", "BUNKER", "CHATEAU",
-  "CAVE", "CHAPELLE", "CITADELLE", "COLONIE", "CHALET", "PORT", "DONJON",
-  "USINE", "FERME", "FORTERESSE", "PORT", "HOPITAL", "HOTEL", "PHARE",
-  "MANOIR", "MARCHE", "MINE", "MUSEE", "PALAIS", "JETEE", "PRISON",
-  "PYRAMIDE", "RANCH", "RUINES", "ECOLE", "SANCTUAIRE", "ECURIE", "GARE",
-  "TEMPLE", "TOUR", "TUNNEL", "VILLAGE", "ENTREPOT", "PUITS",
-  // Nourriture & Boisson
-  "POMME", "BACON", "PAIN", "BEURRE", "GATEAU", "BONBON", "FROMAGE", "CERISE",
-  "CHOCOLAT", "CIDRE", "CAFE", "CREME", "OEUF", "RAISIN", "MIEL", "CONFITURE",
-  "CITRON", "LIME", "ERABLE", "MELON", "LAIT", "MENTHE", "CHAMPIGNON", "MOUTARDE",
-  "OLIVE", "OIGNON", "ORANGE", "PECHE", "POIVRE", "CORNICHON", "PRUNE", "PATATE",
-  "CITROUILLE", "RIZ", "SEL", "SAUCE", "EPICE", "STEAK", "SUCRE", "THE",
-  "TOMATE", "VANILLE", "VINAIGRE", "NOIX", "VIN", "LEVURE",
-  // Gens & Société
-  "AGENT", "ARCHER", "ARTISTE", "BARON", "CAPITAINE", "CHEF", "COLONEL",
-  "DETECTIVE", "DIPLOMATE", "MEDECIN", "DUC", "AINE", "EMPEREUR", "INGENIEUR",
-  "EXPLORATEUR", "GENERAL", "GARDE", "HERAUT", "CHASSEUR", "JUGE", "CHEVALIER",
-  "AVOCAT", "MARCHAND", "MOINE", "NAVIGATEUR", "NOBLE", "INFIRMIER", "PILOTE",
-  "PIRATE", "POETE", "PRETRE", "PRINCE", "REINE", "RANGER", "MARIN",
-  "SAVANT", "ECLAIREUR", "SENATEUR", "SHERIF", "SOLDAT", "CHIRURGIEN", "VOLEUR",
-  "VILAIN", "MAGICIEN",
-  // Abstrait & Concepts
-  "ABIME", "AGE", "ALLIANCE", "EMBUSCADE", "EQUILIBRE", "SANG", "LIEN",
-  "FRONTIERE", "CHAOS", "CODE", "CONTRAT", "CRISE", "MALEDICTION", "AUBE",
-  "MORT", "DECRET", "RUINE", "CREPUSCULE", "ECHO", "EMPIRE", "ENIGME",
-  "EXIL", "DESTIN", "FLAMME", "GEL", "FANTOME", "GLOIRE", "TOMBE", "HONNEUR",
-  "ILLUSION", "FER", "LEGENDE", "LUMIERE", "LIEN", "MASQUE", "MISSION",
-  "NUIT", "SERMENT", "ORDRE", "ORIGINE", "PACTE", "PAIX", "FANTOME", "PESTE",
-  "POISON", "POUVOIR", "PROPHETIE", "QUETE", "RELIQUE", "FAILLE", "RITUEL",
-  "RUNE", "COURSE", "OMBRE", "SILENCE", "FUMEE", "AME", "SOURCE", "TEMPETE",
-  "COUP", "TRONE", "MAREE", "TEMPS", "TRACE", "PROCES", "VERITE", "UNION",
-  "VOILE", "VIDE", "GUERRE", "MONTRE", "VENT", "ZONE"
+  "MONTAGNE",
+  "RIVIERE",
+  "FORET",
+  "OCEAN",
+  "ILE",
+  "LION",
+  "AIGLE",
+  "REQUIN",
+  "HORLOGE",
+  "COURONNE",
+  "CLE",
+  "SERRURE",
+  "BOUCLIER",
+  "EPEE",
+  "CHATEAU",
+  "TOUR",
+  "ECOLE",
+  "HOPITAL",
+  "POMME",
+  "PAIN",
+  "LAIT",
+  "THE",
+  "OR",
+  "ARGENT",
+  "FER",
+  "SOLEIL",
+  "LUNE",
+  "ETOILE",
+  "FEU",
+  "EAU"
 ] as const;
 
 export type FrWord = (typeof FR_WORDS)[number];

@@ -1,41 +1,41 @@
 /**
+ * WARNING: These words need native-speaker review before going live.
+ * Do not rely on machine translation for gameplay words.
+ *
  * Filipino word list for ClueGrid.
- * 260+ common nouns suitable for a word-deduction game.
+ * Curated list of common nouns suitable for word deduction.
  */
 export const FIL_WORDS: readonly string[] = [
-  "BUNDOK", "ILOG", "GUBAT", "DISYERTO", "KARAGATAN", "ISLA", "LAMBAK", "KANYON",
-  "GLASYER", "BULKAN", "KWEBA", "LATIAN", "KAGUBATAN", "KORALES", "DUNA", "KAPATAGAN",
-  "TALON", "LAWA", "BITUIN", "BUWAN", "ULAP", "ULAN", "HANGIN", "APOY",
-  "LUPA", "BATO", "PUNO", "BULAKLAK", "DAMO", "DAHON", "BUTO", "BUHANGIN",
-  "ALON", "LEON", "TIGRE", "OSO", "LOBO", "SORO", "USA", "ELK",
-  "KONEHO", "DAGA", "ELEPANTE", "KAMELYO", "MATSING", "GIRAFA", "KANGGARO", "KABAYO",
-  "BAKA", "TUPA", "BABOY", "ASO", "PUSA", "AGILA", "LAWIN", "KUWAGO",
-  "LORO", "PINGGWINO", "PATO", "ISDA", "PATING", "BALYENA", "DOLPIN", "PUGITA",
-  "ALIMANGO", "IBON", "GAGAMBA", "BUBUYOG", "PARUPARO", "LANGGAM", "UPUAN", "LAMESA",
-  "KAMA", "BINTANA", "PINTO", "SUSI", "TRANGKA", "ORASAN", "SALAMIN", "ILAW",
-  "KANDILA", "AKLAT", "PLUMA", "LAPIS", "PAPEL", "TELEPONO", "KOMPYUTER", "KAMERA",
-  "TELEBISYON", "RADYO", "KAMPANA", "DRUM", "GITARA", "PIYANO", "BIYOLIN", "LUBID",
-  "TANIKALA", "MARTILYO", "KUTSARA", "TINIDOR", "KUTSILYO", "PLATO", "BASO", "BOTE",
-  "TASA", "MANGKOK", "GUNTING", "KARAYOM", "SULID", "PALA", "WALIS", "SIPILYO",
-  "BALDE", "BAHAY", "PAARALAN", "OSPITAL", "AKLATAN", "MUSEO", "HOTEL", "RESTAURANT",
-  "BANGKO", "OPISINA", "TINDAHAN", "PALENGKE", "PABRIKA", "ESTASYON", "PALIPARAN", "DAUNGAN",
-  "KASTILYO", "SIMBAHAN", "TEMPLO", "TORE", "TULAY", "TUNEL", "DAAN", "KALYE",
-  "PARKE", "HALAMANAN", "BUKID", "KULUNGAN", "TEATRO", "PALASYO", "TINAPAY", "GATAS",
-  "KESO", "MANTEKILYA", "ITLOG", "KARNE", "KANIN", "PASTA", "PATATAS", "KAMATIS",
-  "SIBUYAS", "BAWANG", "KAROT", "MANSANAS", "SAGING", "DALANDAN", "LEMON", "UBAS",
-  "PRESAS", "SERESA", "MELOKOTON", "ASUKAL", "ASIN", "PAMINTA", "PULOT", "TUBIG",
-  "TSA", "KAPE", "KATAS", "BIRA", "ALAK", "DOKTOR", "NARS", "GURO",
-  "ESTUDYANTE", "PILOTO", "DRAYBER", "MARINO", "SUNDALO", "PULIS", "BOMBERO", "HARI",
-  "REYNA", "PRINSIPE", "AKTOR", "MANG-AAWIT", "ARTISTA", "MANUNULAT", "KUSINERO", "PANADERO",
-  "MAGSASAKA", "ABOGADO", "HUKOM", "PARI", "KAIBIGAN", "PAMILYA", "AMA", "INA",
-  "BATA", "KAPATID", "LALAKI", "BABAE", "ULO", "BUHOK", "MATA", "TAINGA",
-  "ILONG", "BIBIG", "NGIPIN", "KAMAY", "PAA", "PUSO", "DUGO", "KATAWAN",
-  "KALULUWA", "GINTO", "PILAK", "BAKAL", "TANSO", "PLASTIK", "KAHOY", "METAL",
-  "KULAY", "PULA", "ASUL", "BERDE", "DILAW", "ITIM", "PUTI", "UMAGA",
-  "HAPON", "GABI", "LINGGO", "TAON", "PANAHON", "TAG-ARAW", "TAG-ULAN", "TAGLAMIG",
-  "HANGGANAN", "DIGMAAN", "KAPAYAPAAN", "TAGUMPAY", "PAGKATALO", "LARO", "BOLA", "KALASAG",
-  "PANA", "ESPADA", "LIBINGAN", "WATAWAT", "MAPA", "KUMPAS", "KORONA", "TRONO",
-  "ESTATWA", "KRISTAL", "BRILYANTE"
+  "BUNDOK",
+  "ILOG",
+  "GUBAT",
+  "KARAGATAN",
+  "ISLA",
+  "LEON",
+  "AGILA",
+  "PATING",
+  "ORASAN",
+  "KORONA",
+  "SUSI",
+  "PADLOCK",
+  "KALASAG",
+  "ESPADA",
+  "KASTILYO",
+  "TORE",
+  "PAARALAN",
+  "OSPITAL",
+  "APAT",
+  "TINAPAY",
+  "GATAS",
+  "TSAA",
+  "GINTO",
+  "PILAK",
+  "BAKAL",
+  "ARAW",
+  "BUWAN",
+  "BITUIN",
+  "APOY",
+  "TUBIG"
 ] as const;
 
 export type FilWord = (typeof FIL_WORDS)[number];

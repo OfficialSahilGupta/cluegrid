@@ -1,59 +1,41 @@
 /**
+ * WARNING: These words need native-speaker review before going live.
+ * Do not rely on machine translation for gameplay words.
+ *
  * Polish word list for ClueGrid.
- * 200+ common nouns in Polish suitable for a word-deduction game.
+ * Curated list of common nouns suitable for word deduction.
  */
 export const PL_WORDS: readonly string[] = [
-  // Przyroda i Otoczenie
-  "GORA", "RZEKA", "LAS", "PUSTYNIA", "OCEAN", "WYSPA", "KANION", "LODOWIEC",
-  "WULKAN", "JASKINIA", "DOLINA", "BAGNO", "DZUNGLA", "URAWISKO", "RAFA", "DIUNA",
-  "LAKA", "WODOSPAD", "GEJZER", "LAGUNA", "TUNDRA", "SAWANNA", "PLASKOWIZ"
-  // Zwierzęta
-  , "REKIN", "ORZEL", "LEW", "WILK", "NIEDZWIEDZ", "SOKOL", "KOBRA", "PANTERA",
-  "WIELORYB", "KRAB", "CMA", "PAPUGA", "KALAMARNICA", "BIZON", "RYS", "WYDRA",
-  "CZAPLA", "JELEN", "FOKA", "KRUK", "LIS", "SOWA", "LOS", "PINGWIN",
-  "SKORPION", "CHRZASZCZ", "PYTON", "BUFO", "KAMELEON", "MORS",
-  // Przedmioty & Narzędzia
-  "KOTWICA", "KOWADLO", "STRZALA", "TOPOR", "BECZKA", "DZWON", "OSTRZE", "SRUBA",
-  "MOST", "SZCZOTKA", "WIADRO", "ARMATA", "LANCUCH", "KOMIN", "ZEGAR",
-  "KOMPAS", "KORONA", "KRYSZTAL", "SZTYLET", "BEBEN", "PLOT", "FLAKON", "BRAMA",
-  "MLOTEK", "HACZYK", "ROG", "DZBAN", "KLUCZ", "LATARNIA", "ZAMEK",
-  "LUSTRO", "SIATKA", "IGLA", "KULA", "RURA", "PRYZMAT", "BLOCZEK", "POMPA",
-  "LINA", "ZAGIEL", "TARCZA", "SITO", "GWOZDZ", "SPREZYNA", "LASK", "ZNACZEK",
-  "POSAG", "MIECZ", "POCHODNIA", "PULAPKA", "SEJF", "WOZ", "KOLO", "GWIZDEK",
-  "DRUT", "KLUCZ", "DESKA", "LOPATA", "DLUTO", "PISTON",
-  // Miejsca & Budowle
-  "OPATSTWO", "ARENA", "STRYCH", "BANK", "STODOLA", "BAZAR", "BUNKIER", "ZAMEK",
-  "PIWNICA", "KAPLICA", "CYTADELA", "KOLONIA", "CHATA", "DOK", "LOCH",
-  "FABRYKA", "FARMA", "FORTECA", "PORT", "SZPITAL", "HOTEL", "LATARNIA",
-  "REZYDENCJA", "RYNEK", "KOPALNIA", "MUZEUM", "PALAC", "MOLO", "PORT", "WIEZIENIE",
-  "PIRAMIDA", "RANCZO", "RUINY", "SZKOLA", "SWIATYNIA", "STAJNIA", "STACJA",
-  "SWIATYNIA", "WIEZA", "TUNEL", "WIES", "MAGAZYN", "STUDNIA",
-  // Jedzenie & Picie
-  "JABLKO", "BEKON", "CHLEB", "MASLO", "CIASTO", "CUKIERKI", "SER", "WISNIA",
-  "CZEKOLADA", "CYDR", "KAWA", "SMIETANKA", "JAJKO", "WINOGRONO", "MIOD", "DZEM",
-  "CYTRYNA", "LIMONKA", "KLON", "MELON", "MLEKO", "MIETA", "GRZYB", "MUSZTARDA",
-  "OLIWKA", "CEBULA", "POMARANCZA", "BRZOSKWINIA", "PIEPRZ", "OGOREK", "SLIWKA", "ZIEMNIAK",
-  "DYNIA", "RYZ", "SOL", "SOS", "PRZYPRAWA", "STEK", "CUKIER", "HERBATA",
-  "POMIDOR", "WANILIA", "OCET", "ORZECH", "WINO", "DROZDZE",
-  // Ludzie & Społeczeństwo
-  "AGENT", "LUZNIK", "ARTYSTA", "BARON", "KAPITAN", "SZEF", "PULKOWNIK",
-  "DETEKTYW", "DYPLOMATA", "LEKARZ", "KSIAZE", "STARSI", "CESARZ", "INZYNIER",
-  "ODKRYWCA", "GENERAL", "STRAZNIK", "HEROLD", "MYSLIWY", "SEDZIA", "RYCERZ",
-  "PRAWNIK", "KUPCIEC", "MNICH", "NAWIGATOR", "SZLACHCIC", "PIELEGNIARKA", "PILOT",
-  "PIRAT", "POETA", "KSIADZ", "KSIAZE", "KROLOWA", "STRAZNIK", "MARYNARZ",
-  "UCZONY", "SKAUT", "SENATOR", "SZERYF", "ZOLNIERZ", "CHIRURG", "ZLODZIEJ",
-  "ZLOCZYNCA", "CZARODZIEJ",
-  // Pojęcia & Abstrakcja
-  "OTCHLAN", "WIEK", "PRZYMIERZE", "ZASADZKA", "ROWNOWAGA", "KREW", "WIEZ",
-  "GRANICA", "CHAOS", "KOD", "KONTRAKT", "KRYZYS", "KLATWA", "SWIT",
-  "SMIERC", "DEKRET", "ZGUBA", "ECHO", "IMPERIUM", "ZAGADKA",
-  "WYGNANIE", "LOS", "PLOMIEN", "MROZ", "DUCH", "CHWALA", "GROB", "HONOR",
-  "ILUZJA", "ZELAZO", "LEGENDA", "SWIATLO", "LACZE", "MASKA", "MISJA", "NOC",
-  "PRZYSIEGA", "ZAKON", "POCHODZENIE", "PAKT", "POKOJ", "FANTOM", "PLAGA", "TRUCIZNA",
-  "MOC", "PROROCTWO", "MISJA", "RELIKWIA", "SZCZELINA", "RYTUAL", "RUNA", "PED",
-  "CIEN", "CISZA", "DYM", "DUSZA", "ZRODLO", "BURZA", "UDERZENIE", "TRON", "PLYW",
-  "CZAS", "SLAD", "PROCES", "PRAWDA", "UNIA", "ZASLONA", "PROZNIA", "WOJNA",
-  "ZEGAREK", "WIATR", "STREFA"
+  "GÓRA",
+  "RZEKA",
+  "LAS",
+  "OCEAN",
+  "WYSPA",
+  "LEW",
+  "ORZEŁ",
+  "REKIN",
+  "ZEGAR",
+  "KORONA",
+  "KLUCZ",
+  "ZAMEK",
+  "TARCZA",
+  "MIECZ",
+  "ZAMEK",
+  "WIEŻA",
+  "SZKOŁA",
+  "SZPITAL",
+  "JABŁKO",
+  "CHLEB",
+  "MLEKO",
+  "HERBATA",
+  "ZŁOTO",
+  "SREBRO",
+  "ŻELAZO",
+  "SŁOŃCE",
+  "KSIĘŻYC",
+  "GWIAZDA",
+  "OGIEŃ",
+  "WODA"
 ] as const;
 
 export type PlWord = (typeof PL_WORDS)[number];

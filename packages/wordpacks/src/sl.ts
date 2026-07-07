@@ -1,42 +1,41 @@
 /**
+ * WARNING: These words need native-speaker review before going live.
+ * Do not rely on machine translation for gameplay words.
+ *
  * Slovenian word list for ClueGrid.
- * 270+ common nouns suitable for a word-deduction game.
+ * Curated list of common nouns suitable for word deduction.
  */
 export const SL_WORDS: readonly string[] = [
-  "GORA", "REKA", "GOZD", "PUŠČAVA", "OCEAN", "OTOK", "DOLINA", "KANJON",
-  "LEDENIK", "VULKAN", "JAMA", "MOČVIRJE", "DŽUNGLA", "PEČINA", "GREBEN", "SIPINA",
-  "TRAVNIK", "SLAP", "JEZERO", "ZVEZDA", "SONCE", "LUNA", "OBLAK", "DEŽ",
-  "VETER", "OGENJ", "ZEMLJA", "KAMEN", "DREVO", "CVET", "TRAVA", "LIST",
-  "SEME", "PESEK", "VAL", "LEV", "TIGER", "MEDVED", "VOLK", "LISICA",
-  "JELEN", "LOS", "KUNEC", "MIŠ", "VEVERICA", "SLON", "KAMELA", "OPICA",
-  "ŽIRAFA", "KENGURU", "KONJ", "KRAVA", "OVCA", "PRAŠIČ", "PES", "MAČKA",
-  "OREL", "SOKOL", "SOVA", "PAPAGAJ", "PINGVIN", "RACA", "RIBA", "MORSKI PES",
-  "KIT", "DELFIN", "HOBOTNICA", "RAK", "PTICA", "PAJEK", "ČEBELA", "METULJ",
-  "MRAVLJA", "STOL", "MIZA", "POSTELJA", "OKNO", "VRATA", "KLJUČ", "KLJUČAVNICA",
-  "URA", "OGLEDALO", "SVETILKA", "SVEČA", "KNJIGA", "SVINČNIK", "PAPIR", "TELEFON",
-  "RAČUNALNIK", "KAMERA", "TELEVIZIJA", "RADIO", "ZVON", "BOBEN", "KITARA", "KLAVIR",
-  "VIOLINA", "VRV", "VERIGA", "KLADIVO", "ŽEBELJ", "IZVIJAČ", "SEKIRA", "ŽAGA",
-  "LOPATA", "METLA", "KRTAČA", "VEDRO", "ŽLICA", "VILICE", "NOŽ", "KROŽNIK",
-  "KOZAREC", "STEKLENICA", "SKODELICA", "SKLEDA", "ŠKARJE", "IGLA", "NIT", "HIŠA",
-  "ŠOLA", "BOLNIŠNICA", "KNJIŽNICA", "MUZEJ", "HOTEL", "RESTAVRACIJA", "BANKA", "PISARNA",
-  "TRGOVINA", "TRŽNICA", "TOVARNA", "POSTAJA", "LETALIŠČE", "PRISTANIŠČE", "GRAD", "CERKEV",
-  "STOLP", "MOST", "TUNEL", "CESTA", "ULICA", "PARK", "VRT", "KMETIJA",
-  "ZOOLOŠKI VRT", "ZAPOR", "GLEDALIŠČE", "PALAČA", "KRUH", "MLEKO", "SIR", "MASLO",
-  "JAJCE", "MESO", "RIŽ", "TESTENINE", "KROMPIR", "PARADIŽNIK", "ČEBULA", "ČESEN",
-  "KORENJE", "JABOLKO", "BANANA", "POMARANČA", "LIMONA", "GROZDJE", "JAGODA", "ČEŠNJA",
-  "BRESKEV", "SLADKOR", "SOL", "POPER", "MED", "VODA", "ČAJ", "KAVA",
-  "SOK", "PIVO", "VINO", "ZDRAVNIK", "MEDICINSKA SESTRA", "UČITELJ", "UČENEC", "PILOT",
-  "VOZNIK", "MORNAR", "VOJAK", "POLICIST", "GASILEC", "KRALJ", "KRALJICA", "PRINC",
-  "IGRALEC", "PEVEC", "UMETNIK", "PISATELJ", "KUHAR", "PEK", "KMET", "ODVETNIK",
-  "SODNIK", "DUHOVNIK", "PRIJATELJ", "DRUŽINA", "OČE", "MATI", "OTROK", "BRAT",
-  "SESTRA", "MOŠKI", "ŽENSKA", "GLAVA", "LASJE", "OKO", "UHO", "NOS",
-  "USTA", "ZOB", "ROKA", "NOGA", "SRCE", "KRI", "TELO", "DUŠA",
-  "ZLATO", "SREBRO", "ŽELEZO", "BAKER", "STEKLO", "PLASTIKA", "LES", "KOVINA",
-  "BARVA", "RDEČA", "MODRA", "ZELENA", "RUMENA", "ČRNA", "BELA", "JUTRO",
-  "POPOLDAN", "VEČER", "NOČ", "DAN", "TEDEN", "MESEC", "LETO", "LETNI ČAS",
-  "POMLAD", "POLETJE", "JESEN", "ZIMA", "MEJA", "VOJNA", "MIR", "ZMAGA",
-  "PORAZ", "IGRA", "ŽOGA", "ŠČIT", "PUŠČICA", "MEČ", "GROB", "ZASTAVA",
-  "ZEMLJEVID", "KOMPAS", "KRONA", "PRESTOL", "KIP", "KRISTAL", "DIAMANT"
+  "GORA",
+  "REKA",
+  "GOZD",
+  "OCEAN",
+  "OTOK",
+  "LEV",
+  "OREL",
+  "MORSKI PSI",
+  "URA",
+  "KRONA",
+  "KLJUČ",
+  "KLJUČAVNICA",
+  "ŠČIT",
+  "MEČ",
+  "GRAD",
+  "STOLP",
+  "ŠOLA",
+  "BOLNIŠNICA",
+  "JABOLKO",
+  "KRUH",
+  "MLEKO",
+  "ČAJ",
+  "ZLATO",
+  "SREBRO",
+  "ŽELEZO",
+  "SONCE",
+  "MESEC",
+  "ZVEZDA",
+  "OGENJ",
+  "VODA"
 ] as const;
 
 export type SlWord = (typeof SL_WORDS)[number];

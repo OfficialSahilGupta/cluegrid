@@ -207,11 +207,11 @@ export function getWordPack(locale: string): readonly string[] {
     case "en":
       return EN_WORDS;
     case "hi":
-      return HI_WORDS;
+      return HI_WORDS.length > 0 ? HI_WORDS : EN_WORDS;
     case "ne":
-      return NE_WORDS;
+      return NE_WORDS.length > 0 ? NE_WORDS : EN_WORDS;
     case "ja":
-      return JA_WORDS;
+      return JA_WORDS.length > 0 ? JA_WORDS : EN_WORDS;
     case "de":
       return DE_WORDS.length > 0 ? DE_WORDS : EN_WORDS;
     case "ar":
