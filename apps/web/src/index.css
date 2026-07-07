@@ -6,6 +6,7 @@
   --bg-page: #081619;
   --bg-surface: rgba(8, 22, 25, 0.95);
   --bg-surface-raised: rgba(6, 24, 28, 0.98);
+  --bg-surface-solid: #06181c;
   --border-subtle: rgba(0, 240, 255, 0.15);
   --border-default: rgba(0, 240, 255, 0.3);
   --header-bg: rgba(8, 22, 25, 0.99);
@@ -89,6 +90,7 @@ html[data-theme="light"] {
   --bg-page: #F4F1EA;
   --bg-surface: #FFFFFF;
   --bg-surface-raised: #EBE8E0;
+  --bg-surface-solid: #FFFFFF;
   --border-subtle: rgba(28, 25, 22, 0.1);
   --border-default: rgba(28, 25, 22, 0.2);
   --header-bg: rgba(244, 241, 234, 0.99);

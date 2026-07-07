@@ -1688,7 +1688,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             )}
           </div>
 
-          {/* Team Role Containers */}
+          {/* Team Role Containers (set to overflow: "visible" to prevent clipping role assignment popovers) */}
           {room.gameMode === "coop" ? (
             /* CO-OP Mode */
             <div
@@ -1702,7 +1702,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 flexDirection: "column",
                 justifyContent: "space-between",
                 position: "relative",
-                overflow: "hidden",
+                overflow: "visible",
                 boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
                 boxSizing: "border-box",
                 gap: "12px",
@@ -1780,7 +1780,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   flexDirection: "column",
                   justifyContent: "space-between",
                   position: "relative",
-                  overflow: "hidden",
+                  overflow: "visible",
                   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
                   boxSizing: "border-box",
                   gap: "12px",
@@ -1857,7 +1857,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   flexDirection: "column",
                   justifyContent: "space-between",
                   position: "relative",
-                  overflow: "hidden",
+                  overflow: "visible",
                   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
                   boxSizing: "border-box",
                   gap: "12px",
@@ -5554,7 +5554,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
             top: isMobileViewport ? "50%" : "60px",
             left: "50%",
             transform: isMobileViewport ? "translate(-50%, -50%)" : "translateX(-50%)",
-            background: "var(--color-surface)",
+            background: "var(--bg-surface-solid)",
             border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-md)",
             padding: "16px",
