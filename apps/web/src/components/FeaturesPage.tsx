@@ -152,7 +152,7 @@ export function FeaturesPage() {
         </span>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "14px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "10px" }}>
         {featuresList.map((feat) => {
           const isStandard = feat.badgeType === "standard";
           const accentColor = isStandard ? "#00f0ff" : "#ef959c";
@@ -162,7 +162,7 @@ export function FeaturesPage() {
             <div
               key={feat.id}
               style={{
-                background: "rgba(6,24,28,0.4)",
+                background: "var(--bg-surface-raised)",
                 border: `1.5px solid ${isStandard ? "rgba(0, 240, 255, 0.2)" : "rgba(239, 149, 156, 0.2)"}`,
                 padding: "14px",
                 borderRadius: "6px",

@@ -64,9 +64,9 @@ export function ChangelogPage() {
         </p>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
         {updates.map((up) => (
-          <section key={up.version} style={{ background: "rgba(6,24,28,0.2)", border: "1.5px solid rgba(238,243,238,0.08)", borderLeft: `4px solid ${up.color}`, padding: "14px 18px", borderRadius: "4px" }}>
+          <section key={up.version} style={{ background: "var(--bg-surface-raised)", border: "1.5px solid rgba(238,243,238,0.08)", borderLeft: `4px solid ${up.color}`, padding: "14px 18px", borderRadius: "4px" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "10px", flexWrap: "wrap", gap: "8px" }}>
               <h3 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.25rem", fontWeight: 900, margin: 0, color: up.color, letterSpacing: "0.04em" }}>
                 {up.version}

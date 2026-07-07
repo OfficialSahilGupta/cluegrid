@@ -16,9 +16,9 @@ export function RulesPage() {
         </p>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
         {/* Core Roles Section */}
-        <section style={{ background: "rgba(6,24,28,0.4)", padding: "16px 20px", borderRadius: "6px", border: "1.5px solid rgba(0,240,255,0.2)" }}>
+        <section style={{ background: "var(--bg-surface-raised)", padding: "16px 20px", borderRadius: "6px", border: "1.5px solid rgba(0,240,255,0.2)" }}>
           <h3 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.25rem", fontWeight: 900, margin: "0 0 10px 0", color: "#ef959c", letterSpacing: "0.06em", textTransform: "uppercase" }}>
             Operative Roles Overview
           </h3>

@@ -30,8 +30,8 @@ export function AboutPage() {
             {t("about.featuresTitle", "Protocol Highlights")}
           </h3>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-            <div style={{ padding: "14px 18px", background: "rgba(6,24,28,0.4)", border: "1.5px solid rgba(0,240,255,0.2)", borderRadius: "6px" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            <div style={{ padding: "14px 18px", background: "var(--bg-surface-raised)", border: "1.5px solid rgba(0,240,255,0.2)", borderRadius: "6px" }}>
               <h4 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.1rem", fontWeight: 900, margin: "0 0 4px 0", color: "#eef3ee", letterSpacing: "0.04em" }}>
                 {t("about.feature1Title", "Instant Deployment")}
               </h4>
@@ -40,7 +40,7 @@ export function AboutPage() {
               </p>
             </div>
 
-            <div style={{ padding: "14px 18px", background: "rgba(6,24,28,0.4)", border: "1.5px solid rgba(239,149,156,0.2)", borderRadius: "6px" }}>
+            <div style={{ padding: "14px 18px", background: "var(--bg-surface-raised)", border: "1.5px solid rgba(239,149,156,0.2)", borderRadius: "6px" }}>
               <h4 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.1rem", fontWeight: 900, margin: "0 0 4px 0", color: "#eef3ee", letterSpacing: "0.04em" }}>
                 {t("about.feature2Title", "Multiple Operation Modes")}
               </h4>
@@ -49,7 +49,7 @@ export function AboutPage() {
               </p>
             </div>
 
-            <div style={{ padding: "14px 18px", background: "rgba(6,24,28,0.4)", border: "1.5px solid rgba(0,240,255,0.2)", borderRadius: "6px" }}>
+            <div style={{ padding: "14px 18px", background: "var(--bg-surface-raised)", border: "1.5px solid rgba(0,240,255,0.2)", borderRadius: "6px" }}>
               <h4 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.1rem", fontWeight: 900, margin: "0 0 4px 0", color: "#eef3ee", letterSpacing: "0.04em" }}>
                 {t("about.feature3Title", "Real-Time WebSocket Sync")}
               </h4>

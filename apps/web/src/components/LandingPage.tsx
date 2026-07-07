@@ -1627,7 +1627,7 @@ export function LandingPage({
       {!isActiveRoom && (
         <>
           {/* Left Column Advanced Decryption Center Panel (zIndex 5) */}
-          <div className="hud-side-panel-left" style={{ position: "fixed", top: "110px", left: "24px", width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
+          <div className="hud-side-panel-left" style={{ position: "fixed", top: "110px", left: "24px", width: "270px", background: "var(--bg-surface)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #1b9aaa", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#1b9aaa", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", justifyContent: "space-between" }}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0 }}><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
@@ -1660,7 +1660,7 @@ export function LandingPage({
       </div>
 
       {/* Right Column Cyber Surveillance Map HUD Panel (zIndex 5) */}
-      <div className="hud-side-panel-right" style={{ position: "fixed", top: "110px", right: "24px", width: "270px", background: "rgba(8,22,25,0.76)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #ef959c", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
+      <div className="hud-side-panel-right" style={{ position: "fixed", top: "110px", right: "24px", width: "270px", background: "var(--bg-surface)", border: "1px solid rgba(238,243,238,0.14)", borderTop: "2px solid #ef959c", borderRadius: "4px", padding: "14px 16px", pointerEvents: "none" }}>
         <div style={{ fontSize: "11px", textTransform: "uppercase", color: "#ef959c", borderBottom: "1px solid rgba(238,243,238,0.1)", paddingBottom: "6px", marginBottom: "8px", fontWeight: "bold", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span>🌐 ACTIVE SURVEILLANCE</span>
           <span style={{ display: "flex", alignItems: "center", gap: "5px", fontSize: "9.5px", color: "#ef959c" }}>
@@ -1999,7 +1999,7 @@ export function LandingPage({
 
       {/* CTA Wrap */}
       {showCTA && !showWelcome && currentView === "lobby" && (
-        <div className="landing-cta-wrap" style={{ position: "fixed", left: "50%", bottom: "100px", transform: "translateX(-50%)", zIndex: 6, display: "flex", flexDirection: "column", alignItems: "center", gap: "16px" }}>
+        <div className="landing-cta-wrap" style={{ position: "fixed", left: "50%", bottom: "100px", transform: "translateX(-50%)", zIndex: 6, display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
           <div style={{ width: "78px", height: "78px", borderRadius: "50%", border: "2px solid #00f0ff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 800, fontSize: "10px", letterSpacing: "0.08em", textAlign: "center", color: "#00f0ff", transform: "rotate(-18deg)", boxShadow: "0 0 22px rgba(0,240,255,0.25)" }}>
             CLEARANCE<br/>GRANTED
           </div>
@@ -2010,7 +2010,7 @@ export function LandingPage({
             ENTER AS GUEST <span style={{ transition: "transform .2s ease" }}>→</span>
           </button>
           <div style={{ fontSize: "11px", letterSpacing: "0.14em", color: "#9AA29B", textTransform: "uppercase", textAlign: "center", width: "100%", padding: "0 10px", boxSizing: "border-box" }}>No badge required · guest clearance</div>
-          <div style={{ display: "flex", gap: "14px", alignItems: "center", fontSize: "11px", color: "#9AA29B" }}>
+          <div style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "11px", color: "#9AA29B" }}>
             <button onClick={() => setAuthOpen(true)} className="cyber-dotted-link">Already have an account? Sign in →</button>
           </div>
         </div>
@@ -2028,7 +2028,7 @@ export function LandingPage({
       {(showWelcome || currentView !== "lobby") && (
         <div style={{ position: "fixed", inset: 0, zIndex: 15, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", overflowY: "auto" }}>
           {currentView === "lobby" ? (
-            <div style={{ width: "min(560px, 100%)", background: "rgba(6,24,28,0.9)", border: "1px solid rgba(0,240,255,0.35)", backdropFilter: "blur(6px)", padding: "40px", position: "relative", borderRadius: "14px" }}>
+            <div style={{ width: "min(560px, 100%)", background: "var(--bg-surface-raised)", border: "1px solid rgba(0,240,255,0.35)", backdropFilter: "blur(6px)", padding: "40px", position: "relative", borderRadius: "14px" }}>
               <div style={{ marginBottom: "22px" }}>
                 <div style={{ fontSize: "11.5px", letterSpacing: "0.14em", textTransform: "uppercase", color: "#eef3ee", opacity: 0.85, marginBottom: "10px", fontWeight: 700 }}>Game Mode</div>
                 <div style={{ display: "flex", gap: "10px" }}>
@@ -2158,7 +2158,7 @@ export function LandingPage({
                 width: "min(800px, 95%)", 
                 maxHeight: "85vh", 
                 overflowY: "auto", 
-                background: "rgba(6,24,28,0.92)", 
+                background: "rgba(6, 24, 28, 0.98)", 
                 border: "1px solid rgba(0,240,255,0.35)", 
                 backdropFilter: "blur(8px)", 
                 padding: "32px", 

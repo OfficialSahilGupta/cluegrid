@@ -603,7 +603,7 @@ export default function App() {
                 boxShadow: "0 20px 50px rgba(0,0,0,0.6)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "20px",
+                gap: "12px",
                 margin: 0,
                 boxSizing: "border-box",
               }}
@@ -655,7 +655,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginTop: "8px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "8px" }}>
                 <button
                   type="button"
                   onClick={handleLeave}
@@ -723,7 +723,7 @@ export default function App() {
               >
                 {globalConfirm.message}
               </p>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                 <button
                   onClick={() => {
                     triggerHaptics([100]);
