@@ -2248,6 +2248,11 @@ export function LandingPage({
           border-color: #5865f2;
           box-shadow: 0 0 18px rgba(88, 101, 242, 0.35);
         }
+        @media (max-width: 1024px) {
+          .discord-btn {
+            display: none !important;
+          }
+        }
         .coffee-btn {
           position: fixed;
           bottom: 72px;
