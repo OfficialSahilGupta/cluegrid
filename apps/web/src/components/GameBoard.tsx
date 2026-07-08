@@ -281,10 +281,14 @@ const getTeamBgColor = (team: string | null | undefined) => {
 };
 
 const getTeamDarkColor = (team: string | null | undefined) => {
-  if (team === "red" || team === "team-1") return "var(--team-1)";
-  if (team === "blue" || team === "team-2") return "var(--team-2)";
-  if (team === "green" || team === "team-3") return "var(--team-3)";
-  if (team === "yellow" || team === "team-4") return "var(--team-4)";
+  const normTeam = (team === "team-1" ? "red" : team === "team-2" ? "blue" : team === "team-3" ? "green" : team === "team-4" ? "yellow" : team);
+  if (normTeam && typeColors[normTeam]) {
+    return typeColors[normTeam].text || typeColors[normTeam].border;
+  }
+  if (normTeam === "red") return "var(--team-1)";
+  if (normTeam === "blue") return "var(--team-2)";
+  if (normTeam === "green") return "var(--team-3)";
+  if (normTeam === "yellow") return "var(--team-4)";
   return "var(--border-default)";
 };
 
@@ -7449,25 +7453,41 @@ const renderSettingsCard = (side?: "left" | "right") => {
                   return (
                     <div key={`clue-group-${clue.id || idx}`} style={{ display: "flex", flexDirection: "column", gap: "8px", width: "100%" }}>
                       {/* Clue Banner */}
-                      <div style={{ display: "flex", alignItems: "center", position: "relative", width: "100%" }}>
+                      <div style={{ display: "flex", alignItems: "center", position: "relative", width: "100%", height: "38px" }}>
                         {/* Avatar and Name Badge */}
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 2, marginRight: "-8px", width: "50px", flexShrink: 0 }}>
-                          <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "50px", height: "50px" }}>
-                            {renderAvatar(spymasterAvatar, 44)}
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 2, marginRight: "-8px", width: "32px", flexShrink: 0 }}>
+                          {/* Circular background disk matching team color */}
+                          <div style={{
+                            position: "relative",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "30px",
+                            height: "30px",
+                            borderRadius: "50%",
+                            background: badgeBg,
+                            border: "1px solid rgba(255, 255, 255, 0.2)",
+                            boxShadow: "0 1px 2px rgba(0,0,0,0.2)"
+                          }}>
+                            {renderAvatar(spymasterAvatar, 26)}
                             <div style={{
                               position: "absolute",
-                              bottom: "-12px",
+                              bottom: "-4px",
                               background: badgeBg,
-                              padding: "3px 9px",
-                              borderRadius: "5px",
-                              fontSize: "13px",
+                              padding: "0.5px 4px",
+                              borderRadius: "2px",
+                              fontSize: "11px",
                               fontWeight: 900,
                               color: "#FFFFFF",
                               whiteSpace: "nowrap",
-                              boxShadow: "0 2px 5px rgba(0,0,0,0.35)",
-                              fontFamily: "var(--font-display), var(--font-sans)",
-                              border: "1.5px solid rgba(255,255,255,0.2)",
-                              textShadow: "0 0.5px 1px rgba(0,0,0,0.5)"
+                              maxWidth: "46px",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              lineHeight: 1,
+                              boxShadow: "0 0.5px 1px rgba(0,0,0,0.25)",
+                              fontFamily: "var(--font-sans)",
+                              border: "0.5px solid rgba(255,255,255,0.15)",
+                              textAlign: "center"
                             }}>
                               {spymasterName}
                             </div>
@@ -7477,30 +7497,30 @@ const renderSettingsCard = (side?: "left" | "right") => {
                         {/* Banner Strip */}
                         <div style={{
                           flex: 1,
-                          height: "40px",
+                          height: "28px",
                           background: bannerBg,
-                          borderRadius: "20px",
+                          borderRadius: "14px",
                           display: "flex",
                           alignItems: "center",
-                          padding: "0 12px 0 16px",
-                          boxShadow: "0 3px 8px rgba(0,0,0,0.18)"
+                          padding: "0 10px 0 14px",
+                          boxShadow: "0 2px 5px rgba(0,0,0,0.15)"
                         }}>
                           {/* Clue Word Card */}
                           <div style={{
                             flex: 1,
-                            height: "28px",
+                            height: "22px",
                             background: "#FFFFFF",
-                            borderRadius: "6px",
+                            borderRadius: "4px",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
                             fontWeight: 800,
-                            fontSize: "16px",
+                            fontSize: "14px",
                             color: "#000000",
                             textTransform: "uppercase",
                             letterSpacing: "0.05em",
                             fontFamily: "Outfit, Inter, sans-serif",
-                            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.12)",
+                            boxShadow: "inset 0 0.5px 1.5px rgba(0,0,0,0.12)",
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
@@ -7512,19 +7532,19 @@ const renderSettingsCard = (side?: "left" | "right") => {
                           {/* Clue Count Badge */}
                           {countStr && (
                             <div style={{
-                              width: "28px",
-                              height: "28px",
+                              width: "22px",
+                              height: "22px",
                               borderRadius: "50%",
                               background: "#FFFFFF",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
                               fontWeight: 800,
-                              fontSize: "14.5px",
+                              fontSize: "13px",
                               color: "#000000",
-                              marginLeft: "8px",
+                              marginLeft: "6px",
                               flexShrink: 0,
-                              boxShadow: "inset 0 1px 2px rgba(0,0,0,0.12)",
+                              boxShadow: "inset 0 0.5px 1.5px rgba(0,0,0,0.12)",
                               fontFamily: "Outfit, Inter, sans-serif"
                             }}>
                               {countStr}
@@ -7538,8 +7558,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
                         <div style={{
                           display: "flex",
                           flexWrap: "wrap",
-                          gap: "10px 12px",
-                          paddingLeft: "16px",
+                          gap: "8px 10px",
+                          paddingLeft: "24px",
                           width: "100%"
                         }}>
                           {guesses.map((guess, gIdx) => {
@@ -7580,28 +7600,42 @@ const renderSettingsCard = (side?: "left" | "right") => {
                             }
                             
                             const guessPlayerBadgeBg = getTeamDarkColor(guessPlayerTeam);
-                            const guessPlayerAvatarBorder = getTeamAvatarBorderColor(guessPlayerTeam);
 
                             return (
-                              <div key={`guess-${guess.id || gIdx}`} style={{ display: "flex", alignItems: "center", position: "relative" }}>
-                                {/* Small Avatar & Name Badge */}
-                                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", zIndex: 2, marginRight: "-4px", width: "32px", flexShrink: 0 }}>
-                                  <div style={{ position: "relative", display: "flex", justifyContent: "center", alignItems: "center", width: "32px", height: "32px" }}>
-                                    {renderAvatar(guessPlayerAvatar, 28)}
+                              <div key={`guess-${guess.id || gIdx}`} style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                                {/* Horizontal Stack: Avatar + Name Underneath */}
+                                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "22px", flexShrink: 0 }}>
+                                  {/* Circular background disk matching team color */}
+                                  <div style={{
+                                    position: "relative",
+                                    display: "flex",
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                    width: "22px",
+                                    height: "22px",
+                                    borderRadius: "50%",
+                                    background: guessPlayerBadgeBg,
+                                    border: "0.5px solid rgba(255, 255, 255, 0.15)",
+                                    boxShadow: "0 0.5px 1.5px rgba(0,0,0,0.2)"
+                                  }}>
+                                    {renderAvatar(guessPlayerAvatar, 19)}
                                     <div style={{
                                       position: "absolute",
-                                      bottom: "-8px",
+                                      bottom: "-3px",
                                       background: guessPlayerBadgeBg,
-                                      padding: "2px 6px",
-                                      borderRadius: "3px",
-                                      fontSize: "11px",
-                                      fontWeight: 800,
+                                      padding: "0.5px 3px",
+                                      borderRadius: "2px",
+                                      fontSize: "10px",
+                                      fontWeight: 900,
                                       color: "#FFFFFF",
                                       whiteSpace: "nowrap",
-                                      boxShadow: "0 1px 2px rgba(0,0,0,0.2)",
-                                      fontFamily: "var(--font-display), var(--font-sans)",
-                                      border: "0.5px solid rgba(255,255,255,0.1)",
-                                      textShadow: "0 0.5px 1px rgba(0,0,0,0.5)"
+                                      maxWidth: "38px",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      lineHeight: 0.95,
+                                      fontFamily: "var(--font-sans)",
+                                      border: "0.5px solid rgba(255,255,255,0.06)",
+                                      textAlign: "center"
                                     }}>
                                       {guessPlayerName}
                                     </div>
@@ -7610,26 +7644,22 @@ const renderSettingsCard = (side?: "left" | "right") => {
                                 
                                 {/* Guess Pill */}
                                 <div style={{
-                                  height: "26px",
+                                  height: "20px",
                                   background: pillBg,
                                   color: pillText,
-                                  borderRadius: "13px",
-                                  padding: isPass ? "0 12px 0 14px" : "0 14px 0 14px",
+                                  borderRadius: "4px",
+                                  padding: "0 8px",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
                                   fontWeight: 800,
-                                  fontSize: "13px",
+                                  fontSize: "0.75rem",
                                   textTransform: "uppercase",
-                                  letterSpacing: "0.02em",
+                                  letterSpacing: "0.01em",
                                   fontFamily: "Outfit, Inter, sans-serif",
-                                  boxShadow: "0 1.5px 3px rgba(0,0,0,0.15)",
+                                  boxShadow: "0 1px 2px rgba(0,0,0,0.18)",
                                 }}>
-                                  {isPass ? (
-                                    <span style={{ fontSize: "13px", fontWeight: "bold" }}>✔</span>
-                                  ) : (
-                                    guessWord
-                                  )}
+                                  {isPass ? "✔ PASS" : guessWord}
                                 </div>
                               </div>
                             );

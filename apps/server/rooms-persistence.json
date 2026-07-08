@@ -421,9 +421,9 @@
         "id": 0,
         "word": "ANCHOR",
         "type": "red",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:34:16.022Z",
+        "revealedBy": "red"
       },
       {
         "id": 1,
@@ -461,17 +461,17 @@
         "id": 5,
         "word": "KNIGHT",
         "type": "red",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:34:17.518Z",
+        "revealedBy": "red"
       },
       {
         "id": 6,
         "word": "BARON",
         "type": "red",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:33:58.802Z",
+        "revealedBy": "blue"
       },
       {
         "id": 7,
@@ -501,9 +501,9 @@
         "id": 10,
         "word": "STORM",
         "type": "red",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:34:18.920Z",
+        "revealedBy": "red"
       },
       {
         "id": 11,
@@ -517,9 +517,9 @@
         "id": 12,
         "word": "STATUE",
         "type": "blue",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:33:33.885Z",
+        "revealedBy": "red"
       },
       {
         "id": 13,
@@ -549,9 +549,9 @@
         "id": 16,
         "word": "CRATER",
         "type": "blue",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:34:21.036Z",
+        "revealedBy": "red"
       },
       {
         "id": 17,
@@ -624,17 +624,19 @@
         "displayName": "Guest-5893",
         "avatar": "🎩",
         "team": "red",
-        "role": "spymaster",
-        "connected": true,
+        "role": "operative",
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T14:10:50.805Z",
-        "socketId": "U6EL3NLM8RtBip_JAAAB",
+        "socketId": "L9ePhceIN4L1ETVGAAAD",
         "status": "ACTIVE",
         "userId": null,
         "isHost": true,
         "isSupporter": false,
         "votedCardId": null,
-        "votedCardIds": []
+        "votedCardIds": [],
+        "guessesCount": 6,
+        "correctGuessesCount": 3
       }
     ],
     "winner": null,
@@ -642,14 +644,14 @@
     "endedAt": null,
     "phase": "playing",
     "turnState": {
-      "activeTeam": "red",
-      "phase": "guessing",
-      "clueWord": "sdniskd",
-      "clueCount": 5,
+      "activeTeam": "blue",
+      "phase": "giving_clue",
+      "clueWord": null,
+      "clueCount": null,
       "guessesUsed": 0,
-      "guessesAllowed": 6,
-      "turnNumber": 1,
-      "phaseStartedAt": 1783519891562
+      "guessesAllowed": null,
+      "turnNumber": 4,
+      "phaseStartedAt": 1783521261036
     },
     "settings": {
       "eliminationRule": "continue",
@@ -664,14 +666,14 @@
     "teams": {
       "red": {
         "color": "red",
-        "cardsRemaining": 9,
+        "cardsRemaining": 5,
         "totalCards": 9,
         "eliminated": false,
         "name": "Singapore"
       },
       "blue": {
         "color": "blue",
-        "cardsRemaining": 8,
+        "cardsRemaining": 6,
         "totalCards": 8,
         "eliminated": false,
         "name": "Chennai"
@@ -1095,9 +1097,9 @@
         "id": 14,
         "word": "SATELLITE",
         "type": "red",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:57:21.768Z",
+        "revealedBy": "red"
       },
       {
         "id": 15,
@@ -1127,17 +1129,17 @@
         "id": 18,
         "word": "GUARD",
         "type": "neutral",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:57:28.466Z",
+        "revealedBy": "red"
       },
       {
         "id": 19,
         "word": "JAR",
         "type": "red",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:57:23.767Z",
+        "revealedBy": "red"
       },
       {
         "id": 20,
@@ -1175,9 +1177,9 @@
         "id": 24,
         "word": "CURSE",
         "type": "red",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T14:57:26.215Z",
+        "revealedBy": "red"
       }
     ],
     "players": [
@@ -1186,17 +1188,19 @@
         "displayName": "Shritik",
         "avatar": "s1_0_0",
         "team": "red",
-        "role": "spymaster",
+        "role": "operative",
         "connected": true,
         "ready": false,
         "joinedAt": "2026-07-08T14:18:43.318Z",
-        "socketId": "W9p_Vm5SHNS-dr8vAAAD",
+        "socketId": "mCOFmtQWkXvmEHOmAAAB",
         "status": "ACTIVE",
         "userId": 379,
         "isHost": true,
         "isSupporter": false,
         "votedCardId": null,
-        "votedCardIds": []
+        "votedCardIds": [],
+        "guessesCount": 4,
+        "correctGuessesCount": 3
       }
     ],
     "winner": null,
@@ -1204,14 +1208,14 @@
     "endedAt": null,
     "phase": "playing",
     "turnState": {
-      "activeTeam": "red",
+      "activeTeam": "blue",
       "phase": "giving_clue",
       "clueWord": null,
       "clueCount": null,
       "guessesUsed": 0,
       "guessesAllowed": null,
-      "turnNumber": 1,
-      "phaseStartedAt": 1783520586851
+      "turnNumber": 2,
+      "phaseStartedAt": 1783522648467
     },
     "settings": {
       "eliminationRule": "continue",
@@ -1226,7 +1230,7 @@
     "teams": {
       "red": {
         "color": "red",
-        "cardsRemaining": 9,
+        "cardsRemaining": 6,
         "totalCards": 9,
         "eliminated": false,
         "name": "Toronto"
