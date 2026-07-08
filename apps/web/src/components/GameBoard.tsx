@@ -1098,12 +1098,27 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       const prevClue = prevTurnState?.clueWord;
 
       if (curClue && curClue !== prevClue) {
-        playClueSentSound();
+        // Skip playing if the local player is the spymaster who just submitted this clue
+        const isActiveSpymaster = localPlayer?.role === "spymaster" && localPlayer?.team === prevTurnState?.activeTeam;
+        if (!isActiveSpymaster) {
+          playClueSentSound();
+        }
         triggerNeuralStreams();
       }
 
       if (prevTurnState && room.turnState.activeTeam !== prevTurnState.activeTeam) {
-        playEndTurnSound();
+        const cardFlipped = room.board && prevBoardRef.current.length > 0 && room.board.some((card) => {
+          const prevCard = prevBoardRef.current.find((c) => c.id === card.id);
+          return card.revealed && prevCard && !prevCard.revealed;
+        });
+
+        if (cardFlipped) {
+          setTimeout(() => {
+            playEndTurnSound();
+          }, 1200);
+        } else {
+          playEndTurnSound();
+        }
       }
     }
     prevTurnStateRef.current = room.turnState;
@@ -6623,6 +6638,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
       return;
     }
 
+    playClueSentSound();
     if (socket) {
       socket.emit("give_clue", {
         roomCode: room.roomCode,
