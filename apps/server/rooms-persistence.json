@@ -2044,5 +2044,288 @@
     "coopMistakesMade": 0,
     "coopMistakesAllowed": 9,
     "language": "en"
+  },
+  "quantum-squid": {
+    "roomCode": "quantum-squid",
+    "teamCount": 2,
+    "gridConfig": {
+      "teamCount": 2,
+      "cols": 5,
+      "rows": 5,
+      "totalCards": 25,
+      "teamCardCounts": [
+        9,
+        8
+      ],
+      "neutralCount": 7,
+      "assassinCount": 1
+    },
+    "board": [
+      {
+        "id": 0,
+        "word": "MANSION",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 1,
+        "word": "GUARD",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 2,
+        "word": "MUSTARD",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 3,
+        "word": "BLADE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 4,
+        "word": "SCOUT",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 5,
+        "word": "SAIL",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 6,
+        "word": "SUGAR",
+        "type": "red",
+        "revealed": true,
+        "revealedAt": "2026-07-08T18:25:54.413Z",
+        "revealedBy": "red"
+      },
+      {
+        "id": 7,
+        "word": "ORDER",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 8,
+        "word": "DUSK",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 9,
+        "word": "CHAPEL",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 10,
+        "word": "WAGON",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 11,
+        "word": "CITADEL",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 12,
+        "word": "CANNON",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 13,
+        "word": "RICE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 14,
+        "word": "CURSE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 15,
+        "word": "THRONE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 16,
+        "word": "PLASMA",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 17,
+        "word": "TIME",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 18,
+        "word": "DUNGEON",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 19,
+        "word": "SHRINE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 20,
+        "word": "WELL",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 21,
+        "word": "COMPASS",
+        "type": "assassin",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 22,
+        "word": "RANGER",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 23,
+        "word": "PLUM",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 24,
+        "word": "FORTRESS",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      }
+    ],
+    "players": [
+      {
+        "id": "p_ima6xdwul",
+        "displayName": "Shritik",
+        "avatar": "s1_0_1",
+        "team": "red",
+        "role": "operative",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T18:25:26.491Z",
+        "socketId": "6EHFq679d1QnddU8AAAB",
+        "status": "ACTIVE",
+        "userId": 379,
+        "isHost": true,
+        "isSupporter": false,
+        "votedCardId": null,
+        "votedCardIds": [],
+        "guessesCount": 1,
+        "correctGuessesCount": 1
+      }
+    ],
+    "winner": null,
+    "startedAt": "2026-07-08T18:25:28.245Z",
+    "endedAt": null,
+    "phase": "playing",
+    "turnState": {
+      "activeTeam": "red",
+      "phase": "guessing",
+      "clueWord": "sdhisd",
+      "clueCount": 5,
+      "guessesUsed": 1,
+      "guessesAllowed": 6,
+      "turnNumber": 1,
+      "phaseStartedAt": 1783535149881
+    },
+    "settings": {
+      "eliminationRule": "continue",
+      "timerMode": "fast",
+      "timerSeconds": 120,
+      "spymasterTimerSeconds": 90,
+      "firstClueExtraSeconds": 60,
+      "operativeTimerSeconds": 60,
+      "roomLocked": false,
+      "timerAction": "manual"
+    },
+    "teams": {
+      "red": {
+        "color": "red",
+        "cardsRemaining": 8,
+        "totalCards": 9,
+        "eliminated": false,
+        "name": "Tokyo"
+      },
+      "blue": {
+        "color": "blue",
+        "cardsRemaining": 8,
+        "totalCards": 8,
+        "eliminated": false,
+        "name": "London"
+      }
+    },
+    "gameMode": "classic",
+    "coopMistakesMade": 0,
+    "coopMistakesAllowed": 9,
+    "language": "en"
   }
 }
