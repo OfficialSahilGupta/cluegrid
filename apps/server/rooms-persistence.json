@@ -2269,7 +2269,7 @@
         "avatar": "s1_0_1",
         "team": "red",
         "role": "operative",
-        "connected": true,
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T18:25:26.491Z",
         "socketId": "lEeHQRI4V-S-6u2IAAAH",
