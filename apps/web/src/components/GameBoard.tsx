@@ -976,14 +976,14 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const playCardFlipSound = (cardType: string) => {
     if (!soundEnabled) return;
     try {
-      const myTeam = localPlayer?.team;
+      const activeTeam = room.turnState?.activeTeam;
       let src = "";
 
       if (cardType === "assassin") {
         src = "/cluegrid-music-effects/black-card-flip.mp3";
       } else if (cardType === "neutral") {
         src = "/cluegrid-music-effects/wrong-card-flip.mp3";
-      } else if (myTeam && cardType === myTeam) {
+      } else if (activeTeam && cardType === activeTeam) {
         src = "/cluegrid-music-effects/correct-card-flip.mp3";
       } else {
         // opponent team card
@@ -7648,7 +7648,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
         maxWidth: isChatFloatingOpen && !isMobileViewport ? "1600px" : "1200px",
         margin: "0 auto",
         paddingTop: 0,
-        paddingBottom: isChatFloatingOpen ? "clamp(120px, 42vh, 440px)" : "110px",
+        paddingBottom: isMobileViewport
+          ? (isChatFloatingOpen ? "clamp(120px, 42vh, 440px)" : "110px")
+          : "24px",
         paddingLeft: "clamp(8px, 3vw, 20px)",
         paddingRight: isChatFloatingOpen && !isMobileViewport ? "416px" : "clamp(8px, 3vw, 20px)",
         boxSizing: "border-box",
