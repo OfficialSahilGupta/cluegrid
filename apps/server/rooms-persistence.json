@@ -2269,10 +2269,10 @@
         "avatar": "s1_0_1",
         "team": "red",
         "role": "operative",
-        "connected": true,
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T18:25:26.491Z",
-        "socketId": "6EHFq679d1QnddU8AAAB",
+        "socketId": "lEeHQRI4V-S-6u2IAAAH",
         "status": "ACTIVE",
         "userId": 379,
         "isHost": true,
@@ -2321,6 +2321,285 @@
         "totalCards": 8,
         "eliminated": false,
         "name": "London"
+      }
+    },
+    "gameMode": "classic",
+    "coopMistakesMade": 0,
+    "coopMistakesAllowed": 9,
+    "language": "en"
+  },
+  "grand-badger": {
+    "roomCode": "grand-badger",
+    "teamCount": 2,
+    "gridConfig": {
+      "teamCount": 2,
+      "cols": 5,
+      "rows": 5,
+      "totalCards": 25,
+      "teamCardCounts": [
+        9,
+        8
+      ],
+      "neutralCount": 7,
+      "assassinCount": 1
+    },
+    "board": [
+      {
+        "id": 0,
+        "word": "PRIEST",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 1,
+        "word": "DUNGEON",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 2,
+        "word": "POET",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 3,
+        "word": "HORN",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 4,
+        "word": "NEEDLE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 5,
+        "word": "TRACE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 6,
+        "word": "CURSE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 7,
+        "word": "CRISIS",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 8,
+        "word": "SEAL",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 9,
+        "word": "SURGEON",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 10,
+        "word": "PUMP",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 11,
+        "word": "SHOVEL",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 12,
+        "word": "FOX",
+        "type": "assassin",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 13,
+        "word": "SENATOR",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 14,
+        "word": "SIEVE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 15,
+        "word": "PRISM",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 16,
+        "word": "VECTOR",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 17,
+        "word": "LAWYER",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 18,
+        "word": "CHISEL",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 19,
+        "word": "CHIMNEY",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 20,
+        "word": "PORTAL",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 21,
+        "word": "CHAIN",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 22,
+        "word": "RUSH",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 23,
+        "word": "BACON",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 24,
+        "word": "PRIME",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      }
+    ],
+    "players": [
+      {
+        "id": "p_ima6xdwul",
+        "displayName": "Shritik",
+        "avatar": "s1_0_1",
+        "team": null,
+        "role": null,
+        "connected": false,
+        "ready": false,
+        "joinedAt": "2026-07-08T18:43:24.387Z",
+        "socketId": "iMhJ5Sf9hUcZ8pafAAAJ",
+        "status": "ACTIVE",
+        "userId": 379,
+        "isHost": true,
+        "isSupporter": false
+      }
+    ],
+    "winner": null,
+    "startedAt": "2026-07-08T18:43:26.206Z",
+    "endedAt": null,
+    "phase": "playing",
+    "turnState": {
+      "activeTeam": "red",
+      "phase": "giving_clue",
+      "clueWord": null,
+      "clueCount": null,
+      "guessesUsed": 0,
+      "guessesAllowed": null,
+      "turnNumber": 1,
+      "phaseStartedAt": 1783536206206
+    },
+    "settings": {
+      "eliminationRule": "continue",
+      "timerMode": "fast",
+      "timerSeconds": 120,
+      "spymasterTimerSeconds": 90,
+      "firstClueExtraSeconds": 60,
+      "operativeTimerSeconds": 60,
+      "roomLocked": false,
+      "timerAction": "manual"
+    },
+    "teams": {
+      "red": {
+        "color": "red",
+        "cardsRemaining": 9,
+        "totalCards": 9,
+        "eliminated": false,
+        "name": "Athens"
+      },
+      "blue": {
+        "color": "blue",
+        "cardsRemaining": 8,
+        "totalCards": 8,
+        "eliminated": false,
+        "name": "Rome"
       }
     },
     "gameMode": "classic",
