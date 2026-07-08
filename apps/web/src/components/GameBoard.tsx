@@ -4343,7 +4343,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         onClick={() => handleCardClick(card.id)}
                         className={[cardClassName, "game-board-card"].filter(Boolean).join(" ")}
                         style={{
-                          background: colors.bg,
+                          background: card.revealed ? colors.bg : "var(--bg-surface-raised)",
                           border: clueSelectedCardIds.includes(card.id)
                             ? `3.5px solid ${colors.light}`
                             : `2px solid ${colors.border}`,
