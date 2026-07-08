@@ -29,4 +29,26 @@ export default defineConfig({
       "@": "/src",
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            // Group heavy node modules separately
+            if (id.includes("firebase")) {
+              return "firebase-vendor";
+            }
+            if (id.includes("socket.io")) {
+              return "socket-vendor";
+            }
+            if (id.includes("react")) {
+              return "react-vendor";
+            }
+            return "vendor";
+          }
+        }
+      }
+    }
+  }
 });
+

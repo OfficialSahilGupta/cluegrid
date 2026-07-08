@@ -1,22 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { io, Socket } from "socket.io-client";
 import type { RoomState } from "@cluegrid/shared";
-import { GameBoard } from "./components/GameBoard";
 import { useAuth } from "./context/AuthContext";
 import { useTranslation } from "react-i18next";
-import { RulesPage } from "./components/RulesPage";
-import { ChangelogPage } from "./components/ChangelogPage";
-import { AboutPage } from "./components/AboutPage";
-import { ManagementPanel } from "./components/ManagementPanel";
-import { AuthModal } from "./components/AuthModal";
-import { ProfileSettingsModal } from "./components/ProfileSettingsModal";
-import { LanguageSwitcher } from "./components/LanguageSwitcher";
-import { SupportPage } from "./components/SupportPage";
-import { FeaturesPage } from "./components/FeaturesPage";
-import { FeedbackRobot } from "./components/FeedbackRobot";
-import { GatedUpsellModal } from "./components/GatedUpsellModal";
 import { renderAvatar } from "./utils/avatar";
 import { LandingPage } from "./components/LandingPage";
+
+// Lazily load components that are not needed on initial page paint
+const GameBoard = lazy(() => import("./components/GameBoard").then(module => ({ default: module.GameBoard })));
+const RulesPage = lazy(() => import("./components/RulesPage").then(module => ({ default: module.RulesPage })));
+const ChangelogPage = lazy(() => import("./components/ChangelogPage").then(module => ({ default: module.ChangelogPage })));
+const AboutPage = lazy(() => import("./components/AboutPage").then(module => ({ default: module.AboutPage })));
+const ManagementPanel = lazy(() => import("./components/ManagementPanel").then(module => ({ default: module.ManagementPanel })));
+const AuthModal = lazy(() => import("./components/AuthModal").then(module => ({ default: module.AuthModal })));
+const ProfileSettingsModal = lazy(() => import("./components/ProfileSettingsModal").then(module => ({ default: module.ProfileSettingsModal })));
+const LanguageSwitcher = lazy(() => import("./components/LanguageSwitcher").then(module => ({ default: module.LanguageSwitcher })));
+const SupportPage = lazy(() => import("./components/SupportPage").then(module => ({ default: module.SupportPage })));
+const FeaturesPage = lazy(() => import("./components/FeaturesPage").then(module => ({ default: module.FeaturesPage })));
+const FeedbackRobot = lazy(() => import("./components/FeedbackRobot").then(module => ({ default: module.FeedbackRobot })));
+const GatedUpsellModal = lazy(() => import("./components/GatedUpsellModal").then(module => ({ default: module.GatedUpsellModal })));
+
 
 const isInitialRoomPath = (() => {
   if (typeof window === "undefined") return false;
@@ -563,16 +566,22 @@ export default function App() {
           isActiveRoom={true}
         />
         <div id="game-board-viewport" style={{ position: "fixed", inset: 0, zIndex: 10, overflowY: "auto", overflowX: "hidden", background: "transparent" }}>
-          <GameBoard
-            room={room}
-            playerId={playerId}
-            socket={socket}
-            lightMode={lightMode}
-            setLightMode={setLightMode}
-            setGlobalConfirm={setGlobalConfirm}
-            setGatedFeature={setGatedFeature}
-            onOpenAuth={() => setAuthOpen(true)}
-          />
+          <Suspense fallback={
+            <div style={{ display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: "40px", height: "40px", border: "3px solid transparent", borderTopColor: "#00f0ff", borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+            </div>
+          }>
+            <GameBoard
+              room={room}
+              playerId={playerId}
+              socket={socket}
+              lightMode={lightMode}
+              setLightMode={setLightMode}
+              setGlobalConfirm={setGlobalConfirm}
+              setGatedFeature={setGatedFeature}
+              onOpenAuth={() => setAuthOpen(true)}
+            />
+          </Suspense>
         </div>
 
         {/* Global Auth Modal & Settings Modal */}
@@ -969,24 +978,28 @@ export default function App() {
         loading={loading}
         isActiveRoom={isInitialRoomPath}
       >
-        {currentView === "rules" && <RulesPage />}
-        {currentView === "features" && <FeaturesPage />}
-        {currentView === "changelog" && <ChangelogPage />}
-        {currentView === "about" && <AboutPage />}
-        {currentView === "admin" && <ManagementPanel />}
-        {currentView === "support" && <SupportPage />}
+        <Suspense fallback={<div style={{ padding: "40px", textAlign: "center", color: "var(--accent)" }}>Loading section...</div>}>
+          {currentView === "rules" && <RulesPage />}
+          {currentView === "features" && <FeaturesPage />}
+          {currentView === "changelog" && <ChangelogPage />}
+          {currentView === "about" && <AboutPage />}
+          {currentView === "admin" && <ManagementPanel />}
+          {currentView === "support" && <SupportPage />}
+        </Suspense>
       </LandingPage>
 
       {/* Global Auth Modal & Settings Modal */}
-      {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
-      {settingsOpen && <ProfileSettingsModal onClose={() => setSettingsOpen(false)} />}
-      {gatedFeature && (
-        <GatedUpsellModal
-          featureName={gatedFeature}
-          onClose={() => setGatedFeature(null)}
-          onOpenAuth={() => setAuthOpen(true)}
-        />
-      )}
+      <Suspense fallback={null}>
+        {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
+        {settingsOpen && <ProfileSettingsModal onClose={() => setSettingsOpen(false)} />}
+        {gatedFeature && (
+          <GatedUpsellModal
+            featureName={gatedFeature}
+            onClose={() => setGatedFeature(null)}
+            onOpenAuth={() => setAuthOpen(true)}
+          />
+        )}
+      </Suspense>
 
       {/* Server Maintenance overlay */}
       {serverError && (
