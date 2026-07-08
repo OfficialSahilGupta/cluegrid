@@ -17,7 +17,7 @@
     "board": [
       {
         "id": 0,
-        "word": "SHERIFF",
+        "word": "CAVE",
         "type": "red",
         "revealed": false,
         "revealedAt": null,
@@ -25,47 +25,47 @@
       },
       {
         "id": 1,
-        "word": "IRON",
-        "type": "red",
+        "word": "VOID",
+        "type": "assassin",
         "revealed": false,
         "revealedAt": null,
         "revealedBy": null
       },
       {
         "id": 2,
-        "word": "WELL",
-        "type": "red",
+        "word": "RUNE",
+        "type": "blue",
         "revealed": false,
         "revealedAt": null,
         "revealedBy": null
       },
       {
         "id": 3,
-        "word": "WAVE",
-        "type": "blue",
+        "word": "MASS",
+        "type": "red",
         "revealed": false,
         "revealedAt": null,
         "revealedBy": null
       },
       {
         "id": 4,
-        "word": "CHAIN",
-        "type": "blue",
+        "word": "RELIC",
+        "type": "red",
         "revealed": false,
         "revealedAt": null,
         "revealedBy": null
       },
       {
         "id": 5,
-        "word": "CAVE",
-        "type": "blue",
+        "word": "WATCH",
+        "type": "neutral",
         "revealed": false,
         "revealedAt": null,
         "revealedBy": null
       },
       {
         "id": 6,
-        "word": "SHADOW",
+        "word": "BUFFALO",
         "type": "neutral",
         "revealed": false,
         "revealedAt": null,
@@ -73,86 +73,14 @@
       },
       {
         "id": 7,
-        "word": "GAS",
-        "type": "red",
+        "word": "PYRAMID",
+        "type": "blue",
         "revealed": false,
         "revealedAt": null,
         "revealedBy": null
       },
       {
         "id": 8,
-        "word": "SUGAR",
-        "type": "blue",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 9,
-        "word": "KNIGHT",
-        "type": "neutral",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 10,
-        "word": "MUSEUM",
-        "type": "assassin",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 11,
-        "word": "MUSTARD",
-        "type": "blue",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 12,
-        "word": "AGENT",
-        "type": "blue",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 13,
-        "word": "WHISTLE",
-        "type": "neutral",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 14,
-        "word": "RICE",
-        "type": "red",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 15,
-        "word": "PIPE",
-        "type": "red",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 16,
-        "word": "PUMP",
-        "type": "neutral",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 17,
         "word": "SATELLITE",
         "type": "blue",
         "revealed": false,
@@ -160,8 +88,80 @@
         "revealedBy": null
       },
       {
+        "id": 9,
+        "word": "BOLT",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 10,
+        "word": "BACON",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 11,
+        "word": "GUARD",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 12,
+        "word": "ARENA",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 13,
+        "word": "PRIME",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 14,
+        "word": "CHAMELEON",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 15,
+        "word": "DUNGEON",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 16,
+        "word": "POWER",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 17,
+        "word": "ATTIC",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
         "id": 18,
-        "word": "RIFT",
+        "word": "FALCON",
         "type": "neutral",
         "revealed": false,
         "revealedAt": null,
@@ -169,39 +169,39 @@
       },
       {
         "id": 19,
-        "word": "WINE",
-        "type": "red",
+        "word": "PIER",
+        "type": "blue",
         "revealed": false,
         "revealedAt": null,
         "revealedBy": null
       },
       {
         "id": 20,
-        "word": "MUSHROOM",
-        "type": "red",
+        "word": "SWAMP",
+        "type": "blue",
         "revealed": false,
         "revealedAt": null,
         "revealedBy": null
       },
       {
         "id": 21,
-        "word": "REEF",
-        "type": "neutral",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
-      },
-      {
-        "id": 22,
-        "word": "PLUM",
+        "word": "WAGON",
         "type": "red",
         "revealed": false,
         "revealedAt": null,
         "revealedBy": null
       },
       {
+        "id": 22,
+        "word": "AGE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
         "id": 23,
-        "word": "TEA",
+        "word": "LAGOON",
         "type": "neutral",
         "revealed": false,
         "revealedAt": null,
@@ -209,7 +209,7 @@
       },
       {
         "id": 24,
-        "word": "NETWORK",
+        "word": "MINE",
         "type": "blue",
         "revealed": false,
         "revealedAt": null,
@@ -226,30 +226,146 @@
         "connected": true,
         "ready": false,
         "joinedAt": "2026-07-08T13:10:30.628Z",
-        "socketId": "EGs1TCBTEw8jXrvaAAAB",
+        "socketId": "Gs61WX9LL4Xa3UbEAAAB",
         "status": "ACTIVE",
         "userId": null,
         "isHost": true,
         "isSupporter": false,
         "votedCardIds": [
-          0
+          22,
+          21
         ],
-        "votedCardId": 0
+        "votedCardId": 21,
+        "guessesCount": 5,
+        "correctGuessesCount": 3
+      },
+      {
+        "id": "p_r4ndpbqn7",
+        "displayName": "haha",
+        "avatar": "😎",
+        "team": "red",
+        "role": "operative",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T13:18:39.520Z",
+        "socketId": "3RVWYUbuxzmXcAqJAAAD",
+        "status": "ACTIVE",
+        "userId": null,
+        "isHost": false,
+        "isSupporter": false,
+        "votedCardIds": [
+          21
+        ],
+        "votedCardId": 21
+      },
+      {
+        "id": "p_hc2r4pcuc",
+        "displayName": "Guest-1241",
+        "avatar": "🎩",
+        "team": "red",
+        "role": "operative",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T13:19:07.303Z",
+        "socketId": "DMGWAP5tXw5g0AsTAAAF",
+        "status": "ACTIVE",
+        "userId": null,
+        "isHost": false,
+        "isSupporter": false,
+        "votedCardIds": [
+          22,
+          21
+        ],
+        "votedCardId": 21
+      },
+      {
+        "id": "p_ima6xdwul",
+        "displayName": "Shritik",
+        "avatar": "🕵️‍♂️",
+        "team": "red",
+        "role": "operative",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T13:20:12.354Z",
+        "socketId": "SuHIIC7X8TnkI1V8AAAJ",
+        "status": "ACTIVE",
+        "userId": 379,
+        "isHost": false,
+        "isSupporter": false,
+        "votedCardIds": [
+          21
+        ],
+        "votedCardId": 21
+      },
+      {
+        "id": "p_8kpp1qa6j",
+        "displayName": "hello",
+        "avatar": "😎",
+        "team": "red",
+        "role": "operative",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T13:20:32.541Z",
+        "socketId": "fcD_D_ek4xTEvLwaAAAL",
+        "status": "ACTIVE",
+        "userId": null,
+        "isHost": false,
+        "isSupporter": false,
+        "votedCardIds": [
+          21
+        ],
+        "votedCardId": 21
+      },
+      {
+        "id": "p_z4wxrjct2",
+        "displayName": "aeroplane avata",
+        "avatar": "👁️‍🗨️",
+        "team": "red",
+        "role": "operative",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T13:21:56.278Z",
+        "socketId": "LjlcSbMArLWjzYrqAAAN",
+        "status": "ACTIVE",
+        "userId": null,
+        "isHost": false,
+        "isSupporter": false,
+        "votedCardIds": [
+          21
+        ],
+        "votedCardId": 21
+      },
+      {
+        "id": "p_nhumhp5bo",
+        "displayName": "avatar",
+        "avatar": "😀",
+        "team": "red",
+        "role": "operative",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T13:22:21.171Z",
+        "socketId": "0ltwqShor1arRrN7AAAP",
+        "status": "ACTIVE",
+        "userId": null,
+        "isHost": false,
+        "isSupporter": false,
+        "votedCardIds": [],
+        "votedCardId": null
       }
     ],
     "winner": null,
-    "startedAt": "2026-07-08T13:10:34.926Z",
+    "startedAt": "2026-07-08T13:16:57.173Z",
     "endedAt": null,
     "phase": "playing",
     "turnState": {
       "activeTeam": "red",
       "phase": "guessing",
-      "clueWord": "uhsdnkdas",
-      "clueCount": 7,
+      "clueWord": "sdbjnkasd",
+      "clueCount": -1,
       "guessesUsed": 0,
-      "guessesAllowed": 8,
+      "guessesAllowed": null,
       "turnNumber": 1,
-      "phaseStartedAt": 1783516259777
+      "phaseStartedAt": 1783516675472
     },
     "settings": {
       "eliminationRule": "continue",

@@ -4563,24 +4563,42 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                               {voters.map((v, index) => {
                                 const delay = `${(index * 200) % 1000}ms`;
                                 return (
-                                  <span
+                                  <div
                                     key={v.id}
                                     title={v.displayName}
                                     className="voter-badge-floating"
                                     style={{
                                       display: "inline-flex",
                                       alignItems: "center",
-                                      justifyContent: "center",
-                                      width: "20px",
-                                      height: "20px",
-                                      borderRadius: "50%",
+                                      gap: "4px",
+                                      padding: "2px 6px 2px 2px",
+                                      background: "rgba(0, 0, 0, 0.75)",
+                                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                                      borderRadius: "12px",
                                       cursor: "default",
                                       animation: "voter-badge-entry 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, avatar-float 3s ease-in-out infinite alternate",
                                       animationDelay: `0s, ${delay}`,
+                                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.4)",
+                                      pointerEvents: "none",
                                     }}
                                   >
-                                    {renderAvatar(v.avatar || v.displayName.charAt(0), 20)}
-                                  </span>
+                                    <div style={{ display: "flex", borderRadius: "50%", overflow: "hidden", flexShrink: 0 }}>
+                                      {renderAvatar(v.avatar || v.displayName.charAt(0), 16)}
+                                    </div>
+                                    <span style={{
+                                      fontFamily: "var(--font-sans)",
+                                      fontSize: "0.62rem",
+                                      fontWeight: 700,
+                                      color: "#fff",
+                                      maxWidth: "64px",
+                                      whiteSpace: "nowrap",
+                                      overflow: "hidden",
+                                      textOverflow: "ellipsis",
+                                      lineHeight: 1,
+                                    }}>
+                                      {v.displayName}
+                                    </span>
+                                  </div>
                                 );
                               })}
                             </div>
