@@ -311,6 +311,16 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const [activeTab, setActiveTab] = useState<"chat" | "log">("log");
   const [unreadLog, setUnreadLog] = useState(false);
   const [isChatFloatingOpen, setIsChatFloatingOpen] = useState(false); // Default closed as FAB is floating
+  const [alternateTabLabel, setAlternateTabLabel] = useState<"log" | "chat">("log");
+
+  // Alternates the closed FAB label between LOG and CHAT every 5 seconds
+  useEffect(() => {
+    if (isChatFloatingOpen) return;
+    const interval = setInterval(() => {
+      setAlternateTabLabel((prev) => (prev === "log" ? "chat" : "log"));
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [isChatFloatingOpen]);
 
 
   // Collapsible Stats Card state
@@ -8417,7 +8427,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
       )}
 
       {/* ─── Floating Chat & Game Log Panel ─── */}
-      {createPortal(
+      {room.phase !== "lobby" && createPortal(
         <div
           style={{
             position: "fixed",
@@ -8486,12 +8496,15 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 style={{
                   fontFamily: "var(--font-display)",
                   fontWeight: 900,
-                  fontSize: isChatFloatingOpen && activeTab === "chat" ? "0.92rem" : "1.05rem",
+                  fontSize: (isChatFloatingOpen ? activeTab === "chat" : alternateTabLabel === "chat") ? "0.92rem" : "1.05rem",
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
                 }}
               >
-                {isChatFloatingOpen && activeTab === "chat" ? "Chat" : "Log"}
+                {isChatFloatingOpen 
+                  ? (activeTab === "chat" ? "Chat" : "Log")
+                  : (alternateTabLabel === "chat" ? "Chat" : "Log")
+                }
               </span>
 
               {/* Notification Dot */}
