@@ -8464,12 +8464,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 style={{
                   fontFamily: "var(--font-display)",
                   fontWeight: 900,
-                  fontSize: "1.05rem",
+                  fontSize: isChatFloatingOpen && activeTab === "chat" ? "0.92rem" : "1.05rem",
                   letterSpacing: "0.06em",
                   textTransform: "uppercase",
                 }}
               >
-                Log
+                {isChatFloatingOpen && activeTab === "chat" ? "Chat" : "Log"}
               </span>
 
               {/* Notification Dot */}
