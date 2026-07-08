@@ -371,6 +371,19 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const [showWordCardIds, setShowWordCardIds] = useState<number[]>([]);
   const [clueSelectedCardIds, setClueSelectedCardIds] = useState<number[]>([]);
   const [recentlyFlippedCardIds, setRecentlyFlippedCardIds] = useState<number[]>([]);
+
+  // Preload Card Character WebP Assets in background to achieve 100% performance (Zero paint lag on flips)
+  useEffect(() => {
+    const imagesToPreload = [
+      "/game-board-card/black-card/assassin-card.webp",
+      ...Array.from({ length: 10 }, (_, i) => `/game-board-card/teams-card/happy-${i + 1}.webp`),
+      ...Array.from({ length: 6 }, (_, i) => `/game-board-card/whilte-flips/sad-${i + 1}.webp`)
+    ];
+    imagesToPreload.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
   const prevBoardRef = useRef<CardState[]>([]);
   const [isAssassinShake, setIsAssassinShake] = useState(false);
   const prevWinnerRef = useRef<string | null>(null);
@@ -383,6 +396,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const soundEnabledRef = useRef(soundEnabled);
   const soundVolumeRef = useRef(soundVolume);
   const lastVolumeRef = useRef<number>(soundVolume > 0 ? soundVolume : 5);
+  const lastActiveTeamRef = useRef<string | null>(null);
 
   useEffect(() => {
     roomPlayersRef.current = room.players;
@@ -986,7 +1000,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const playCardFlipSound = (cardType: string) => {
     if (!soundEnabled) return;
     try {
-      const activeTeam = room.turnState?.activeTeam;
+      const activeTeam = lastActiveTeamRef.current || room.turnState?.activeTeam;
       let src = "";
 
       if (cardType === "assassin") {
@@ -1189,7 +1203,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     }
 
     prevBoardRef.current = room.board;
-  }, [room.board, room.phase, soundEnabled, localPlayer?.team]);
+    // Update the last active team ref after sound evaluations have completed
+    if (room.turnState) {
+      lastActiveTeamRef.current = room.turnState.activeTeam;
+    }
+  }, [room.board, room.phase, soundEnabled, localPlayer?.team, room.turnState]);
 
   // Listen for Victory transition to play fanfare sound
   useEffect(() => {
@@ -4286,8 +4304,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       zIndex: 100 - card.id,
                     } as React.CSSProperties : {};
 
-                    const happyImages = ["happy-1.png", "happy-2.png", "happy-3.png", "happy-4.png", "happy-5.png", "happy-6.png", "happy-7.png", "happy-8.png", "happy-9.png", "happy-10.png"];
-                    const sadImages = ["sad-1.png", "sad-2.png", "sad-3.png", "sad-4.png", "sad-5.png", "sad-6.png"];
+                    const happyImages = ["happy-1.webp", "happy-2.webp", "happy-3.webp", "happy-4.webp", "happy-5.webp", "happy-6.webp", "happy-7.webp", "happy-8.webp", "happy-9.webp", "happy-10.webp"];
+                    const sadImages = ["sad-1.webp", "sad-2.webp", "sad-3.webp", "sad-4.webp", "sad-5.webp", "sad-6.webp"];
                     const getDeterministicIndex = (str: string, max: number) => {
                       let hash = 0;
                       for (let i = 0; i < str.length; i++) {
@@ -4313,7 +4331,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         const idx = getDeterministicIndex(card.word, sadImages.length);
                         revealedCharacterUrl = `/game-board-card/whilte-flips/${sadImages[idx]}`;
                       } else if (card.type === "assassin") {
-                        revealedCharacterUrl = `/game-board-card/black-card/assassin-card.png`;
+                        revealedCharacterUrl = `/game-board-card/black-card/assassin-card.webp`;
                       }
                     }
 
@@ -4409,8 +4427,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                               position: "absolute",
                               inset: 0,
                               backgroundImage: `url("${revealedCharacterUrl}")`,
-                              backgroundSize: "cover",
-                              backgroundPosition: "center",
+                              backgroundSize: "160%",
+                              backgroundPosition: "top center",
                               opacity: showWordCardIds.includes(card.id) ? 0.08 : 0.95,
                               pointerEvents: "none",
                               zIndex: 1,
