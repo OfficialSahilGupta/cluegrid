@@ -333,12 +333,21 @@ export default function App() {
 
     newSocket.on("connect", () => {
       console.log("[socket] connected as:", newSocket.id);
+      setServerError(null); // Clear server maintenance overlays
       newSocket.emit("join_room", {
         roomCode: room.roomCode,
         playerId,
         displayName: user ? user.username : localStorage.getItem("cluegrid_display_name"),
         avatar: user ? user.avatar : localStorage.getItem("cluegrid_avatar"),
         userId: user ? user.id : null,
+      });
+    });
+
+    newSocket.on("disconnect", (reason) => {
+      console.log("[socket] disconnected:", reason);
+      setServerError({
+        status: 0,
+        message: "Connection lost. Reconnecting to grid server...",
       });
     });
 
@@ -571,6 +580,97 @@ export default function App() {
             onClose={() => setGatedFeature(null)}
             onOpenAuth={() => setAuthOpen(true)}
           />
+        )}
+
+        {/* Server Maintenance overlay */}
+        {serverError && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(3, 11, 14, 0.95)",
+              backdropFilter: "blur(12px)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "24px",
+              zIndex: 9999999,
+              textAlign: "center",
+              boxSizing: "border-box",
+            }}
+          >
+            <div
+              className="scale-up"
+              style={{
+                width: "min(420px, 100%)",
+                background: "rgba(6, 24, 28, 0.96)",
+                border: "1.5px solid var(--accent)",
+                padding: "36px 28px",
+                borderRadius: "var(--radius-lg)",
+                boxShadow: "0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(232, 163, 61, 0.15)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "20px",
+              }}
+            >
+              <div
+                style={{
+                  width: "50px",
+                  height: "50px",
+                  border: "3px solid transparent",
+                  borderTopColor: "var(--accent)",
+                  borderBottomColor: "var(--accent)",
+                  borderRadius: "50%",
+                  animation: "spin 1.5s linear infinite",
+                }}
+              />
+              <div>
+                <h2
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontSize: "1.45rem",
+                    fontWeight: 800,
+                    color: "var(--accent)",
+                    margin: "0 0 8px 0",
+                    letterSpacing: "0.05em",
+                  }}
+                >
+                  SYSTEM UPGRADE
+                </h2>
+                <p
+                  style={{
+                    fontSize: "0.88rem",
+                    lineHeight: 1.6,
+                    color: "var(--text-secondary)",
+                    margin: 0,
+                    fontFamily: "var(--font-body)",
+                  }}
+                >
+                  We are updating our decryption grid. The system will resume automatically in just a few seconds...
+                </p>
+              </div>
+              <div
+                style={{
+                  fontSize: "0.72rem",
+                  color: "var(--text-muted)",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  background: "rgba(255, 255, 255, 0.02)",
+                  padding: "6px 12px",
+                  borderRadius: "12px",
+                  border: "1px solid rgba(255, 255, 255, 0.04)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                }}
+              >
+                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#e8a33d", animation: "pulse 1.2s infinite alternate" }} />
+                Connecting to grid link...
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Guest Profile Entrance Modal */}
@@ -882,6 +982,97 @@ export default function App() {
           onClose={() => setGatedFeature(null)}
           onOpenAuth={() => setAuthOpen(true)}
         />
+      )}
+
+      {/* Server Maintenance overlay */}
+      {serverError && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(3, 11, 14, 0.95)",
+            backdropFilter: "blur(12px)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "24px",
+            zIndex: 9999999,
+            textAlign: "center",
+            boxSizing: "border-box",
+          }}
+        >
+          <div
+            className="scale-up"
+            style={{
+              width: "min(420px, 100%)",
+              background: "rgba(6, 24, 28, 0.96)",
+              border: "1.5px solid var(--accent)",
+              padding: "36px 28px",
+              borderRadius: "var(--radius-lg)",
+              boxShadow: "0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(232, 163, 61, 0.15)",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "20px",
+            }}
+          >
+            <div
+              style={{
+                width: "50px",
+                height: "50px",
+                border: "3px solid transparent",
+                borderTopColor: "var(--accent)",
+                borderBottomColor: "var(--accent)",
+                borderRadius: "50%",
+                animation: "spin 1.5s linear infinite",
+              }}
+            />
+            <div>
+              <h2
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "1.45rem",
+                  fontWeight: 800,
+                  color: "var(--accent)",
+                  margin: "0 0 8px 0",
+                  letterSpacing: "0.05em",
+                }}
+              >
+                SYSTEM UPGRADE
+              </h2>
+              <p
+                style={{
+                  fontSize: "0.88rem",
+                  lineHeight: 1.6,
+                  color: "var(--text-secondary)",
+                  margin: 0,
+                  fontFamily: "var(--font-body)",
+                }}
+              >
+                We are updating our decryption grid. The system will resume automatically in just a few seconds...
+              </p>
+            </div>
+            <div
+              style={{
+                fontSize: "0.72rem",
+                color: "var(--text-muted)",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                background: "rgba(255, 255, 255, 0.02)",
+                padding: "6px 12px",
+                borderRadius: "12px",
+                border: "1px solid rgba(255, 255, 255, 0.04)",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+              }}
+            >
+              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#e8a33d", animation: "pulse 1.2s infinite alternate" }} />
+              Connecting to grid link...
+            </div>
+          </div>
+        </div>
       )}
     </>
   );
