@@ -6128,7 +6128,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
         >
           {p.displayName}
         </span>
-        {!isMobileViewport && activeSwitchPlayerId === p.id && renderAssignPopover(p)}
+        {activeSwitchPlayerId === p.id && renderAssignPopover(p)}
       </div>
     );
   };
@@ -7647,7 +7647,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
         maxWidth: isChatFloatingOpen && !isMobileViewport ? "1600px" : "1200px",
         margin: "0 auto",
         paddingTop: 0,
-        paddingBottom: "24px",
+        paddingBottom: isChatFloatingOpen ? "clamp(120px, 42vh, 440px)" : "110px",
         paddingLeft: "clamp(8px, 3vw, 20px)",
         paddingRight: isChatFloatingOpen && !isMobileViewport ? "416px" : "clamp(8px, 3vw, 20px)",
         boxSizing: "border-box",
@@ -8448,10 +8448,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
       {profileSettingsOpen && (
         <ProfileSettingsModal onClose={() => setProfileSettingsOpen(false)} />
       )}
-      {isMobileViewport && activeSwitchPlayerId && (() => {
-        const activePlayer = room.players.find(p => p.id === activeSwitchPlayerId);
-        return activePlayer ? createPortal(renderAssignPopover(activePlayer), document.body) : null;
-      })()}
+
     </div>
   );
 }

@@ -607,14 +607,27 @@ html.increased-fonts {
 
 @media (max-width: 768px) {
   .assign-popover-card {
-    position: fixed !important;
-    top: 50% !important;
-    left: 58% !important; /* Shifted to the right */
-    transform: translate(-35%, -50%) !important; /* Shifted translate center point to the right */
-    width: 290px !important;
+    position: absolute !important;
+    bottom: 65px !important;
+    top: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 280px !important;
     max-width: 90vw !important;
     margin: 0 !important;
     box-shadow: 0 25px 60px rgba(0,0,0,0.95) !important;
     z-index: 10000 !important;
+  }
+}
+
+/* Align clue count selector dropdown to expand to the right on mobile screens */
+@media (max-width: 480px) {
+  .clue-count-dropdown {
+    left: 0 !important;
+    right: auto !important;
+    transform: translateY(4px) !important;
+  }
+  .clue-count-selector-container:hover .clue-count-dropdown {
+    transform: translateY(0) !important;
   }
 }
