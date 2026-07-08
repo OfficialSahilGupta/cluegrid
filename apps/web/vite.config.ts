@@ -40,12 +40,6 @@ export default defineConfig({
             if (id.includes("firebase")) {
               return "firebase-vendor";
             }
-            if (id.includes("socket.io")) {
-              return "socket-vendor";
-            }
-            if (id.includes("react")) {
-              return "react-vendor";
-            }
             return "vendor";
           }
         }
