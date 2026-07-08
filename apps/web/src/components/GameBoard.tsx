@@ -144,6 +144,30 @@ const renderCustomIcon = (color: string) => (
   </svg>
 );
 
+const getWatermarkImage = (color: string, role: "operative" | "spymaster") => {
+  if (color === "red") {
+    return role === "operative" 
+      ? "/game-board-card/teams-card/happy-1.webp" 
+      : "/game-board-card/teams-card/happy-2.webp";
+  }
+  if (color === "blue") {
+    return role === "operative" 
+      ? "/game-board-card/teams-card/happy-6.webp" 
+      : "/game-board-card/teams-card/happy-7.webp";
+  }
+  if (color === "green") {
+    return role === "operative" 
+      ? "/game-board-card/whilte-flips/sad-5.webp" 
+      : "/game-board-card/whilte-flips/sad-6.webp";
+  }
+  if (color === "yellow") {
+    return role === "operative" 
+      ? "/game-board-card/whilte-flips/sad-3.webp" 
+      : "/game-board-card/teams-card/happy-2.webp";
+  }
+  return "";
+};
+
 const typeColors: Record<string, { bg: string; border: string; text: string; light: string }> = {
   red: teamColorPresets[0]!,
   blue: teamColorPresets[1]!,
@@ -1859,18 +1883,17 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 <div
                   style={{
                     position: "absolute",
-                    left: "12px",
-                    bottom: "6px",
-                    fontSize: "100px",
-                    lineHeight: 1,
-                    opacity: 0.1,
+                    inset: 0,
+                    backgroundImage: `url(${getWatermarkImage(color, "operative")})`,
+                    backgroundSize: "140%",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center 20%",
+                    opacity: 0.28,
                     pointerEvents: "none",
                     userSelect: "none",
                     zIndex: 1,
                   }}
-                >
-                  {cardStyle.watermarkOp}
-                </div>
+                />
 
                 <div style={{ zIndex: 2 }}>
                   <div style={{ fontSize: "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: "8px" }}>
@@ -1943,18 +1966,17 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 <div
                   style={{
                     position: "absolute",
-                    left: "12px",
-                    bottom: "6px",
-                    fontSize: "100px",
-                    lineHeight: 1,
-                    opacity: 0.1,
+                    inset: 0,
+                    backgroundImage: `url(${getWatermarkImage(color, "spymaster")})`,
+                    backgroundSize: "140%",
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center 20%",
+                    opacity: 0.28,
                     pointerEvents: "none",
                     userSelect: "none",
                     zIndex: 1,
                   }}
-                >
-                  {cardStyle.watermarkSpy}
-                </div>
+                />
 
                 <div style={{ zIndex: 2 }}>
                   <div style={{ fontSize: "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: "8px" }}>
