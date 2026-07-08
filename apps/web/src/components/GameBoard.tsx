@@ -8436,8 +8436,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 }
               }}
               style={{
-                width: "56px",
-                height: "56px",
+                width: "64px",
+                height: "64px",
                 borderRadius: "50%",
                 background: "var(--accent)",
                 color: "var(--accent-text-on)",
@@ -8464,8 +8464,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 style={{
                   fontFamily: "var(--font-display)",
                   fontWeight: 900,
-                  fontSize: "0.82rem",
-                  letterSpacing: "0.05em",
+                  fontSize: "1.05rem",
+                  letterSpacing: "0.06em",
                   textTransform: "uppercase",
                 }}
               >
