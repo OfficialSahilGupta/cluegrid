@@ -41,9 +41,9 @@
   --team-4-text: #ff9100;
 
   /* Card states */
-  --card-neutral-bg: rgba(255, 255, 255, 0.08);
-  --card-neutral-border: rgba(255, 255, 255, 0.2);
-  --card-neutral-text: #f4f4f5;
+  --card-neutral-bg: rgba(255, 255, 255, 0.25);
+  --card-neutral-border: rgba(255, 255, 255, 0.35);
+  --card-neutral-text: #ffffff;
 
   --card-assassin-bg: #09090b;
   --card-assassin-border: #3f3f46;
@@ -125,9 +125,9 @@ html[data-theme="light"] {
   --team-4-text: #8C6B2E;
 
   /* Card states */
-  --card-neutral-bg: #EDEAE2;
-  --card-neutral-border: rgba(28, 25, 22, 0.2);
-  --card-neutral-text: #1C1916;
+  --card-neutral-bg: rgba(28, 25, 22, 0.12);
+  --card-neutral-border: rgba(28, 25, 22, 0.25);
+  --card-neutral-text: var(--text-primary);
 
   --card-assassin-bg: #E8E0F2;
   --card-assassin-border: #5A3D8C;
