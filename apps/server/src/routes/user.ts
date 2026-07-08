@@ -300,11 +300,15 @@ async function verifyAdmin(req: express.Request, res: express.Response, next: ex
 
 // Admin Cities (Static/Read-only fallback)
 const defaultCities = [
-  "Tokyo", "London", "Paris", "New York", "Cairo",
-  "Sydney", "Mumbai", "Rio de Janeiro", "Moscow", "Cape Town",
+  "Tokyo", "London", "Paris", "Cairo",
+  "Sydney", "Mumbai", "Moscow",
   "Toronto", "Berlin", "Dubai", "Singapore", "Beijing",
-  "Rome", "Amsterdam", "San Francisco", "Buenos Aires", "Nairobi",
-  "Birgunj", "Kathmandu", "Pokhara", "Delhi", "Patna", "Chennai"
+  "Rome", "Amsterdam", "Nairobi",
+  "Birgunj", "Kathmandu", "Pokhara", "Delhi", "Patna", "Chennai",
+  "Seoul", "Bangkok", "Istanbul", "Vienna", "Madrid",
+  "Lisbon", "Dublin", "Stockholm", "Athens", "Brussels",
+  "Oslo", "Helsinki", "Prague", "Budapest", "Warsaw",
+  "Zagreb", "Belgrade", "Jakarta", "Manila", "Melbourne"
 ];
 const staticCities = defaultCities.map((name, index) => ({ id: index + 1, name }));
 

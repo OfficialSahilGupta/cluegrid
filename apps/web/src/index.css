@@ -620,14 +620,14 @@ html.increased-fonts {
   }
 }
 
-/* Align clue count selector dropdown to expand to the right on mobile screens */
+/* Center clue count selector dropdown on mobile screens to prevent edge clipping */
 @media (max-width: 480px) {
   .clue-count-dropdown {
-    left: 0 !important;
+    left: 50% !important;
     right: auto !important;
-    transform: translateY(4px) !important;
+    transform: translateX(-50%) translateY(4px) !important;
   }
   .clue-count-selector-container:hover .clue-count-dropdown {
-    transform: translateY(0) !important;
+    transform: translateX(-50%) translateY(0) !important;
   }
 }

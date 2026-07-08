@@ -4513,8 +4513,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         </strong> on the board. Give a clue that points to those cards — your partner will guess them!
                       </div>
                     )}
-                    <div style={{ display: "flex", gap: "14px", alignItems: "center", width: "100%", flexWrap: "wrap" }}>
-                      <div style={{ flex: "2 1 300px" }}>
+                    <div style={{ display: "flex", gap: isMobileViewport ? "8px" : "14px", alignItems: "center", width: "100%", flexWrap: "nowrap" }}>
+                      <div style={{ flex: "1 1 auto", minWidth: 0 }}>
                         <input
                           type="text"
                           placeholder="GIVE YOUR CLUE"
@@ -4522,7 +4522,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           onChange={(e) => setClueWord(e.target.value)}
                           style={{
                             width: "100%",
-                            padding: "12px 20px",
+                            padding: isMobileViewport ? "12px 14px" : "12px 20px",
                             borderRadius: "9999px",
                             border: "1px solid var(--border-default)",
                             background: "var(--bg-surface-raised)",
@@ -4539,7 +4539,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       </div>
 
                       {/* Count Selector Trigger (-) */}
-                      <div className="clue-count-selector-container">
+                      <div className="clue-count-selector-container" style={{ flexShrink: 0 }}>
                         <button
                           type="button"
                           className={`clue-count-trigger-btn ${clueCount !== null ? "active" : ""}`}
@@ -4602,7 +4602,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       <button
                         type="submit"
                         style={{
-                          padding: "12px 28px",
+                          padding: isMobileViewport ? "12px 18px" : "12px 28px",
+                          flexShrink: 0,
                           borderRadius: "9999px",
                           border: "1.5px solid rgba(255, 255, 255, 0.2)",
                           background: "linear-gradient(180deg, #10b981 0%, #047857 100%)",
