@@ -1377,8 +1377,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   Members
                 </div>
                 {teamPlayers.length > 0 ? (
-                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "8px" }}>
-                    {teamPlayers.map((p) => renderPlayerRow(p))}
+                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: teamPlayers.length > 5 ? "4px" : "8px", marginBottom: "8px", width: "100%" }}>
+                    {(() => {
+                      const size = teamPlayers.length <= 4 ? 54 : (teamPlayers.length === 5 ? 46 : (teamPlayers.length === 6 ? 40 : 34));
+                      return teamPlayers.map((p) => renderPlayerRow(p, size));
+                    })()}
                   </div>
                 ) : null}
                 {localPlayer?.team !== color && (
@@ -1447,8 +1450,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Operatives
                   </div>
                   {operatives.length > 0 && (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
-                      {operatives.map((p) => renderPlayerRow(p))}
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: operatives.length > 5 ? "4px" : "8px", marginBottom: "6px", width: "100%" }}>
+                      {(() => {
+                        const size = operatives.length <= 4 ? 54 : (operatives.length === 5 ? 46 : (operatives.length === 6 ? 40 : 34));
+                        return operatives.map((p) => renderPlayerRow(p, size));
+                      })()}
                     </div>
                   )}
                   {!room.settings.roomLocked ? (
@@ -1518,8 +1524,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Spymasters
                   </div>
                   {spymasters.length > 0 && (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
-                      {spymasters.map((p) => renderPlayerRow(p))}
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: spymasters.length > 5 ? "4px" : "8px", marginBottom: "6px", width: "100%" }}>
+                      {(() => {
+                        const size = spymasters.length <= 4 ? 54 : (spymasters.length === 5 ? 46 : (spymasters.length === 6 ? 40 : 34));
+                        return spymasters.map((p) => renderPlayerRow(p, size));
+                      })()}
                     </div>
                   )}
                   {!room.settings.roomLocked ? (
@@ -1868,8 +1877,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Operatives
                   </div>
                   {operatives.length > 0 ? (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "4px" }}>
-                      {operatives.map((p) => renderPlayerRow(p))}
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: operatives.length > 5 ? "4px" : "8px", marginBottom: "4px", width: "100%" }}>
+                      {(() => {
+                        const size = operatives.length <= 4 ? 54 : (operatives.length === 5 ? 46 : (operatives.length === 6 ? 40 : 34));
+                        return operatives.map((p) => renderPlayerRow(p, size));
+                      })()}
                     </div>
                   ) : (
                     <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Operatives deployed</div>
@@ -1949,8 +1961,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Spymasters
                   </div>
                   {spymasters.length > 0 ? (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "4px" }}>
-                      {spymasters.map((p) => renderPlayerRow(p))}
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: spymasters.length > 5 ? "4px" : "8px", marginBottom: "4px", width: "100%" }}>
+                      {(() => {
+                        const size = spymasters.length <= 4 ? 54 : (spymasters.length === 5 ? 46 : (spymasters.length === 6 ? 40 : 34));
+                        return spymasters.map((p) => renderPlayerRow(p, size));
+                      })()}
                     </div>
                   ) : (
                     <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Spymaster deployed</div>
@@ -4548,61 +4563,70 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           )}
 
                           {/* Real-time Voter Avatars Overlay (floats above divider inside top section) */}
-                          {voters.length > 0 && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                bottom: "6px",
-                                left: "8px",
-                                display: "flex",
-                                gap: "4px",
-                                flexWrap: "wrap",
-                                zIndex: 4,
-                              }}
-                            >
-                              {voters.map((v, index) => {
-                                const delay = `${(index * 200) % 1000}ms`;
-                                return (
-                                  <div
-                                    key={v.id}
-                                    title={v.displayName}
-                                    className="voter-badge-floating"
-                                    style={{
-                                      display: "inline-flex",
-                                      alignItems: "center",
-                                      gap: "4px",
-                                      padding: "2px 6px 2px 2px",
-                                      background: "rgba(0, 0, 0, 0.75)",
-                                      border: "1px solid rgba(255, 255, 255, 0.2)",
-                                      borderRadius: "12px",
-                                      cursor: "default",
-                                      animation: "voter-badge-entry 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, avatar-float 3s ease-in-out infinite alternate",
-                                      animationDelay: `0s, ${delay}`,
-                                      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.4)",
-                                      pointerEvents: "none",
-                                    }}
-                                  >
-                                    <div style={{ display: "flex", borderRadius: "50%", overflow: "hidden", flexShrink: 0 }}>
-                                      {renderAvatar(v.avatar || v.displayName.charAt(0), 16)}
+                          {voters.length > 0 && (() => {
+                            const count = voters.length;
+                            const gap = count > 4 ? "2px" : "4px";
+                            const padding = count > 4 ? "1px 4px 1px 1px" : "2px 6px 2px 2px";
+                            const avSize = count > 4 ? 12 : 16;
+                            const fSize = count > 4 ? "0.55rem" : "0.62rem";
+                            const maxW = count > 4 ? "48px" : "64px";
+                            return (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  bottom: "6px",
+                                  left: "8px",
+                                  right: "8px",
+                                  display: "flex",
+                                  gap: gap,
+                                  flexWrap: "wrap",
+                                  zIndex: 4,
+                                }}
+                              >
+                                {voters.map((v, index) => {
+                                  const delay = `${(index * 200) % 1000}ms`;
+                                  return (
+                                    <div
+                                      key={v.id}
+                                      title={v.displayName}
+                                      className="voter-badge-floating"
+                                      style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        gap: count > 4 ? "2px" : "4px",
+                                        padding: padding,
+                                        background: "rgba(0, 0, 0, 0.75)",
+                                        border: "1px solid rgba(255, 255, 255, 0.2)",
+                                        borderRadius: "12px",
+                                        cursor: "default",
+                                        animation: "voter-badge-entry 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, avatar-float 3s ease-in-out infinite alternate",
+                                        animationDelay: `0s, ${delay}`,
+                                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.4)",
+                                        pointerEvents: "none",
+                                      }}
+                                    >
+                                      <div style={{ display: "flex", borderRadius: "50%", overflow: "hidden", flexShrink: 0 }}>
+                                        {renderAvatar(v.avatar || v.displayName.charAt(0), avSize)}
+                                      </div>
+                                      <span style={{
+                                        fontFamily: "var(--font-sans)",
+                                        fontSize: fSize,
+                                        fontWeight: 700,
+                                        color: "#fff",
+                                        maxWidth: maxW,
+                                        whiteSpace: "nowrap",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        lineHeight: 1,
+                                      }}>
+                                        {v.displayName}
+                                      </span>
                                     </div>
-                                    <span style={{
-                                      fontFamily: "var(--font-sans)",
-                                      fontSize: "0.62rem",
-                                      fontWeight: 700,
-                                      color: "#fff",
-                                      maxWidth: "64px",
-                                      whiteSpace: "nowrap",
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      lineHeight: 1,
-                                    }}>
-                                      {v.displayName}
-                                    </span>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          )}
+                                  );
+                                })}
+                              </div>
+                            );
+                          })()}
                         </div>
 
                         {/* 2. BOTTOM Word Capsule Section */}
@@ -6180,7 +6204,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
     );
   };
 
-    const renderPlayerRow = (p: Player) => {
+    const renderPlayerRow = (p: Player, customSize?: number) => {
+    const size = customSize || 54;
+    const avatarSize = Math.floor(size * 0.7);
     const border = p.team ? typeColors[p.team]!.border : "rgba(255,255,255,0.15)";
     const isCurrent = p.id === playerId;
     const canSwitch = isHost || (p.id === playerId && !room.settings.roomLocked);
@@ -6204,7 +6230,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           flexDirection: "column",
           alignItems: "center",
           cursor: canSwitch ? "pointer" : "default",
-          margin: "4px",
+          margin: size > 46 ? "4px" : "2px",
           zIndex: activeSwitchPlayerId === p.id ? 50 : 1,
         }}
       >
@@ -6218,8 +6244,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
           title={`${p.displayName}${p.id === playerId ? " (You)" : ""} - ${p.status || "ACTIVE"} (${p.connected ? "Online" : "Offline"})`}
           style={{
             position: "relative",
-            width: "54px",
-            height: "54px",
+            width: `${size}px`,
+            height: `${size}px`,
             borderRadius: "50%",
             background: "rgba(255,255,255,0.03)",
             border: `2px solid ${finalBorderColor}`,
@@ -6240,9 +6266,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
         >
           {/* Avatar inside */}
           {p.avatar ? (
-            renderAvatar(p.avatar, 38)
+            renderAvatar(p.avatar, avatarSize)
           ) : (
-            <Identicon username={p.displayName} size={38} />
+            <Identicon username={p.displayName} size={avatarSize} />
           )}
 
           {/* Connection dot (top right) */}
@@ -6251,8 +6277,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
               position: "absolute",
               top: "1px",
               right: "1px",
-              width: "9px",
-              height: "9px",
+              width: `${Math.max(6, Math.floor(size * 0.16))}px`,
+              height: `${Math.max(6, Math.floor(size * 0.16))}px`,
               borderRadius: "50%",
               background: p.connected ? "hsl(142,75%,45%)" : "hsl(355,85%,58%)",
               border: "1px solid var(--color-surface)",
@@ -6264,7 +6290,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
             <span
               style={{
                 position: "absolute",
-                top: "-12px",
+                top: `-${Math.max(6, Math.floor(size * 0.22))}px`,
                 left: "50%",
                 transform: "translateX(-50%) rotate(-5deg)",
                 filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
@@ -6272,7 +6298,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               }}
               title="Room Host"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--accent)" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg width={Math.max(10, Math.floor(size * 0.3))} height={Math.max(10, Math.floor(size * 0.3))} viewBox="0 0 24 24" fill="var(--accent)" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M2 4L5 12L12 6L19 12L22 4L17 18H7L2 4Z" />
                 <circle cx="12" cy="6" r="1" fill="var(--accent)" />
                 <circle cx="2" cy="4" r="1" fill="var(--accent)" />
@@ -6288,7 +6314,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 position: "absolute",
                 bottom: "-2px",
                 right: "-2px",
-                fontSize: "0.6rem",
+                fontSize: `${Math.max(0.4, size * 0.011)}rem`,
                 fontWeight: 800,
                 padding: "1px 3px",
                 borderRadius: "3px",
@@ -6307,10 +6333,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
         {/* Small name label (underneath) */}
         <span
           style={{
-            fontSize: "0.9rem",
+            fontSize: `${Math.max(0.65, Math.min(0.9, size * 0.016))}rem`,
             fontWeight: isCurrent ? 700 : 500,
             color: p.team ? typeColors[p.team]!.border : (isCurrent ? "var(--accent)" : "var(--color-text-muted)"),
-            maxWidth: "70px",
+            maxWidth: `${size + 12}px`,
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
