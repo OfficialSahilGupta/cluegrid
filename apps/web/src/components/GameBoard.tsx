@@ -6928,8 +6928,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
       <div
         className="scale-up"
         style={{
-          position: "fixed",
-          right: "clamp(12px, 3vw, 24px)",
+          position: "absolute",
+          right: isMobileViewport ? "12px" : "clamp(8px, 3vw, 20px)",
           bottom: "92px",
           width: "min(380px, calc(100vw - 32px))",
           height: "min(520px, calc(100vh - 140px))",
@@ -8391,8 +8391,31 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
       {/* ─── Floating Chat & Game Log Panel ─── */}
       {createPortal(
-        <>
-          <div style={{ position: "fixed", bottom: "24px", right: "24px", zIndex: 9999 }}>
+        <div
+          style={{
+            position: "fixed",
+            bottom: 0,
+            left: "50%",
+            transform: "translateX(-50%)",
+            width: "100%",
+            maxWidth: isChatFloatingOpen && !isMobileViewport ? "1600px" : "1200px",
+            height: 0,
+            pointerEvents: "none",
+            zIndex: 9999,
+            transition: "max-width 0.3s ease",
+          }}
+        >
+          {/* Floating Panel */}
+          {isChatFloatingOpen && renderChatAndLogPanel()}
+
+          <div
+            style={{
+              position: "absolute",
+              bottom: "24px",
+              right: isMobileViewport ? "24px" : "clamp(8px, 3vw, 20px)",
+              pointerEvents: "auto",
+            }}
+          >
             <button
               onClick={() => {
                 setIsChatFloatingOpen((prev) => !prev);
@@ -8456,10 +8479,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               )}
             </button>
           </div>
-
-          {/* Floating Panel */}
-          {isChatFloatingOpen && renderChatAndLogPanel()}
-        </>,
+        </div>,
         document.body
       )}
 
