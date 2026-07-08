@@ -1604,6 +1604,22 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         zIndex: 2,
       };
 
+      const absoluteButtonStyle: React.CSSProperties = {
+        ...greenPillButtonStyle,
+        position: "absolute",
+        bottom: "16px",
+        left: "16px",
+        width: "calc(100% - 32px)",
+      };
+
+      const lockedAbsoluteButtonStyle: React.CSSProperties = {
+        ...lockedButtonStyle,
+        position: "absolute",
+        bottom: "16px",
+        left: "16px",
+        width: "calc(100% - 32px)",
+      };
+
       const cardStyle = {
         bg: themeCol.bg,
         border: `2.5px solid ${themeCol.border}`,
@@ -1790,10 +1806,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   border: cardStyle.border,
                   borderRadius: "var(--radius-lg)",
                   padding: "16px",
-                  minHeight: "150px",
+                  paddingBottom: "68px",
+                  height: "195px",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "space-between",
+                  justifyContent: "flex-start",
                   position: "relative",
                   overflow: "visible",
                   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
@@ -1835,7 +1852,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   (!localPlayer || localPlayer.team !== color || localPlayer.role !== "operative") ? (
                     <button
                       onClick={() => handleJoinTeamRole(color, "operative")}
-                      style={greenPillButtonStyle}
+                      style={absoluteButtonStyle}
                       onMouseOver={(e) => {
                         e.currentTarget.style.transform = "translateY(-1px)";
                         e.currentTarget.style.filter = "brightness(1.1)";
@@ -1848,11 +1865,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       Join Operatives
                     </button>
                   ) : (
-                    <button style={{ ...greenPillButtonStyle, visibility: "hidden" }}>Join Operatives</button>
+                    <button style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Operatives</button>
                   )
                 ) : (
                   operatives.length === 0 && (
-                    <div style={lockedButtonStyle}>
+                    <div style={lockedAbsoluteButtonStyle}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -1870,10 +1887,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   border: cardStyle.border,
                   borderRadius: "var(--radius-lg)",
                   padding: "16px",
-                  minHeight: "150px",
+                  paddingBottom: "68px",
+                  height: "195px",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "space-between",
+                  justifyContent: "flex-start",
                   position: "relative",
                   overflow: "visible",
                   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
@@ -1915,7 +1933,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") ? (
                     <button
                       onClick={() => handleJoinTeamRole(color, "spymaster")}
-                      style={greenPillButtonStyle}
+                      style={absoluteButtonStyle}
                       onMouseOver={(e) => {
                         e.currentTarget.style.transform = "translateY(-1px)";
                         e.currentTarget.style.filter = "brightness(1.1)";
@@ -1928,11 +1946,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       Join Spymasters
                     </button>
                   ) : (
-                    <button style={{ ...greenPillButtonStyle, visibility: "hidden" }}>Join Spymasters</button>
+                    <button style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Spymasters</button>
                   )
                 ) : (
                   spymasters.length === 0 && (
-                    <div style={lockedButtonStyle}>
+                    <div style={lockedAbsoluteButtonStyle}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
