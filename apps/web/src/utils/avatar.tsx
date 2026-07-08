@@ -20,7 +20,7 @@ export function renderAvatar(avatarId: string | null | undefined, size = 32, ext
           backgroundImage: `url(${sheetUrl})`,
           backgroundSize: "500% 500%",
           backgroundPosition,
-          display: "inline-block",
+          display: "block",
           verticalAlign: "middle",
           boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
           flexShrink: 0,

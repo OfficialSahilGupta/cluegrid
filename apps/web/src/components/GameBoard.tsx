@@ -280,6 +280,17 @@ const getTeamBgColor = (team: string | null | undefined) => {
   return "var(--bg-surface-raised)";
 };
 
+const getTeamTranslucentBg = (type: string | null | undefined) => {
+  if (!type) return "transparent";
+  if (type === "red" || type === "team-1") return "rgba(240, 113, 103, 0.16)";
+  if (type === "blue" || type === "team-2") return "rgba(74, 144, 226, 0.16)";
+  if (type === "green" || type === "team-3") return "rgba(16, 185, 129, 0.16)";
+  if (type === "yellow" || type === "team-4") return "rgba(255, 145, 0, 0.16)";
+  if (type === "neutral") return "rgba(148, 163, 184, 0.15)";
+  if (type === "assassin") return "rgba(15, 15, 18, 0.4)";
+  return "transparent";
+};
+
 const getTeamDarkColor = (team: string | null | undefined) => {
   const normTeam = (team === "team-1" ? "red" : team === "team-2" ? "blue" : team === "team-3" ? "green" : team === "team-4" ? "yellow" : team);
   if (normTeam && typeColors[normTeam]) {
@@ -1407,7 +1418,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 {teamPlayers.length > 0 ? (
                   <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: teamPlayers.length > 5 ? "4px" : "8px", marginBottom: "8px", width: "100%" }}>
                     {(() => {
-                      const size = teamPlayers.length <= 4 ? 54 : (teamPlayers.length === 5 ? 46 : (teamPlayers.length === 6 ? 40 : 34));
+                      const size = teamPlayers.length <= 4 ? 68 : (teamPlayers.length === 5 ? 58 : (teamPlayers.length === 6 ? 50 : 44));
                       return teamPlayers.map((p) => renderPlayerRow(p, size));
                     })()}
                   </div>
@@ -1480,7 +1491,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   {operatives.length > 0 && (
                     <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: operatives.length > 5 ? "4px" : "8px", marginBottom: "6px", width: "100%" }}>
                       {(() => {
-                        const size = operatives.length <= 4 ? 54 : (operatives.length === 5 ? 46 : (operatives.length === 6 ? 40 : 34));
+                        const size = operatives.length <= 4 ? 68 : (operatives.length === 5 ? 58 : (operatives.length === 6 ? 50 : 44));
                         return operatives.map((p) => renderPlayerRow(p, size));
                       })()}
                     </div>
@@ -1554,7 +1565,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   {spymasters.length > 0 && (
                     <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: spymasters.length > 5 ? "4px" : "8px", marginBottom: "6px", width: "100%" }}>
                       {(() => {
-                        const size = spymasters.length <= 4 ? 54 : (spymasters.length === 5 ? 46 : (spymasters.length === 6 ? 40 : 34));
+                        const size = spymasters.length <= 4 ? 68 : (spymasters.length === 5 ? 58 : (spymasters.length === 6 ? 50 : 44));
                         return spymasters.map((p) => renderPlayerRow(p, size));
                       })()}
                     </div>
@@ -1906,7 +1917,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   {operatives.length > 0 ? (
                     <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: operatives.length > 5 ? "4px" : "8px", marginBottom: "4px", width: "100%" }}>
                       {(() => {
-                        const size = operatives.length <= 4 ? 54 : (operatives.length === 5 ? 46 : (operatives.length === 6 ? 40 : 34));
+                        const size = operatives.length <= 4 ? 68 : (operatives.length === 5 ? 58 : (operatives.length === 6 ? 50 : 44));
                         return operatives.map((p) => renderPlayerRow(p, size));
                       })()}
                     </div>
@@ -1989,7 +2000,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   {spymasters.length > 0 ? (
                     <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: spymasters.length > 5 ? "4px" : "8px", marginBottom: "4px", width: "100%" }}>
                       {(() => {
-                        const size = spymasters.length <= 4 ? 54 : (spymasters.length === 5 ? 46 : (spymasters.length === 6 ? 40 : 34));
+                        const size = spymasters.length <= 4 ? 68 : (spymasters.length === 5 ? 58 : (spymasters.length === 6 ? 50 : 44));
                         return spymasters.map((p) => renderPlayerRow(p, size));
                       })()}
                     </div>
@@ -3663,9 +3674,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 }}
               >
                 
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "left", flex: 1, minWidth: "280px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "center", alignItems: "center", justifyContent: "center", flex: 1, minWidth: "280px", width: "100%" }}>
                   {room.phase === "playing" && room.turnState ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", width: "100%" }}>
                       <span
                         style={{
                           display: "inline-block",
@@ -3722,7 +3733,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       )}
                     </div>
                   ) : (
-                    <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", width: "100%" }}>
                       <span
                         style={{
                           display: "inline-block",
@@ -3746,6 +3757,38 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   
                     {/* Integrated Scores & Timer Row */}
                     <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", marginTop: "8px", width: "100%" }}>
+                      {/* Inline Premium Shaking Timer badge at the end of Scores row */}
+                      {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            background: "var(--color-surface)",
+                            border: `1.5px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "rgba(255,255,255,0.15)"}`,
+                            padding: "6px 14px",
+                            borderRadius: "var(--radius-md)",
+                            marginLeft: "auto",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                            minHeight: "36px",
+                            boxSizing: "border-box"
+                          }}
+                        >
+                          <svg className="premium-clock-shake" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transformOrigin: "center center" }}>
+                            <circle cx="12" cy="12" r="10" />
+                            <polyline points="12 6 12 12 16 14" />
+                          </svg>
+                          <span style={{
+                            fontFamily: "var(--font-display)",
+                            fontSize: "1.05rem",
+                            fontWeight: 900,
+                            fontVariantNumeric: "tabular-nums",
+                            color: timerCount <= 10 ? "hsl(355,85%,58%)" : "var(--text-primary)"
+                          }}>
+                            {Math.floor(Math.max(0, timerCount) / 60)}:{(Math.max(0, timerCount) % 60) < 10 ? "0" : ""}{Math.max(0, timerCount) % 60}
+                          </span>
+                        </div>
+                      )}
                       {/* Cards remaining badges */}
               {room.gameMode === "coop" ? (
                 <div
@@ -4490,32 +4533,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             position: "relative",
                             padding: "8px",
                             borderBottom: `1.5px solid ${colors.border}`,
-                            background: card.revealed ? "rgba(0,0,0,0.15)" : "transparent",
+                            background: (card.revealed || canSeeKey) ? getTeamTranslucentBg(card.type) : "transparent",
                             boxSizing: "border-box",
                           }}
                         >
-                          {/* Ghosted Watermark Icon inside Top Section */}
-                          <div
-                            style={{
-                              position: "absolute",
-                              left: "50%",
-                              top: "50%",
-                              transform: "translate(-50%, -50%)",
-                              fontSize: "44px",
-                              lineHeight: 1,
-                              opacity: 0.08,
-                              pointerEvents: "none",
-                              userSelect: "none",
-                              zIndex: 0,
-                            }}
-                          >
-                            {cardType === "red" ? "🎯" :
-                             cardType === "blue" ? "🛡️" :
-                             cardType === "green" ? "🌿" :
-                             cardType === "yellow" ? "⚡" :
-                             cardType === "neutral" ? "📁" :
-                             cardType === "assassin" ? "💀" : "❓"}
-                          </div>
+
 
                           {/* Reveal Status Badge (top right) */}
                           {(card.revealed || (canSeeKey && card.type === "assassin")) && !votedCardIds.includes(card.id) && (
@@ -5071,7 +5093,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                                     {opt.renderIcon(iconColor)}
                                   </span>
                                   <div style={{ display: "flex", flexDirection: "column" }}>
-                                    <span style={{ fontSize: "0.85rem", fontWeight: 700, color: isSelected ? "var(--accent)" : "var(--text-primary)" }}>{opt.label}</span>
+                                    <span style={{ fontSize: "1rem", fontWeight: 800, color: isSelected ? "var(--accent)" : "var(--text-primary)" }}>{opt.label}</span>
                                     <span style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", marginTop: "2px" }}>{opt.desc}</span>
                                   </div>
                                 </button>
@@ -5564,7 +5586,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                                   {opt.renderIcon(iconColor)}
                                 </span>
                                 <div style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-                                  <span style={{ fontSize: "0.85rem", fontWeight: 700, color: isSelected ? "var(--accent)" : "var(--text-primary)" }}>
+                                  <span style={{ fontSize: "1rem", fontWeight: 800, color: isSelected ? "var(--accent)" : "var(--text-primary)" }}>
                                     {opt.label}
                                   </span>
                                   <span style={{ fontSize: "0.7rem", color: "var(--text-secondary)" }}>
@@ -5912,7 +5934,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           }}
           className="scale-up assign-popover-card"
         >
-          <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)", textTransform: "uppercase", textAlign: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "8px" }}>
+          <span style={{ fontSize: "1rem", fontWeight: 800, color: "var(--text-primary)", textTransform: "uppercase", textAlign: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "8px" }}>
             {t("game.assign", "Assign")} {p.displayName}
           </span>
           
@@ -7686,8 +7708,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
   };
 
   const renderCustomReaction = (type: string, isButton = false) => {
-    const size = isButton ? "16px" : "32px";
-    const padding = isButton ? "8px 12px" : "18px";
+    const size = isButton ? "20px" : "84px";
+    const padding = isButton ? "10px 18px" : "36px";
     const borderRadius = isButton ? "var(--radius-sm)" : "50%";
     
     switch (type) {
@@ -7714,7 +7736,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
             {isButton && (
-              <span style={{ fontSize: "0.85rem", fontWeight: 700, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Misplay
               </span>
             )}
@@ -7741,7 +7763,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/>
             </svg>
             {isButton && (
-              <span style={{ fontSize: "0.85rem", fontWeight: 700, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Firey
               </span>
             )}
@@ -7771,7 +7793,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               <circle cx="14" cy="8" r="1" fill="currentColor"/>
             </svg>
             {isButton && (
-              <span style={{ fontSize: "0.85rem", fontWeight: 700, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Deadly
               </span>
             )}
@@ -7798,7 +7820,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
             {isButton && (
-              <span style={{ fontSize: "0.85rem", fontWeight: 700, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Genius
               </span>
             )}
@@ -7825,7 +7847,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
             </svg>
             {isButton && (
-              <span style={{ fontSize: "0.85rem", fontWeight: 700, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Bravo
               </span>
             )}
@@ -7852,7 +7874,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
             {isButton && (
-              <span style={{ fontSize: "0.85rem", fontWeight: 700, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Heart
               </span>
             )}

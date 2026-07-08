@@ -40,15 +40,14 @@
   --team-4-bg: rgba(226, 163, 61, 0.15);
   --team-4-text: #ff9100;
 
-  /* Card states */
-  --card-neutral-bg: rgba(255, 255, 255, 0.25);
-  --card-neutral-border: rgba(255, 255, 255, 0.35);
-  --card-neutral-text: #ffffff;
+  --card-neutral-bg: rgba(148, 163, 184, 0.28);
+  --card-neutral-border: rgba(148, 163, 184, 0.4);
+  --card-neutral-text: #CBD5E1;
 
-  --card-assassin-bg: #09090b;
-  --card-assassin-border: #3f3f46;
-  --card-assassin-text: #a1a1aa;
-  --card-assassin-label-text: #fafafa;
+  --card-assassin-bg: rgba(15, 15, 18, 0.82);
+  --card-assassin-border: rgba(255, 255, 255, 0.15);
+  --card-assassin-text: #E4E4E7;
+  --card-assassin-label-text: #A1A1AA;
 
   /* Status badges */
   --status-active-bg: rgba(178, 239, 155, 0.15);
@@ -125,9 +124,9 @@ html[data-theme="light"] {
   --team-4-text: #8C6B2E;
 
   /* Card states */
-  --card-neutral-bg: rgba(28, 25, 22, 0.12);
-  --card-neutral-border: rgba(28, 25, 22, 0.25);
-  --card-neutral-text: var(--text-primary);
+  --card-neutral-bg: rgba(214, 203, 182, 0.15);
+  --card-neutral-border: rgba(140, 120, 80, 0.3);
+  --card-neutral-text: #5C4A30;
 
   --card-assassin-bg: #E8E0F2;
   --card-assassin-border: #5A3D8C;
