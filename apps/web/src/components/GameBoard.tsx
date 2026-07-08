@@ -6931,7 +6931,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
           position: "absolute",
           right: isMobileViewport ? "12px" : "clamp(8px, 3vw, 20px)",
           bottom: "92px",
-          width: "min(380px, calc(100vw - 32px))",
+          width: activeTab === "log"
+            ? "min(280px, calc(100vw - 24px))"
+            : "min(380px, calc(100vw - 32px))",
           height: "min(520px, calc(100vh - 140px))",
           background: "var(--bg-surface-raised)",
           border: "1px solid var(--border-default)",
@@ -6942,6 +6944,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           padding: "16px",
           textAlign: "left",
           zIndex: 9999,
+          pointerEvents: "auto",
         }}
       >
         {/* Header row with Tab navigation, minimize button */}
@@ -7668,7 +7671,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
           ? (isChatFloatingOpen ? "clamp(120px, 42vh, 440px)" : "110px")
           : "24px",
         paddingLeft: "clamp(8px, 3vw, 20px)",
-        paddingRight: isChatFloatingOpen && !isMobileViewport ? "416px" : "clamp(8px, 3vw, 20px)",
+        paddingRight: isChatFloatingOpen && !isMobileViewport
+          ? (activeTab === "log" ? "316px" : "416px")
+          : "clamp(8px, 3vw, 20px)",
         boxSizing: "border-box",
         transition: "max-width 0.3s ease, padding-right 0.3s ease",
       }}
@@ -8418,9 +8423,16 @@ const renderSettingsCard = (side?: "left" | "right") => {
           >
             <button
               onClick={() => {
-                setIsChatFloatingOpen((prev) => !prev);
                 if (!isChatFloatingOpen) {
+                  setIsChatFloatingOpen(true);
+                  setActiveTab("log");
                   setUnreadLog(false);
+                } else {
+                  if (activeTab === "log") {
+                    setActiveTab("chat");
+                  } else {
+                    setIsChatFloatingOpen(false);
+                  }
                 }
               }}
               style={{
@@ -8446,20 +8458,19 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 e.currentTarget.style.transform = "scale(1)";
                 e.currentTarget.style.background = "var(--accent)";
               }}
-              title={isChatFloatingOpen ? t("profile.cancel") : "Open Chat & Log"}
+              title={isChatFloatingOpen ? (activeTab === "log" ? "Switch to Chat" : "Minimize") : "Open Game Log"}
             >
-              {isChatFloatingOpen ? (
-                /* Close/X Icon */
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              ) : (
-                /* Speech Bubble / Chat Icon */
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-              )}
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontWeight: 900,
+                  fontSize: "0.82rem",
+                  letterSpacing: "0.05em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Log
+              </span>
 
               {/* Notification Dot */}
               {!isChatFloatingOpen && unreadLog && (
