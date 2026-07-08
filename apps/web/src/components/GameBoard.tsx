@@ -1832,7 +1832,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 </div>
 
                 {!room.settings.roomLocked ? (
-                  (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") && (
+                  (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") ? (
                     <button
                       onClick={() => handleJoinTeamRole(color, "spymaster")}
                       style={greenPillButtonStyle}
@@ -1847,6 +1847,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     >
                       Join Spymasters
                     </button>
+                  ) : (
+                    <button style={{ ...greenPillButtonStyle, visibility: "hidden" }}>Join Spymasters</button>
                   )
                 ) : (
                   spymasters.length === 0 && (
@@ -1910,7 +1912,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 </div>
 
                 {!room.settings.roomLocked ? (
-                  (!localPlayer || localPlayer.team !== color || localPlayer.role !== "operative") && (
+                  (!localPlayer || localPlayer.team !== color || localPlayer.role !== "operative") ? (
                     <button
                       onClick={() => handleJoinTeamRole(color, "operative")}
                       style={greenPillButtonStyle}
@@ -1925,6 +1927,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     >
                       Join Operatives
                     </button>
+                  ) : (
+                    <button style={{ ...greenPillButtonStyle, visibility: "hidden" }}>Join Operatives</button>
                   )
                 ) : (
                   operatives.length === 0 && (
