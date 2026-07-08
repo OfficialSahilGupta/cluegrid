@@ -291,6 +291,8 @@ const getTeamTranslucentBg = (type: string | null | undefined) => {
   return "transparent";
 };
 
+
+
 const getTeamDarkColor = (team: string | null | undefined) => {
   const normTeam = (team === "team-1" ? "red" : team === "team-2" ? "blue" : team === "team-3" ? "green" : team === "team-4" ? "yellow" : team);
   if (normTeam && typeColors[normTeam]) {
@@ -2889,6 +2891,133 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const renderGameplayLayout = () => {
     return (
       <>
+        {/* Full-screen Centered Congratulations Modal Overlay */}
+        {room.phase === "ended" && (
+          <div
+            id="congrats-modal"
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100vw",
+              height: "100vh",
+              background: "rgba(10, 10, 12, 0.88)",
+              backdropFilter: "blur(12px)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 20000,
+              padding: "20px",
+              boxSizing: "border-box"
+            }}
+          >
+            <style>{`
+              @keyframes shine {
+                0% { left: -100%; }
+                100% { left: 200%; }
+              }
+            `}</style>
+            <div
+              className="scale-up"
+              style={{
+                background: "linear-gradient(135deg, rgba(var(--team-accent-rgb,232,163,61),0.12), rgba(var(--team-accent-rgb,232,163,61),0.06))",
+                border: "2px solid var(--accent)",
+                borderRadius: "var(--radius-lg)",
+                padding: "36px 48px",
+                textAlign: "center",
+                maxWidth: "550px",
+                width: "100%",
+                boxShadow: "0 20px 50px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.15)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: "16px",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <div 
+                className="celebration-shine" 
+                style={{ 
+                  position: "absolute", 
+                  inset: 0, 
+                  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)", 
+                  transform: "skewX(-20deg)", 
+                  animation: "shine 3s infinite",
+                  pointerEvents: "none"
+                }} 
+              />
+              
+              <h2 style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "2.4rem",
+                fontWeight: 900,
+                background: "linear-gradient(90deg, #FFE082, #FFB300, #FFE082)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                margin: 0,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                textShadow: "0 4px 15px rgba(255, 179, 0, 0.4)"
+              }}>
+                🎉 CONGRATULATIONS! 🎉
+              </h2>
+              
+              <p style={{
+                fontSize: "1.25rem",
+                fontWeight: 800,
+                color: "var(--text-primary)",
+                margin: 0,
+                fontFamily: "var(--font-display)",
+                letterSpacing: "0.04em"
+              }}>
+                {room.winner ? `${room.winner.toUpperCase()} TEAM WINS THE DECRYPTION MATCH!` : "MATCH COMPLETED!"}
+              </p>
+              
+              <p style={{
+                fontSize: "0.95rem",
+                color: "var(--color-text-muted)",
+                margin: 0,
+                lineHeight: 1.6
+              }}>
+                Decryption grid solved successfully. The lobby host can reset the match from the room controls to start a new match.
+              </p>
+
+              <button
+                onClick={() => {
+                  const modal = document.getElementById("congrats-modal");
+                  if (modal) modal.style.display = "none";
+                }}
+                style={{
+                  marginTop: "12px",
+                  padding: "10px 24px",
+                  borderRadius: "var(--radius-sm)",
+                  background: "var(--accent)",
+                  color: "#1C1916",
+                  fontWeight: 700,
+                  border: "none",
+                  fontFamily: "var(--font-display)",
+                  cursor: "pointer",
+                  boxShadow: "0 4px 12px rgba(232,163,61,0.2)"
+                }}
+              >
+                View Decryption Board
+              </button>
+            </div>
+          </div>
+        )}
+        <style>{`
+          @keyframes slow-shake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-6deg); }
+            50% { transform: rotate(0deg); }
+            75% { transform: rotate(6deg); }
+            100% { transform: rotate(0deg); }
+          }
+          .premium-clock-shake {
+            animation: slow-shake 3s ease-in-out infinite;
+          }
+        `}</style>
         {/* Top Horizontal Row: User Profile, Music Player, and Host Controls Unified in a Single Card */}
         <div
           style={{
@@ -3663,10 +3792,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   borderRadius: "var(--radius-md)",
                   padding: "20px",
                   display: "flex",
-                  justifyContent: "space-between",
+                  flexDirection: "column",
+                  justifyContent: "center",
                   alignItems: "center",
-                  flexWrap: "wrap",
-                  gap: "16px",
+                  gap: "14px",
                   position: "relative",
                   zIndex: 2,
                   width: "100%",
@@ -3756,39 +3885,74 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
                   
                     {/* Integrated Scores & Timer Row */}
-                    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", alignItems: "center", marginTop: "8px", width: "100%" }}>
-                      {/* Inline Premium Shaking Timer badge at the end of Scores row */}
+                    <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", alignItems: "center", justifyContent: "center", marginTop: "4px", width: "100%" }}>
+                      {/* Inline Premium Shaking Timer badge at the end of Scores row with CLAIM OPPONENT TURN action */}
                       {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
-                        <div
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "8px",
-                            background: "var(--color-surface)",
-                            border: `1.5px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "rgba(255,255,255,0.15)"}`,
-                            padding: "6px 14px",
-                            borderRadius: "var(--radius-md)",
-                            marginLeft: "auto",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                            minHeight: "36px",
-                            boxSizing: "border-box"
-                          }}
-                        >
-                          <svg className="premium-clock-shake" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transformOrigin: "center center" }}>
-                            <circle cx="12" cy="12" r="10" />
-                            <polyline points="12 6 12 12 16 14" />
-                          </svg>
-                          <span style={{
-                            fontFamily: "var(--font-display)",
-                            fontSize: "1.05rem",
-                            fontWeight: 900,
-                            fontVariantNumeric: "tabular-nums",
-                            color: timerCount <= 10 ? "hsl(355,85%,58%)" : "var(--text-primary)"
-                          }}>
-                            {Math.floor(Math.max(0, timerCount) / 60)}:{(Math.max(0, timerCount) % 60) < 10 ? "0" : ""}{Math.max(0, timerCount) % 60}
-                          </span>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                          {timerCount <= 0 && localPlayer && localPlayer.team !== room.turnState?.activeTeam && room.settings.timerAction === "manual" && (
+                            <button
+                              onClick={() => {
+                                playNavClick();
+                                if (socket) {
+                                  socket.emit("end_turn", { roomCode: room.roomCode, playerId });
+                                }
+                              }}
+                              style={{
+                                background: "hsl(355, 85%, 58%)",
+                                border: "none",
+                                borderRadius: "var(--radius-sm)",
+                                color: "#fff",
+                                fontFamily: "var(--font-display)",
+                                fontWeight: 700,
+                                fontSize: "0.8rem",
+                                padding: "6px 12px",
+                                cursor: "pointer",
+                                boxShadow: "0 0 10px rgba(239, 68, 68, 0.4)",
+                                transition: "all 0.15s ease",
+                              }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.background = "hsl(355, 90%, 65%)";
+                                e.currentTarget.style.transform = "scale(1.05)";
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.background = "hsl(355, 85%, 58%)";
+                                e.currentTarget.style.transform = "none";
+                              }}
+                            >
+                              CLAIM OPPONENT TURN
+                            </button>
+                          )}
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "8px",
+                              background: "var(--color-surface)",
+                              border: `1.5px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "rgba(255, 255, 255, 0.15)"}`,
+                              padding: "6px 14px",
+                              borderRadius: "var(--radius-md)",
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                              minHeight: "36px",
+                              boxSizing: "border-box"
+                            }}
+                          >
+                            <svg className="premium-clock-shake" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transformOrigin: "center center" }}>
+                              <circle cx="12" cy="12" r="10" />
+                              <polyline points="12 6 12 12 16 14" />
+                            </svg>
+                            <span style={{
+                              fontFamily: "var(--font-display)",
+                              fontSize: "1.05rem",
+                              fontWeight: 900,
+                              fontVariantNumeric: "tabular-nums",
+                              color: timerCount <= 10 ? "hsl(355,85%,58%)" : "var(--text-primary)"
+                            }}>
+                              {Math.floor(Math.max(0, timerCount) / 60)}:{(Math.max(0, timerCount) % 60) < 10 ? "0" : ""}{Math.max(0, timerCount) % 60}
+                            </span>
+                          </div>
                         </div>
                       )}
+
                       {/* Cards remaining badges */}
               {room.gameMode === "coop" ? (
                 <div
@@ -3860,73 +4024,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     </div>
                   </div>
 
-                  {/* Turn Timer Countdown — only show when timer is active */}
-                  {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
-                    <div
-                      className={
-                        timerCount <= 5  ? "timer-danger-fast"
-                        : timerCount <= 10 ? "timer-danger-medium"
-                        : timerCount <= 20 ? "timer-danger-slow"
-                        : ""
-                      }
-                      style={{
-                        background: "var(--color-surface)",
-                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
-                        padding: "6px 12px",
-                        borderRadius: "var(--radius-md)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        transition: "border-color 0.5s ease",
-                      }}
-                    >
-                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
-                        {t("turn.timerLabel")}:{" "}
-                        <span style={{
-                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
-                          fontVariantNumeric: "tabular-nums",
-                          minWidth: "2.5ch",
-                          display: "inline-block",
-                          transition: "color 0.4s ease",
-                        }}>
-                          {timerCount}s
-                        </span>
-                      </span>
-                      {timerCount <= 0 && localPlayer && localPlayer.team !== room.turnState?.activeTeam && room.settings.timerAction === "manual" && (
-                        <button
-                          onClick={() => {
-                            if (socket) {
-                              socket.emit("end_turn", { roomCode: room.roomCode, playerId });
-                            }
-                          }}
-                          style={{
-                            background: "hsl(355, 85%, 58%)",
-                            border: "none",
-                            borderRadius: "var(--radius-sm)",
-                            color: "#fff",
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 700,
-                            fontSize: "0.8rem",
-                            padding: "6px 12px",
-                            cursor: "pointer",
-                            boxShadow: "0 0 10px rgba(239, 68, 68, 0.4)",
-                            transition: "all 0.15s ease",
-                            marginLeft: "8px",
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.background = "hsl(355, 90%, 65%)";
-                            e.currentTarget.style.transform = "scale(1.05)";
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.background = "hsl(355, 85%, 58%)";
-                            e.currentTarget.style.transform = "none";
-                          }}
-                        >
-                          CLAIM OPPONENT TURN
-                        </button>
-                      )}
-                    </div>
-                  )}
+
                 </div>
               ) : (
                 <div
@@ -3983,112 +4081,46 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       </div>
                     );
                   })}
-                  {/* Turn Timer Countdown — only show when timer is active */}
-                  {room.phase === "playing" && (room.settings.timerMode && room.settings.timerMode !== "off") && (
-                    <div
-                      className={
-                        timerCount <= 5  ? "timer-danger-fast"
-                        : timerCount <= 10 ? "timer-danger-medium"
-                        : timerCount <= 20 ? "timer-danger-slow"
-                        : ""
-                      }
-                      style={{
-                        background: "var(--color-surface)",
-                        border: `2px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"}`,
-                        padding: "6px 12px",
-                        borderRadius: "var(--radius-md)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                        transition: "border-color 0.5s ease",
-                      }}
-                    >
-                      <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)", display: "flex", alignItems: "center", gap: "6px" }}>
-                        {t("turn.timerLabel")}:{" "}
-                        <span style={{
-                          color: timerCount <= 0 ? "var(--team-1)" : timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)",
-                          fontVariantNumeric: "tabular-nums",
-                          minWidth: "2.5ch",
-                          display: "inline-block",
-                          transition: "color 0.4s ease",
-                        }}>
-                          {timerCount}s
-                        </span>
-                      </span>
-                      {timerCount <= 0 && localPlayer && localPlayer.team !== room.turnState?.activeTeam && room.settings.timerAction === "manual" && (
-                        <button
-                          onClick={() => {
-                            if (socket) {
-                              socket.emit("end_turn", { roomCode: room.roomCode, playerId });
-                            }
-                          }}
-                          style={{
-                            background: "hsl(355, 85%, 58%)",
-                            border: "none",
-                            borderRadius: "var(--radius-sm)",
-                            color: "#fff",
-                            fontFamily: "var(--font-display)",
-                            fontWeight: 700,
-                            fontSize: "0.8rem",
-                            padding: "6px 12px",
-                            cursor: "pointer",
-                            boxShadow: "0 0 10px rgba(239, 68, 68, 0.4)",
-                            transition: "all 0.15s ease",
-                            marginLeft: "8px",
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.background = "hsl(355, 90%, 65%)";
-                            e.currentTarget.style.transform = "scale(1.05)";
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.background = "hsl(355, 85%, 58%)";
-                            e.currentTarget.style.transform = "none";
-                          }}
-                        >
-                          CLAIM OPPONENT TURN
-                        </button>
-                      )}
-                    </div>
-                  )}
+
                 </div>
               )}
                     </div>
 
-                </div>
-                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                  {room.phase === "playing" && room.turnState && (
-                    <>
-                      {((room.gameMode === "coop" &&
-                          localPlayer?.team === (room.turnState.activeTeam === "red" ? "blue" : "red")) ||
-                        (room.gameMode !== "coop" &&
-                          localPlayer?.team === room.turnState.activeTeam &&
-                          localPlayer?.role === "operative")) &&
-                        room.turnState.phase === "guessing" && (
-                          <button
-                            onClick={handleEndTurn}
-                            style={{
-                              padding: "10px 24px",
-                              borderRadius: "var(--radius-md)",
-                              background: "var(--accent)",
-                              border: "none",
-                              color: "var(--accent-text-on)",
-                              fontFamily: "var(--font-display)",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              transition: "all 0.15s ease",
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
-                            onMouseOut={(e) => (e.currentTarget.style.background = "var(--accent)")}
-                          >
-                            End Turn
-                          </button>
-                        )}
-
-
-                    </>
+                  {/* Centered Action Controls (End Turn, Waiting Status) */}
+                  {(room.phase === "playing" && room.turnState && (
+                    ((room.gameMode === "coop" &&
+                        localPlayer?.team === (room.turnState.activeTeam === "red" ? "blue" : "red")) ||
+                      (room.gameMode !== "coop" &&
+                        localPlayer?.team === room.turnState.activeTeam &&
+                        localPlayer?.role === "operative")) &&
+                      room.turnState.phase === "guessing"
+                  )) && (
+                    <div style={{ display: "flex", justifyContent: "center", marginTop: "4px" }}>
+                      <button
+                        onClick={handleEndTurn}
+                        style={{
+                          padding: "10px 28px",
+                          borderRadius: "var(--radius-md)",
+                          background: "var(--accent)",
+                          border: "none",
+                          color: "#1C1916",
+                          fontFamily: "var(--font-display)",
+                          fontWeight: 800,
+                          cursor: "pointer",
+                          transition: "all 0.15s ease",
+                          letterSpacing: "0.04em",
+                          textTransform: "uppercase",
+                          boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)"
+                        }}
+                        onMouseOver={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
+                        onMouseOut={(e) => (e.currentTarget.style.background = "var(--accent)")}
+                      >
+                        End Turn
+                      </button>
+                    </div>
                   )}
                   {room.phase === "ended" && !isHost && (
-                    <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic" }}>
+                    <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", marginTop: "4px", textAlign: "center" }}>
                       Waiting for Host to restart the game...
                     </div>
                   )}

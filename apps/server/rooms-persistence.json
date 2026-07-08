@@ -1848,9 +1848,9 @@
         "id": 7,
         "word": "WAR",
         "type": "blue",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T16:01:59.303Z",
+        "revealedBy": "red"
       },
       {
         "id": 8,
@@ -1896,9 +1896,9 @@
         "id": 13,
         "word": "SAILOR",
         "type": "assassin",
-        "revealed": false,
-        "revealedAt": null,
-        "revealedBy": null
+        "revealed": true,
+        "revealedAt": "2026-07-08T16:02:16.768Z",
+        "revealedBy": "blue"
       },
       {
         "id": 14,
@@ -1994,35 +1994,26 @@
         "id": "p_ima6xdwul",
         "displayName": "Shritik",
         "avatar": "s1_0_1",
-        "team": "red",
-        "role": "spymaster",
+        "team": "blue",
+        "role": "operative",
         "connected": true,
         "ready": false,
         "joinedAt": "2026-07-08T15:47:37.681Z",
-        "socketId": "DFSehNWE2QPmj-GVAAAB",
+        "socketId": "SigvqNATKyKM0yYVAAAB",
         "status": "ACTIVE",
         "userId": 379,
         "isHost": true,
         "isSupporter": false,
         "votedCardId": null,
         "votedCardIds": [],
-        "guessesCount": 1
+        "guessesCount": 3
       }
     ],
-    "winner": null,
+    "winner": "red",
     "startedAt": "2026-07-08T15:53:41.465Z",
-    "endedAt": null,
-    "phase": "playing",
-    "turnState": {
-      "activeTeam": "red",
-      "phase": "giving_clue",
-      "clueWord": null,
-      "clueCount": null,
-      "guessesUsed": 0,
-      "guessesAllowed": null,
-      "turnNumber": 1,
-      "phaseStartedAt": 1783526021466
-    },
+    "endedAt": "2026-07-08T16:02:16.772Z",
+    "phase": "ended",
+    "turnState": null,
     "settings": {
       "eliminationRule": "continue",
       "timerMode": "fast",
@@ -2043,9 +2034,9 @@
       },
       "blue": {
         "color": "blue",
-        "cardsRemaining": 8,
+        "cardsRemaining": 7,
         "totalCards": 8,
-        "eliminated": false,
+        "eliminated": true,
         "name": "Dubai"
       }
     },
