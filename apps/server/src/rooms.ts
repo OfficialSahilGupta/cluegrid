@@ -2,8 +2,38 @@ import { GRID_PRESETS, RoomState, TeamIdentifier, TeamState, TEAM_COLORS_BY_INDE
 import { sampleWords } from "@cluegrid/wordpacks";
 import { generateBoard } from "./engine.js";
 
-// Basic in-memory store for rooms in Phase 1
+import fs from "fs";
+import path from "path";
+
+// Basic in-memory store for rooms, initialized from disk if it exists
 const roomsStore = new Map<string, RoomState>();
+const PERSISTENCE_FILE = path.join(process.cwd(), "rooms-persistence.json");
+
+try {
+  if (fs.existsSync(PERSISTENCE_FILE)) {
+    const data = JSON.parse(fs.readFileSync(PERSISTENCE_FILE, "utf-8"));
+    for (const [code, room] of Object.entries(data)) {
+      roomsStore.set(code, room as RoomState);
+    }
+    console.log(`[rooms] Restored ${roomsStore.size} rooms from disk persistence.`);
+  }
+} catch (e) {
+  console.error("[rooms] Failed to load disk persistence:", e);
+}
+
+let saveTimeout: NodeJS.Timeout | null = null;
+export function saveRoomsToDisk() {
+  if (saveTimeout) return;
+  saveTimeout = setTimeout(() => {
+    saveTimeout = null;
+    try {
+      const data = Object.fromEntries(roomsStore);
+      fs.writeFileSync(PERSISTENCE_FILE, JSON.stringify(data, null, 2), "utf-8");
+    } catch (e) {
+      console.error("[rooms] Failed to save rooms to disk:", e);
+    }
+  }, 1000);
+}
 
 /**
  * Generate a random 6-character room code of uppercase letters
@@ -123,6 +153,7 @@ export async function createRoom(
   };
 
   roomsStore.set(roomCode, room);
+  saveRoomsToDisk();
   return room;
 }
 

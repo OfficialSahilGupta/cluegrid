@@ -1,0 +1,285 @@
+{
+  "quantum-shark": {
+    "roomCode": "quantum-shark",
+    "teamCount": 2,
+    "gridConfig": {
+      "teamCount": 2,
+      "cols": 5,
+      "rows": 5,
+      "totalCards": 25,
+      "teamCardCounts": [
+        9,
+        8
+      ],
+      "neutralCount": 7,
+      "assassinCount": 1
+    },
+    "board": [
+      {
+        "id": 0,
+        "word": "SHERIFF",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 1,
+        "word": "IRON",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 2,
+        "word": "WELL",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 3,
+        "word": "WAVE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 4,
+        "word": "CHAIN",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 5,
+        "word": "CAVE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 6,
+        "word": "SHADOW",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 7,
+        "word": "GAS",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 8,
+        "word": "SUGAR",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 9,
+        "word": "KNIGHT",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 10,
+        "word": "MUSEUM",
+        "type": "assassin",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 11,
+        "word": "MUSTARD",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 12,
+        "word": "AGENT",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 13,
+        "word": "WHISTLE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 14,
+        "word": "RICE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 15,
+        "word": "PIPE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 16,
+        "word": "PUMP",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 17,
+        "word": "SATELLITE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 18,
+        "word": "RIFT",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 19,
+        "word": "WINE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 20,
+        "word": "MUSHROOM",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 21,
+        "word": "REEF",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 22,
+        "word": "PLUM",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 23,
+        "word": "TEA",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 24,
+        "word": "NETWORK",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      }
+    ],
+    "players": [
+      {
+        "id": "p_l1daj2l8g",
+        "displayName": "Guest-5893",
+        "avatar": "🎩",
+        "team": "red",
+        "role": "operative",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T13:10:30.628Z",
+        "socketId": "EGs1TCBTEw8jXrvaAAAB",
+        "status": "ACTIVE",
+        "userId": null,
+        "isHost": true,
+        "isSupporter": false,
+        "votedCardIds": [
+          0
+        ],
+        "votedCardId": 0
+      }
+    ],
+    "winner": null,
+    "startedAt": "2026-07-08T13:10:34.926Z",
+    "endedAt": null,
+    "phase": "playing",
+    "turnState": {
+      "activeTeam": "red",
+      "phase": "guessing",
+      "clueWord": "uhsdnkdas",
+      "clueCount": 7,
+      "guessesUsed": 0,
+      "guessesAllowed": 8,
+      "turnNumber": 1,
+      "phaseStartedAt": 1783516259777
+    },
+    "settings": {
+      "eliminationRule": "continue",
+      "timerMode": "fast",
+      "timerSeconds": 120,
+      "spymasterTimerSeconds": 90,
+      "firstClueExtraSeconds": 60,
+      "operativeTimerSeconds": 60,
+      "roomLocked": false,
+      "timerAction": "manual"
+    },
+    "teams": {
+      "red": {
+        "color": "red",
+        "cardsRemaining": 9,
+        "totalCards": 9,
+        "eliminated": false,
+        "name": "Beijing"
+      },
+      "blue": {
+        "color": "blue",
+        "cardsRemaining": 8,
+        "totalCards": 8,
+        "eliminated": false,
+        "name": "Toronto"
+      }
+    },
+    "gameMode": "classic",
+    "coopMistakesMade": 0,
+    "coopMistakesAllowed": 9,
+    "language": "en"
+  }
+}

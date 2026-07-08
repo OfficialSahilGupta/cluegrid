@@ -1,5 +1,5 @@
 import { Server as SocketIOServer, Socket } from "socket.io";
-import { getRoom } from "./rooms.js";
+import { getRoom, saveRoomsToDisk } from "./rooms.js";
 import { generateBoard } from "./engine.js";
 import { sampleWords } from "@cluegrid/wordpacks";
 import { redis } from "./redis.js";
@@ -248,6 +248,7 @@ function getRoomStateForPlayer(room: RoomState, playerId: string): any {
  * Broadcast room state individually to each connected player in the room
  */
 export function broadcastRoomState(room: RoomState, io: SocketIOServer) {
+  saveRoomsToDisk();
   room.players.forEach((player) => {
     // We can emit directly to player sockets.
     // Since players can reconnect, we store their socketIds.
