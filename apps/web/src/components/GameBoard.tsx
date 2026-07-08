@@ -1413,77 +1413,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: "16px", width: "100%", boxSizing: "border-box" }}>
-                {/* Spymasters section */}
-                <div>
-                  <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
-                    Spymaster
-                  </div>
-                  {spymasters.length > 0 && (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
-                      {spymasters.map((p) => renderPlayerRow(p))}
-                    </div>
-                  )}
-                  {!room.settings.roomLocked ? (
-                    (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") && (
-                      <button
-                        onClick={() => handleJoinTeamRole(color, "spymaster")}
-                        style={{
-                          width: "100%",
-                          padding: "6px 8px",
-                          background: "transparent",
-                          border: `1px solid ${themeCol.border}`,
-                          color: themeCol.text,
-                          borderRadius: "var(--radius-sm)",
-                          fontSize: "0.85rem",
-                          fontWeight: 700,
-                          cursor: "pointer",
-                          fontFamily: "var(--font-display)",
-                          transition: "all 0.15s ease",
-                          boxSizing: "border-box",
-                          textAlign: "center",
-                        }}
-                        onMouseOver={(e) => {
-                          e.currentTarget.style.background = themeCol.border;
-                          e.currentTarget.style.color = "#fff";
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.background = "transparent";
-                          e.currentTarget.style.color = themeCol.text;
-                        }}
-                      >
-                        + JOIN TEAM
-                      </button>
-                    )
-                  ) : (
-                    spymasters.length === 0 && (
-                      <div style={{
-                        width: "100%",
-                        padding: "6px 8px",
-                        background: "rgba(255, 255, 255, 0.02)",
-                        border: "1px dashed var(--border-default)",
-                        color: "var(--text-muted)",
-                        borderRadius: "var(--radius-sm)",
-                        fontSize: "0.8rem",
-                        fontWeight: 500,
-                        fontFamily: "var(--font-display)",
-                        boxSizing: "border-box",
-                        textAlign: "center",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "6px",
-                        opacity: 0.6
-                      }}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
-                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                        </svg>
-                        <span>Locked</span>
-                      </div>
-                    )
-                  )}
-                </div>
-
                 {/* Operatives section */}
                 <div>
                   <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
@@ -1527,6 +1456,77 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     )
                   ) : (
                     operatives.length === 0 && (
+                      <div style={{
+                        width: "100%",
+                        padding: "6px 8px",
+                        background: "rgba(255, 255, 255, 0.02)",
+                        border: "1px dashed var(--border-default)",
+                        color: "var(--text-muted)",
+                        borderRadius: "var(--radius-sm)",
+                        fontSize: "0.8rem",
+                        fontWeight: 500,
+                        fontFamily: "var(--font-display)",
+                        boxSizing: "border-box",
+                        textAlign: "center",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "6px",
+                        opacity: 0.6
+                      }}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <span>Locked</span>
+                      </div>
+                    )
+                  )}
+                </div>
+
+                {/* Spymasters section */}
+                <div>
+                  <div style={{ fontSize: "0.8rem", color: "var(--color-text-muted)", textTransform: "uppercase", fontWeight: 700, marginBottom: "4px" }}>
+                    Spymasters
+                  </div>
+                  {spymasters.length > 0 && (
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "6px" }}>
+                      {spymasters.map((p) => renderPlayerRow(p))}
+                    </div>
+                  )}
+                  {!room.settings.roomLocked ? (
+                    (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") && (
+                      <button
+                        onClick={() => handleJoinTeamRole(color, "spymaster")}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          background: "transparent",
+                          border: `1px solid ${themeCol.border}`,
+                          color: themeCol.text,
+                          borderRadius: "var(--radius-sm)",
+                          fontSize: "0.85rem",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-display)",
+                          transition: "all 0.15s ease",
+                          boxSizing: "border-box",
+                          textAlign: "center",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.background = themeCol.border;
+                          e.currentTarget.style.color = "#fff";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = themeCol.text;
+                        }}
+                      >
+                        + JOIN TEAM
+                      </button>
+                    )
+                  ) : (
+                    spymasters.length === 0 && (
                       <div style={{
                         width: "100%",
                         padding: "6px 8px",
@@ -1782,86 +1782,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           ) : (
             /* COMPETITIVE Modes */
             <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%", boxSizing: "border-box" }}>
-              
-              {/* Spymasters Card */}
-              <div
-                style={{
-                  background: cardStyle.bg,
-                  border: cardStyle.border,
-                  borderRadius: "var(--radius-lg)",
-                  padding: "16px",
-                  minHeight: "150px",
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  position: "relative",
-                  overflow: "visible",
-                  boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
-                  boxSizing: "border-box",
-                  gap: "12px",
-                  zIndex: hasActiveSpyPopover ? 30 : 1,
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    left: "12px",
-                    bottom: "6px",
-                    fontSize: "100px",
-                    lineHeight: 1,
-                    opacity: 0.1,
-                    pointerEvents: "none",
-                    userSelect: "none",
-                    zIndex: 1,
-                  }}
-                >
-                  {cardStyle.watermarkSpy}
-                </div>
-
-                <div style={{ zIndex: 2 }}>
-                  <div style={{ fontSize: "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: "8px" }}>
-                    Spymasters
-                  </div>
-                  {spymasters.length > 0 ? (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "4px" }}>
-                      {spymasters.map((p) => renderPlayerRow(p))}
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Spymaster deployed</div>
-                  )}
-                </div>
-
-                {!room.settings.roomLocked ? (
-                  (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") ? (
-                    <button
-                      onClick={() => handleJoinTeamRole(color, "spymaster")}
-                      style={greenPillButtonStyle}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.transform = "translateY(-1px)";
-                        e.currentTarget.style.filter = "brightness(1.1)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.transform = "translateY(0)";
-                        e.currentTarget.style.filter = "brightness(1)";
-                      }}
-                    >
-                      Join Spymasters
-                    </button>
-                  ) : (
-                    <button style={{ ...greenPillButtonStyle, visibility: "hidden" }}>Join Spymasters</button>
-                  )
-                ) : (
-                  spymasters.length === 0 && (
-                    <div style={lockedButtonStyle}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      </svg>
-                      <span>Locked</span>
-                    </div>
-                  )
-                )}
-              </div>
 
               {/* Operatives Card */}
               <div
@@ -1932,6 +1852,86 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   )
                 ) : (
                   operatives.length === 0 && (
+                    <div style={lockedButtonStyle}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                      </svg>
+                      <span>Locked</span>
+                    </div>
+                  )
+                )}
+              </div>
+
+              {/* Spymasters Card */}
+              <div
+                style={{
+                  background: cardStyle.bg,
+                  border: cardStyle.border,
+                  borderRadius: "var(--radius-lg)",
+                  padding: "16px",
+                  minHeight: "150px",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  position: "relative",
+                  overflow: "visible",
+                  boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
+                  boxSizing: "border-box",
+                  gap: "12px",
+                  zIndex: hasActiveSpyPopover ? 30 : 1,
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "12px",
+                    bottom: "6px",
+                    fontSize: "100px",
+                    lineHeight: 1,
+                    opacity: 0.1,
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    zIndex: 1,
+                  }}
+                >
+                  {cardStyle.watermarkSpy}
+                </div>
+
+                <div style={{ zIndex: 2 }}>
+                  <div style={{ fontSize: "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: "8px" }}>
+                    Spymasters
+                  </div>
+                  {spymasters.length > 0 ? (
+                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "4px" }}>
+                      {spymasters.map((p) => renderPlayerRow(p))}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Spymaster deployed</div>
+                  )}
+                </div>
+
+                {!room.settings.roomLocked ? (
+                  (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") ? (
+                    <button
+                      onClick={() => handleJoinTeamRole(color, "spymaster")}
+                      style={greenPillButtonStyle}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                        e.currentTarget.style.filter = "brightness(1.1)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = "translateY(0)";
+                        e.currentTarget.style.filter = "brightness(1)";
+                      }}
+                    >
+                      Join Spymasters
+                    </button>
+                  ) : (
+                    <button style={{ ...greenPillButtonStyle, visibility: "hidden" }}>Join Spymasters</button>
+                  )
+                ) : (
+                  spymasters.length === 0 && (
                     <div style={lockedButtonStyle}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
