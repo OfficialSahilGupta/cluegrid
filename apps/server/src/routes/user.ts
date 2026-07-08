@@ -216,16 +216,6 @@ router.post("/settings", async (req, res) => {
       "🔮", "🧿", "💎", "🔑", "🛡️", "⚔️", "🎯", "🧩", "🎲", "🃏"
     ];
 
-    if (avatar) {
-      const isPremium = avatar.startsWith("s1_") || avatar.startsWith("s2_");
-
-      // Standard avatars (non-premium) are accessible to all logged-in users
-      if (isPremium && !isSupporter) {
-        res.status(403).json({ success: false, error: "Premium avatars are restricted to supporters" });
-        return;
-      }
-    }
-
     // Update DB
     await db.query("UPDATE users SET username = $1, avatar = $2 WHERE id = $3", [
       username.trim(),

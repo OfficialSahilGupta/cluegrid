@@ -524,6 +524,8 @@ export function registerSocketHandlers(io: SocketIOServer) {
       }
 
       if (team !== undefined || role !== undefined) {
+        player.votedCardId = null;
+        player.votedCardIds = [];
         if (room.gameMode === "coop") {
           player.team = team !== undefined ? team : player.team;
           player.role = null;

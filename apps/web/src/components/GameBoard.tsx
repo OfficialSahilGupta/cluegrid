@@ -1968,9 +1968,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     position: "absolute",
                     inset: 0,
                     backgroundImage: `url(${getWatermarkImage(color, "spymaster")})`,
-                    backgroundSize: "140%",
+                    backgroundSize: getWatermarkImage(color, "spymaster").includes("happy-2") ? "110%" : "140%",
                     backgroundRepeat: "no-repeat",
-                    backgroundPosition: "center 20%",
+                    backgroundPosition: getWatermarkImage(color, "spymaster").includes("happy-2") ? "95% 10%" : "center 20%",
                     opacity: 0.28,
                     pointerEvents: "none",
                     userSelect: "none",
@@ -6308,26 +6308,50 @@ const renderSettingsCard = (side?: "left" | "right") => {
           />
 
           {/* Host Crown (above) */}
-          {(p.isHost || p.id === room.players[0]?.id) && (
-            <span
-              style={{
-                position: "absolute",
-                top: `-${Math.max(6, Math.floor(size * 0.22))}px`,
-                left: "50%",
-                transform: "translateX(-50%) rotate(-5deg)",
-                filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
-                pointerEvents: "none",
-              }}
-              title="Room Host"
-            >
-              <svg width={Math.max(10, Math.floor(size * 0.3))} height={Math.max(10, Math.floor(size * 0.3))} viewBox="0 0 24 24" fill="var(--accent)" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 4L5 12L12 6L19 12L22 4L17 18H7L2 4Z" />
-                <circle cx="12" cy="6" r="1" fill="var(--accent)" />
-                <circle cx="2" cy="4" r="1" fill="var(--accent)" />
-                <circle cx="22" cy="4" r="1" fill="var(--accent)" />
-              </svg>
-            </span>
-          )}
+          {(p.isHost || p.id === room.players[0]?.id) && (() => {
+            const crownSize = Math.max(14, Math.floor(size * 0.35));
+            return (
+              <span
+                className="premium-host-crown"
+                style={{
+                  position: "absolute",
+                  top: `-${Math.max(10, Math.floor(size * 0.28))}px`,
+                  left: "50%",
+                  transform: "translateX(-50%) rotate(-5deg)",
+                  filter: "drop-shadow(0 0 8px rgba(255, 179, 0, 0.75)) drop-shadow(0 2px 4px rgba(0,0,0,0.4))",
+                  pointerEvents: "none",
+                  animation: "avatar-float 3s ease-in-out infinite alternate",
+                }}
+                title="Room Host"
+              >
+                <svg width={crownSize} height={crownSize} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="crown-gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#FFF2A3" />
+                      <stop offset="40%" stopColor="#F9A825" />
+                      <stop offset="100%" stopColor="#E65100" />
+                    </linearGradient>
+                  </defs>
+                  {/* Detailed Crown Path */}
+                  <path 
+                    d="M2 5L6.5 12.5L12 5.5L17.5 12.5L22 5L18.5 18.5H5.5L2 5Z" 
+                    fill="url(#crown-gold-grad)" 
+                    stroke="#FF8F00" 
+                    strokeWidth="0.75" 
+                    strokeLinejoin="round" 
+                  />
+                  {/* Jewels details */}
+                  <circle cx="12" cy="5.5" r="1.2" fill="#FFFFFF" />
+                  <circle cx="2" cy="5" r="1.2" fill="#FFFFFF" />
+                  <circle cx="22" cy="5" r="1.2" fill="#FFFFFF" />
+                  <circle cx="12" cy="12" r="1" fill="#FF1744" />
+                  <circle cx="6.5" cy="12.5" r="0.8" fill="#2979FF" />
+                  <circle cx="17.5" cy="12.5" r="0.8" fill="#2979FF" />
+                  <line x1="6" y1="16" x2="18" y2="16" stroke="#FF8F00" strokeWidth="0.8" />
+                </svg>
+              </span>
+            );
+          })()}
 
           {/* Small status overlay badge (bottom right) */}
           {p.status && p.status !== "ACTIVE" && (

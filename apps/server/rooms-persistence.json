@@ -221,12 +221,12 @@
         "id": "p_l1daj2l8g",
         "displayName": "Guest-5893",
         "avatar": "🎩",
-        "team": "blue",
-        "role": "operative",
-        "connected": true,
+        "team": "red",
+        "role": "spymaster",
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T13:10:30.628Z",
-        "socketId": "kiHZQIt2QopAqop-AAAK",
+        "socketId": "YYL2St9S-IW2twLBAAAF",
         "status": "ACTIVE",
         "userId": null,
         "isHost": true,
@@ -245,10 +245,10 @@
         "avatar": "😎",
         "team": "blue",
         "role": "operative",
-        "connected": true,
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T13:18:39.520Z",
-        "socketId": "Gv-cYIrjivVn0_qdAAAI",
+        "socketId": "P4nCDOQTk3WmNpANAAAD",
         "status": "ACTIVE",
         "userId": null,
         "isHost": false,
@@ -265,10 +265,10 @@
         "avatar": "🎩",
         "team": "blue",
         "role": "operative",
-        "connected": true,
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T13:19:07.303Z",
-        "socketId": "j3q2pEE3eKx52XJ_AAAN",
+        "socketId": "xj7Pi5vA9lxQoqGpAAAL",
         "status": "ACTIVE",
         "userId": null,
         "isHost": false,
@@ -285,10 +285,10 @@
         "avatar": "🕵️‍♂️",
         "team": "blue",
         "role": "operative",
-        "connected": true,
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T13:20:12.354Z",
-        "socketId": "JTPVhBDBjzhbUtLBAAAL",
+        "socketId": "rgpHy0lliWYHdeyzAAAP",
         "status": "ACTIVE",
         "userId": 379,
         "isHost": false,
@@ -304,10 +304,10 @@
         "avatar": "😎",
         "team": "blue",
         "role": "operative",
-        "connected": true,
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T13:20:32.541Z",
-        "socketId": "ViZcq4kv26-iBcf-AAAF",
+        "socketId": "VMTvWk5YyczpC-RFAAAC",
         "status": "ACTIVE",
         "userId": null,
         "isHost": false,
@@ -323,10 +323,10 @@
         "avatar": "👁️‍🗨️",
         "team": "blue",
         "role": "operative",
-        "connected": true,
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T13:21:56.278Z",
-        "socketId": "U_EaMJ2i2xtW6scMAAAD",
+        "socketId": "qKxXeubncBQdGkgVAAAH",
         "status": "ACTIVE",
         "userId": null,
         "isHost": false,
@@ -342,10 +342,10 @@
         "avatar": "😀",
         "team": "blue",
         "role": "operative",
-        "connected": true,
+        "connected": false,
         "ready": false,
         "joinedAt": "2026-07-08T13:22:21.171Z",
-        "socketId": "bKixpDDq7KMKc7WxAAAC",
+        "socketId": "QYozfmGF5KdTgPrNAAAN",
         "status": "ACTIVE",
         "userId": null,
         "isHost": false,
@@ -394,6 +394,1373 @@
         "totalCards": 8,
         "eliminated": false,
         "name": "Toronto"
+      }
+    },
+    "gameMode": "classic",
+    "coopMistakesMade": 0,
+    "coopMistakesAllowed": 9,
+    "language": "en"
+  },
+  "lively-viper": {
+    "roomCode": "lively-viper",
+    "teamCount": 2,
+    "gridConfig": {
+      "teamCount": 2,
+      "cols": 5,
+      "rows": 5,
+      "totalCards": 25,
+      "teamCardCounts": [
+        9,
+        8
+      ],
+      "neutralCount": 7,
+      "assassinCount": 1
+    },
+    "board": [
+      {
+        "id": 0,
+        "word": "ANCHOR",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 1,
+        "word": "PLAGUE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 2,
+        "word": "WRENCH",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 3,
+        "word": "GAS",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 4,
+        "word": "MAGNET",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 5,
+        "word": "KNIGHT",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 6,
+        "word": "BARON",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 7,
+        "word": "NOBLE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 8,
+        "word": "RAVEN",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 9,
+        "word": "SWAMP",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 10,
+        "word": "STORM",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 11,
+        "word": "CIRCUIT",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 12,
+        "word": "STATUE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 13,
+        "word": "BOLT",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 14,
+        "word": "HARBOR",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 15,
+        "word": "CRAB",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 16,
+        "word": "CRATER",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 17,
+        "word": "MERCHANT",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 18,
+        "word": "ARCHER",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 19,
+        "word": "LAGOON",
+        "type": "assassin",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 20,
+        "word": "STAMP",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 21,
+        "word": "NIGHT",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 22,
+        "word": "BORDER",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 23,
+        "word": "MIRROR",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 24,
+        "word": "GRAPE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      }
+    ],
+    "players": [
+      {
+        "id": "p_l1daj2l8g",
+        "displayName": "Guest-5893",
+        "avatar": "🎩",
+        "team": "red",
+        "role": "spymaster",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T14:10:50.805Z",
+        "socketId": "U6EL3NLM8RtBip_JAAAB",
+        "status": "ACTIVE",
+        "userId": null,
+        "isHost": true,
+        "isSupporter": false,
+        "votedCardId": null,
+        "votedCardIds": []
+      }
+    ],
+    "winner": null,
+    "startedAt": "2026-07-08T14:10:52.592Z",
+    "endedAt": null,
+    "phase": "playing",
+    "turnState": {
+      "activeTeam": "red",
+      "phase": "guessing",
+      "clueWord": "sdniskd",
+      "clueCount": 5,
+      "guessesUsed": 0,
+      "guessesAllowed": 6,
+      "turnNumber": 1,
+      "phaseStartedAt": 1783519891562
+    },
+    "settings": {
+      "eliminationRule": "continue",
+      "timerMode": "fast",
+      "timerSeconds": 120,
+      "spymasterTimerSeconds": 90,
+      "firstClueExtraSeconds": 60,
+      "operativeTimerSeconds": 60,
+      "roomLocked": false,
+      "timerAction": "manual"
+    },
+    "teams": {
+      "red": {
+        "color": "red",
+        "cardsRemaining": 9,
+        "totalCards": 9,
+        "eliminated": false,
+        "name": "Singapore"
+      },
+      "blue": {
+        "color": "blue",
+        "cardsRemaining": 8,
+        "totalCards": 8,
+        "eliminated": false,
+        "name": "Chennai"
+      }
+    },
+    "gameMode": "classic",
+    "coopMistakesMade": 0,
+    "coopMistakesAllowed": 9,
+    "language": "en"
+  },
+  "eager-viper": {
+    "roomCode": "eager-viper",
+    "teamCount": 2,
+    "gridConfig": {
+      "teamCount": 2,
+      "cols": 5,
+      "rows": 5,
+      "totalCards": 25,
+      "teamCardCounts": [
+        9,
+        8
+      ],
+      "neutralCount": 7,
+      "assassinCount": 1
+    },
+    "board": [
+      {
+        "id": 0,
+        "word": "STORM",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 1,
+        "word": "CLOCK",
+        "type": "assassin",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 2,
+        "word": "RUSH",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 3,
+        "word": "WHEEL",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 4,
+        "word": "SIGNAL",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 5,
+        "word": "REEF",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 6,
+        "word": "PROBE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 7,
+        "word": "MONK",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 8,
+        "word": "NOBLE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 9,
+        "word": "WAGON",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 10,
+        "word": "NURSE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 11,
+        "word": "WAR",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 12,
+        "word": "BUCKET",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 13,
+        "word": "DAGGER",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 14,
+        "word": "BALANCE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 15,
+        "word": "NETWORK",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 16,
+        "word": "YEAST",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 17,
+        "word": "MATRIX",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 18,
+        "word": "ONION",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 19,
+        "word": "HONEY",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 20,
+        "word": "WRENCH",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 21,
+        "word": "EMPIRE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 22,
+        "word": "OWL",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 23,
+        "word": "CIRCUIT",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 24,
+        "word": "RADAR",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      }
+    ],
+    "players": [
+      {
+        "id": "p_6o7wv2gbk",
+        "displayName": "Hello",
+        "avatar": "🐼",
+        "team": null,
+        "role": "operative",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T14:15:16.078Z",
+        "socketId": "cmmU-lCEw-wUlGsvAAAD",
+        "status": "ACTIVE",
+        "userId": null,
+        "isHost": true,
+        "isSupporter": false,
+        "votedCardId": null,
+        "votedCardIds": []
+      }
+    ],
+    "winner": null,
+    "startedAt": "2026-07-08T14:15:26.566Z",
+    "endedAt": null,
+    "phase": "playing",
+    "turnState": {
+      "activeTeam": "red",
+      "phase": "giving_clue",
+      "clueWord": null,
+      "clueCount": null,
+      "guessesUsed": 0,
+      "guessesAllowed": null,
+      "turnNumber": 1,
+      "phaseStartedAt": 1783520126566
+    },
+    "settings": {
+      "eliminationRule": "continue",
+      "timerMode": "fast",
+      "timerSeconds": 120,
+      "spymasterTimerSeconds": 90,
+      "firstClueExtraSeconds": 60,
+      "operativeTimerSeconds": 60,
+      "roomLocked": false,
+      "timerAction": "manual"
+    },
+    "teams": {
+      "red": {
+        "color": "red",
+        "cardsRemaining": 9,
+        "totalCards": 9,
+        "eliminated": false,
+        "name": "Istanbul"
+      },
+      "blue": {
+        "color": "blue",
+        "cardsRemaining": 8,
+        "totalCards": 8,
+        "eliminated": false,
+        "name": "Moscow"
+      }
+    },
+    "gameMode": "classic",
+    "coopMistakesMade": 0,
+    "coopMistakesAllowed": 9,
+    "language": "en"
+  },
+  "quiet-cat": {
+    "roomCode": "quiet-cat",
+    "teamCount": 2,
+    "gridConfig": {
+      "teamCount": 2,
+      "cols": 5,
+      "rows": 5,
+      "totalCards": 25,
+      "teamCardCounts": [
+        9,
+        8
+      ],
+      "neutralCount": 7,
+      "assassinCount": 1
+    },
+    "board": [
+      {
+        "id": 0,
+        "word": "VINEGAR",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 1,
+        "word": "COMPASS",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 2,
+        "word": "FREQUENCY",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 3,
+        "word": "ILLUSION",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 4,
+        "word": "ISLAND",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 5,
+        "word": "CHISEL",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 6,
+        "word": "WINE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 7,
+        "word": "DETECTIVE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 8,
+        "word": "NETWORK",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 9,
+        "word": "PILOT",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 10,
+        "word": "NET",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 11,
+        "word": "EXPLORER",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 12,
+        "word": "OLIVE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 13,
+        "word": "FALCON",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 14,
+        "word": "SATELLITE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 15,
+        "word": "KNIGHT",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 16,
+        "word": "SUGAR",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 17,
+        "word": "CRATER",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 18,
+        "word": "GUARD",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 19,
+        "word": "JAR",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 20,
+        "word": "FARM",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 21,
+        "word": "CRANE",
+        "type": "assassin",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 22,
+        "word": "PLUM",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 23,
+        "word": "ENIGMA",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 24,
+        "word": "CURSE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      }
+    ],
+    "players": [
+      {
+        "id": "p_ima6xdwul",
+        "displayName": "Shritik",
+        "avatar": "s1_0_0",
+        "team": "red",
+        "role": "spymaster",
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T14:18:43.318Z",
+        "socketId": "W9p_Vm5SHNS-dr8vAAAD",
+        "status": "ACTIVE",
+        "userId": 379,
+        "isHost": true,
+        "isSupporter": false,
+        "votedCardId": null,
+        "votedCardIds": []
+      }
+    ],
+    "winner": null,
+    "startedAt": "2026-07-08T14:23:06.851Z",
+    "endedAt": null,
+    "phase": "playing",
+    "turnState": {
+      "activeTeam": "red",
+      "phase": "giving_clue",
+      "clueWord": null,
+      "clueCount": null,
+      "guessesUsed": 0,
+      "guessesAllowed": null,
+      "turnNumber": 1,
+      "phaseStartedAt": 1783520586851
+    },
+    "settings": {
+      "eliminationRule": "continue",
+      "timerMode": "fast",
+      "timerSeconds": 120,
+      "spymasterTimerSeconds": 90,
+      "firstClueExtraSeconds": 60,
+      "operativeTimerSeconds": 60,
+      "roomLocked": false,
+      "timerAction": "manual"
+    },
+    "teams": {
+      "red": {
+        "color": "red",
+        "cardsRemaining": 9,
+        "totalCards": 9,
+        "eliminated": false,
+        "name": "Toronto"
+      },
+      "blue": {
+        "color": "blue",
+        "cardsRemaining": 8,
+        "totalCards": 8,
+        "eliminated": false,
+        "name": "Amsterdam"
+      }
+    },
+    "gameMode": "classic",
+    "coopMistakesMade": 0,
+    "coopMistakesAllowed": 9,
+    "language": "en"
+  },
+  "gentle-llama": {
+    "roomCode": "gentle-llama",
+    "teamCount": 2,
+    "gridConfig": {
+      "teamCount": 2,
+      "cols": 5,
+      "rows": 5,
+      "totalCards": 25,
+      "teamCardCounts": [
+        9,
+        8
+      ],
+      "neutralCount": 7,
+      "assassinCount": 1
+    },
+    "board": [
+      {
+        "id": 0,
+        "word": "BORDER",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 1,
+        "word": "WIRE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 2,
+        "word": "ORBIT",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 3,
+        "word": "MELON",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 4,
+        "word": "ANVIL",
+        "type": "assassin",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 5,
+        "word": "AGE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 6,
+        "word": "PICKLE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 7,
+        "word": "NIGHT",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 8,
+        "word": "PRIEST",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 9,
+        "word": "PRISON",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 10,
+        "word": "BEETLE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 11,
+        "word": "ATTIC",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 12,
+        "word": "SHADOW",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 13,
+        "word": "ENGINEER",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 14,
+        "word": "JAM",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 15,
+        "word": "SHIELD",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 16,
+        "word": "PIPE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 17,
+        "word": "BELL",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 18,
+        "word": "MARKET",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 19,
+        "word": "EXPLORER",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 20,
+        "word": "LIME",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 21,
+        "word": "ROPE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 22,
+        "word": "CITADEL",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 23,
+        "word": "CRANE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 24,
+        "word": "WINE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      }
+    ],
+    "players": [],
+    "winner": null,
+    "startedAt": null,
+    "endedAt": null,
+    "phase": "lobby",
+    "turnState": null,
+    "settings": {
+      "eliminationRule": "continue",
+      "timerMode": "fast",
+      "timerSeconds": 120,
+      "spymasterTimerSeconds": 90,
+      "firstClueExtraSeconds": 60,
+      "operativeTimerSeconds": 60,
+      "roomLocked": false,
+      "timerAction": "manual"
+    },
+    "teams": {
+      "red": {
+        "color": "red",
+        "cardsRemaining": 9,
+        "totalCards": 9,
+        "eliminated": false,
+        "name": "Toronto"
+      },
+      "blue": {
+        "color": "blue",
+        "cardsRemaining": 8,
+        "totalCards": 8,
+        "eliminated": false,
+        "name": "Chennai"
+      }
+    },
+    "gameMode": "classic",
+    "coopMistakesMade": 0,
+    "coopMistakesAllowed": 9,
+    "language": "en"
+  },
+  "cozy-koala": {
+    "roomCode": "cozy-koala",
+    "teamCount": 2,
+    "gridConfig": {
+      "teamCount": 2,
+      "cols": 5,
+      "rows": 5,
+      "totalCards": 25,
+      "teamCardCounts": [
+        9,
+        8
+      ],
+      "neutralCount": 7,
+      "assassinCount": 1
+    },
+    "board": [
+      {
+        "id": 0,
+        "word": "ENGINE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 1,
+        "word": "AXE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 2,
+        "word": "PENGUIN",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 3,
+        "word": "CLIFF",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 4,
+        "word": "STATIC",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 5,
+        "word": "WAREHOUSE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 6,
+        "word": "CHEF",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 7,
+        "word": "PACT",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 8,
+        "word": "MUSHROOM",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 9,
+        "word": "BALANCE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 10,
+        "word": "SATELLITE",
+        "type": "assassin",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 11,
+        "word": "YEAST",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 12,
+        "word": "PARTICLE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 13,
+        "word": "FREQUENCY",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 14,
+        "word": "CHISEL",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 15,
+        "word": "ZONE",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 16,
+        "word": "SPIKE",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 17,
+        "word": "BACON",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 18,
+        "word": "LAWYER",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 19,
+        "word": "FOX",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 20,
+        "word": "BUCKET",
+        "type": "blue",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 21,
+        "word": "VILLAGE",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 22,
+        "word": "SHOVEL",
+        "type": "neutral",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 23,
+        "word": "LIME",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      },
+      {
+        "id": 24,
+        "word": "CLOCK",
+        "type": "red",
+        "revealed": false,
+        "revealedAt": null,
+        "revealedBy": null
+      }
+    ],
+    "players": [
+      {
+        "id": "p_6o7wv2gbk",
+        "displayName": "Hello",
+        "avatar": "🐼",
+        "team": null,
+        "role": null,
+        "connected": true,
+        "ready": false,
+        "joinedAt": "2026-07-08T14:22:10.355Z",
+        "socketId": "9yb6XvpJlhDGhyGVAAAF",
+        "status": "ACTIVE",
+        "userId": null,
+        "isHost": true,
+        "isSupporter": false
+      }
+    ],
+    "winner": null,
+    "startedAt": null,
+    "endedAt": null,
+    "phase": "lobby",
+    "turnState": null,
+    "settings": {
+      "eliminationRule": "continue",
+      "timerMode": "fast",
+      "timerSeconds": 120,
+      "spymasterTimerSeconds": 90,
+      "firstClueExtraSeconds": 60,
+      "operativeTimerSeconds": 60,
+      "roomLocked": false,
+      "timerAction": "manual"
+    },
+    "teams": {
+      "red": {
+        "color": "red",
+        "cardsRemaining": 9,
+        "totalCards": 9,
+        "eliminated": false,
+        "name": "Berlin"
+      },
+      "blue": {
+        "color": "blue",
+        "cardsRemaining": 8,
+        "totalCards": 8,
+        "eliminated": false,
+        "name": "Brussels"
       }
     },
     "gameMode": "classic",

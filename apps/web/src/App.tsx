@@ -249,6 +249,10 @@ export default function App() {
     window.fetch = async (...args) => {
       try {
         const response = await originalFetch(...args);
+        // Clear server error if request succeeded
+        if (response.status < 400) {
+          setServerError(null);
+        }
         // Only trigger server error popup for 5xx status codes
         if (response.status >= 500) {
           let errMsg = `Internal server error occurred on the grid database. (Status ${response.status})`;
