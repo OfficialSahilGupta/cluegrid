@@ -7328,40 +7328,6 @@ const renderSettingsCard = (side?: "left" | "right") => {
         {/* TAB CONTENT: Chat Box */}
         {activeTab === "chat" && (
           <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "calc(100% - 44px)" }}>
-            {!user ? (
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px", padding: "20px", textAlign: "center" }}>
-                <h4 style={{ margin: 0, fontSize: "1.1rem", fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text-primary)" }}>
-                  Chat Locked
-                </h4>
-                <p style={{ margin: 0, fontSize: "0.85rem", color: "var(--color-text-muted)", lineHeight: 1.4, maxWidth: "220px" }}>
-                  Real-time chat is gated for Guest accounts. Sign in to chat with your team!
-                </p>
-                <button
-                  onClick={() => onOpenAuth()}
-                  style={{
-                    padding: "8px 16px",
-                    borderRadius: "var(--radius-sm)",
-                    border: "none",
-                    background: "var(--accent)",
-                    color: "var(--accent-text-on)",
-                    fontWeight: 700,
-                    fontSize: "0.85rem",
-                    cursor: "pointer",
-                    boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)",
-                    transition: "all 0.2s ease",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = "var(--accent-hover)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = "var(--accent)";
-                  }}
-                >
-                  Sign In / Sign Up
-                </button>
-              </div>
-            ) : (
-              <>
                 {/* Chat header channel name */}
                 <div
                   style={{
@@ -7449,8 +7415,6 @@ const renderSettingsCard = (side?: "left" | "right") => {
                     </button>
                   </form>
                 )}
-              </>
-            )}
           </div>
         )}
 
@@ -8290,11 +8254,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           <button
             onClick={() => {
               playGlassDing();
-              if (!user) {
-                setGatedFeature("Meaning Lookup");
-              } else {
                 setIsSearchOpen(true);
-              }
             }}
             style={{
               padding: "10px 16px",

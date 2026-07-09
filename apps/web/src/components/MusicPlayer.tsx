@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useAuth } from "../context/AuthContext.js";
 
 export function parseYouTubeUrl(url: string): { type: "video" | "playlist"; id: string } | null {
   const playlistMatch = url.match(/[?&]list=([^"&?/\s]+)/i);
@@ -24,12 +23,11 @@ export function parseSpotifyUrl(url: string): { type: "track" | "playlist" | "al
 }
 
 interface MusicPlayerProps {
-  onShowGatedUpsell: () => void;
+  onShowGatedUpsell?: () => void;
   noBorder?: boolean;
 }
 
-export function MusicPlayer({ onShowGatedUpsell, noBorder }: MusicPlayerProps) {
-  const { user } = useAuth();
+export function MusicPlayer({ noBorder }: MusicPlayerProps) {
   const [activeTab, setActiveTab] = useState<"youtube" | "spotify">("youtube");
   const [ytUrl, setYtUrl] = useState("");
   const [spotifyUrl, setSpotifyUrl] = useState("");
@@ -65,33 +63,6 @@ export function MusicPlayer({ onShowGatedUpsell, noBorder }: MusicPlayerProps) {
     setActiveTab(tab);
     setError(null);
   };
-
-  // If user is not logged in, render the locked version that triggers the upsell
-  if (!user) {
-    return (
-      <div
-        style={{
-          background: noBorder ? "transparent" : "var(--color-surface)",
-          border: noBorder ? "none" : "1px solid var(--color-border)",
-          borderRadius: noBorder ? "0" : "var(--radius-md)",
-          padding: noBorder ? "0" : "20px",
-          textAlign: "left",
-          position: "relative",
-          cursor: "pointer",
-        }}
-        onClick={onShowGatedUpsell}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", fontWeight: 700, margin: 0, color: "var(--text-secondary)" }}>
-            Music Player (Locked)
-          </h3>
-        </div>
-        <p style={{ margin: "8px 0 0 0", color: "var(--text-secondary)", fontSize: "0.8rem", lineHeight: 1.4 }}>
-          Log in or create a profile to unlock the personal media player widget!
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div

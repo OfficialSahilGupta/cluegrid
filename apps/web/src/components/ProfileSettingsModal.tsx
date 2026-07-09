@@ -234,15 +234,9 @@ export function ProfileSettingsModal({ onClose }: ProfileSettingsModalProps) {
               <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
                 💎 Premium Avatars
               </label>
-              {!user ? (
-                <span style={{ fontSize: "0.75rem", color: "var(--accent)", fontWeight: 700 }}>
-                  Sign in to unlock
-                </span>
-              ) : (
-                <span style={{ fontSize: "0.75rem", color: "hsl(142,75%,45%)", fontWeight: 700 }}>
+              <span style={{ fontSize: "0.75rem", color: "hsl(142,75%,45%)", fontWeight: 700 }}>
                   ✨ Unlocked
                 </span>
-              )}
             </div>
             <div
               style={{
@@ -255,12 +249,12 @@ export function ProfileSettingsModal({ onClose }: ProfileSettingsModalProps) {
                 background: "var(--bg-surface-raised)",
                 border: "1px solid var(--border-default)",
                 borderRadius: "var(--radius-sm)",
-                opacity: user ? 1 : 0.65,
+                opacity: 1,
               }}
             >
               {supporterAvatars.map((emoji) => {
                 const isSelected = selectedAvatar === emoji;
-                const isLocked = !user;
+                const isLocked = false;
                 return (
                   <button
                     key={emoji}

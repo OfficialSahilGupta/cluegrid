@@ -1,4 +1,4 @@
-import { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { io, Socket } from "socket.io-client";
 import type { RoomState } from "@cluegrid/shared";
 import { useAuth } from "./context/AuthContext";
@@ -143,6 +143,10 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Tracks intentional disconnects (back nav, leave button) so the socket
+  // disconnect handler doesn't show a "Connection Lost" error overlay.
+  const intentionalLeave = useRef(false);
+
   // Global Light Mode State
   const [lightMode, setLightMode] = useState(() => {
     return localStorage.getItem("cluegrid_theme") === "light";
@@ -246,19 +250,19 @@ export default function App() {
     message: string;
   } | null>(null);
 
-  // Intercept all API fetches to catch server errors globally
+  // Intercept all API fetches to catch server errors globally (only show overlay when inside a room)
   useEffect(() => {
     const originalFetch = window.fetch;
     window.fetch = async (...args) => {
       try {
         const response = await originalFetch(...args);
-        // Clear server error if request succeeded
+        // Clear server error if any request succeeds
         if (response.status < 400) {
           setServerError(null);
         }
-        // Only trigger server error popup for 5xx status codes
-        if (response.status >= 500) {
-          let errMsg = `Internal server error occurred on the grid database. (Status ${response.status})`;
+        // Only trigger overlay for 5xx errors and only while inside a room
+        if (response.status >= 500 && room) {
+          let errMsg = `Server error (${response.status})`;
           try {
             const clone = response.clone();
             const body = await clone.json();
@@ -270,25 +274,25 @@ export default function App() {
               if (text) errMsg = text;
             } catch {}
           }
-          setServerError({
-            status: response.status,
-            message: errMsg,
-          });
+          setServerError({ status: response.status, message: errMsg });
         }
         return response;
       } catch (err: any) {
-        setServerError({
-          status: 0,
-          message: err?.message || "Failed to establish a secure connection to the database grid.",
-        });
+        // Only block with overlay when inside a room — on the landing page, let the caller handle the error
+        if (room) {
+          setServerError({
+            status: 0,
+            message: err?.message || "Cannot reach the server.",
+          });
+        }
         throw err;
       }
     };
-
     return () => {
       window.fetch = originalFetch;
     };
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room]);
 
   // Manage font scaling class on root html element (increased font size on all screens except the main landing page)
   useEffect(() => {
@@ -352,6 +356,11 @@ export default function App() {
 
     newSocket.on("disconnect", (reason) => {
       console.log("[socket] disconnected:", reason);
+      // Skip error overlay if the user intentionally left (back nav, leave button)
+      if (intentionalLeave.current) {
+        intentionalLeave.current = false;
+        return;
+      }
       setServerError({
         status: 0,
         message: "Connection lost. Reconnecting to grid server...",
@@ -522,13 +531,40 @@ export default function App() {
 
 
   const handleLeave = () => {
+    intentionalLeave.current = true;
     if (socket) {
       socket.disconnect();
       setSocket(null);
     }
     setRoom(null);
+    setServerError(null);
     window.history.pushState(null, "", "/");
   };
+
+  // Handle browser back (Cmd+Left) and forward (Cmd+Right) navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      const pathParts = window.location.pathname.split("/");
+      const roomIndex = pathParts.indexOf("room");
+      const roomCodeInUrl = roomIndex !== -1 && pathParts[roomIndex + 1]
+        ? pathParts[roomIndex + 1]!.trim()
+        : "";
+
+      if (room && !roomCodeInUrl) {
+        // Navigated back out of a room — intentional leave
+        intentionalLeave.current = true;
+        if (socket) { socket.disconnect(); setSocket(null); }
+        setRoom(null);
+        setServerError(null);
+      } else if (!room && roomCodeInUrl) {
+        // Navigated forward back into a room — reload it
+        loadRoom(roomCodeInUrl);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room, socket]);
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -597,13 +633,13 @@ export default function App() {
           )}
         </Suspense>
 
-        {/* Server Maintenance overlay */}
+        {/* Server / Connection Error overlay */}
         {serverError && (
           <div
             style={{
               position: "fixed",
               inset: 0,
-              background: "rgba(3, 11, 14, 0.95)",
+              background: "rgba(3, 11, 14, 0.92)",
               backdropFilter: "blur(12px)",
               display: "flex",
               flexDirection: "column",
@@ -618,71 +654,101 @@ export default function App() {
             <div
               className="scale-up"
               style={{
-                width: "min(420px, 100%)",
-                background: "rgba(6, 24, 28, 0.96)",
-                border: "1.5px solid var(--accent)",
-                padding: "36px 28px",
+                width: "min(440px, 100%)",
+                background: "rgba(6, 24, 28, 0.97)",
+                border: "1.5px solid hsl(355, 80%, 50%)",
+                padding: "32px 28px",
                 borderRadius: "var(--radius-lg)",
-                boxShadow: "0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(232, 163, 61, 0.15)",
+                boxShadow: "0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(239, 68, 68, 0.12)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: "20px",
+                gap: "16px",
               }}
             >
-              <div
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  border: "3px solid transparent",
-                  borderTopColor: "var(--accent)",
-                  borderBottomColor: "var(--accent)",
-                  borderRadius: "50%",
-                  animation: "spin 1.5s linear infinite",
-                }}
-              />
+              {/* Icon */}
+              <div style={{
+                width: "48px",
+                height: "48px",
+                borderRadius: "50%",
+                background: "rgba(239, 68, 68, 0.1)",
+                border: "1.5px solid hsl(355, 80%, 50%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(355, 80%, 60%)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+              </div>
+
               <div>
-                <h2
-                  style={{
-                    fontFamily: "var(--font-display)",
-                    fontSize: "1.45rem",
-                    fontWeight: 800,
-                    color: "var(--accent)",
-                    margin: "0 0 8px 0",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  SYSTEM UPGRADE
+                <h2 style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "1.3rem",
+                  fontWeight: 800,
+                  color: "hsl(355, 80%, 60%)",
+                  margin: "0 0 8px 0",
+                  letterSpacing: "0.05em",
+                }}>
+                  {serverError.status === 0 ? "CONNECTION LOST" : `SERVER ERROR ${serverError.status}`}
                 </h2>
-                <p
-                  style={{
-                    fontSize: "0.88rem",
-                    lineHeight: 1.6,
-                    color: "var(--text-secondary)",
-                    margin: 0,
-                    fontFamily: "var(--font-body)",
-                  }}
-                >
-                  We are updating our decryption grid. The system will resume automatically in just a few seconds...
+                <p style={{
+                  fontSize: "0.85rem",
+                  lineHeight: 1.6,
+                  color: "var(--text-secondary)",
+                  margin: 0,
+                  fontFamily: "var(--font-body)",
+                  maxWidth: "320px",
+                }}>
+                  {serverError.message}
                 </p>
               </div>
-              <div
-                style={{
-                  fontSize: "0.72rem",
-                  color: "var(--text-muted)",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  background: "rgba(255, 255, 255, 0.02)",
-                  padding: "6px 12px",
-                  borderRadius: "12px",
-                  border: "1px solid rgba(255, 255, 255, 0.04)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "6px",
-                }}
-              >
-                <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#e8a33d", animation: "pulse 1.2s infinite alternate" }} />
-                Connecting to grid link...
+
+              <div style={{ display: "flex", gap: "10px", width: "100%" }}>
+                <button
+                  onClick={() => setServerError(null)}
+                  style={{
+                    flex: 1,
+                    padding: "10px",
+                    borderRadius: "var(--radius-sm)",
+                    border: "1.5px solid var(--border-default)",
+                    background: "transparent",
+                    color: "var(--text-secondary)",
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    cursor: "pointer",
+                    fontFamily: "var(--font-display)",
+                    transition: "all 0.15s ease",
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.borderColor = "var(--text-secondary)"; }}
+                  onMouseOut={(e) => { e.currentTarget.style.borderColor = "var(--border-default)"; }}
+                >
+                  Dismiss
+                </button>
+                <button
+                  onClick={() => { setServerError(null); window.location.reload(); }}
+                  style={{
+                    flex: 1,
+                    padding: "10px",
+                    borderRadius: "var(--radius-sm)",
+                    border: "none",
+                    background: "hsl(355, 80%, 50%)",
+                    color: "#fff",
+                    fontWeight: 700,
+                    fontSize: "0.85rem",
+                    cursor: "pointer",
+                    fontFamily: "var(--font-display)",
+                    transition: "all 0.15s ease",
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.background = "hsl(355, 80%, 42%)"; }}
+                  onMouseOut={(e) => { e.currentTarget.style.background = "hsl(355, 80%, 50%)"; }}
+                >
+                  Retry
+                </button>
               </div>
             </div>
           </div>
@@ -747,7 +813,9 @@ export default function App() {
                   maxLength={15}
                   value={tempName}
                   onChange={(e) => setTempName(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSaveProfile(e as any); } }}
                   placeholder="Enter alias..."
+                  autoFocus
                   style={{ width: "100%", background: "rgba(238,243,238,0.04)", border: "1.5px solid rgba(238,243,238,0.14)", borderRadius: "8px", color: "#eef3ee", fontSize: "14px", padding: "13px 14px", outline: "none", boxSizing: "border-box" }}
                 />
               </div>
@@ -1003,13 +1071,13 @@ export default function App() {
         )}
       </Suspense>
 
-      {/* Server Maintenance overlay */}
+      {/* Server / Connection Error overlay */}
       {serverError && (
         <div
           style={{
             position: "fixed",
             inset: 0,
-            background: "rgba(3, 11, 14, 0.95)",
+            background: "rgba(3, 11, 14, 0.92)",
             backdropFilter: "blur(12px)",
             display: "flex",
             flexDirection: "column",
@@ -1024,71 +1092,100 @@ export default function App() {
           <div
             className="scale-up"
             style={{
-              width: "min(420px, 100%)",
-              background: "rgba(6, 24, 28, 0.96)",
-              border: "1.5px solid var(--accent)",
-              padding: "36px 28px",
+              width: "min(440px, 100%)",
+              background: "rgba(6, 24, 28, 0.97)",
+              border: "1.5px solid hsl(355, 80%, 50%)",
+              padding: "32px 28px",
               borderRadius: "var(--radius-lg)",
-              boxShadow: "0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(232, 163, 61, 0.15)",
+              boxShadow: "0 24px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(239, 68, 68, 0.12)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              gap: "20px",
+              gap: "16px",
             }}
           >
-            <div
-              style={{
-                width: "50px",
-                height: "50px",
-                border: "3px solid transparent",
-                borderTopColor: "var(--accent)",
-                borderBottomColor: "var(--accent)",
-                borderRadius: "50%",
-                animation: "spin 1.5s linear infinite",
-              }}
-            />
+            <div style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "50%",
+              background: "rgba(239, 68, 68, 0.1)",
+              border: "1.5px solid hsl(355, 80%, 50%)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="hsl(355, 80%, 60%)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+
             <div>
-              <h2
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: "1.45rem",
-                  fontWeight: 800,
-                  color: "var(--accent)",
-                  margin: "0 0 8px 0",
-                  letterSpacing: "0.05em",
-                }}
-              >
-                SYSTEM UPGRADE
+              <h2 style={{
+                fontFamily: "var(--font-display)",
+                fontSize: "1.3rem",
+                fontWeight: 800,
+                color: "hsl(355, 80%, 60%)",
+                margin: "0 0 8px 0",
+                letterSpacing: "0.05em",
+              }}>
+                {serverError.status === 0 ? "CONNECTION LOST" : `SERVER ERROR ${serverError.status}`}
               </h2>
-              <p
-                style={{
-                  fontSize: "0.88rem",
-                  lineHeight: 1.6,
-                  color: "var(--text-secondary)",
-                  margin: 0,
-                  fontFamily: "var(--font-body)",
-                }}
-              >
-                We are updating our decryption grid. The system will resume automatically in just a few seconds...
+              <p style={{
+                fontSize: "0.85rem",
+                lineHeight: 1.6,
+                color: "var(--text-secondary)",
+                margin: 0,
+                fontFamily: "var(--font-body)",
+                maxWidth: "320px",
+              }}>
+                {serverError.message}
               </p>
             </div>
-            <div
-              style={{
-                fontSize: "0.72rem",
-                color: "var(--text-muted)",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                background: "rgba(255, 255, 255, 0.02)",
-                padding: "6px 12px",
-                borderRadius: "12px",
-                border: "1px solid rgba(255, 255, 255, 0.04)",
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#e8a33d", animation: "pulse 1.2s infinite alternate" }} />
-              Connecting to grid link...
+
+            <div style={{ display: "flex", gap: "10px", width: "100%" }}>
+              <button
+                onClick={() => setServerError(null)}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: "var(--radius-sm)",
+                  border: "1.5px solid var(--border-default)",
+                  background: "transparent",
+                  color: "var(--text-secondary)",
+                  fontWeight: 700,
+                  fontSize: "0.85rem",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-display)",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.borderColor = "var(--text-secondary)"; }}
+                onMouseOut={(e) => { e.currentTarget.style.borderColor = "var(--border-default)"; }}
+              >
+                Dismiss
+              </button>
+              <button
+                onClick={() => { setServerError(null); window.location.reload(); }}
+                style={{
+                  flex: 1,
+                  padding: "10px",
+                  borderRadius: "var(--radius-sm)",
+                  border: "none",
+                  background: "hsl(355, 80%, 50%)",
+                  color: "#fff",
+                  fontWeight: 700,
+                  fontSize: "0.85rem",
+                  cursor: "pointer",
+                  fontFamily: "var(--font-display)",
+                  transition: "all 0.15s ease",
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.background = "hsl(355, 80%, 42%)"; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = "hsl(355, 80%, 50%)"; }}
+              >
+                Retry
+              </button>
             </div>
           </div>
         </div>
