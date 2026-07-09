@@ -364,10 +364,6 @@ export default function App() {
         intentionalLeave.current = false;
         return;
       }
-      setServerError({
-        status: 0,
-        message: "Connection lost. Reconnecting to grid server...",
-      });
     });
 
     newSocket.on("room_state", (updatedRoom: RoomState) => {
@@ -376,10 +372,6 @@ export default function App() {
 
     newSocket.on("connect_error", (err) => {
       console.error("[socket] connection error:", err);
-      setServerError({
-        status: 0,
-        message: "Failed to maintain a real-time connection with the grid server. Retrying secure link...",
-      });
     });
 
     newSocket.on("error_msg", (err: string) => {
