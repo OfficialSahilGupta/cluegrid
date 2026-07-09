@@ -6845,42 +6845,11 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
   const handleStartGame = () => {
     playHapticClick(1.0);
-
-    if (room.phase === "playing") {
-      setGlobalConfirm({
-        title: "Reset Game?",
-        message: "Warning! This will wipe the grid and start a new game immediately. All players will be moved to Spectators. Proceed?",
-        isWarning: true,
-        onConfirm: () => {
-          if (socket) socket.emit("start_game", { roomCode: room.roomCode });
-        }
-      });
-    } else if (room.phase === "ended") {
-      setGlobalConfirm({
-        title: "Play Again?",
-        message: "The grid will be reshuffled and a new game will start immediately. All players will be moved to Spectators. Proceed?",
-        onConfirm: () => {
-          if (socket) socket.emit("start_game", { roomCode: room.roomCode });
-        }
-      });
-    } else {
-      if (socket) socket.emit("start_game", { roomCode: room.roomCode });
-    }
+    if (socket) socket.emit("start_game", { roomCode: room.roomCode });
   };
 
   const handleReturnToLobby = () => {
-    playWarningSound();
-    const msg = room.phase === "playing"
-      ? "Warning! Returning to the lobby will end the currently running game. Do you want to abort the match?"
-      : "Return all players to the lobby to prepare for a new match? Action cannot be undone.";
-    setGlobalConfirm({
-      title: "Return to Lobby?",
-      message: msg,
-      isWarning: true,
-      onConfirm: () => {
-        if (socket) socket.emit("reset_to_lobby", { roomCode: room.roomCode });
-      }
-    });
+    if (socket) socket.emit("reset_to_lobby", { roomCode: room.roomCode });
   };
 
   const handleGiveClue = useCallback((word: string) => {
