@@ -1814,17 +1814,18 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
           {/* Team Role Containers (set to overflow: "visible" to prevent clipping role assignment popovers) */}
           {room.gameMode === "coop" ? (
-            /* CO-OP Mode */
+            /* CO-OP Mode: Single card representing the whole City Team */
             <div
               style={{
                 background: cardStyle.bg,
                 border: cardStyle.border,
                 borderRadius: "var(--radius-lg)",
                 padding: "16px",
-                minHeight: "150px",
+                paddingBottom: "68px",
+                height: "265px",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between",
+                justifyContent: "flex-start",
                 position: "relative",
                 overflow: "visible",
                 boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
@@ -1854,7 +1855,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   Members
                 </div>
                 {teamPlayers.length > 0 ? (
-                  renderOverlappingPlayers(teamPlayers, 54)
+                  renderOverlappingPlayers(teamPlayers, teamPlayers.length <= 4 ? 68 : (teamPlayers.length === 5 ? 58 : (teamPlayers.length === 6 ? 50 : 44)))
                 ) : (
                   <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No members active</div>
                 )}
@@ -1864,7 +1865,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 !room.settings.roomLocked ? (
                   <button
                     onClick={() => handleJoinTeamRole(color, "operative")}
-                    style={greenPillButtonStyle}
+                    style={absoluteButtonStyle}
                     onMouseOver={(e) => {
                       e.currentTarget.style.transform = "translateY(-1px)";
                       e.currentTarget.style.filter = "brightness(1.1)";
@@ -1874,10 +1875,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       e.currentTarget.style.filter = "brightness(1)";
                     }}
                   >
-                    Join Team
+                    Join {teamObj?.name || label}
                   </button>
                 ) : (
-                  <div style={lockedButtonStyle}>
+                  <div style={lockedAbsoluteButtonStyle}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
