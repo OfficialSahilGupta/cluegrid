@@ -103,6 +103,41 @@ export function LandingPage({
   const [showCTA, setShowCTA] = useState(false);
   const [isWiping, setIsWiping] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    const handleRouteChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && typeof customEvent.detail.showWelcome === "boolean") {
+        setShowWelcome(customEvent.detail.showWelcome);
+        if (customEvent.detail.showWelcome) {
+          setShowCTA(false);
+          if (threeStateRef.current) threeStateRef.current.entering = true;
+        } else {
+          setShowCTA(true);
+          if (threeStateRef.current) {
+            threeStateRef.current.entering = false;
+            threeStateRef.current.dollyProgress = 0;
+            threeStateRef.current.camera.position.set(0, 2.3, threeStateRef.current.baseCameraZ);
+          }
+        }
+      }
+    };
+    window.addEventListener("route-change", handleRouteChange);
+    
+    // Sync initial mount path
+    if (window.location.pathname === "/room") {
+      setShowWelcome(true);
+      setShowCTA(false);
+      setTimeout(() => {
+        if (threeStateRef.current) {
+          threeStateRef.current.entering = true;
+          threeStateRef.current.dollyProgress = 1;
+        }
+      }, 500);
+    }
+    
+    return () => window.removeEventListener("route-change", handleRouteChange);
+  }, []);
   const [showReport, setShowReport] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -1559,6 +1594,7 @@ export function LandingPage({
     }
     setShowCTA(false);
     setIsWiping(true);
+    window.history.pushState(null, "", "/room");
     setTimeout(() => {
       setShowWelcome(true);
     }, 420);
@@ -1576,6 +1612,7 @@ export function LandingPage({
   };
 
   const handleReplayBriefing = () => {
+    window.history.pushState(null, "", "/");
     setShowWelcome(false);
     soundPlayedRef.current = false;
     soundSuccessRef.current = false;
@@ -2168,7 +2205,14 @@ export function LandingPage({
               }}
             >
               <button 
-                onClick={() => setCurrentView("lobby")}
+                onClick={() => {
+                  window.history.pushState(null, "", "/");
+                  setShowWelcome(false);
+                  setShowCTA(true);
+                  if (threeStateRef.current) {
+                    threeStateRef.current.entering = false;
+                  }
+                }}
                 style={{ 
                   position: "absolute", top: "16px", right: "16px", 
                   background: "transparent", border: "1.5px solid rgba(0,240,255,0.4)", 

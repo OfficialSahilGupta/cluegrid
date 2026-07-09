@@ -313,7 +313,7 @@ export default function App() {
 
     if (roomIndex !== -1 && pathParts.length > roomIndex + 1) {
       const targetPart = pathParts[roomIndex + 1];
-      if (targetPart) {
+      if (targetPart && targetPart !== "play" && targetPart.trim() !== "") {
         roomCode = targetPart.trim();
       }
     } else {
@@ -544,27 +544,48 @@ export default function App() {
   // Handle browser back (Cmd+Left) and forward (Cmd+Right) navigation
   useEffect(() => {
     const handlePopState = () => {
-      const pathParts = window.location.pathname.split("/");
+      const path = window.location.pathname;
+      const pathParts = path.split("/");
       const roomIndex = pathParts.indexOf("room");
-      const roomCodeInUrl = roomIndex !== -1 && pathParts[roomIndex + 1]
+      const roomCodeInUrl = roomIndex !== -1 && pathParts[roomIndex + 1] && pathParts[roomIndex + 1] !== "play"
         ? pathParts[roomIndex + 1]!.trim()
         : "";
 
-      if (room && !roomCodeInUrl) {
-        // Navigated back out of a room — intentional leave
+      if (path === "/") {
+        // Navigated back to landing
         intentionalLeave.current = true;
         if (socket) { socket.disconnect(); setSocket(null); }
         setRoom(null);
         setServerError(null);
-      } else if (!room && roomCodeInUrl) {
-        // Navigated forward back into a room — reload it
-        loadRoom(roomCodeInUrl);
+        window.dispatchEvent(new CustomEvent("route-change", { detail: { showWelcome: false } }));
+      } else if (path === "/room") {
+        // Navigated to creation screen
+        intentionalLeave.current = true;
+        if (socket) { socket.disconnect(); setSocket(null); }
+        setRoom(null);
+        setServerError(null);
+        window.dispatchEvent(new CustomEvent("route-change", { detail: { showWelcome: true } }));
+      } else if (roomCodeInUrl) {
+        if (!room || room.roomCode !== roomCodeInUrl) {
+          loadRoom(roomCodeInUrl);
+        }
       }
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room, socket]);
+
+  // Keep URL in sync with active room phase (lobby vs play)
+  useEffect(() => {
+    if (!room) return;
+    const targetPath = room.phase === "lobby"
+      ? `/room/${room.roomCode}`
+      : `/room/${room.roomCode}/play`;
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState(null, "", targetPath);
+    }
+  }, [room?.phase, room?.roomCode]);
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
