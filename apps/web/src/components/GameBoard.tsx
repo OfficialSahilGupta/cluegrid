@@ -8750,7 +8750,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
 
       {profileSettingsOpen && (
-        <ProfileSettingsModal onClose={() => setProfileSettingsOpen(false)} />
+        <ProfileSettingsModal 
+          onClose={() => setProfileSettingsOpen(false)} 
+          socket={socket}
+          playerId={playerId}
+          roomCode={room?.roomCode}
+        />
       )}
 
     </div>

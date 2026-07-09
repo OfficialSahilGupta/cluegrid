@@ -238,7 +238,7 @@ export default function App() {
 
   // Local storage profile values (fallback if guest)
   const [tempName, setTempName] = useState(localStorage.getItem("cluegrid_display_name") || "");
-  const [tempAvatar, setTempAvatar] = useState(localStorage.getItem("cluegrid_avatar") || "");
+  const [tempAvatar, setTempAvatar] = useState(localStorage.getItem("cluegrid_avatar") || "s2_0_0");
   const [hasProfile, setHasProfile] = useState(
     !!localStorage.getItem("cluegrid_display_name") && !!localStorage.getItem("cluegrid_avatar")
   );
@@ -634,6 +634,19 @@ export default function App() {
     }
   }, [room?.phase, room?.roomCode]);
 
+  // Generate the 50 premium avatar identifiers (sheet 1 & sheet 2)
+  const premiumAvatars: string[] = [];
+  for (let r = 0; r < 5; r++) {
+    for (let c = 0; c < 5; c++) {
+      premiumAvatars.push(`s1_${r}_${c}`);
+    }
+  }
+  for (let r = 0; r < 5; r++) {
+    for (let c = 0; c < 5; c++) {
+      premiumAvatars.push(`s2_${r}_${c}`);
+    }
+  }
+
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
     setProfileError(null);
@@ -904,15 +917,25 @@ export default function App() {
                 <label style={{ display: "block", fontSize: "11px", letterSpacing: "0.14em", textTransform: "uppercase", color: "#eef3ee", opacity: 0.8, marginBottom: "8px", fontWeight: 700 }}>
                   Select Avatar
                 </label>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "10px", maxHeight: "140px", overflowY: "auto", padding: "4px", background: "rgba(0,0,0,0.2)", borderRadius: "8px", border: "1px solid rgba(238,243,238,0.08)" }}>
-                  {["🕵️‍♂️", "🕵️‍♀️", "🥷", "👥", "👁️‍🗨️", "🛡️", "😀", "😎", "🧐", "🤖", "👽", "🦊", "🦁", "🐧", "🦉", "🚀", "🛸", "🔮"].map((emoji) => (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: "10px", maxHeight: "175px", overflowY: "auto", padding: "8px", background: "rgba(0,0,0,0.25)", borderRadius: "8px", border: "1px solid rgba(238,243,238,0.08)" }}>
+                  {premiumAvatars.map((emoji) => (
                     <button
                       key={emoji}
                       type="button"
                       onClick={() => setTempAvatar(emoji)}
-                      style={{ fontSize: "1.5rem", padding: "8px 0", cursor: "pointer", background: tempAvatar === emoji ? "rgba(0,240,255,0.15)" : "transparent", border: tempAvatar === emoji ? "1px solid #00f0ff" : "1px solid transparent", borderRadius: "6px", transition: "all 0.15s" }}
+                      style={{
+                        padding: "4px",
+                        cursor: "pointer",
+                        background: tempAvatar === emoji ? "rgba(0,240,255,0.12)" : "transparent",
+                        border: tempAvatar === emoji ? "1.5px solid #00f0ff" : "1.5px solid transparent",
+                        borderRadius: "50%",
+                        transition: "all 0.15s",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center"
+                      }}
                     >
-                      {emoji}
+                      {renderAvatar(emoji, 38)}
                     </button>
                   ))}
                 </div>
