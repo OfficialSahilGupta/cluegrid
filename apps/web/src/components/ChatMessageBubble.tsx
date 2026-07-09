@@ -11,6 +11,7 @@ interface ChatMessageBubbleProps {
   /** Role of the person VIEWING this message (not the sender). */
   viewerRole?: string | null;
   getPlayerName?: (id: string) => string;
+  hideName?: boolean;
 }
 
 const REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🔥", "👎", "🎉"];
@@ -48,6 +49,7 @@ export function ChatMessageBubble({
   onReact,
   viewerRole,
   getPlayerName,
+  hideName,
 }: ChatMessageBubbleProps) {
   // Spymaster viewing an operative message = read-only (can't reply or react)
   const isViewerSpy = viewerRole === "spymaster";
@@ -135,6 +137,19 @@ export function ChatMessageBubble({
     .map(([emoji]) => emoji);
 
   const isSpymaster = msg.senderRole === "spymaster";
+
+  const getTeamColor = (team: string | null | undefined) => {
+    switch (team) {
+      case "red": return "var(--team-1)";
+      case "blue": return "var(--team-2)";
+      case "green": return "var(--team-3)";
+      case "yellow": return "var(--team-4)";
+      default: return "var(--color-text-muted)";
+    }
+  };
+  
+  const senderNameColor = isSpymaster ? "rgba(200,140,255,0.9)" : getTeamColor(msg.senderTeam);
+
   // Re-derive readOnly here since it's used in JSX closures below
   const isReadOnly = readOnly;
 
@@ -241,7 +256,7 @@ export function ChatMessageBubble({
       )}
 
       {/* Sender name + role badge */}
-      {!isMe && (
+      {!isMe && !hideName && (
         <div
           style={{
             display: "flex",
@@ -254,9 +269,10 @@ export function ChatMessageBubble({
           <span
             style={{
               fontSize: "0.72rem",
-              color: isSpymaster ? "rgba(200,140,255,0.9)" : "var(--color-text-muted)",
-              fontWeight: 700,
-              letterSpacing: "0.01em",
+              color: senderNameColor,
+              fontWeight: 800,
+              letterSpacing: "0.02em",
+              textShadow: "0 1px 4px rgba(0,0,0,0.4)"
             }}
           >
             {msg.senderName}
@@ -280,7 +296,13 @@ export function ChatMessageBubble({
                 gap: "3px",
               }}
             >
-              <span style={{ fontSize: "0.65rem" }}>👁</span> Operative
+              <span style={{ display: "flex", alignItems: "center", opacity: 0.8 }}>
+                <svg xmlns="http://www.w3.org/w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+              </span>
+              Operative
             </span>
           )}
           {isSpymaster && (

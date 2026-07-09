@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import { Socket } from "socket.io-client";
 import { getWordPack } from "@cluegrid/wordpacks";
@@ -355,6 +355,14 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const [unreadLog, setUnreadLog] = useState(false);
   const [isChatFloatingOpen, setIsChatFloatingOpen] = useState(false); // Default closed as FAB is floating
   const [alternateTabLabel, setAlternateTabLabel] = useState<"log" | "chat">("log");
+  const [unreadChatToast, setUnreadChatToast] = useState<{ id: string; name: string; content: string } | null>(null);
+  const isChatFloatingOpenRef = useRef(isChatFloatingOpen);
+  const activeTabRef = useRef(activeTab);
+
+  useEffect(() => {
+    isChatFloatingOpenRef.current = isChatFloatingOpen;
+    activeTabRef.current = activeTab;
+  }, [isChatFloatingOpen, activeTab]);
 
   // Alternates the closed FAB label between LOG and CHAT every 5 seconds
   useEffect(() => {
@@ -6517,21 +6525,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
     );
   };
 
-  // Auto scroll chat to bottom
-  const scrollToBottom = () => {
-    if (chatScrollContainerRef.current) {
-      chatScrollContainerRef.current.scrollTo({
-        top: chatScrollContainerRef.current.scrollHeight,
-        behavior: "smooth"
-      });
-    }
-  };
 
-  useEffect(() => {
-    if (activeTab === "chat") {
-      scrollToBottom();
-    }
-  }, [chatMessages, activeTab]);
 
   // Reset voted cards when active team or turn phase changes
   useEffect(() => {
@@ -6789,6 +6783,13 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
     socket.on("chat_message", (message: ChatMessage) => {
       setChatMessages((prev) => [...prev, message]);
+      
+      if (!isChatFloatingOpenRef.current || activeTabRef.current !== "chat") {
+        setUnreadChatToast({ id: message.id, name: message.senderName, content: message.content });
+        setTimeout(() => {
+          setUnreadChatToast((current) => current?.id === message.id ? null : current);
+        }, 4000);
+      }
     });
 
     socket.on("reaction_update", ({ messageId, reactions }: { messageId: string; reactions: Record<string, string[]> }) => {
@@ -6888,13 +6889,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
   }, [cooldownRemaining]);
 
 
-
-  // Auto-scroll chat to bottom on new messages (disabled in lobby)
-  useEffect(() => {
-    if (room.phase !== "lobby" && chatScrollContainerRef.current) {
+  // Instantly snap to the most recent message (bottom) without any scrolling animation
+  useLayoutEffect(() => {
+    if (chatScrollContainerRef.current && isChatFloatingOpen && activeTab === "chat") {
       chatScrollContainerRef.current.scrollTop = chatScrollContainerRef.current.scrollHeight;
     }
-  }, [chatMessages, room.phase]);
+  }, [chatMessages, isChatFloatingOpen, activeTab]);
 
   // Auto-scroll game log to bottom on new events (disabled in lobby)
   useEffect(() => {
@@ -7482,7 +7482,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
                   <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
                     {/* Write channel indicator */}
                     <div className="chat-spy-banner">
-                      <span>🔐</span>
+                      <span style={{ display: "flex", alignItems: "center" }}>
+                        <svg xmlns="http://www.w3.org/w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                      </span>
                       <span>Spy Channel</span>
                       <span style={{ marginLeft: "auto", opacity: 0.6, fontSize: "0.65rem" }}>write here</span>
                     </div>
@@ -7501,7 +7506,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
                       letterSpacing: "0.04em",
                       textTransform: "uppercase",
                     }}>
-                      <span style={{ fontSize: "0.75rem" }}>👁</span>
+                      <span style={{ display: "flex", alignItems: "center", opacity: 0.8 }}>
+                        <svg xmlns="http://www.w3.org/w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                      </span>
                       <span>Operative Channel</span>
                       <span style={{ marginLeft: "auto", opacity: 0.6, fontSize: "0.65rem" }}>read only</span>
                     </div>
@@ -7573,6 +7583,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                             allMessages={chatMessages}
                             viewerRole={localPlayer?.role ?? null}
                             getPlayerName={(id) => room?.players.find(p => p.id === id)?.displayName || "Unknown Player"}
+                            hideName={sameAuthor}
                             onReply={(m) => {
                               // Spymasters can only reply within the spy channel
                               if (isSpymasterLocal && m.senderRole === "operative") return;
@@ -8932,8 +8943,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
             transition: "max-width 0.3s ease",
           }}
         >
-          {/* Floating Panel */}
-          {isChatFloatingOpen && renderChatAndLogPanel()}
+          {/* Floating Panel (rendered always, visibility toggled to preserve scroll) */}
+          <div style={{ display: isChatFloatingOpen ? "block" : "none" }}>
+            {renderChatAndLogPanel()}
+          </div>
 
           <div
             style={{
