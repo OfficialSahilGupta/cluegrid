@@ -6243,8 +6243,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
   };
 
     const renderPlayerRow = (p: Player, customSize?: number) => {
-    const size = customSize || 54;
-    const avatarSize = Math.floor(size * 0.7);
+    const size = Math.floor((customSize || 54) * 1.22);
+    const avatarSize = Math.floor(size * 0.88);
     const border = p.team ? typeColors[p.team]!.border : "rgba(255,255,255,0.15)";
     const isCurrent = p.id === playerId;
     const canSwitch = isHost || (p.id === playerId && !room.settings.roomLocked);

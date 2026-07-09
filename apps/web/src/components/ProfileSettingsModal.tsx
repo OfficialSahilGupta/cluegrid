@@ -13,48 +13,13 @@ interface ProfileSettingsModalProps {
 export function ProfileSettingsModal({ onClose, socket, playerId, roomCode, onGuestProfileUpdate }: ProfileSettingsModalProps) {
   const { user, updateSettings } = useAuth();
   const [username, setUsername] = useState(user?.username || localStorage.getItem("cluegrid_display_name") || "");
-  const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || localStorage.getItem("cluegrid_avatar") || "🕵️‍♂️");
+  const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || localStorage.getItem("cluegrid_avatar") || "s2_0_0");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   // 150+ standard emojis for registered users
-  const registeredAvatars = [
-    // --- Detectives & Spies (Theme Icons) ---
-    "🕵️‍♂️", "🕵️‍♀️", "🥷", "👥", "👁️‍🗨️", "🛡️", "⚔️", "🧩",
 
-    // --- Chess Pieces ---
-    "♟️", "♞", "♝", "♜", "♛", "♚",
-
-    // --- Human Emotions & Expressions ---
-    "😀", "😎", "🧐", "🤔", "🥶", "🥵", "😈", "🤖", "👽", "🤩", 
-    "🥳", "😮‍💨", "🤫", "🤭", "🥱", "😬", "😏", "😜", "😇", "🤡",
-    
-    // --- Cute Pets & Wild Animals ---
-    "🐶", "🐱", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", 
-    "🐮", "🐷", "🐸", "🐵", "🐔", "🐧", "🐦", "🦆", "🦅", "🦉", 
-    "🦇", "🐺", "🐗", "🐴", "🦄", "🦭", "🦦", "🦖", "🐙", "🐬", 
-    "🦈", "🐝", "🐛", "🦋", "🐌",
-    
-    // --- Professionals & Fantasy (Men & Women) ---
-    "👨‍⚕️", "👩‍⚕️", "👨‍🎓", "👩‍🎓", "👨‍🍳", "👩‍🍳", "👨‍🌾", "👩‍🌾",
-    "👨‍🏫", "👩‍🏫", "👨‍🚒", "👩‍🚒", "👨‍🚀", "👩‍🚀", "👨‍🎨", "👩‍🎨",
-    "👨‍💻", "👩‍💻", "👨‍🎤", "👩‍🎤", "👨‍🔬", "👩‍🔬", "👨‍✈️", "👩‍✈️",
-    "👨‍💼", "👩‍💼", "👨‍🔧", "👩‍🔧", "🤴", "👸", "🧙‍♂️", "🧙‍♀️", 
-    "🧚‍♂️", "🧚‍♀️", "🧛‍♂️", "🧛‍♀️", "🧜‍♂️", "🧜‍♀️", "🧝‍♂️", "🧝‍♀️",
-    
-    // --- Age groups / Casual ---
-    "👨", "👩", "👴", "👵", "👦", "👧", "👶",
-    
-    // --- Sports & Hobbies ---
-    "⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🏓", "🏸", 
-    "🎨", "🎬", "🎤", "🎧", "🎸",
-    
-    // --- Space & Items ---
-    "🚀", "🛸", "🌙", "☀️", "⭐", "🪐", "🌍", "🔮", "🧿", "💎", 
-    "🔑", "🎯", "🎲", "🃏"
-  ];
-
-  // 50 custom AI-made avatars for supporters
+  // 50 premium character face avatars for supporters
   const supporterAvatars: string[] = [];
   for (let r = 0; r < 5; r++) {
     for (let c = 0; c < 5; c++) {
@@ -200,74 +165,31 @@ export function ProfileSettingsModal({ onClose, socket, playerId, roomCode, onGu
             />
           </div>
 
-          {/* Standard Avatars Section */}
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", fontSize: "0.85rem", marginBottom: "8px", fontWeight: 700, color: "var(--text-primary)" }}>
-              Standard Avatars
-            </label>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, 1fr)",
-                gap: "10px",
-                maxHeight: "120px",
-                overflowY: "auto",
-                padding: "8px",
-                background: "var(--bg-surface-raised)",
-                border: "1px solid var(--border-default)",
-                borderRadius: "var(--radius-sm)",
-              }}
-            >
-              {registeredAvatars.map((emoji) => {
-                const isSelected = selectedAvatar === emoji;
-                return (
-                  <button
-                    key={emoji}
-                    type="button"
-                    onClick={() => setSelectedAvatar(emoji)}
-                    style={{
-                      padding: "2px",
-                      background: isSelected ? "var(--accent-bg-subtle)" : "transparent",
-                      border: isSelected ? "2px solid var(--accent)" : "2px solid transparent",
-                      borderRadius: "50%",
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      transition: "all 0.15s ease",
-                    }}
-                    onMouseOver={(e) => {
-                      if (!isSelected) e.currentTarget.style.background = "var(--border-subtle)";
-                    }}
-                    onMouseOut={(e) => {
-                      if (!isSelected) e.currentTarget.style.background = "transparent";
-                    }}
-                  >
-                    {renderAvatar(emoji, 36)}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
           {/* Supporter Premium Avatars Section */}
           <div style={{ marginBottom: "16px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-              <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)" }}>
-                💎 Premium Avatars
-              </label>
-              <span style={{ fontSize: "0.75rem", color: "hsl(142,75%,45%)", fontWeight: 700 }}>
-                  ✨ Unlocked
-                </span>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ filter: "drop-shadow(0 0 5px var(--accent))" }}>
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="M12 8v4" />
+                  <path d="M12 16h.01" />
+                </svg>
+                <label style={{ fontSize: "0.9rem", fontWeight: 800, color: "var(--accent)", fontFamily: "var(--font-display)", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                  AGENT IDENTITY MATRIX
+                </label>
+              </div>
+              <span style={{ fontSize: "0.75rem", color: "hsl(142,75%,45%)", fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                ✨ ACTIVE
+              </span>
             </div>
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(5, 1fr)",
-                gap: "10px",
-                maxHeight: "120px",
+                gridTemplateColumns: "repeat(6, 1fr)",
+                gap: "12px",
+                maxHeight: "285px",
                 overflowY: "auto",
-                padding: "8px",
+                padding: "12px",
                 background: "var(--bg-surface-raised)",
                 border: "1px solid var(--border-default)",
                 borderRadius: "var(--radius-sm)",
@@ -302,7 +224,7 @@ export function ProfileSettingsModal({ onClose, socket, playerId, roomCode, onGu
                       if (!isSelected && !isLocked) e.currentTarget.style.background = "transparent";
                     }}
                   >
-                    {renderAvatar(emoji, 36)}
+                    {renderAvatar(emoji, 44)}
                     {isLocked && (
                       <div
                         style={{
