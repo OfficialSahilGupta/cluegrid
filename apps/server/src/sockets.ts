@@ -491,6 +491,19 @@ export function registerSocketHandlers(io: SocketIOServer) {
       }
     });
 
+    // Fetch chat history and game log (called by client after mount)
+    socket.on("request_history", ({ roomCode, playerId }) => {
+      const room = getRoom(roomCode);
+      if (!room) return;
+      const player = room.players.find(p => p.id === playerId);
+      if (!player) return;
+
+      sendChatHistory(socket, room.roomCode, player.team, player.role);
+      getGameLog(room.roomCode).then((log) => {
+        socket.emit("game_log", { log });
+      });
+    });
+
     // Update player team, role, or ready status
     socket.on("update_player", ({ roomCode, playerId, team, role, ready }) => {
       const room = getRoom(roomCode);

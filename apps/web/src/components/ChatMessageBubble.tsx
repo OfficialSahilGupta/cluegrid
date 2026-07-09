@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import type { ChatMessage, ChatReactions } from "@cluegrid/shared";
 import { parseYouTubeUrl, parseSpotifyUrl } from "./MusicPlayer.js";
 
@@ -10,12 +10,13 @@ interface ChatMessageBubbleProps {
   onReact: (messageId: string, emoji: string) => void;
   /** Role of the person VIEWING this message (not the sender). */
   viewerRole?: string | null;
+  getPlayerName?: (id: string) => string;
 }
 
 const REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🔥", "👎", "🎉"];
 
 /** Render message text with @mention highlights */
-function renderContent(content: string) {
+function renderContent(content: string, isMe: boolean) {
   const parts = content.split(/(@\w[\w\s]*?\b)/g);
   return parts.map((part, i) => {
     if (part.startsWith("@")) {
@@ -25,9 +26,9 @@ function renderContent(content: string) {
           style={{
             background: "rgba(0,240,255,0.15)",
             color: "var(--accent)",
-            borderRadius: "3px",
-            padding: "0 3px",
-            fontWeight: 700,
+            borderRadius: "4px",
+            padding: "0 4px",
+            fontWeight: 800,
             fontSize: "0.88em",
           }}
         >
@@ -46,6 +47,7 @@ export function ChatMessageBubble({
   onReply,
   onReact,
   viewerRole,
+  getPlayerName,
 }: ChatMessageBubbleProps) {
   // Spymaster viewing an operative message = read-only (can't reply or react)
   const isViewerSpy = viewerRole === "spymaster";
@@ -60,6 +62,26 @@ export function ChatMessageBubble({
   const touchStartX = useRef<number | null>(null);
   const reactionPickerRef = useRef<HTMLDivElement | null>(null);
   const swipeThreshold = 60;
+
+  // Close reaction picker on click outside
+  useEffect(() => {
+    if (!showReactionPicker) return;
+    const handleClick = (e: MouseEvent) => {
+      // Ignore clicks on the react button itself to prevent immediate toggle closure conflicts
+      if (
+        reactionPickerRef.current && 
+        !reactionPickerRef.current.contains(e.target as Node) && 
+        !(e.target as Element).closest('.chat-react-btn')
+      ) {
+        setShowReactionPicker(false);
+      }
+    };
+    const timer = setTimeout(() => document.addEventListener("click", handleClick), 0);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("click", handleClick);
+    };
+  }, [showReactionPicker]);
 
   const formattedTime = new Date(msg.sentAt).toLocaleTimeString([], {
     hour: "2-digit",
@@ -117,18 +139,18 @@ export function ChatMessageBubble({
   const isReadOnly = readOnly;
 
   const bubbleBg = isMe
-    ? "linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%)"
+    ? "var(--accent-bg-subtle)"
     : isSpymaster
     ? "linear-gradient(135deg, rgba(138,43,226,0.35) 0%, rgba(100,10,200,0.25) 100%)"
     : "rgba(255,255,255,0.06)";
 
   const bubbleBorder = isMe
-    ? "none"
+    ? "1px solid var(--accent)"
     : isSpymaster
     ? "1px solid rgba(180,100,255,0.35)"
     : "1px solid rgba(255,255,255,0.06)";
 
-  const bubbleColor = isMe ? "var(--accent-text-on)" : "#fff";
+  const bubbleColor = "#fff";
 
   const swipeIndicatorOpacity = Math.min(swipeOffset / swipeThreshold, 1);
 
@@ -164,6 +186,57 @@ export function ChatMessageBubble({
           }}
         >
           ↩
+        </div>
+      )}
+
+      {/* Reaction picker (Positioned above the entire message) */}
+      {showReactionPicker && (
+        <div
+          ref={reactionPickerRef}
+          className="scale-up"
+          style={{
+            position: "absolute",
+            bottom: "calc(100% + 4px)", // pops above the outer div
+            [isMe ? "right" : "left"]: 0,
+            background: "var(--bg-surface-raised)",
+            border: "1px solid var(--border-default)",
+            borderRadius: "24px",
+            padding: "6px 10px",
+            display: "flex",
+            gap: "4px",
+            zIndex: 200,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {REACTION_EMOJIS.map((emoji) => {
+            const isMine = myReactions.includes(emoji);
+            return (
+              <button
+                key={emoji}
+                onClick={() => {
+                  onReact(msg.id, emoji);
+                  setShowReactionPicker(false);
+                }}
+                style={{
+                  background: isMine ? "rgba(0,240,255,0.12)" : "none",
+                  border: isMine ? "1px solid rgba(0,240,255,0.3)" : "1px solid transparent",
+                  borderRadius: "50%",
+                  cursor: "pointer",
+                  fontSize: "1.05rem",
+                  padding: "4px 5px",
+                  lineHeight: 1,
+                  transition: "transform 0.12s, background 0.12s",
+                  transform: isMine ? "scale(1.15)" : "scale(1)",
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1.3)"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = isMine ? "scale(1.15)" : "scale(1)"; }}
+                title={emoji}
+              >
+                {emoji}
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -236,52 +309,20 @@ export function ChatMessageBubble({
         </div>
       )}
 
-      {/* Reply-to preview */}
-      {msg.replyToId && msg.replyToContent && (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: isMe ? "flex-end" : "flex-start",
-            marginBottom: "4px",
-            maxWidth: "85%",
-            opacity: 0.75,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              padding: "4px 10px",
-              borderRadius: "8px",
-              background: "rgba(255,255,255,0.05)",
-              borderLeft: isMe ? "none" : "2px solid var(--accent)",
-              borderRight: isMe ? "2px solid var(--accent)" : "none",
-              fontSize: "0.72rem",
-              color: "var(--color-text-muted)",
-              maxWidth: "100%",
-              overflow: "hidden",
-            }}
-          >
-            <span style={{ color: "var(--accent)", fontWeight: 700, flexShrink: 0 }}>
-              ↩ {msg.replyToSenderName}
-            </span>
-            <span
-              style={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {msg.replyToContent}
-            </span>
-          </div>
-        </div>
-      )}
-
       {/* Main bubble row */}
       <div
+        onMouseEnter={(e) => {
+          const reply = e.currentTarget.querySelector(".chat-reply-btn") as HTMLElement | null;
+          const react = e.currentTarget.querySelector(".chat-react-btn") as HTMLElement | null;
+          if (reply) reply.style.opacity = "1";
+          if (react) react.style.opacity = "1";
+        }}
+        onMouseLeave={(e) => {
+          const reply = e.currentTarget.querySelector(".chat-reply-btn") as HTMLElement | null;
+          const react = e.currentTarget.querySelector(".chat-react-btn") as HTMLElement | null;
+          if (reply) reply.style.opacity = "0";
+          if (react && !showReactionPicker) react.style.opacity = "0";
+        }}
         style={{
           display: "flex",
           alignItems: "flex-end",
@@ -337,19 +378,34 @@ export function ChatMessageBubble({
             boxShadow: isSpymaster && !isMe
               ? "0 0 12px rgba(138,43,226,0.2)"
               : isMe
-              ? "0 2px 8px rgba(0,240,255,0.2)"
-              : "none",
-          }}
-          onMouseEnter={(e) => {
-            const replyBtn = e.currentTarget.parentElement?.querySelector(".chat-reply-btn") as HTMLElement | null;
-            if (replyBtn) replyBtn.style.opacity = "1";
-          }}
-          onMouseLeave={(e) => {
-            const replyBtn = e.currentTarget.parentElement?.querySelector(".chat-reply-btn") as HTMLElement | null;
-            if (replyBtn) replyBtn.style.opacity = "0";
+              ? "0 4px 16px rgba(0,0,0,0.2)"
+              : "0 2px 8px rgba(0,0,0,0.15)",
           }}
         >
-          {renderContent(msg.content)}
+          {/* WhatsApp-style internal reply preview */}
+          {msg.replyToId && msg.replyToContent && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                background: "rgba(0, 0, 0, 0.2)",
+                borderLeft: "3px solid var(--accent)",
+                borderRadius: "4px",
+                padding: "6px 8px",
+                marginBottom: "6px",
+                cursor: "pointer",
+              }}
+            >
+              <span style={{ color: "var(--accent)", fontWeight: 700, fontSize: "0.75rem", marginBottom: "2px" }}>
+                {msg.replyToSenderName}
+              </span>
+              <span style={{ opacity: 0.85, fontSize: "0.82rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "250px" }}>
+                {msg.replyToContent}
+              </span>
+            </div>
+          )}
+
+          {renderContent(msg.content, isMe)}
 
           {/* Time tooltip on click */}
           {showTime && (
@@ -358,7 +414,7 @@ export function ChatMessageBubble({
                 display: "block",
                 marginTop: "4px",
                 fontSize: "0.62rem",
-                color: isMe ? "rgba(0,0,0,0.5)" : "var(--color-text-muted)",
+                color: isMe ? "rgba(255,255,255,0.6)" : "var(--color-text-muted)",
                 textAlign: isMe ? "right" : "left",
                 animation: "fadeIn 0.15s ease",
               }}
@@ -388,69 +444,15 @@ export function ChatMessageBubble({
             }}
             onMouseEnter={(e) => {
               const btn = e.currentTarget as HTMLElement;
-              btn.style.opacity = "1";
               btn.style.background = "rgba(255,255,255,0.07)";
             }}
             onMouseLeave={(e) => {
               const btn = e.currentTarget as HTMLElement;
-              btn.style.opacity = "0";
               btn.style.background = "none";
-              if (!showReactionPicker) btn.style.opacity = "0";
             }}
           >
             😊
           </button>
-
-          {/* Reaction picker */}
-          {showReactionPicker && (
-            <div
-              ref={reactionPickerRef}
-              className="scale-up"
-              style={{
-                position: "absolute",
-                bottom: "calc(100% + 6px)",
-                [isMe ? "right" : "left"]: 0,
-                background: "var(--bg-surface-raised)",
-                border: "1px solid var(--border-default)",
-                borderRadius: "24px",
-                padding: "6px 10px",
-                display: "flex",
-                gap: "4px",
-                zIndex: 200,
-                boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {REACTION_EMOJIS.map((emoji) => {
-                const isMine = myReactions.includes(emoji);
-                return (
-                  <button
-                    key={emoji}
-                    onClick={() => {
-                      onReact(msg.id, emoji);
-                      setShowReactionPicker(false);
-                    }}
-                    style={{
-                      background: isMine ? "rgba(0,240,255,0.12)" : "none",
-                      border: isMine ? "1px solid rgba(0,240,255,0.3)" : "1px solid transparent",
-                      borderRadius: "50%",
-                      cursor: "pointer",
-                      fontSize: "1.05rem",
-                      padding: "4px 5px",
-                      lineHeight: 1,
-                      transition: "transform 0.12s, background 0.12s",
-                      transform: isMine ? "scale(1.15)" : "scale(1)",
-                    }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1.3)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = isMine ? "scale(1.15)" : "scale(1)"; }}
-                    title={emoji}
-                  >
-                    {emoji}
-                  </button>
-                );
-              })}
-            </div>
-          )}
         </div>
         )}
       </div>
@@ -470,6 +472,9 @@ export function ChatMessageBubble({
         >
           {Object.entries(reactions).map(([emoji, pids]) => {
             const isMine = pids.includes(playerId);
+            const reactorNames = getPlayerName 
+              ? pids.map(getPlayerName).join(", ") 
+              : pids.length + " " + (pids.length === 1 ? "person" : "people");
             return (
               <button
                 key={emoji}
@@ -494,7 +499,7 @@ export function ChatMessageBubble({
                 }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1.05)"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = "scale(1)"; }}
-                title={`${pids.length} ${pids.length === 1 ? "person" : "people"} reacted`}
+                title={reactorNames}
               >
                 <span>{emoji}</span>
                 <span style={{ fontSize: "0.7rem" }}>{pids.length}</span>

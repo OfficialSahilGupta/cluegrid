@@ -6773,11 +6773,15 @@ const renderSettingsCard = (side?: "left" | "right") => {
     }
   }, [i18n.language, isHost, socket, room?.roomCode, room?.language]);
 
+  // Request history on mount or socket reconnect (fixes race condition where history is missed)
+  useEffect(() => {
+    if (!socket || !room?.roomCode || !localPlayer?.id) return;
+    socket.emit("request_history", { roomCode: room.roomCode, playerId: localPlayer.id });
+  }, [socket, room?.roomCode, localPlayer?.id]);
+
   // Synchronize chat events and history based on team and role memberships
   useEffect(() => {
     if (!socket) return;
-
-    setChatMessages([]);
 
     socket.on("chat_history", ({ messages }) => {
       setChatMessages(messages);
@@ -7568,6 +7572,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                             playerId={playerId}
                             allMessages={chatMessages}
                             viewerRole={localPlayer?.role ?? null}
+                            getPlayerName={(id) => room?.players.find(p => p.id === id)?.displayName || "Unknown Player"}
                             onReply={(m) => {
                               // Spymasters can only reply within the spy channel
                               if (isSpymasterLocal && m.senderRole === "operative") return;
