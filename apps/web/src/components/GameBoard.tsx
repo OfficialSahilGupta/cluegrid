@@ -2392,8 +2392,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     </button>
                   </div>
                   <div className="profile-popup-content" style={{ maxHeight: "360px", overflowY: "auto", paddingRight: "4px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                {user ? (
-                  <>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -2653,6 +2651,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           )}</div>
                       )}
                     </div>
+                    {user ? (
+                      <>
                     <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 10px 0", color: "var(--text-primary)" }}>
                       My Stats & History
                     </h4>
@@ -2711,92 +2711,43 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       </button>
                     </div>
                   </>
-                ) : (
-                  /* Guest upsell section */
-                  <div style={{ display: "flex", flexDirection: "column", gap: "12px", padding: "4px 0" }}>
-                    <div style={{
-                      background: "linear-gradient(135deg, rgba(232,163,61,0.08) 0%, rgba(232,163,61,0.04) 100%)",
-                      border: "1px solid rgba(232,163,61,0.2)",
-                      borderRadius: "var(--radius-md)",
-                      padding: "14px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "8px",
-                    }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                        </svg>
-                        <span style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--text-primary)", fontFamily: "var(--font-display)" }}>Create a free account</span>
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: "8px" }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                          </svg>
-                          <span>Real-time chat with teammates</span>
-                        </div>
-                        <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: "8px" }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                            <line x1="18" y1="20" x2="18" y2="10" />
-                            <line x1="12" y1="20" x2="12" y2="4" />
-                            <line x1="6" y1="20" x2="6" y2="14" />
-                          </svg>
-                          <span>Track stats & match history</span>
-                        </div>
-                        <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: "8px" }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                            <circle cx="12" cy="12" r="10" />
-                            <circle cx="12" cy="10" r="3" />
-                            <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
-                          </svg>
-                          <span>Unlock exclusive avatars</span>
-                        </div>
-                        <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", display: "flex", alignItems: "center", gap: "8px" }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
-                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
-                            <path d="M4 22h16" />
-                            <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34" />
-                            <path d="M12 2a4 4 0 0 1 4 4v6H8V6a4 4 0 0 1 4-4z" />
-                          </svg>
-                          <span>Climb the leaderboard</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); onOpenAuth(); }}
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        background: "var(--accent)",
-                        color: "var(--accent-text-on)",
-                        border: "none",
-                        borderRadius: "var(--radius-sm)",
-                        cursor: "pointer",
-                        fontWeight: 800,
-                        fontSize: "0.88rem",
-                        boxShadow: "0 4px 16px rgba(232, 163, 61, 0.35)",
-                        fontFamily: "var(--font-display)",
-                        letterSpacing: "0.04em",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                        transition: "all 0.15s ease",
-                      }}
-                      onMouseOver={(e) => { e.currentTarget.style.background = "var(--accent-hover)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                      onMouseOut={(e) => { e.currentTarget.style.background = "var(--accent)"; e.currentTarget.style.transform = "translateY(0)"; }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-                        <polyline points="10 17 15 12 10 7" />
-                        <line x1="15" y1="12" x2="3" y2="12" />
-                      </svg>
-                      Sign In / Sign Up — It's Free
-                    </button>
-                  </div>
-                )}
+                    ) : (
+                       /* Guest — sign-in nudge */
+                       <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "4px 0" }}>
+                         <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--color-text-muted)", lineHeight: 1.5 }}>
+                           You're playing as a guest. Sign in to save stats and track match history.
+                         </p>
+
+                         <button
+                           onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); onOpenAuth(); }}
+                           style={{
+                             padding: "8px 12px",
+                             background: "transparent",
+                             color: "var(--accent)",
+                             border: "1.5px solid var(--accent)",
+                             borderRadius: "var(--radius-sm)",
+                             cursor: "pointer",
+                             fontWeight: 700,
+                             fontSize: "0.82rem",
+                             fontFamily: "var(--font-display)",
+                             letterSpacing: "0.04em",
+                             transition: "all 0.15s ease",
+                             display: "flex",
+                             alignItems: "center",
+                             gap: "6px",
+                           }}
+                           onMouseOver={(e) => { e.currentTarget.style.background = "rgba(232,163,61,0.12)"; }}
+                           onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
+                         >
+                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                             <polyline points="10 17 15 12 10 7" />
+                             <line x1="15" y1="12" x2="3" y2="12" />
+                           </svg>
+                           Save My Wins — Sign Up Free
+                         </button>
+                       </div>
+                     )}
               </div>
             </div>
           </>
@@ -3149,8 +3100,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     </button>
                   </div>
                   <div className="profile-popup-content" style={{ maxHeight: "360px", overflowY: "auto", paddingRight: "4px", display: "flex", flexDirection: "column", gap: "16px" }}>
-                {user ? (
-                  <>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -3415,6 +3364,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       )}
                     </div>
 
+                    {user ? (
+                      <>
                     <h4 style={{ fontFamily: "var(--font-display)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 10px 0", color: "var(--text-primary)" }}>
                       My Stats & History
                     </h4>
@@ -3486,37 +3437,43 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       )}
                     </div>
                   </>
-                ) : (
-                  <div style={{ textAlign: "center", padding: "12px 0" }}>
-                    <p style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", margin: "0 0 12px 0", lineHeight: 1.4 }}>
-                      Track your wins, losses, guess accuracy, and match history across games!
-                    </p>
-                    <button
-                      onClick={() => onOpenAuth()}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        background: "var(--accent)",
-                        color: "var(--accent-text-on)",
-                        border: "none",
-                        borderRadius: "var(--radius-sm)",
-                        cursor: "pointer",
-                        fontWeight: 700,
-                        fontSize: "0.85rem",
-                        boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)",
-                        transition: "background 0.2s ease",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.background = "var(--accent-hover)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.background = "var(--accent)";
-                      }}
-                    >
-                      Sign In / Sign Up
-                    </button>
-                  </div>
-                )}
+                    ) : (
+                       /* Guest — sign-in nudge */
+                       <div style={{ display: "flex", flexDirection: "column", gap: "10px", padding: "4px 0" }}>
+                         <p style={{ margin: 0, fontSize: "0.8rem", color: "var(--color-text-muted)", lineHeight: 1.5 }}>
+                           You're playing as a guest. Sign in to save stats and track match history.
+                         </p>
+
+                         <button
+                           onClick={(e) => { e.stopPropagation(); setStatsExpanded(false); onOpenAuth(); }}
+                           style={{
+                             padding: "8px 12px",
+                             background: "transparent",
+                             color: "var(--accent)",
+                             border: "1.5px solid var(--accent)",
+                             borderRadius: "var(--radius-sm)",
+                             cursor: "pointer",
+                             fontWeight: 700,
+                             fontSize: "0.82rem",
+                             fontFamily: "var(--font-display)",
+                             letterSpacing: "0.04em",
+                             transition: "all 0.15s ease",
+                             display: "flex",
+                             alignItems: "center",
+                             gap: "6px",
+                           }}
+                           onMouseOver={(e) => { e.currentTarget.style.background = "rgba(232,163,61,0.12)"; }}
+                           onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
+                         >
+                           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                             <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                             <polyline points="10 17 15 12 10 7" />
+                             <line x1="15" y1="12" x2="3" y2="12" />
+                           </svg>
+                           Save My Wins — Sign Up Free
+                         </button>
+                       </div>
+                     )}
               </div>
             </div>
           </>

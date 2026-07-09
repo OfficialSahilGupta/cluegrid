@@ -623,7 +623,19 @@ export default function App() {
         {/* Global Auth Modal & Settings Modal */}
         <Suspense fallback={null}>
           {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
-          {settingsOpen && <ProfileSettingsModal onClose={() => setSettingsOpen(false)} />}
+          {settingsOpen && (
+          <ProfileSettingsModal
+            onClose={() => setSettingsOpen(false)}
+            socket={socket}
+            playerId={playerId}
+            roomCode={room ? (room as any).roomCode : undefined}
+            onGuestProfileUpdate={(name, avatar) => {
+              setTempName(name);
+              setTempAvatar(avatar);
+              setHasProfile(true);
+            }}
+          />
+        )}
           {gatedFeature && (
             <GatedUpsellModal
               featureName={gatedFeature}
@@ -1061,7 +1073,19 @@ export default function App() {
       {/* Global Auth Modal & Settings Modal */}
       <Suspense fallback={null}>
         {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
-        {settingsOpen && <ProfileSettingsModal onClose={() => setSettingsOpen(false)} />}
+        {settingsOpen && (
+          <ProfileSettingsModal
+            onClose={() => setSettingsOpen(false)}
+            socket={socket}
+            playerId={playerId}
+            roomCode={room ? (room as any).roomCode : undefined}
+            onGuestProfileUpdate={(name, avatar) => {
+              setTempName(name);
+              setTempAvatar(avatar);
+              setHasProfile(true);
+            }}
+          />
+        )}
         {gatedFeature && (
           <GatedUpsellModal
             featureName={gatedFeature}

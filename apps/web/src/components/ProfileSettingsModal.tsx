@@ -4,12 +4,16 @@ import { renderAvatar } from "../utils/avatar";
 
 interface ProfileSettingsModalProps {
   onClose: () => void;
+  socket?: any;
+  playerId?: string;
+  roomCode?: string;
+  onGuestProfileUpdate?: (name: string, avatar: string) => void;
 }
 
-export function ProfileSettingsModal({ onClose }: ProfileSettingsModalProps) {
+export function ProfileSettingsModal({ onClose, socket, playerId, roomCode, onGuestProfileUpdate }: ProfileSettingsModalProps) {
   const { user, updateSettings } = useAuth();
-  const [username, setUsername] = useState(user?.username || "");
-  const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || "🕵️‍♂️");
+  const [username, setUsername] = useState(user?.username || localStorage.getItem("cluegrid_display_name") || "");
+  const [selectedAvatar, setSelectedAvatar] = useState(user?.avatar || localStorage.getItem("cluegrid_avatar") || "🕵️‍♂️");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -69,8 +73,27 @@ export function ProfileSettingsModal({ onClose }: ProfileSettingsModalProps) {
     setLoading(true);
 
     try {
-      if (!username.trim()) throw new Error("Username cannot be empty");
-      await updateSettings(username, selectedAvatar);
+      const trimmedName = username.trim();
+      if (!trimmedName) throw new Error("Username cannot be empty");
+
+      if (user) {
+        await updateSettings(trimmedName, selectedAvatar);
+      } else {
+        // Guest flow: save locally and emit to room
+        localStorage.setItem("cluegrid_display_name", trimmedName);
+        localStorage.setItem("cluegrid_avatar", selectedAvatar);
+        if (onGuestProfileUpdate) {
+          onGuestProfileUpdate(trimmedName, selectedAvatar);
+        }
+        if (socket && roomCode && playerId) {
+          socket.emit("join_room", {
+            roomCode,
+            playerId,
+            displayName: trimmedName,
+            avatar: selectedAvatar,
+          });
+        }
+      }
       onClose();
     } catch (err: any) {
       setError(err.message || "Failed to update profile settings");
@@ -78,7 +101,6 @@ export function ProfileSettingsModal({ onClose }: ProfileSettingsModalProps) {
       setLoading(false);
     }
   };
-
   return (
     <div
       style={{
