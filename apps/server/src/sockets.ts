@@ -1446,7 +1446,7 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
     });
 
     // Send chat message
-    socket.on("send_chat", async ({ roomCode, playerId, content }) => {
+    socket.on("send_chat", async ({ roomCode, playerId, content, replyToId, mentions }) => {
       const room = getRoom(roomCode);
       if (!room) return;
 
@@ -1456,7 +1456,20 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
       const trimmedContent = content.trim();
       if (!trimmedContent) return;
 
-      const chatMessage = {
+      // Resolve reply-to snapshot if provided
+      let replyToContent: string | null = null;
+      let replyToSenderName: string | null = null;
+      if (replyToId) {
+        // Look up the message from any relevant Redis channel to find the snapshot
+        const channels = [`chat:${roomCode}:operatives`, `chat:${roomCode}:spymasters`];
+        for (const ch of channels) {
+          const msgs = await redis.lrange(ch, -100, -1).catch(() => []);
+          const found = msgs.map((m: string) => { try { return JSON.parse(m); } catch { return null; } }).find((m: any) => m?.id === replyToId);
+          if (found) { replyToContent = found.content; replyToSenderName = found.senderName; break; }
+        }
+      }
+
+      const chatMessage: any = {
         id: `msg_${Math.random().toString(36).substring(2, 11)}`,
         roomCode,
         senderId: player.id,
@@ -1465,6 +1478,13 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
         sentAt: new Date().toISOString(),
         isSystemMessage: false,
         senderIsSupporter: !!(player as any).isSupporter,
+        senderRole: player.role ?? null,
+        senderTeam: player.team ?? null,
+        replyToId: replyToId ?? null,
+        replyToContent,
+        replyToSenderName,
+        reactions: {},
+        mentions: mentions ?? [],
       };
 
       let redisKey = "";
@@ -1487,6 +1507,55 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
 
       io.to(socketRoom).emit("chat_message", chatMessage);
     });
+
+    // Toggle emoji reaction on a chat message
+    socket.on("toggle_reaction", async ({ roomCode, playerId, messageId, emoji }) => {
+      const room = getRoom(roomCode);
+      if (!room) return;
+      const player = room.players.find((p) => p.id === playerId);
+      if (!player) return;
+
+      const validEmojis = ["👍", "❤️", "😂", "😮", "😢", "🔥", "👎", "🎉"];
+      if (!validEmojis.includes(emoji)) return;
+
+      // Find and update the message in Redis
+      const channels = player.role === "spymaster"
+        ? [`chat:${roomCode}:spymasters`]
+        : [`chat:${roomCode}:operatives`];
+
+      for (const ch of channels) {
+        const msgs = await redis.lrange(ch, -100, -1).catch(() => []);
+        const idx = msgs.findIndex((m: string) => { try { return JSON.parse(m)?.id === messageId; } catch { return false; } });
+        if (idx === -1) continue;
+
+        const raw = msgs[idx];
+        if (!raw) continue;
+        const msg = JSON.parse(raw as string);
+
+        if (!msg.reactions) msg.reactions = {};
+        if (!msg.reactions[emoji]) msg.reactions[emoji] = [];
+
+        const reactors: string[] = msg.reactions[emoji];
+        const pidIdx = reactors.indexOf(playerId);
+        if (pidIdx >= 0) {
+          reactors.splice(pidIdx, 1); // toggle off
+        } else {
+          reactors.push(playerId); // toggle on
+        }
+        if (reactors.length === 0) delete msg.reactions[emoji];
+
+        // Patch the item in Redis list (replace at index)
+        const listLen = await redis.llen(ch);
+        const absoluteIdx = listLen - msgs.length + idx;
+        await redis.lset(ch, absoluteIdx, JSON.stringify(msg)).catch(() => {});
+
+        // Broadcast updated reactions
+        const socketRoom = ch.includes("spymasters") ? `room:${roomCode}:spymasters` : `room:${roomCode}:operatives`;
+        io.to(socketRoom).emit("reaction_update", { messageId, reactions: msg.reactions });
+        break;
+      }
+    });
+
 
     // Update player status (presence)
     socket.on("update_status", ({ roomCode, playerId, status }) => {

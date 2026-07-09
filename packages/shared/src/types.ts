@@ -125,6 +125,9 @@ export interface GameState {
   locale: string;
 }
 
+/** A reaction on a chat message (emoji → list of playerIds who reacted). */
+export type ChatReactions = Record<string, string[]>;
+
 /**
  * A message in the in-room chat.
  */
@@ -141,6 +144,19 @@ export interface ChatMessage {
   /** Whether this is a system-generated event message (e.g. "Blue team revealed AGENT"). */
   isSystemMessage: boolean;
   senderIsSupporter?: boolean;
+  /** The role of the sender ('spymaster' | 'operative' | null). */
+  senderRole?: string | null;
+  /** The team color of the sender. */
+  senderTeam?: string | null;
+  /** If this message is a reply, the ID of the parent message. */
+  replyToId?: string | null;
+  /** Snapshot of the replied-to message for display without lookup. */
+  replyToContent?: string | null;
+  replyToSenderName?: string | null;
+  /** Emoji reactions keyed by emoji → array of playerIds. */
+  reactions?: ChatReactions;
+  /** List of player IDs mentioned in this message. */
+  mentions?: string[];
 }
 
 // ─── Socket Event Payloads ────────────────────────────────────────────────────
@@ -169,6 +185,17 @@ export interface GuessCardPayload {
 export interface SendChatPayload {
   roomCode: string;
   content: string;
+  /** ID of the message being replied to, if any. */
+  replyToId?: string | null;
+  /** Mentioned player IDs. */
+  mentions?: string[];
+}
+
+/** Payload emitted when a player adds/removes a reaction on a message. */
+export interface ToggleReactionPayload {
+  roomCode: string;
+  messageId: string;
+  emoji: string;
 }
 
 // ─── REST API shapes ─────────────────────────────────────────────────────────

@@ -381,6 +381,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const chatScrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const chatInputRef = useRef<HTMLTextAreaElement | null>(null);
+  // Reply state
+  const [replyTarget, setReplyTarget] = useState<ChatMessage | null>(null);
+  // @mention state
+  const [mentionQuery, setMentionQuery] = useState<string | null>(null);
+  const [mentionIndex, setMentionIndex] = useState(0);
+
 
   // Game Log panel state
   const [gameLog, setGameLog] = useState<GameLogEntry[]>([]);
@@ -6780,11 +6787,19 @@ const renderSettingsCard = (side?: "left" | "right") => {
       setChatMessages((prev) => [...prev, message]);
     });
 
+    socket.on("reaction_update", ({ messageId, reactions }: { messageId: string; reactions: Record<string, string[]> }) => {
+      setChatMessages((prev) =>
+        prev.map((m) => (m.id === messageId ? { ...m, reactions } : m))
+      );
+    });
+
     return () => {
       socket.off("chat_history");
       socket.off("chat_message");
+      socket.off("reaction_update");
     };
   }, [socket, localPlayer?.team, localPlayer?.role]);
+
 
   // Synchronize game log and log entries
   useEffect(() => {
@@ -7091,17 +7106,55 @@ const renderSettingsCard = (side?: "left" | "right") => {
     }
   };
 
-  const handleSendChat = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendChat = (e?: React.FormEvent) => {
+    e?.preventDefault();
     if (!chatInput.trim() || !socket) return;
+
+    // Extract @mentioned player IDs from content
+    const mentionedNames = Array.from(chatInput.matchAll(/@([\w\s]+?)(?=\s|$)/g)).map((m) => (m[1] ?? "").trim());
+
+    const mentionedIds = room.players
+      .filter((p) => mentionedNames.some((n) => p.displayName.toLowerCase() === n.toLowerCase()))
+      .map((p) => p.id);
 
     socket.emit("send_chat", {
       roomCode: room.roomCode,
       playerId,
       content: chatInput.trim(),
+      replyToId: replyTarget?.id ?? null,
+      mentions: mentionedIds,
     });
     setChatInput("");
+    setReplyTarget(null);
+    setMentionQuery(null);
+    chatInputRef.current?.focus();
   };
+
+  const handleReact = (messageId: string, emoji: string) => {
+    if (!socket) return;
+    socket.emit("toggle_reaction", {
+      roomCode: room.roomCode,
+      playerId,
+      messageId,
+      emoji,
+    });
+    // Optimistic local update
+    setChatMessages((prev) =>
+      prev.map((m) => {
+        if (m.id !== messageId) return m;
+        const reactions = { ...(m.reactions ?? {}) };
+        const pids = [...(reactions[emoji] ?? [])];
+        const idx = pids.indexOf(playerId);
+        if (idx >= 0) pids.splice(idx, 1);
+        else pids.push(playerId);
+        if (pids.length === 0) delete reactions[emoji];
+        else reactions[emoji] = pids;
+        return { ...m, reactions };
+      })
+    );
+  };
+
+
 
   const triggerReaction = (emoji: string) => {
     if (cooldownRemaining > 0 || !socket) return;
@@ -7322,97 +7375,271 @@ const renderSettingsCard = (side?: "left" | "right") => {
         </div>
 
         {/* TAB CONTENT: Chat Box */}
-        {activeTab === "chat" && (
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "calc(100% - 44px)" }}>
-                {/* Chat header channel name */}
-                <div
-                  style={{
-                    borderBottom: `2px solid ${chatHeader.badgeColor}`,
-                    paddingBottom: "8px",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <span style={{ fontSize: "0.85rem", color: "var(--color-text-muted)", fontWeight: 600 }}>
-                    Channel: {chatHeader.title}
-                  </span>
-                </div>
+        {activeTab === "chat" && (() => {
+          // Build @mention candidates:
+          // - Spymasters can only @mention other spymasters (their write channel)
+          // - Operatives can @mention ALL other operatives (any team)
+          const isSpymasterLocal = localPlayer?.role === "spymaster";
+          const mentionCandidates = room.players.filter((p) => {
+            if (p.id === playerId) return false;
+            if (isSpymasterLocal) return p.role === "spymaster";
+            return p.role === "operative"; // operatives see ALL operatives across teams
+          });
 
-                {/* Messages feed */}
-                <div
-                  ref={chatScrollContainerRef}
-                  style={{
-                    flex: 1,
-                    overflowY: "auto",
+          const filteredMentions = mentionQuery !== null
+            ? mentionCandidates.filter((p) =>
+                p.displayName.toLowerCase().includes(mentionQuery.toLowerCase())
+              )
+            : [];
+
+          const handleChatInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            const val = e.target.value;
+            setChatInput(val);
+            // Detect @mention trigger
+            const cursor = e.target.selectionStart ?? val.length;
+            const textUpToCursor = val.slice(0, cursor);
+            const match = textUpToCursor.match(/@([\w ]*)$/);
+            if (match) {
+              setMentionQuery(match[1] ?? null);
+
+              setMentionIndex(0);
+            } else {
+              setMentionQuery(null);
+            }
+            // Auto-grow textarea
+            e.target.style.height = "auto";
+            e.target.style.height = Math.min(e.target.scrollHeight, 80) + "px";
+          };
+
+          const insertMention = (player: typeof room.players[0]) => {
+            const cursor = chatInputRef.current?.selectionStart ?? chatInput.length;
+            const before = chatInput.slice(0, cursor).replace(/@[\w ]*$/, "");
+            const after = chatInput.slice(cursor);
+            const newVal = `${before}@${player.displayName} ${after}`;
+            setChatInput(newVal);
+            setMentionQuery(null);
+            setTimeout(() => {
+              chatInputRef.current?.focus();
+              const pos = before.length + player.displayName.length + 2;
+              chatInputRef.current?.setSelectionRange(pos, pos);
+            }, 0);
+          };
+
+          const handleChatKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+            if (filteredMentions.length > 0 && mentionQuery !== null) {
+              if (e.key === "ArrowDown") {
+                e.preventDefault();
+                setMentionIndex((i) => (i + 1) % filteredMentions.length);
+                return;
+              }
+              if (e.key === "ArrowUp") {
+                e.preventDefault();
+                setMentionIndex((i) => (i - 1 + filteredMentions.length) % filteredMentions.length);
+                return;
+              }
+              if (e.key === "Enter" || e.key === "Tab") {
+                e.preventDefault();
+                const candidate = filteredMentions[mentionIndex] ?? filteredMentions[0];
+                if (candidate) insertMention(candidate);
+                return;
+
+              }
+              if (e.key === "Escape") {
+                setMentionQuery(null);
+                return;
+              }
+            }
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSendChat();
+            }
+          };
+
+          // Group messages by date
+          const grouped: { dateLabel: string; msgs: ChatMessage[] }[] = [];
+          chatMessages.forEach((msg) => {
+            const d = new Date(msg.sentAt);
+            const today = new Date();
+            const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+            let label = d.toLocaleDateString([], { weekday: "long", month: "short", day: "numeric" });
+            if (d.toDateString() === today.toDateString()) label = "Today";
+            else if (d.toDateString() === yesterday.toDateString()) label = "Yesterday";
+            const last = grouped[grouped.length - 1];
+            if (last && last.dateLabel === label) last.msgs.push(msg);
+            else grouped.push({ dateLabel: label, msgs: [msg] });
+          });
+
+          return (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+
+              {/* Channel header */}
+              <div style={{ marginBottom: "8px" }}>
+                {isSpymasterLocal ? (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                    {/* Write channel indicator */}
+                    <div className="chat-spy-banner">
+                      <span>🔐</span>
+                      <span>Spy Channel</span>
+                      <span style={{ marginLeft: "auto", opacity: 0.6, fontSize: "0.65rem" }}>write here</span>
+                    </div>
+                    {/* Read-only operative channel indicator */}
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "4px 10px",
+                      background: "rgba(255,255,255,0.03)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      borderRadius: "6px",
+                      fontSize: "0.7rem",
+                      color: "rgba(160,160,180,0.75)",
+                      fontWeight: 600,
+                      letterSpacing: "0.04em",
+                      textTransform: "uppercase",
+                    }}>
+                      <span style={{ fontSize: "0.75rem" }}>👁</span>
+                      <span>Operative Channel</span>
+                      <span style={{ marginLeft: "auto", opacity: 0.6, fontSize: "0.65rem" }}>read only</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{
                     display: "flex",
-                    flexDirection: "column",
-                    gap: "10px",
-                    paddingRight: "4px",
-                    marginBottom: "12px",
-                  }}
-                >
-                  {chatMessages.map((msg) => (
-                    <ChatMessageBubble key={msg.id} msg={msg} playerId={playerId} />
-                  ))}
+                    alignItems: "center",
+                    gap: "6px",
+                    paddingBottom: "6px",
+                    borderBottom: `1.5px solid ${chatHeader.badgeColor}22`,
+                  }}>
+                    <span style={{
+                      width: "8px", height: "8px", borderRadius: "50%",
+                      background: chatHeader.badgeColor,
+                      boxShadow: `0 0 6px ${chatHeader.badgeColor}`,
+                      flexShrink: 0,
+                    }} />
+                    <span style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontWeight: 600 }}>
+                      All Operatives Chat
+                    </span>
+                  </div>
+                )}
+              </div>
 
-                  {chatDisabled && (
-                    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-text-muted)", fontSize: "0.9rem", textAlign: "center", padding: "20px" }}>
-                      Join a team and role to participate in the real-time chat.
+              {/* Messages feed */}
+              <div
+                ref={chatScrollContainerRef}
+                className="chat-messages-feed"
+                style={{
+                  flex: 1,
+                  overflowY: "auto",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "6px",
+                  paddingRight: "2px",
+                  marginBottom: "10px",
+                  minHeight: 0,
+                }}
+              >
+                {chatDisabled && (
+                  <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-text-muted)", fontSize: "0.85rem", textAlign: "center", padding: "20px", fontStyle: "italic" }}>
+                    Join a team and role to participate in chat.
+                  </div>
+                )}
+
+                {!chatDisabled && chatMessages.length === 0 && (
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "8px", color: "var(--color-text-muted)", padding: "20px" }}>
+                    <span style={{ fontSize: "1.8rem", opacity: 0.4 }}>💬</span>
+                    <span style={{ fontSize: "0.82rem", fontStyle: "italic" }}>No messages yet — break the silence!</span>
+                  </div>
+                )}
+
+                {grouped.map(({ dateLabel, msgs }) => (
+                  <div key={dateLabel}>
+                    <div className="chat-date-sep">{dateLabel}</div>
+                    {msgs.map((msg, i) => {
+                      const prevMsg = i > 0 ? msgs[i - 1] : null;
+                      const sameAuthor = prevMsg?.senderId === msg.senderId;
+                      return (
+                        <div
+                          key={msg.id}
+                          className="chat-bubble-row"
+                          style={{ marginTop: sameAuthor ? "2px" : "8px" }}
+                        >
+                          <ChatMessageBubble
+                            msg={msg}
+                            playerId={playerId}
+                            allMessages={chatMessages}
+                            viewerRole={localPlayer?.role ?? null}
+                            onReply={(m) => {
+                              // Spymasters can only reply within the spy channel
+                              if (isSpymasterLocal && m.senderRole === "operative") return;
+                              setReplyTarget(m);
+                              setActiveTab("chat");
+                              chatInputRef.current?.focus();
+                            }}
+                            onReact={handleReact}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+
+                <div ref={chatEndRef} />
+              </div>
+
+              {/* Input area */}
+              {!chatDisabled && (
+                <div style={{ position: "relative", flexShrink: 0 }}>
+                  {/* @mention dropdown */}
+                  {mentionQuery !== null && filteredMentions.length > 0 && (
+                    <div className="mention-dropdown">
+                      {filteredMentions.map((p, i) => (
+                        <div
+                          key={p.id}
+                          className={`mention-item${i === mentionIndex ? " selected" : ""}`}
+                          onMouseDown={(e) => { e.preventDefault(); insertMention(p); }}
+                        >
+                          <span className="mention-item-avatar">{p.avatar || "🕵️"}</span>
+                          <span className="mention-item-name">@{p.displayName}</span>
+                          <span className="mention-item-role">{p.role ?? "player"}</span>
+                        </div>
+                      ))}
                     </div>
                   )}
 
-                  {(!chatDisabled && chatMessages.length === 0) && (
-                    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", color: "var(--color-text-muted)", fontSize: "0.9rem", fontStyle: "italic" }}>
-                      No messages yet. Send a whisper!
+                  {/* Reply preview */}
+                  {replyTarget && (
+                    <div className="chat-reply-preview">
+                      <span className="chat-reply-preview-name">↩ {replyTarget.senderName}</span>
+                      <span className="chat-reply-preview-text">{replyTarget.content}</span>
+                      <button className="chat-reply-dismiss" onClick={() => setReplyTarget(null)}>✕</button>
                     </div>
                   )}
 
-                  <div ref={chatEndRef} />
-                </div>
-
-                {/* Send input */}
-                {!chatDisabled && (
-                  <form onSubmit={handleSendChat} style={{ display: "flex", gap: "8px" }}>
-                    <input
-                      type="text"
-                      placeholder="Type a message..."
+                  {/* Input bar */}
+                  <form onSubmit={handleSendChat} className="chat-input-bar">
+                    <textarea
+                      ref={chatInputRef}
+                      className="chat-input-field"
+                      placeholder={replyTarget ? `Reply to ${replyTarget.senderName}…` : "Message… (@ to mention)"}
                       value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      style={{
-                        flex: 1,
-                        padding: "10px 12px",
-                        borderRadius: "var(--radius-sm)",
-                        border: "1px solid var(--border-default)",
-                        background: "var(--bg-surface-raised)",
-                        color: "var(--text-primary)",
-                        fontSize: "0.9rem",
-                      }}
+                      onChange={handleChatInputChange}
+                      onKeyDown={handleChatKeyDown}
+                      rows={1}
                     />
                     <button
                       type="submit"
-                      style={{
-                        padding: "10px 18px",
-                        borderRadius: "var(--radius-sm)",
-                        border: "none",
-                        background: "var(--accent)",
-                        color: "var(--accent-text-on)",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        fontSize: "0.9rem",
-                        transition: "all 0.15s ease",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.background = "var(--accent-hover)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.background = "var(--accent)";
-                      }}
+                      className="chat-send-btn"
+                      disabled={!chatInput.trim()}
+                      title="Send"
                     >
-                      Send
+                      ↑
                     </button>
                   </form>
-                )}
-          </div>
-        )}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* TAB CONTENT: Game Log */}
         {activeTab === "log" && (() => {
