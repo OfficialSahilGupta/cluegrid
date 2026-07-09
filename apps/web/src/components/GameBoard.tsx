@@ -7295,7 +7295,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           width: activeTab === "log"
             ? "min(280px, calc(100vw - 24px))"
             : "min(380px, calc(100vw - 32px))",
-          height: "min(520px, calc(100vh - 140px))",
+          height: "min(680px, calc(100vh - 120px))",
           background: "var(--bg-surface-raised)",
           border: "1px solid var(--border-default)",
           borderRadius: "var(--radius-lg)",
