@@ -402,6 +402,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
   // Active Switching Player State
   const [activeSwitchPlayerId, setActiveSwitchPlayerId] = useState<string | null>(null);
+  const [popoverCoords, setPopoverCoords] = useState<{ top: number; left: number } | null>(null);
   const [isMobileViewport, setIsMobileViewport] = useState(typeof window !== "undefined" ? window.innerWidth <= 768 : false);
   useEffect(() => {
     const handleResize = () => setIsMobileViewport(window.innerWidth <= 768);
@@ -1418,12 +1419,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   Members
                 </div>
                 {teamPlayers.length > 0 ? (
-                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: teamPlayers.length > 5 ? "4px" : "8px", marginBottom: "8px", width: "100%" }}>
-                    {(() => {
-                      const size = teamPlayers.length <= 4 ? 68 : (teamPlayers.length === 5 ? 58 : (teamPlayers.length === 6 ? 50 : 44));
-                      return teamPlayers.map((p) => renderPlayerRow(p, size));
-                    })()}
-                  </div>
+                  renderOverlappingPlayers(teamPlayers, teamPlayers.length <= 4 ? 68 : (teamPlayers.length === 5 ? 58 : (teamPlayers.length === 6 ? 50 : 44)))
                 ) : null}
                 {localPlayer?.team !== color && (
                   !room.settings.roomLocked ? (
@@ -1491,12 +1487,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Operatives
                   </div>
                   {operatives.length > 0 && (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: operatives.length > 5 ? "4px" : "8px", marginBottom: "6px", width: "100%" }}>
-                      {(() => {
-                        const size = operatives.length <= 4 ? 68 : (operatives.length === 5 ? 58 : (operatives.length === 6 ? 50 : 44));
-                        return operatives.map((p) => renderPlayerRow(p, size));
-                      })()}
-                    </div>
+                    renderOverlappingPlayers(operatives, operatives.length <= 4 ? 68 : (operatives.length === 5 ? 58 : (operatives.length === 6 ? 50 : 44)))
                   )}
                   {!room.settings.roomLocked ? (
                     (!localPlayer || localPlayer.team !== color || localPlayer.role !== "operative") && (
@@ -1565,12 +1556,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Spymasters
                   </div>
                   {spymasters.length > 0 && (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: spymasters.length > 5 ? "4px" : "8px", marginBottom: "6px", width: "100%" }}>
-                      {(() => {
-                        const size = spymasters.length <= 4 ? 68 : (spymasters.length === 5 ? 58 : (spymasters.length === 6 ? 50 : 44));
-                        return spymasters.map((p) => renderPlayerRow(p, size));
-                      })()}
-                    </div>
+                    renderOverlappingPlayers(spymasters, spymasters.length <= 4 ? 68 : (spymasters.length === 5 ? 58 : (spymasters.length === 6 ? 50 : 44)))
                   )}
                   {!room.settings.roomLocked ? (
                     (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") && (
@@ -1838,9 +1824,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   Members
                 </div>
                 {teamPlayers.length > 0 ? (
-                  <div style={{ display: "flex", flexDirection: "row", flexWrap: "wrap", gap: "8px", marginBottom: "4px" }}>
-                    {teamPlayers.map((p) => renderPlayerRow(p))}
-                  </div>
+                  renderOverlappingPlayers(teamPlayers, 54)
                 ) : (
                   <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No members active</div>
                 )}
@@ -1917,12 +1901,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Operatives
                   </div>
                   {operatives.length > 0 ? (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: operatives.length > 5 ? "4px" : "8px", marginBottom: "4px", width: "100%" }}>
-                      {(() => {
-                        const size = operatives.length <= 4 ? 68 : (operatives.length === 5 ? 58 : (operatives.length === 6 ? 50 : 44));
-                        return operatives.map((p) => renderPlayerRow(p, size));
-                      })()}
-                    </div>
+                    renderOverlappingPlayers(operatives, operatives.length <= 4 ? 68 : (operatives.length === 5 ? 58 : (operatives.length === 6 ? 50 : 44)))
                   ) : (
                     <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Operatives deployed</div>
                   )}
@@ -2000,12 +1979,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Spymasters
                   </div>
                   {spymasters.length > 0 ? (
-                    <div style={{ display: "flex", flexDirection: "row", flexWrap: "nowrap", justifyContent: "center", gap: spymasters.length > 5 ? "4px" : "8px", marginBottom: "4px", width: "100%" }}>
-                      {(() => {
-                        const size = spymasters.length <= 4 ? 68 : (spymasters.length === 5 ? 58 : (spymasters.length === 6 ? 50 : 44));
-                        return spymasters.map((p) => renderPlayerRow(p, size));
-                      })()}
-                    </div>
+                    renderOverlappingPlayers(spymasters, spymasters.length <= 4 ? 68 : (spymasters.length === 5 ? 58 : (spymasters.length === 6 ? 50 : 44)))
                   ) : (
                     <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Spymaster deployed</div>
                   )}
@@ -5908,8 +5882,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
         <div
           style={{
             position: isMobileViewport ? "fixed" : "absolute",
-            top: isMobileViewport ? "50%" : "60px",
-            left: "50%",
+            top: isMobileViewport ? "50%" : (popoverCoords ? `${popoverCoords.top + 8}px` : "60px"),
+            left: isMobileViewport ? "50%" : (popoverCoords ? `${popoverCoords.left}px` : "50%"),
             transform: isMobileViewport ? "translate(-50%, -50%)" : "translateX(-50%)",
             background: "var(--bg-surface-solid)",
             border: "1px solid var(--color-border)",
@@ -6269,13 +6243,19 @@ const renderSettingsCard = (side?: "left" | "right") => {
           alignItems: "center",
           cursor: canSwitch ? "pointer" : "default",
           margin: size > 46 ? "4px" : "2px",
+          width: `${size}px`,
           zIndex: activeSwitchPlayerId === p.id ? 50 : 1,
         }}
       >
         {/* The Circle */}
         <div
-          onClick={() => {
+          onClick={(e) => {
             if (canSwitch) {
+              const rect = e.currentTarget.getBoundingClientRect();
+              setPopoverCoords({
+                top: rect.bottom + window.scrollY,
+                left: rect.left + rect.width / 2 + window.scrollX
+              });
               setActiveSwitchPlayerId(activeSwitchPlayerId === p.id ? null : p.id);
             }
           }}
@@ -6409,7 +6389,65 @@ const renderSettingsCard = (side?: "left" | "right") => {
         >
           {p.displayName}
         </span>
-        {activeSwitchPlayerId === p.id && renderAssignPopover(p)}
+        {/* Popover is now rendered via React Portal at the end of the file to prevent overflow clipping */}
+      </div>
+    );
+  };
+
+  const renderOverlappingPlayers = (players: Player[], size: number) => {
+    const listLength = players.length;
+    const useOverlap = listLength > 3;
+    const overlapMargin = useOverlap ? "-18px" : "4px";
+
+    return (
+      <div 
+        className="overlapping-players-scroll-container"
+        style={{ 
+          display: "flex", 
+          flexDirection: "row", 
+          flexWrap: "nowrap", 
+          justifyContent: "flex-start", // Always use flex-start to prevent left-side clipping on overflow
+          width: "100%",
+          overflowX: "auto",
+          overflowY: "hidden",
+          paddingLeft: "0px",
+          paddingRight: "0px",
+          paddingTop: "28px", // prevent clipping the host crown at its highest floating animation peak
+          paddingBottom: "12px", // space for scrollbar/labels
+          boxSizing: "border-box",
+          scrollbarWidth: "thin",
+          msOverflowStyle: "none",
+        }}
+      >
+        {players.map((p, idx) => {
+          const leftMargin = idx === 0 
+            ? (useOverlap ? "20px" : "10px") 
+            : overlapMargin;
+          const rightMargin = idx === players.length - 1 ? "10px" : "4px";
+
+          return (
+            <div
+              key={p.id}
+              style={{
+                marginLeft: leftMargin,
+                marginRight: rightMargin,
+                transition: "all 0.2s ease",
+                position: "relative",
+                zIndex: idx + 1,
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.zIndex = "100";
+                e.currentTarget.style.transform = "scale(1.08)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.zIndex = String(idx + 1);
+                e.currentTarget.style.transform = "none";
+              }}
+            >
+              {renderPlayerRow(p, size)}
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -8757,6 +8795,15 @@ const renderSettingsCard = (side?: "left" | "right") => {
           roomCode={room?.roomCode}
         />
       )}
+
+      {activeSwitchPlayerId && (() => {
+        const p = room.players.find(player => player.id === activeSwitchPlayerId);
+        if (!p) return null;
+        return createPortal(
+          renderAssignPopover(p),
+          document.body
+        );
+      })()}
 
     </div>
   );
