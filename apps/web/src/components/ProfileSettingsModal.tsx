@@ -44,21 +44,25 @@ export function ProfileSettingsModal({ onClose, socket, playerId, roomCode, onGu
       if (user) {
         await updateSettings(trimmedName, selectedAvatar);
       } else {
-        // Guest flow: save locally and emit to room
+        // Guest flow: save locally
         localStorage.setItem("cluegrid_display_name", trimmedName);
         localStorage.setItem("cluegrid_avatar", selectedAvatar);
         if (onGuestProfileUpdate) {
           onGuestProfileUpdate(trimmedName, selectedAvatar);
         }
-        if (socket && roomCode && playerId) {
-          socket.emit("join_room", {
-            roomCode,
-            playerId,
-            displayName: trimmedName,
-            avatar: selectedAvatar,
-          });
-        }
       }
+
+      // Universal instant socket sync: if inside a room, notify the socket regardless of guest/user status
+      if (socket && roomCode && playerId) {
+        socket.emit("join_room", {
+          roomCode,
+          playerId,
+          displayName: trimmedName,
+          avatar: selectedAvatar,
+          userId: user?.id || undefined,
+        });
+      }
+
       onClose();
     } catch (err: any) {
       setError(err.message || "Failed to update profile settings");
