@@ -28,9 +28,13 @@ export function saveRoomsToDisk() {
     saveTimeout = null;
     try {
       const data = Object.fromEntries(roomsStore);
-      fs.writeFileSync(PERSISTENCE_FILE, JSON.stringify(data, null, 2), "utf-8");
+      fs.writeFile(PERSISTENCE_FILE, JSON.stringify(data, null, 2), "utf-8", (err) => {
+        if (err) {
+          console.error("[rooms] Failed to save rooms to disk:", err);
+        }
+      });
     } catch (e) {
-      console.error("[rooms] Failed to save rooms to disk:", e);
+      console.error("[rooms] Failed to serialize rooms for disk write:", e);
     }
   }, 1000);
 }

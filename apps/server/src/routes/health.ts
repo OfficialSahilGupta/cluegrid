@@ -6,23 +6,31 @@ import { config } from "../config.js";
 
 export const healthRouter = Router();
 
+let cachedHealth: { postgresOk: boolean; redisOk: boolean; timestamp: number } | null = null;
+const CACHE_TTL_MS = 2000; // Cache health checks for 2 seconds to prevent DB/Redis connection hammering
+
 /**
  * GET /health
  * Returns service status for Postgres, Redis, and the server itself.
  */
 healthRouter.get("/", async (_req, res) => {
-  const [postgresOk, redisOk] = await Promise.all([
-    checkDbConnection(),
-    checkRedisConnection(),
-  ]);
+  const now = Date.now();
+
+  if (!cachedHealth || now - cachedHealth.timestamp > CACHE_TTL_MS) {
+    const [postgresOk, redisOk] = await Promise.all([
+      checkDbConnection(),
+      checkRedisConnection(),
+    ]);
+    cachedHealth = { postgresOk, redisOk, timestamp: now };
+  }
 
   const body: HealthResponse = {
     status: "ok",
     timestamp: new Date().toISOString(),
     version: config.version,
     services: {
-      postgres: postgresOk ? "up" : "down",
-      redis: redisOk ? "up" : "down",
+      postgres: cachedHealth.postgresOk ? "up" : "down",
+      redis: cachedHealth.redisOk ? "up" : "down",
     },
   };
 

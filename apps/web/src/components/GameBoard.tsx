@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { Socket } from "socket.io-client";
 import { getWordPack } from "@cluegrid/wordpacks";
@@ -331,9 +331,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const board = room.board as CardState[];
 
   // Clue Form state
-  const [clueWord, setClueWord] = useState("");
   const [clueCount, setClueCount] = useState<number | null>(null);
+  const [clueWord, setClueWord] = useState<string>("");
   const [clueError, setClueError] = useState<string | null>(null);
+  const [chatInput, setChatInput] = useState<string>("");
+  const [timerCount, setTimerCount] = useState<number>(0);
   const [neuralStreams, setNeuralStreams] = useState<{ start: { x: number; y: number }; end: { x: number; y: number } }[]>([]);
   const [assassinRevealedId, setAssassinRevealedId] = useState<number | null>(null);
   const [shockwaveCardOffsets, setShockwaveCardOffsets] = useState<Record<number, { x: number; y: number }>>({});
@@ -377,7 +379,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
   // Chat panel state
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const chatScrollContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -393,8 +394,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   // Local debug key peeking state
   const [peekKey, setPeekKey] = useState(false);
 
-  // Cooperative Timer Count State
-  const [timerCount, setTimerCount] = useState(120);
 
   // Personal Preference Toggles (Local Only)
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => localStorage.getItem("cluegrid_sound_enabled") !== "false");
@@ -1314,6 +1313,37 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const [searchResults, setSearchResults] = useState<any | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
 
+  const performSearch = async (queryStr: string) => {
+    const trimmed = queryStr.trim();
+    if (!trimmed) return;
+    setSearchLoading(true);
+    setSearchError(null);
+    setSearchResults(null);
+    try {
+      const res = await fetch(`/api/search/meaning?q=${encodeURIComponent(trimmed)}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSearchResults(data.result);
+      } else {
+        setSearchError(data.error || "Search failed");
+      }
+    } catch (err: any) {
+      setSearchError(err.message || "Failed to contact search service");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    performSearch(searchQuery);
+  };
+
+  const handleSuggestionClick = (word: string) => {
+    setSearchQuery(word);
+    performSearch(word);
+  };
+
   const renderGroupedPlayersCard = (side?: "left" | "right") => {
     const renderTeamSegment = (color: "red" | "blue" | "green" | "yellow", label: string) => {
       const teamObj = room.teams[color];
@@ -1869,7 +1899,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   borderRadius: "var(--radius-lg)",
                   padding: "16px",
                   paddingBottom: "68px",
-                  height: "195px",
+                  height: "240px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "flex-start",
@@ -1947,7 +1977,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   borderRadius: "var(--radius-lg)",
                   padding: "16px",
                   paddingBottom: "68px",
-                  height: "195px",
+                  height: "240px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "flex-start",
@@ -4705,7 +4735,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 localPlayer?.team === room.turnState.activeTeam &&
                 (localPlayer?.role === "spymaster" || room.gameMode === "coop") && (
                    <form
-                    onSubmit={handleGiveClue}
+                    onSubmit={onSubmitClue}
                     className="fade-in"
                     style={{
                       background: "var(--bg-surface)",
@@ -6398,6 +6428,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
     const listLength = players.length;
     const useOverlap = listLength > 3;
     const overlapMargin = useOverlap ? "-18px" : "4px";
+    const isPlayPage = room.phase !== "lobby";
 
     return (
       <div 
@@ -6406,7 +6437,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           display: "flex", 
           flexDirection: "row", 
           flexWrap: "nowrap", 
-          justifyContent: "flex-start", // Always use flex-start to prevent left-side clipping on overflow
+          justifyContent: isPlayPage ? "center" : "flex-start",
           width: "100%",
           overflowX: "auto",
           overflowY: "hidden",
@@ -6420,10 +6451,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
         }}
       >
         {players.map((p, idx) => {
-          const leftMargin = idx === 0 
-            ? (useOverlap ? "20px" : "10px") 
-            : overlapMargin;
-          const rightMargin = idx === players.length - 1 ? "10px" : "4px";
+          const leftMargin = isPlayPage
+            ? (idx === 0 ? "0px" : overlapMargin)
+            : (idx === 0 ? (useOverlap ? "20px" : "10px") : overlapMargin);
+          const rightMargin = isPlayPage
+            ? "0px"
+            : (idx === players.length - 1 ? "10px" : "4px");
 
           return (
             <div
@@ -6520,6 +6553,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
     const cg = parseInt(hex.substring(2, 4), 16);
     const cb = parseInt(hex.substring(4, 6), 16);
     const draw = () => {
+      if (document.hidden) {
+        particleRafRef.current = requestAnimationFrame(draw);
+        return;
+      }
       ctx.clearRect(0, 0, W, H);
       particles.forEach((p) => {
         ctx.beginPath();
@@ -6891,67 +6928,37 @@ const renderSettingsCard = (side?: "left" | "right") => {
     });
   };
 
-  const runSearch = async (query: string) => {
-    setSearchLoading(true);
-    setSearchError(null);
-    setSearchResults(null);
-
-    try {
-      const res = await fetch(`/api/search/meaning?q=${encodeURIComponent(query)}`);
-      const data = await res.json();
-      if (data.success && data.result) {
-        setSearchResults(data.result);
-      } else {
-        setSearchError(data.error || "No results found.");
-      }
-    } catch (err) {
-      setSearchError("Failed to fetch meaning. Please try again.");
-    } finally {
-      setSearchLoading(false);
-    }
-  };
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      runSearch(searchQuery);
-    }
-  };
-
-  const handleSuggestionClick = (word: string) => {
-    setSearchQuery(word);
-    runSearch(word);
-  };
-
-  const handleGiveClue = (e: React.FormEvent) => {
-    e.preventDefault();
-    setClueError(null);
-
-    const trimmed = clueWord.trim();
-    if (!trimmed) {
-      setClueError("Clue word cannot be empty");
-      return;
-    }
-    if (trimmed.includes(" ")) {
-      setClueError("Clue must be a single word");
-      return;
-    }
-    if (clueCount === null) {
-      setClueError("Please select a clue count");
-      return;
-    }
-
+  const handleGiveClue = useCallback((word: string) => {
     playClueSentSound();
     if (socket) {
       socket.emit("give_clue", {
         roomCode: room.roomCode,
         playerId,
-        clueWord: trimmed,
+        clueWord: word,
         clueCount,
       });
     }
-    setClueWord("");
     setClueCount(null);
+  }, [socket, room.roomCode, playerId, clueCount]);
+
+  const onSubmitClue = (e: React.FormEvent) => {
+    e.preventDefault();
+    setClueError(null);
+    const word = clueWord.trim();
+    if (!word) {
+      setClueError("Clue word cannot be empty.");
+      return;
+    }
+    if (word.includes(" ")) {
+      setClueError("Clue must be a single word.");
+      return;
+    }
+    if (clueCount === null) {
+      setClueError("Please select a clue count.");
+      return;
+    }
+    handleGiveClue(word);
+    setClueWord("");
   };
 
   const getTeamButtonStyles = (team: string, role: string, isSelected: boolean) => {

@@ -1287,6 +1287,9 @@ export function LandingPage({
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
+      if (document.hidden) {
+        return;
+      }
       const delta = clock.getDelta();
       const t = clock.getElapsedTime();
       const state = threeStateRef.current;

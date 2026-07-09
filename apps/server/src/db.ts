@@ -84,6 +84,10 @@ export async function initializeSchema() {
     `);
 
     await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_match_history_user_id_ended_at ON match_history (user_id, ended_at DESC);
+    `);
+
+    await client.query(`
       CREATE TABLE IF NOT EXISTS feedback (
         id SERIAL PRIMARY KEY,
         category VARCHAR(50) NOT NULL,
