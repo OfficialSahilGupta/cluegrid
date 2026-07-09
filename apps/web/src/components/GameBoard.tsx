@@ -1038,21 +1038,53 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     }
   };
 
-  const playCardFlipSound = (cardType: string) => {
+  const playCardFlipSound = (card: any) => {
     if (!soundEnabled) return;
     try {
-      const activeTeam = lastActiveTeamRef.current || room.turnState?.activeTeam;
       let src = "";
 
-      if (cardType === "assassin") {
-        src = "/cluegrid-music-effects/black-card-flip.mp3";
-      } else if (cardType === "neutral") {
-        src = "/cluegrid-music-effects/wrong-card-flip.mp3";
-      } else if (activeTeam && cardType === activeTeam) {
-        src = "/cluegrid-music-effects/correct-card-flip.mp3";
+      if (room.gameMode === "coop") {
+        // Duet Mode special rules: check card perspective relative to the flipper team
+        const flipperTeam = card.revealedBy || room.turnState?.activeTeam;
+
+        if (flipperTeam === "blue") {
+          if (card.coopBlueType === "blue") {
+            src = "/cluegrid-music-effects/correct-card-flip.mp3";
+          } else if (card.coopBlueType === "assassin") {
+            src = "/cluegrid-music-effects/black-card-flip.mp3";
+          } else {
+            src = "/cluegrid-music-effects/wrong-card-flip.mp3";
+          }
+        } else if (flipperTeam === "red") {
+          if (card.coopRedType === "red") {
+            src = "/cluegrid-music-effects/correct-card-flip.mp3";
+          } else if (card.coopRedType === "assassin") {
+            src = "/cluegrid-music-effects/black-card-flip.mp3";
+          } else {
+            src = "/cluegrid-music-effects/wrong-card-flip.mp3";
+          }
+        } else {
+          // Fallback if no specific team is identified
+          if (card.type === "assassin") {
+            src = "/cluegrid-music-effects/black-card-flip.mp3";
+          } else if (card.type === "neutral") {
+            src = "/cluegrid-music-effects/wrong-card-flip.mp3";
+          } else {
+            src = "/cluegrid-music-effects/correct-card-flip.mp3";
+          }
+        }
       } else {
-        // opponent team card
-        src = "/cluegrid-music-effects/wrong-card-flip.mp3";
+        // Classic / Competitive Mode rules
+        const activeTeam = lastActiveTeamRef.current || room.turnState?.activeTeam;
+        if (card.type === "assassin") {
+          src = "/cluegrid-music-effects/black-card-flip.mp3";
+        } else if (card.type === "neutral") {
+          src = "/cluegrid-music-effects/wrong-card-flip.mp3";
+        } else if (activeTeam && card.type === activeTeam) {
+          src = "/cluegrid-music-effects/correct-card-flip.mp3";
+        } else {
+          src = "/cluegrid-music-effects/wrong-card-flip.mp3";
+        }
       }
 
       if (src) {
@@ -1198,10 +1230,25 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         const prevCard = prevBoardRef.current.find((c) => c.id === card.id);
         if (card.revealed && prevCard && !prevCard.revealed) {
           // Play flip sound with full volume
-          playCardFlipSound(card.type);
+          playCardFlipSound(card);
           
           // Trigger flip animation class (matches sound effect duration)
-          const duration = card.type === "assassin" ? 1800 : (localPlayer?.team && card.type === localPlayer.team ? 1200 : 800);
+          let isCorrectFlip = false;
+          let isAssassinFlip = false;
+          if (room.gameMode === "coop") {
+            const flipperTeam = card.revealedBy || room.turnState?.activeTeam;
+            if (flipperTeam === "blue") {
+              isCorrectFlip = card.coopBlueType === "blue";
+              isAssassinFlip = card.coopBlueType === "assassin";
+            } else if (flipperTeam === "red") {
+              isCorrectFlip = card.coopRedType === "red";
+              isAssassinFlip = card.coopRedType === "assassin";
+            }
+          } else {
+            isCorrectFlip = !!(localPlayer?.team && card.type === localPlayer.team);
+            isAssassinFlip = card.type === "assassin";
+          }
+          const duration = isAssassinFlip ? 1800 : (isCorrectFlip ? 1200 : 800);
           setRecentlyFlippedCardIds((prev) => [...prev, card.id]);
           setTimeout(() => {
             setRecentlyFlippedCardIds((prev) => prev.filter((id) => id !== card.id));
@@ -3741,11 +3788,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 </div>
               )}
 
-              
-
-
-              
-        {/* Turn Banner */}
+              {/* Turn Banner */}
               <div
                 id="clue-display-panel"
                 style={{
@@ -3766,64 +3809,90 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               >
                 
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "center", alignItems: "center", justifyContent: "center", flex: 1, minWidth: "280px", width: "100%" }}>
-                  {room.phase === "playing" && room.turnState ? (
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", width: "100%" }}>
-                      <span
-                        style={{
-                          display: "inline-block",
-                          padding: "4px 10px",
-                          borderRadius: "4px",
-                          fontSize: "0.8rem",
-                          fontWeight: 700,
-                          textTransform: "uppercase",
-                          backgroundColor: typeColors[room.turnState.activeTeam]!.border,
-                          color: "#fff",
-                        }}
-                      >
-                        {`${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team's Turn`}
-                      </span>
-                      <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, margin: 0 }}>
-                        {room.turnState.phase === "giving_clue" ? (
-                          room.gameMode === "coop"
-                            ? `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team is giving a clue to the other team...`
-                            : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Spymaster is giving clue...`
-                        ) : (
-                          <>
-                            Clue:{" "}
-                            <span style={{
-                              color: typeColors[room.turnState.activeTeam]!.light,
-                              fontWeight: 800,
-                              textTransform: "uppercase",
-                              fontSize: "1.8rem",
-                              letterSpacing: "1px",
-                              textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
-                            }}>
-                              {typewriterText || room.turnState.clueWord || "[Secret Clue]"}
-                              {typewriterCursor && <span className="clue-cursor" />}
-                            </span>{" "}
-                            · Count:{" "}
-                            <span style={{
-                              color: typeColors[room.turnState.activeTeam]!.light,
-                              fontWeight: 800,
-                              fontSize: "1.8rem",
-                              textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
-                            }}>
-                              {room.turnState.clueCount !== null
-                                ? room.turnState.clueCount === -1
-                                  ? "∞"
-                                  : room.turnState.clueCount
-                                : "[Secret]"}
-                            </span>
-                          </>
+                  {room.phase === "playing" && room.turnState ? (() => {
+                    const activeCity = room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam === "red" ? "Belgrade" : "Paris");
+                    const otherTeam = room.turnState.activeTeam === "red" ? "blue" : "red";
+                    const otherCity = room.teams[otherTeam]?.name || (otherTeam === "red" ? "Belgrade" : "Paris");
+                    return (
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", width: "100%" }}>
+                        <span
+                          style={{
+                            display: "inline-block",
+                            padding: "4px 10px",
+                            borderRadius: "4px",
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                            textTransform: "uppercase",
+                            backgroundColor: typeColors[room.turnState.activeTeam]!.border,
+                            color: "#fff",
+                          }}
+                        >
+                          {room.gameMode === "coop"
+                            ? room.turnState.phase === "giving_clue"
+                              ? `${activeCity} - Giving Clue`
+                              : `${otherCity} - Guessing`
+                            : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team's Turn`
+                          }
+                        </span>
+                        <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, margin: 0 }}>
+                          {room.turnState.phase === "giving_clue" ? (
+                            room.gameMode === "coop"
+                              ? `${activeCity} is giving clue`
+                              : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Spymaster is giving clue...`
+                          ) : (
+                            <>
+                              Clue:{" "}
+                              <span style={{
+                                color: typeColors[room.turnState.activeTeam]!.light,
+                                fontWeight: 800,
+                                textTransform: "uppercase",
+                                fontSize: "1.8rem",
+                                letterSpacing: "1px",
+                                textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
+                              }}>
+                                {typewriterText || room.turnState.clueWord || "[Secret Clue]"}
+                                {typewriterCursor && <span className="clue-cursor" />}
+                              </span>{" "}
+                              · Count:{" "}
+                              <span style={{
+                                color: typeColors[room.turnState.activeTeam]!.light,
+                                fontWeight: 800,
+                                fontSize: "1.8rem",
+                                textShadow: `0 0 10px ${typeColors[room.turnState.activeTeam]!.border}55`,
+                              }}>
+                                {room.turnState.clueCount !== null
+                                  ? room.turnState.clueCount === -1
+                                    ? "∞"
+                                    : room.turnState.clueCount
+                                  : "[Secret]"}
+                              </span>
+                            </>
+                          )}
+                        </h3>
+                        {room.turnState.phase === "guessing" && room.gameMode === "coop" && (
+                          <div style={{
+                            fontFamily: "var(--font-display)",
+                            fontSize: "1.4rem",
+                            color: typeColors[otherTeam]!.border,
+                            fontWeight: 800,
+                            textTransform: "uppercase",
+                            letterSpacing: "0.06em",
+                            width: "100%",
+                            textAlign: "center",
+                            marginTop: "6px",
+                            textShadow: `0 0 8px ${typeColors[otherTeam]!.border}44`
+                          }}>
+                            {otherCity} is guessing grid...
+                          </div>
                         )}
-                      </h3>
-                      {room.turnState.phase === "guessing" && (
-                        <p style={{ margin: "4px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.9rem" }}>
-                          Guesses used: {room.turnState.guessesUsed} / {room.turnState.guessesAllowed === Infinity ? "Unlimited" : room.turnState.guessesAllowed}
-                        </p>
-                      )}
-                    </div>
-                  ) : (
+                        {room.turnState.phase === "guessing" && (
+                          <p style={{ margin: "4px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.9rem", width: "100%", textAlign: "center" }}>
+                            Guesses used: {room.turnState.guessesUsed} / {room.turnState.guessesAllowed === Infinity ? "Unlimited" : room.turnState.guessesAllowed}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })() : (
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", width: "100%" }}>
                       <span
                         style={{
