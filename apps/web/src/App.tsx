@@ -146,6 +146,9 @@ export default function App() {
   // Tracks intentional disconnects (back nav, leave button) so the socket
   // disconnect handler doesn't show a "Connection Lost" error overlay.
   const intentionalLeave = useRef(false);
+  
+  // Tracks history navigation (back/forward) to prevent phase-sync loops
+  const isNavigatingHistory = useRef(false);
 
   // Global Light Mode State
   const [lightMode, setLightMode] = useState(() => {
@@ -544,12 +547,17 @@ export default function App() {
   // Handle browser back (Cmd+Left) and forward (Cmd+Right) navigation
   useEffect(() => {
     const handlePopState = () => {
+      isNavigatingHistory.current = true;
       const path = window.location.pathname;
       const pathParts = path.split("/");
       const roomIndex = pathParts.indexOf("room");
       const roomCodeInUrl = roomIndex !== -1 && pathParts[roomIndex + 1] && pathParts[roomIndex + 1] !== "play"
         ? pathParts[roomIndex + 1]!.trim()
         : "";
+
+      // Determine local player status
+      const localPlayer = room?.players?.find((p) => p.id === playerId);
+      const isHost = !!localPlayer?.isHost || (room?.players?.length && playerId === room.players[0]?.id);
 
       if (path === "/") {
         // Navigated back to landing
@@ -567,18 +575,46 @@ export default function App() {
         window.dispatchEvent(new CustomEvent("route-change", { detail: { showWelcome: true } }));
       } else if (roomCodeInUrl) {
         if (!room || room.roomCode !== roomCodeInUrl) {
+          // If entering a new/different room
           loadRoom(roomCodeInUrl);
+        } else if (path === `/room/${room.roomCode}`) {
+          // Navigated back from /play to lobby in the same room
+          if (isHost) {
+            // Host can request resetting room phase to lobby
+            if (socket) socket.emit("reset_to_lobby", { roomCode: room.roomCode });
+          } else {
+            // Operatives/Spectators leave the room on back navigation since they can't change room phase
+            intentionalLeave.current = true;
+            if (socket) { socket.disconnect(); setSocket(null); }
+            setRoom(null);
+            setServerError(null);
+            window.history.pushState(null, "", "/room");
+            window.dispatchEvent(new CustomEvent("route-change", { detail: { showWelcome: true } }));
+          }
+        }
+      } else {
+        // Leave active room
+        if (room) {
+          intentionalLeave.current = true;
+          if (socket) { socket.disconnect(); setSocket(null); }
+          setRoom(null);
+          setServerError(null);
         }
       }
+      
+      // Allow sync effect to run on next user actions
+      setTimeout(() => {
+        isNavigatingHistory.current = false;
+      }, 100);
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room, socket]);
+  }, [room, socket, playerId]);
 
-  // Keep URL in sync with active room phase (lobby vs play)
+  // Keep URL in sync with active room phase (lobby vs play) using pushState (so history stacks correctly)
   useEffect(() => {
-    if (!room) return;
+    if (!room || isNavigatingHistory.current) return;
     const targetPath = room.phase === "lobby"
       ? `/room/${room.roomCode}`
       : `/room/${room.roomCode}/play`;
