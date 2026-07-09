@@ -5905,9 +5905,55 @@ const renderSettingsCard = (side?: "left" | "right") => {
   };
 
   const renderAssignPopover = (p: Player) => {
+    const renderRoleButton = (teamColor: "red" | "blue" | "green" | "yellow", role: "spymaster" | "operative", label: string) => {
+      const isSelected = p.team === teamColor && p.role === role;
+      const themeCol = typeColors[teamColor]!;
+      return (
+        <button
+          onClick={() => {
+            handleJoinTeamRole(teamColor, role, p.id);
+            setActiveSwitchPlayerId(null);
+          }}
+          style={{
+            padding: "8px 10px",
+            fontSize: "0.75rem",
+            background: isSelected ? `rgba(${teamColor === 'red' ? '239,149,156' : teamColor === 'blue' ? '0,240,255' : teamColor === 'green' ? '178,239,155' : '243,211,91'}, 0.12)` : "rgba(255,255,255,0.03)",
+            border: isSelected ? `1.5px solid ${themeCol.border}` : "1px solid rgba(255,255,255,0.12)",
+            borderRadius: "6px",
+            color: isSelected ? themeCol.border : "#9AA29B",
+            fontWeight: 700,
+            cursor: "pointer",
+            fontFamily: "var(--font-display)",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            width: "100%",
+            boxShadow: isSelected ? `0 0 10px ${themeCol.border}33` : "none",
+            transition: "all 0.2s ease",
+          }}
+          onMouseOver={(e) => {
+            if (!isSelected) {
+              e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+              e.currentTarget.style.color = "#eef3ee";
+            }
+          }}
+          onMouseOut={(e) => {
+            if (!isSelected) {
+              e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+              e.currentTarget.style.color = "#9AA29B";
+            }
+          }}
+        >
+          {label}
+        </button>
+      );
+    };
+
+    const activeColor = p.team ? typeColors[p.team]!.border : "#00f0ff";
+    const activeBorderColor = p.team ? `rgba(${p.team === 'red' ? '239,149,156' : p.team === 'blue' ? '0,240,255' : p.team === 'green' ? '178,239,155' : '243,211,91'}, 0.45)` : "rgba(0, 240, 255, 0.35)";
+    const activeGlowColor = p.team ? `rgba(${p.team === 'red' ? '239,149,156' : p.team === 'blue' ? '0,240,255' : p.team === 'green' ? '178,239,155' : '243,211,91'}, 0.15)` : "rgba(0, 240, 255, 0.1)";
+
     return (
       <>
-
         {/* Popover content positioned near the user's left or right */}
         <div
           style={{
@@ -5915,11 +5961,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
             top: popoverCoords ? `${popoverCoords.top}px` : "60px",
             left: popoverCoords ? `${popoverCoords.left}px` : "50%",
             transform: popoverCoords ? popoverCoords.transform : "translateX(-50%)",
-            background: "var(--bg-surface-solid)",
-            border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-md)",
-            padding: "16px",
-            boxShadow: "0 15px 45px rgba(0,0,0,0.85)",
+            background: "rgba(6, 24, 28, 0.98)",
+            border: `1.5px solid ${activeBorderColor}`,
+            backdropFilter: "blur(12px)",
+            borderRadius: "10px",
+            padding: "20px",
+            boxShadow: `0 20px 50px rgba(0,0,0,0.85), 0 0 25px ${activeGlowColor}`,
             width: "290px",
             display: "flex",
             flexDirection: "column",
@@ -5928,12 +5975,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
           }}
           className="scale-up assign-popover-card"
         >
-          <span style={{ fontSize: "1rem", fontWeight: 800, color: "var(--text-primary)", textTransform: "uppercase", textAlign: "center", borderBottom: "1px solid var(--border-default)", paddingBottom: "8px" }}>
+          <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.3rem", fontWeight: 900, color: activeColor, textTransform: "uppercase", textAlign: "center", borderBottom: `1.5px solid ${activeBorderColor}`, paddingBottom: "10px", letterSpacing: "0.06em" }}>
             {t("game.assign", "Assign")} {p.displayName}
           </span>
           
           {room.gameMode === "coop" ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               {Object.entries(room.teams).map(([color, teamState]) => {
                 const isSelected = p.team === color;
                 const themeCol = typeColors[color]!;
@@ -5945,18 +5992,32 @@ const renderSettingsCard = (side?: "left" | "right") => {
                       setActiveSwitchPlayerId(null);
                     }}
                     style={{
-                      padding: "8px",
-                      fontSize: "0.75rem",
-                      background: isSelected ? themeCol.border : themeCol.bg,
-                      border: `1px solid ${themeCol.border}`,
-                      borderRadius: "4px",
-                      color: isSelected ? "#fff" : themeCol.text,
-                      fontWeight: 600,
+                      padding: "10px 12px",
+                      fontSize: "0.8rem",
+                      background: isSelected ? `rgba(${color === 'red' ? '239,149,156' : '0,240,255'}, 0.12)` : "rgba(255,255,255,0.03)",
+                      border: isSelected ? `1.5px solid ${themeCol.border}` : "1px solid rgba(255,255,255,0.12)",
+                      borderRadius: "6px",
+                      color: isSelected ? themeCol.border : "#9AA29B",
+                      fontWeight: 700,
                       cursor: "pointer",
                       fontFamily: "var(--font-display)",
                       textTransform: "uppercase",
-                      letterSpacing: "0.03em",
+                      letterSpacing: "0.05em",
                       width: "100%",
+                      boxShadow: isSelected ? `0 0 10px rgba(${color === 'red' ? '239,149,156' : '0,240,255'}, 0.15)` : "none",
+                      transition: "all 0.2s ease",
+                    }}
+                    onMouseOver={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                        e.currentTarget.style.color = "#eef3ee";
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (!isSelected) {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                        e.currentTarget.style.color = "#9AA29B";
+                      }
                     }}
                   >
                     {t("game.joinAs", { role: teamState.name || t(`teams.${color}`) })}
@@ -5968,197 +6029,29 @@ const renderSettingsCard = (side?: "left" | "right") => {
             <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {/* Red Team */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                <button
-                  onClick={() => {
-                    handleJoinTeamRole("red", "spymaster", p.id);
-                    setActiveSwitchPlayerId(null);
-                  }}
-                  style={{
-                    padding: "6px",
-                    fontSize: "0.75rem",
-                    background: p.team === "red" && p.role === "spymaster" ? typeColors.red!.border : typeColors.red!.bg,
-                    border: `1px solid ${typeColors.red!.border}`,
-                    borderRadius: "4px",
-                    color: p.team === "red" && p.role === "spymaster" ? "#fff" : typeColors.red!.text,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-display)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.03em",
-                    width: "100%",
-                  }}
-                >
-                  Red Spy
-                </button>
-                <button
-                  onClick={() => {
-                    handleJoinTeamRole("red", "operative", p.id);
-                    setActiveSwitchPlayerId(null);
-                  }}
-                  style={{
-                    padding: "6px",
-                    fontSize: "0.75rem",
-                    background: p.team === "red" && p.role === "operative" ? typeColors.red!.border : typeColors.red!.bg,
-                    border: `1px solid ${typeColors.red!.border}`,
-                    borderRadius: "4px",
-                    color: p.team === "red" && p.role === "operative" ? "#fff" : typeColors.red!.text,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-display)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.03em",
-                    width: "100%",
-                  }}
-                >
-                  Red Op
-                </button>
+                {renderRoleButton("red", "spymaster", "Red Spy")}
+                {renderRoleButton("red", "operative", "Red Op")}
               </div>
 
               {/* Blue Team */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                <button
-                  onClick={() => {
-                    handleJoinTeamRole("blue", "spymaster", p.id);
-                    setActiveSwitchPlayerId(null);
-                  }}
-                  style={{
-                    padding: "6px",
-                    fontSize: "0.75rem",
-                    background: p.team === "blue" && p.role === "spymaster" ? typeColors.blue!.border : typeColors.blue!.bg,
-                    border: `1px solid ${typeColors.blue!.border}`,
-                    borderRadius: "4px",
-                    color: p.team === "blue" && p.role === "spymaster" ? "#fff" : typeColors.blue!.text,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-display)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.03em",
-                    width: "100%",
-                  }}
-                >
-                  Blue Spy
-                </button>
-                <button
-                  onClick={() => {
-                    handleJoinTeamRole("blue", "operative", p.id);
-                    setActiveSwitchPlayerId(null);
-                  }}
-                  style={{
-                    padding: "6px",
-                    fontSize: "0.75rem",
-                    background: p.team === "blue" && p.role === "operative" ? typeColors.blue!.border : typeColors.blue!.bg,
-                    border: `1px solid ${typeColors.blue!.border}`,
-                    borderRadius: "4px",
-                    color: p.team === "blue" && p.role === "operative" ? "#fff" : typeColors.blue!.text,
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-display)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.03em",
-                    width: "100%",
-                  }}
-                >
-                  Blue Op
-                </button>
+                {renderRoleButton("blue", "spymaster", "Blue Spy")}
+                {renderRoleButton("blue", "operative", "Blue Op")}
               </div>
 
               {/* Green Team */}
               {room.teamCount > 2 && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                  <button
-                    onClick={() => {
-                      handleJoinTeamRole("green", "spymaster", p.id);
-                      setActiveSwitchPlayerId(null);
-                    }}
-                    style={{
-                      padding: "6px",
-                      fontSize: "0.75rem",
-                      background: p.team === "green" && p.role === "spymaster" ? typeColors.green!.border : typeColors.green!.bg,
-                      border: `1px solid ${typeColors.green!.border}`,
-                      borderRadius: "4px",
-                      color: p.team === "green" && p.role === "spymaster" ? "#fff" : typeColors.green!.text,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      fontFamily: "var(--font-display)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.03em",
-                      width: "100%",
-                    }}
-                  >
-                    Green Spy
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleJoinTeamRole("green", "operative", p.id);
-                      setActiveSwitchPlayerId(null);
-                    }}
-                    style={{
-                      padding: "6px",
-                      fontSize: "0.75rem",
-                      background: p.team === "green" && p.role === "operative" ? typeColors.green!.border : typeColors.green!.bg,
-                      border: `1px solid ${typeColors.green!.border}`,
-                      borderRadius: "4px",
-                      color: p.team === "green" && p.role === "operative" ? "#fff" : typeColors.green!.text,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      fontFamily: "var(--font-display)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.03em",
-                      width: "100%",
-                    }}
-                  >
-                    Green Op
-                  </button>
+                  {renderRoleButton("green", "spymaster", "Green Spy")}
+                  {renderRoleButton("green", "operative", "Green Op")}
                 </div>
               )}
 
               {/* Yellow Team */}
               {room.teamCount > 3 && (
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                  <button
-                    onClick={() => {
-                      handleJoinTeamRole("yellow", "spymaster", p.id);
-                      setActiveSwitchPlayerId(null);
-                    }}
-                    style={{
-                      padding: "6px",
-                      fontSize: "0.75rem",
-                      background: p.team === "yellow" && p.role === "spymaster" ? typeColors.yellow!.border : typeColors.yellow!.bg,
-                      border: `1px solid ${typeColors.yellow!.border}`,
-                      borderRadius: "4px",
-                      color: p.team === "yellow" && p.role === "spymaster" ? "#fff" : typeColors.yellow!.text,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      fontFamily: "var(--font-display)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.03em",
-                      width: "100%",
-                    }}
-                  >
-                    Yellow Spy
-                  </button>
-                  <button
-                    onClick={() => {
-                      handleJoinTeamRole("yellow", "operative", p.id);
-                      setActiveSwitchPlayerId(null);
-                    }}
-                    style={{
-                      padding: "6px",
-                      fontSize: "0.75rem",
-                      background: p.team === "yellow" && p.role === "operative" ? typeColors.yellow!.border : typeColors.yellow!.bg,
-                      border: `1px solid ${typeColors.yellow!.border}`,
-                      borderRadius: "4px",
-                      color: p.team === "yellow" && p.role === "operative" ? "#fff" : typeColors.yellow!.text,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      fontFamily: "var(--font-display)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.03em",
-                      width: "100%",
-                  }}
-                  >
-                    Yellow Op
-                  </button>
+                  {renderRoleButton("yellow", "spymaster", "Yellow Spy")}
+                  {renderRoleButton("yellow", "operative", "Yellow Op")}
                 </div>
               )}
             </div>
@@ -6171,18 +6064,32 @@ const renderSettingsCard = (side?: "left" | "right") => {
               setActiveSwitchPlayerId(null);
             }}
             style={{
-              padding: "6px",
-              background: !p.team ? "var(--accent)" : "var(--bg-surface-raised)",
-              border: !p.team ? "1px solid var(--accent)" : "1px solid var(--border-default)",
-              borderRadius: "4px",
-              color: !p.team ? "var(--accent-text-on)" : "var(--text-primary)",
-              fontWeight: 600,
-              fontSize: "0.75rem",
+              padding: "10px",
+              background: !p.team ? "rgba(0, 240, 255, 0.12)" : "rgba(255,255,255,0.03)",
+              border: !p.team ? "1.5px solid #00f0ff" : "1px solid rgba(255,255,255,0.12)",
+              borderRadius: "6px",
+              color: !p.team ? "#00f0ff" : "#9AA29B",
+              fontWeight: 700,
+              fontSize: "0.8rem",
               cursor: "pointer",
               width: "100%",
               fontFamily: "var(--font-display)",
               textTransform: "uppercase",
-              letterSpacing: "0.03em",
+              letterSpacing: "0.04em",
+              boxShadow: !p.team ? "0 0 10px rgba(0, 240, 255, 0.15)" : "none",
+              transition: "all 0.2s ease",
+            }}
+            onMouseOver={(e) => {
+              if (p.team) {
+                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                e.currentTarget.style.color = "#eef3ee";
+              }
+            }}
+            onMouseOut={(e) => {
+              if (p.team) {
+                e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                e.currentTarget.style.color = "#9AA29B";
+              }
             }}
           >
             {t("roles.spectator", "Spectate")}
@@ -6190,7 +6097,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
           {/* Host Actions: Kick / Promote */}
           {isHost && p.id !== playerId && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px", borderTop: "1px solid var(--border-default)", paddingTop: "8px", marginTop: "4px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", borderTop: "1.5px solid rgba(255,255,255,0.1)", paddingTop: "12px", marginTop: "4px" }}>
               {!p.isHost && p.id !== room.players[0]?.id && (
                 <button
                   onClick={() => {
@@ -6198,18 +6105,27 @@ const renderSettingsCard = (side?: "left" | "right") => {
                     setActiveSwitchPlayerId(null);
                   }}
                   style={{
-                    padding: "6px",
+                    padding: "8px 10px",
                     fontSize: "0.75rem",
-                    background: "rgba(16, 185, 129, 0.1)",
-                    border: "1px solid rgb(16, 185, 129)",
-                    borderRadius: "4px",
-                    color: "hsl(142,75%,45%)",
-                    fontWeight: 600,
+                    background: "rgba(16, 185, 129, 0.06)",
+                    border: "1px solid rgba(16, 185, 129, 0.4)",
+                    borderRadius: "6px",
+                    color: "rgb(16, 185, 129)",
+                    fontWeight: 700,
                     cursor: "pointer",
                     fontFamily: "var(--font-display)",
                     textTransform: "uppercase",
-                    letterSpacing: "0.03em",
+                    letterSpacing: "0.04em",
                     width: "100%",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = "rgba(16, 185, 129, 0.12)";
+                    e.currentTarget.style.border = "1px solid rgb(16, 185, 129)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = "rgba(16, 185, 129, 0.06)";
+                    e.currentTarget.style.border = "1px solid rgba(16, 185, 129, 0.4)";
                   }}
                 >
                   {t("game.makeHost", "Make Host")}
@@ -6222,18 +6138,27 @@ const renderSettingsCard = (side?: "left" | "right") => {
                     setActiveSwitchPlayerId(null);
                   }}
                   style={{
-                    padding: "6px",
+                    padding: "8px 10px",
                     fontSize: "0.75rem",
-                    background: "rgba(239, 68, 68, 0.1)",
-                    border: "1px solid rgb(239, 68, 68)",
-                    borderRadius: "4px",
-                    color: "hsl(355,85%,65%)",
-                    fontWeight: 600,
+                    background: "rgba(239, 68, 68, 0.06)",
+                    border: "1px solid rgba(239, 68, 68, 0.4)",
+                    borderRadius: "6px",
+                    color: "rgb(239, 68, 68)",
+                    fontWeight: 700,
                     cursor: "pointer",
                     fontFamily: "var(--font-display)",
                     textTransform: "uppercase",
-                    letterSpacing: "0.03em",
+                    letterSpacing: "0.04em",
                     width: "100%",
+                    transition: "all 0.2s ease",
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.12)";
+                    e.currentTarget.style.border = "1px solid rgb(239, 68, 68)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.background = "rgba(239, 68, 68, 0.06)";
+                    e.currentTarget.style.border = "1px solid rgba(239, 68, 68, 0.4)";
                   }}
                 >
                   {t("game.kick", "Kick")}
