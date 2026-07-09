@@ -401,7 +401,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
   // Active Switching Player State
   const [activeSwitchPlayerId, setActiveSwitchPlayerId] = useState<string | null>(null);
-  const [popoverCoords, setPopoverCoords] = useState<{ top: number; left: number } | null>(null);
+  const [popoverCoords, setPopoverCoords] = useState<{ top: number; left: number; transform: string } | null>(null);
   const [isMobileViewport, setIsMobileViewport] = useState(typeof window !== "undefined" ? window.innerWidth <= 768 : false);
   useEffect(() => {
     const handleResize = () => setIsMobileViewport(window.innerWidth <= 768);
@@ -5908,13 +5908,13 @@ const renderSettingsCard = (side?: "left" | "right") => {
     return (
       <>
 
-        {/* Popover content positioned absolute nested on desktop, fixed centered portal on mobile */}
+        {/* Popover content positioned near the user's left or right */}
         <div
           style={{
-            position: isMobileViewport ? "fixed" : "absolute",
-            top: isMobileViewport ? "50%" : (popoverCoords ? `${popoverCoords.top + 8}px` : "60px"),
-            left: isMobileViewport ? "50%" : (popoverCoords ? `${popoverCoords.left}px` : "50%"),
-            transform: isMobileViewport ? "translate(-50%, -50%)" : "translateX(-50%)",
+            position: "absolute",
+            top: popoverCoords ? `${popoverCoords.top}px` : "60px",
+            left: popoverCoords ? `${popoverCoords.left}px` : "50%",
+            transform: popoverCoords ? popoverCoords.transform : "translateX(-50%)",
             background: "var(--bg-surface-solid)",
             border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-md)",
@@ -6282,9 +6282,39 @@ const renderSettingsCard = (side?: "left" | "right") => {
           onClick={(e) => {
             if (canSwitch) {
               const rect = e.currentTarget.getBoundingClientRect();
+              const avatarCenterX = rect.left + rect.width / 2;
+              const screenWidth = window.innerWidth;
+              const popoverWidth = 290;
+              const margin = 12;
+
+              let leftVal = 0;
+              let topVal = rect.top + rect.height / 2 + window.scrollY;
+              let transformVal = "";
+
+              if (avatarCenterX < screenWidth / 2) {
+                leftVal = rect.right + margin + window.scrollX;
+                transformVal = "translateY(-50%)";
+                
+                if (leftVal + popoverWidth > screenWidth + window.scrollX) {
+                  leftVal = rect.left + rect.width / 2 + window.scrollX;
+                  topVal = rect.bottom + margin + window.scrollY;
+                  transformVal = "translateX(-50%)";
+                }
+              } else {
+                leftVal = rect.left - margin - popoverWidth + window.scrollX;
+                transformVal = "translateY(-50%)";
+
+                if (leftVal < window.scrollX) {
+                  leftVal = rect.left + rect.width / 2 + window.scrollX;
+                  topVal = rect.bottom + margin + window.scrollY;
+                  transformVal = "translateX(-50%)";
+                }
+              }
+
               setPopoverCoords({
-                top: rect.bottom + window.scrollY,
-                left: rect.left + rect.width / 2 + window.scrollX
+                top: topVal,
+                left: leftVal,
+                transform: transformVal
               });
               setActiveSwitchPlayerId(activeSwitchPlayerId === p.id ? null : p.id);
             }
