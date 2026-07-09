@@ -5,6 +5,7 @@ import { useAuth } from "./context/AuthContext";
 import { useTranslation } from "react-i18next";
 import { renderAvatar } from "./utils/avatar";
 import { LandingPage } from "./components/LandingPage";
+import { CookieConsent } from "./components/CookieConsent";
 
 // Lazily load components that are not needed on initial page paint
 const GameBoard = lazy(() => import("./components/GameBoard").then(module => ({ default: module.GameBoard })));
@@ -1297,6 +1298,8 @@ export default function App() {
           </div>
         </div>
       )}
+
+      <CookieConsent />
     </>
   );
 }
