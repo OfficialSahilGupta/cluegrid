@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../context/AuthContext";
 
 declare const THREE: any;
 
@@ -90,6 +91,7 @@ export function LandingPage({
   isActiveRoom = false,
 }: LandingPageProps) {
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
   const mountRef = useRef<HTMLDivElement>(null);
   const leftCanvasRef = useRef<HTMLCanvasElement>(null);
   const rightCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -2047,11 +2049,17 @@ export function LandingPage({
             onClick={handleEnterGuest}
             style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontWeight: 800, fontSize: "18px", letterSpacing: "0.05em", background: "#00f0ff", color: "#040b0d", border: "none", padding: "11px 24px", borderRadius: "4px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", boxShadow: "0 6px 20px rgba(0,240,255,0.2)", width: "min(260px, 85vw)", boxSizing: "border-box", transition: "all 0.2s ease" }}
           >
-            ENTER AS GUEST <span style={{ transition: "transform .2s ease" }}>→</span>
+            {user ? `ENTER AS ${user.username.toUpperCase()}` : "ENTER AS GUEST"} <span style={{ transition: "transform .2s ease" }}>→</span>
           </button>
-          <div style={{ fontSize: "11px", letterSpacing: "0.14em", color: "#9AA29B", textTransform: "uppercase", textAlign: "center", width: "100%", padding: "0 10px", boxSizing: "border-box" }}>No badge required · guest clearance</div>
+          <div style={{ fontSize: "11px", letterSpacing: "0.14em", color: "#9AA29B", textTransform: "uppercase", textAlign: "center", width: "100%", padding: "0 10px", boxSizing: "border-box" }}>
+            {user ? `Logged in as ${user.username} · secure clearance` : "No badge required · guest clearance"}
+          </div>
           <div style={{ display: "flex", gap: "8px", alignItems: "center", fontSize: "11px", color: "#9AA29B" }}>
-            <button onClick={() => setAuthOpen(true)} className="cyber-dotted-link">Already have an account? Sign in →</button>
+            {user ? (
+              <button onClick={logout} className="cyber-dotted-link">Sign out of your account →</button>
+            ) : (
+              <button onClick={() => setAuthOpen(true)} className="cyber-dotted-link">Already have an account? Sign in →</button>
+            )}
           </div>
         </div>
       )}
