@@ -281,8 +281,8 @@ export default function App() {
         }
         return response;
       } catch (err: any) {
-        // Only block with overlay when inside a room — on the landing page, let the caller handle the error
-        if (room) {
+        // Only block with overlay when inside a room and not intentionally leaving
+        if (room && !intentionalLeave.current) {
           setServerError({
             status: 0,
             message: err?.message || "Cannot reach the server.",
