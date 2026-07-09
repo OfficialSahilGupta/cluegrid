@@ -591,6 +591,17 @@ export default function App() {
             window.history.pushState(null, "", "/room");
             window.dispatchEvent(new CustomEvent("route-change", { detail: { showWelcome: true } }));
           }
+        } else if (path === `/room/${room.roomCode}/play`) {
+          // Navigated forward from lobby to /play in the same room
+          if (room.phase === "lobby") {
+            if (isHost) {
+              // Host starts the game
+              if (socket) socket.emit("start_game", { roomCode: room.roomCode });
+            } else {
+              // Non-hosts cannot start the game, revert URL to lobby
+              window.history.replaceState(null, "", `/room/${room.roomCode}`);
+            }
+          }
         }
       } else {
         // Leave active room
