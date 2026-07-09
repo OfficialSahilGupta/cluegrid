@@ -585,15 +585,17 @@ export default function App() {
         </div>
 
         {/* Global Auth Modal & Settings Modal */}
-        {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
-        {settingsOpen && <ProfileSettingsModal onClose={() => setSettingsOpen(false)} />}
-        {gatedFeature && (
-          <GatedUpsellModal
-            featureName={gatedFeature}
-            onClose={() => setGatedFeature(null)}
-            onOpenAuth={() => setAuthOpen(true)}
-          />
-        )}
+        <Suspense fallback={null}>
+          {authOpen && <AuthModal onClose={() => setAuthOpen(false)} />}
+          {settingsOpen && <ProfileSettingsModal onClose={() => setSettingsOpen(false)} />}
+          {gatedFeature && (
+            <GatedUpsellModal
+              featureName={gatedFeature}
+              onClose={() => setGatedFeature(null)}
+              onOpenAuth={() => setAuthOpen(true)}
+            />
+          )}
+        </Suspense>
 
         {/* Server Maintenance overlay */}
         {serverError && (
