@@ -1,66 +1,46 @@
 import React from "react";
-import { useTranslation } from "react-i18next";
 
 export function ChangelogPage() {
-  const { t } = useTranslation();
-
   const updates = [
     {
-      version: "v1.4.0 - Operation Cyber-Stealth Redesign",
+      version: "Music & Profiles",
       date: "July 2026",
       color: "#00f0ff",
       features: [
-        "Purged Yellow/Amber color tokens for tactical stealth cyber-cyan (#00F0FF) and rose (#ef959c) palette.",
-        "Redesigned Navigation Link styling with dotted underlines.",
-        "Implemented real-time surveillance terminal animations in empty background zones.",
-        "Created real-time Spy Dossier panels tracking active operatives.",
+        "YouTube & Spotify Player: Play your favorite music inside the game room.",
+        "Avatar Gallery: Choose amazing avatars for your player profile.",
+        "Chat Music Integration: Share music links in team chat to play them instantly.",
       ],
     },
     {
-      version: "v1.3.0 - Visual Overhaul and Core Polish",
+      version: "Room Settings",
       date: "June 2026",
       color: "#ef959c",
       features: [
-        "Daylight Dossier Theme Support: Added a warm paper light mode counterpart matching the classified folder theme.",
-        "Vietnamese Locale Support: Created localized UI translations and gameplay decks.",
-        "Security / Standard - Anti-Spy Action Logging: Catch and record unverified spymaster access attempts.",
-        "Custom Game Timers: Control the pressure! Tailor turn and clue timers.",
-        "Sensory Sound Effects: Satisfying, responsive sound triggers for card taps and turns.",
+        "Turn Timers: Set custom time limits for each turn to keep the game moving fast.",
+        "Game Modes: Switch easily between Duet (co-op) and Classic competitive modes.",
       ],
     },
     {
-      version: "v1.2.0 - Duet Mode & Custom Settings",
-      date: "June 2026",
+      version: "Profiles & Statistics",
+      date: "May 2026",
       color: "#00f0ff",
       features: [
-        "Cooperative Duet Mode: Play cooperatively against a shared mistake limit of 9 tokens.",
-        "Turn & Clue Timers: Integrated 120-second timers with Spymaster and Operative auto-skips.",
-        "Personal Music Player: Paste YouTube/Spotify links into a personal docked player widget.",
-        "Chat Link Unfurling: Pasting YouTube/Spotify URLs in chat renders collapsible embedded players.",
-      ],
-    },
-    {
-      version: "v1.1.0 - Profiles & Match Statistics",
-      date: "May 2026",
-      color: "#ef959c",
-      features: [
-        "Auth.js Integration: Support credentials signup, Google, and Discord login.",
-        "Deterministic Identicons: Symmetrical 5x5 SVG grid icons generated from guest usernames.",
-        "Premium Avatar Gallery: Seeded 20 premium unlocked emojis for registered users.",
-        "Match Statistics: Track career games played, won, correct guesses, and match histories.",
+        "Easy Sign-In: Join quickly as a Guest, or log in with Google and Discord.",
+        "Match Statistics: Track your overall win rate, total games played, and scores.",
       ],
     },
   ];
 
   return (
     <div className="fade-in" style={{ color: "#eef3ee", fontFamily: "'JetBrains Mono', monospace", fontSize: "14px", lineHeight: 1.5 }}>
-      {/* Header section with Cyber bracket style */}
+      {/* Header section */}
       <div style={{ borderBottom: "1.5px solid rgba(0, 240, 255, 0.3)", paddingBottom: "12px", marginBottom: "20px" }}>
         <h2 style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.8rem", fontWeight: 900, margin: 0, color: "#00f0ff", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-          {t("news.title")}
+          What's New
         </h2>
         <p style={{ color: "#9AA29B", fontSize: "12px", margin: "4px 0 0 0", letterSpacing: "0.03em" }}>
-          {t("news.subtitle")}
+          Check out our latest game features and updates.
         </p>
       </div>
 

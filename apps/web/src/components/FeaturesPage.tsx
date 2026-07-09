@@ -1,7 +1,7 @@
 import React from "react";
 
 export function FeaturesPage() {
-  const featuresList = [
+    const featuresList = [
     {
       id: "Teams",
       badge: "Standard",
@@ -19,8 +19,8 @@ export function FeaturesPage() {
     },
     {
       id: "Search",
-      badge: "Signed In",
-      badgeType: "signedin",
+      badge: "Standard",
+      badgeType: "standard",
       title: "Google Search Meanings",
       desc: "Stuck on a word? Click any card on the grid to search and lookup definitions instantly via the integrated Google lookup search bar.",
       icon: (
@@ -46,23 +46,11 @@ export function FeaturesPage() {
         </svg>
       ),
     },
-    {
-      id: "Theme",
-      badge: "Standard",
-      badgeType: "standard",
-      title: "Dual Creative Themes",
-      desc: "Switch on the fly between \"Redacted Ink\" (tactile dark mode) and \"Daylight Dossier\" (warm paper light mode).",
-      icon: (
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 2a7 7 0 1 0 10 10A7 7 0 0 0 12 2z" />
-        </svg>
-      ),
-    },
+
     {
       id: "Status",
-      badge: "Signed In",
-      badgeType: "signedin",
+      badge: "Standard",
+      badgeType: "standard",
       title: "Live Presence Status",
       desc: "Inform your teammates of your current status with quick selector badges such as Active, AFK, Busy, or sleep.",
       icon: (
@@ -88,8 +76,8 @@ export function FeaturesPage() {
     },
     {
       id: "Media",
-      badge: "Signed In",
-      badgeType: "signedin",
+      badge: "Standard",
+      badgeType: "standard",
       title: "YouTube and Spotify Player",
       desc: "Synchronize and stream background music directly inside the room panel while discussing clues with teammates.",
       icon: (
@@ -102,8 +90,8 @@ export function FeaturesPage() {
     },
     {
       id: "Chat",
-      badge: "Signed In",
-      badgeType: "signedin",
+      badge: "Standard",
+      badgeType: "standard",
       title: "Isolated Team Chats",
       desc: "Discuss your plans privately in dedicated Operative channels or coordinate Spymaster signals without leaking info.",
       icon: (

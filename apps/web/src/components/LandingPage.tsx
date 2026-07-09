@@ -1733,8 +1733,8 @@ export function LandingPage({
           <div className="hud-corner bl" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(239,149,156,0.4)", borderLeft: "2px solid rgba(239,149,156,0.4)", bottom: "14px", left: "14px" }}></div>
           <div className="hud-corner br" style={{ position: "fixed", zIndex: 5, width: "34px", height: "34px", pointerEvents: "none", borderBottom: "2px solid rgba(178,239,155,0.4)", borderRight: "2px solid rgba(178,239,155,0.4)", bottom: "14px", right: "14px" }}></div>
 
-      {/* Top Header Logo (zIndex 6) */}
-      <div className="wordmark" style={{ position: "fixed", top: "24px", left: "24px", zIndex: 6, display: "flex", flexDirection: "column", gap: "6px" }}>
+      {/* Top Header Logo (zIndex 20) */}
+      <div className="wordmark" style={{ position: "fixed", top: "24px", left: "24px", zIndex: 20, display: "flex", flexDirection: "column", gap: "6px" }}>
         <div 
           onClick={() => setCurrentView("lobby")}
           style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
@@ -1764,7 +1764,7 @@ export function LandingPage({
       </div>
 
       {/* Navigation links */}
-      <nav className="nav-links" style={{ position: "fixed", top: "28px", right: "64px", zIndex: 6, display: "flex", alignItems: "center", gap: "16px", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+      <nav className="nav-links" style={{ position: "fixed", top: "28px", right: "64px", zIndex: 20, display: "flex", alignItems: "center", gap: "16px", fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase" }}>
         <button onClick={() => setCurrentView("rules")} className="cyber-dotted-link">How to play</button>
         <span style={{ opacity: 0.35 }}>·</span>
         <button onClick={() => setCurrentView("features")} className="cyber-dotted-link">Features</button>
@@ -2066,7 +2066,20 @@ export function LandingPage({
 
       {/* Centered content overlay */}
       {(showWelcome || currentView !== "lobby") && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 15, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", overflowY: "auto" }}>
+        <div 
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              window.history.pushState(null, "", "/");
+              setCurrentView("lobby");
+              setShowWelcome(false);
+              setShowCTA(true);
+              if (threeStateRef.current) {
+                threeStateRef.current.entering = false;
+              }
+            }
+          }}
+          style={{ position: "fixed", inset: 0, zIndex: 15, display: "flex", alignItems: "center", justifyContent: "center", padding: "24px", overflowY: "auto" }}
+        >
           {currentView === "lobby" ? (
             <div style={{ width: "min(560px, 100%)", background: "var(--bg-surface-raised)", border: "1px solid rgba(0,240,255,0.35)", backdropFilter: "blur(6px)", padding: "40px", position: "relative", borderRadius: "14px" }}>
               <div style={{ marginBottom: "22px" }}>
@@ -2210,6 +2223,7 @@ export function LandingPage({
               <button 
                 onClick={() => {
                   window.history.pushState(null, "", "/");
+                  setCurrentView("lobby");
                   setShowWelcome(false);
                   setShowCTA(true);
                   if (threeStateRef.current) {
