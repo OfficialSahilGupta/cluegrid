@@ -234,7 +234,11 @@ h1, h2, h3, h4, h5 { font-family: var(--font-display); line-height: 1.2; }
 
   .clue-count-dropdown {
     left: auto !important;
-    right: 0 !important;
+    right: -130px !important;
+    transform: translateY(6px) !important;
+  }
+  .clue-count-dropdown.open {
+    transform: translateY(0) !important;
   }
 }
 
@@ -618,14 +622,15 @@ html.increased-fonts {
   background: rgba(232,163,61,0.08);
 }
 
-/* Mobile — keep strip centred so it doesn’t clip screen edge */
+/* Mobile — shift count selector strip position to the right to fit the viewport */
 @media (max-width: 480px) {
   .clue-count-dropdown {
-    left: 50%;
-    right: auto;
+    left: auto;
+    right: -240px; /* Shifted significantly further right to make 0, 1, 2, 3 fully visible */
+    transform: translateY(6px);
   }
   .clue-count-dropdown.open {
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
 }
 
