@@ -4502,17 +4502,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 >
                   {board.map((card) => {
                     let cardType = "unknown";
-                    if (room.gameMode === "coop" && localPlayer?.team) {
-                      if (card.revealed) {
-                        cardType = card.type || "unknown";
-                      } else {
-                        const opponentColor = localPlayer.team === "red" ? "blue" : "red";
-                        if (card.type === opponentColor || card.type === "assassin") {
-                          cardType = card.type || "unknown";
-                        } else {
-                          cardType = "unknown";
-                        }
-                      }
+                    if (room.gameMode === "coop") {
+                      // Duet: show actual card type for all cards — same coloring as multi-team
+                      cardType = card.type || "unknown";
                     } else {
                       cardType = canSeeKey ? (card.type || "unknown") : (card.revealed ? card.type || "unknown" : "unknown");
                     }

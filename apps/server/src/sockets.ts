@@ -207,8 +207,8 @@ function getRoomStateForPlayer(room: RoomState, playerId: string): any {
           displayType = card.coopRedType;  // "red" | "assassin" | "neutral"
         }
 
-        if (!displayType || displayType === "neutral") {
-          // Hide neutral cards (strip type)
+        if (!displayType) {
+          // Hide cards if no display type (spectators without team)
           const { type: _t, coopRedType: _r, coopBlueType: _b, ...safeCard } = card;
           return safeCard;
         }
