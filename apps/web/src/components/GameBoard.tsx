@@ -3996,11 +3996,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             </div>
                           ) : null;
                         })()}
-                        {room.turnState.phase === "guessing" && (
-                          <p style={{ margin: "4px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.9rem", width: "100%", textAlign: "center" }}>
-                            Guesses used: {room.turnState.guessesUsed} / {room.turnState.guessesAllowed === Infinity ? "Unlimited" : room.turnState.guessesAllowed}
-                          </p>
-                        )}
+
                       </div>
                     );
                   })() : (
@@ -4226,41 +4222,40 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
                 </div>
               )}
-                    </div>
 
-                  {/* Centered Action Controls (End Turn, Waiting Status) */}
-                  {(room.phase === "playing" && room.turnState && (
-                    ((room.gameMode === "coop" &&
-                        localPlayer?.team === (room.turnState.activeTeam === "red" ? "blue" : "red")) ||
-                      (room.gameMode !== "coop" &&
-                        localPlayer?.team === room.turnState.activeTeam &&
-                        localPlayer?.role === "operative")) &&
-                      room.turnState.phase === "guessing"
-                  )) && (
-                    <div style={{ display: "flex", justifyContent: "center", marginTop: "4px" }}>
-                      <button
-                        onClick={handleEndTurn}
-                        style={{
-                          padding: "10px 28px",
-                          borderRadius: "var(--radius-md)",
-                          background: "var(--accent)",
-                          border: "none",
-                          color: "#1C1916",
-                          fontFamily: "var(--font-display)",
-                          fontWeight: 800,
-                          cursor: "pointer",
-                          transition: "all 0.15s ease",
-                          letterSpacing: "0.04em",
-                          textTransform: "uppercase",
-                          boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)"
-                        }}
-                        onMouseOver={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
-                        onMouseOut={(e) => (e.currentTarget.style.background = "var(--accent)")}
-                      >
-                        End Turn
-                      </button>
-                    </div>
-                  )}
+              {/* End Turn Button (moved here to be on same line) */}
+              {(room.phase === "playing" && room.turnState && (
+                ((room.gameMode === "coop" &&
+                    localPlayer?.team === (room.turnState.activeTeam === "red" ? "blue" : "red")) ||
+                  (room.gameMode !== "coop" &&
+                    localPlayer?.team === room.turnState.activeTeam &&
+                    localPlayer?.role === "operative")) &&
+                  room.turnState.phase === "guessing"
+              )) && (
+                <button
+                  onClick={handleEndTurn}
+                  style={{
+                    padding: "8px 24px",
+                    borderRadius: "var(--radius-md)",
+                    background: "var(--accent)",
+                    border: "none",
+                    color: "#1C1916",
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase",
+                    boxShadow: "0 4px 12px rgba(232, 163, 61, 0.25)"
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.background = "var(--accent-hover)")}
+                  onMouseOut={(e) => (e.currentTarget.style.background = "var(--accent)")}
+                >
+                  End Turn
+                </button>
+              )}
+            </div>
+                  {/* Waiting Status */}
                   {room.phase === "ended" && !isHost && (
                     <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", marginTop: "4px", textAlign: "center" }}>
                       Waiting for Host to restart the game...
