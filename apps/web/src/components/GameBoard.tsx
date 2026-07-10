@@ -332,6 +332,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
   // Clue Form state
   const [clueCount, setClueCount] = useState<number | null>(null);
+  const [clueCountOpen, setClueCountOpen] = useState(false);
+  const clueCountRef = useRef<HTMLDivElement>(null);
   const [clueWord, setClueWord] = useState<string>("");
   const [clueError, setClueError] = useState<string | null>(null);
   const [chatInput, setChatInput] = useState<string>("");
@@ -569,6 +571,18 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       setVotedCardIds([]);
     }
   }, [localPlayer?.votedCardIds]);
+
+  // Close clue-count picker when user clicks outside it
+  useEffect(() => {
+    if (!clueCountOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (clueCountRef.current && !clueCountRef.current.contains(e.target as Node)) {
+        setClueCountOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [clueCountOpen]);
 
   const playCardDealCascade = (cardCount: number) => {
     if (!soundEnabled) return;
@@ -1521,8 +1535,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         width: "100%",
                         padding: "6px 8px",
                         background: "transparent",
-                        border: "1px solid var(--accent)",
-                        color: "var(--accent)",
+                        border: `1px solid ${themeCol.border}`,
+                        color: themeCol.text,
                         borderRadius: "var(--radius-sm)",
                         fontSize: "0.85rem",
                         fontWeight: 700,
@@ -1533,12 +1547,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         textAlign: "center",
                       }}
                       onMouseOver={(e) => {
-                        e.currentTarget.style.background = "var(--accent)";
-                        e.currentTarget.style.color = "var(--accent-text-on)";
+                        e.currentTarget.style.background = themeCol.border;
+                        e.currentTarget.style.color = "#fff";
                       }}
                       onMouseOut={(e) => {
                         e.currentTarget.style.background = "transparent";
-                        e.currentTarget.style.color = "var(--accent)";
+                        e.currentTarget.style.color = themeCol.text;
                       }}
                     >
                       + Join Team
@@ -3844,16 +3858,64 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         >
                           {room.gameMode === "coop"
                             ? room.turnState.phase === "giving_clue"
-                              ? `${activeCity} - Giving Clue`
+                              ? "Clue Phase"
                               : `${otherCity} - Guessing`
                             : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team's Turn`
                           }
                         </span>
                         <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, margin: 0 }}>
                           {room.turnState.phase === "giving_clue" ? (
-                            room.gameMode === "coop"
-                              ? `${activeCity} is giving clue`
-                              : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Spymaster is giving clue...`
+                            room.gameMode === "coop" ? (
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "1.05rem", fontWeight: 600, color: "var(--color-text-muted)", letterSpacing: "0.02em", flexWrap: "wrap", justifyContent: "center" }}>
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}>
+                                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                                </svg>
+                                Awaiting a clue from the field
+                                <span style={{ opacity: 0.45, fontWeight: 400 }}>·</span>
+                                <span style={{ fontStyle: "italic", opacity: 0.55, fontWeight: 400, fontSize: "0.95rem" }}>pick a side to play</span>
+                              </span>
+                            ) : (() => {
+                              const activeSpymaster = room.players.find((p) => p.team === room.turnState!.activeTeam && p.role === "spymaster");
+                              return (
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+                                  {activeSpymaster ? (
+                                    <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
+                                      <span style={{
+                                        display: "inline-flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        width: "38px",
+                                        height: "38px",
+                                        borderRadius: "50%",
+                                        border: `2px solid ${typeColors[room.turnState!.activeTeam]!.border}`,
+                                        background: typeColors[room.turnState!.activeTeam]!.bg,
+                                        overflow: "hidden",
+                                        flexShrink: 0,
+                                      }}>
+                                        {activeSpymaster.avatar
+                                          ? renderAvatar(activeSpymaster.avatar, 32)
+                                          : <span style={{ fontSize: "1rem" }}>{activeSpymaster.displayName.charAt(0).toUpperCase()}</span>
+                                        }
+                                      </span>
+                                      <span style={{ fontSize: "0.65rem", fontWeight: 700, color: typeColors[room.turnState!.activeTeam]!.light, textTransform: "uppercase", letterSpacing: "0.05em", maxWidth: "54px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        {activeSpymaster.displayName}
+                                      </span>
+                                    </span>
+                                  ) : (
+                                    <span style={{
+                                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                                      width: "38px", height: "38px", borderRadius: "50%",
+                                      border: `2px dashed ${typeColors[room.turnState!.activeTeam]!.border}`,
+                                      background: typeColors[room.turnState!.activeTeam]!.bg,
+                                      opacity: 0.5, flexShrink: 0,
+                                    }}>
+                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                    </span>
+                                  )}
+                                  <span>is giving clue...</span>
+                                </span>
+                              );
+                            })()
                           ) : (
                             <>
                               Clue:{" "}
@@ -3900,6 +3962,40 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             {otherCity} is guessing grid...
                           </div>
                         )}
+                        {room.turnState.phase === "guessing" && room.gameMode !== "coop" && (() => {
+                          const operatives = room.players.filter((p) => p.team === room.turnState!.activeTeam && p.role === "operative");
+                          const teamCol = typeColors[room.turnState!.activeTeam]!;
+                          return operatives.length > 0 ? (
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", flexWrap: "wrap", marginTop: "6px", width: "100%" }}>
+                              <div style={{ display: "flex", alignItems: "center" }}>
+                                {operatives.slice(0, 5).map((p, idx) => (
+                                  <span
+                                    key={p.id}
+                                    title={p.displayName}
+                                    style={{
+                                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                                      width: "30px", height: "30px", borderRadius: "50%",
+                                      border: `2px solid ${teamCol.border}`,
+                                      background: teamCol.bg,
+                                      overflow: "hidden",
+                                      marginLeft: idx === 0 ? 0 : "-8px",
+                                      zIndex: operatives.length - idx,
+                                      position: "relative",
+                                    }}
+                                  >
+                                    {p.avatar ? renderAvatar(p.avatar, 24) : <span style={{ fontSize: "0.75rem", fontWeight: 700, color: teamCol.text }}>{p.displayName.charAt(0).toUpperCase()}</span>}
+                                  </span>
+                                ))}
+                                {operatives.length > 5 && (
+                                  <span style={{ marginLeft: "-8px", display: "inline-flex", alignItems: "center", justifyContent: "center", width: "30px", height: "30px", borderRadius: "50%", background: teamCol.bg, border: `2px solid ${teamCol.border}`, fontSize: "0.65rem", fontWeight: 700, color: teamCol.text, position: "relative", zIndex: 0 }}>
+                                    +{operatives.length - 5}
+                                  </span>
+                                )}
+                              </div>
+                              <span style={{ fontSize: "0.9rem", fontWeight: 600, color: teamCol.light }}>are guessing the grid...</span>
+                            </div>
+                          ) : null;
+                        })()}
                         {room.turnState.phase === "guessing" && (
                           <p style={{ margin: "4px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.9rem", width: "100%", textAlign: "center" }}>
                             Guesses used: {room.turnState.guessesUsed} / {room.turnState.guessesAllowed === Infinity ? "Unlimited" : room.turnState.guessesAllowed}
@@ -3935,7 +4031,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       {/* Inline Premium Shaking Timer badge at the end of Scores row with CLAIM OPPONENT TURN action */}
                       {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                          {timerCount <= 0 && localPlayer && localPlayer.team !== room.turnState?.activeTeam && room.settings.timerAction === "manual" && (
+                          {timerCount <= 0 && localPlayer && localPlayer.team !== room.turnState?.activeTeam && room.settings.timerAction === "manual" && room.gameMode !== "coop" && (
                             <button
                               onClick={() => {
                                 playNavClick();
@@ -4817,8 +4913,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               {room.phase === "playing" &&
                 room.turnState &&
                 room.turnState.phase === "giving_clue" &&
-                localPlayer?.team === room.turnState.activeTeam &&
-                (localPlayer?.role === "spymaster" || room.gameMode === "coop") && (
+                (room.gameMode === "coop"
+                  ? !!localPlayer?.team  // In duet: any player on any team can give a clue
+                  : localPlayer?.team === room.turnState.activeTeam && localPlayer?.role === "spymaster"
+                ) && (
                    <form
                     onSubmit={onSubmitClue}
                     className="fade-in"
@@ -4865,11 +4963,38 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         />
                       </div>
 
-                      {/* Count Selector Trigger (-) */}
-                      <div className="clue-count-selector-container" style={{ flexShrink: 0 }}>
+                      {/* Count Selector — click to open/close, linear row above */}
+                      <div
+                        className="clue-count-selector-container"
+                        ref={clueCountRef}
+                        style={{ flexShrink: 0, position: "relative" }}
+                      >
+                        {/* The horizontal number strip — shown when open */}
+                        <div className={`clue-count-dropdown${clueCountOpen ? " open" : ""}`}>
+                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1].map((n) => {
+                            const isSelected = clueCount === n;
+                            return (
+                              <button
+                                key={n}
+                                type="button"
+                                className={`clue-count-item${isSelected ? " selected" : ""}`}
+                                onClick={() => {
+                                  setClueCount(n);
+                                  setClueCountOpen(false);
+                                }}
+                              >
+                                {n === -1 ? "∞" : n}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Trigger button */}
                         <button
                           type="button"
-                          className={`clue-count-trigger-btn ${clueCount !== null ? "active" : ""}`}
+                          className={`clue-count-trigger-btn${clueCount !== null ? " active" : ""}${clueCountOpen ? " open" : ""}`}
+                          onClick={() => setClueCountOpen((v) => !v)}
+                          title="Select clue count"
                           style={{
                             width: "44px",
                             height: "44px",
@@ -4890,39 +5015,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         >
                           {clueCount === -1 ? "∞" : clueCount === null ? "-" : clueCount}
                         </button>
-                        <div className="clue-count-dropdown">
-                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1].map((n) => {
-                            const isSelected = clueCount === n;
-                            return (
-                              <button
-                                key={n}
-                                type="button"
-                                onClick={() => setClueCount(n)}
-                                style={{
-                                  width: "36px",
-                                  height: "36px",
-                                  borderRadius: "50%",
-                                  border: `1px solid ${isSelected ? "var(--accent)" : "var(--border-default)"}`,
-                                  background: isSelected
-                                    ? "var(--accent)"
-                                    : "var(--bg-surface-raised)",
-                                  color: isSelected ? "var(--accent-text-on)" : "var(--text-secondary)",
-                                  fontFamily: "var(--font-display)",
-                                  fontWeight: 700,
-                                  fontSize: "0.95rem",
-                                  cursor: "pointer",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  boxShadow: isSelected ? "0 0 8px var(--accent)" : "none",
-                                  transition: "all 0.15s ease",
-                                }}
-                              >
-                                {n === -1 ? "∞" : n}
-                              </button>
-                            );
-                          })}
-                        </div>
                       </div>
 
                       {/* Custom design Send Clue button */}
