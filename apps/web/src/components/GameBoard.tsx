@@ -4411,7 +4411,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         cardType = card.type || "unknown";
                       } else {
                         const opponentColor = localPlayer.team === "red" ? "blue" : "red";
-                        if (card.type === opponentColor || card.type === "assassin" || card.type === "neutral") {
+                        if (card.type === opponentColor || card.type === "assassin") {
                           cardType = card.type || "unknown";
                         } else {
                           cardType = "unknown";
@@ -4839,23 +4839,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       boxSizing: "border-box",
                     }}
                   >
-                    {room.gameMode === "coop" && (
-                      <div style={{
-                        background: "linear-gradient(135deg, rgba(var(--team-accent-rgb,232,163,61),0.08), rgba(var(--team-accent-rgb,232,163,61),0.04))",
-                        border: "1px solid rgba(232,163,61,0.25)",
-                        borderRadius: "var(--radius-sm)",
-                        padding: "10px 14px",
-                        fontSize: "0.82rem",
-                        color: "var(--text-secondary)",
-                        lineHeight: 1.6,
-                        marginBottom: "12px",
-                      }}>
-                        💡 <strong style={{ color: "var(--accent)" }}>Duet Mode:</strong>{" "}
-                        You can see the <strong style={{ color: typeColors[localPlayer?.team === "red" ? "blue" : "red"]?.light }}>
-                          {localPlayer?.team === "red" ? "Blue" : "Red"} Team&apos;s cards
-                        </strong> on the board. Give a clue that points to those cards — your partner will guess them!
-                      </div>
-                    )}
+
                     <div style={{ display: "flex", gap: isMobileViewport ? "8px" : "14px", alignItems: "center", width: "100%", flexWrap: "nowrap" }}>
                       <div style={{ flex: "1 1 auto", minWidth: 0 }}>
                         <input
