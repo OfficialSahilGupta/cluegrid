@@ -3871,25 +3871,22 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           }}
                         >
                           {room.gameMode === "coop"
-                            ? room.turnState.phase === "giving_clue"
-                              ? "Clue Phase"
-                              : `${otherCity} - Guessing`
+                            ? "Clue Phase"
                             : `${room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1))} Team's Turn`
                           }
                         </span>
                         <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, margin: 0 }}>
-                          {room.turnState.phase === "giving_clue" ? 
-                            room.gameMode === "coop" ? (
-                              <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "1.05rem", fontWeight: 600, color: "var(--color-text-muted)", letterSpacing: "0.02em", flexWrap: "wrap", justifyContent: "center" }}>
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}>
-                                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                </svg>
-                                Awaiting a clue from the field
-                                <span style={{ opacity: 0.45, fontWeight: 400 }}>·</span>
-                                <span style={{ fontStyle: "italic", opacity: 0.55, fontWeight: 400, fontSize: "0.95rem" }}>pick a side to play</span>
-                              </span>
-                            ) : (() => {
-                              const activeSpymasters = room.players.filter((p) => p.team === room.turnState!.activeTeam && p.role === "spymaster");
+                          {room.gameMode === "coop" ? (
+                            <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "1.05rem", fontWeight: 600, color: "var(--color-text-muted)", letterSpacing: "0.02em", flexWrap: "wrap", justifyContent: "center" }}>
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}>
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                              </svg>
+                              Awaiting a clue from the field
+                              <span style={{ opacity: 0.45, fontWeight: 400 }}>·</span>
+                              <span style={{ fontStyle: "italic", opacity: 0.55, fontWeight: 400, fontSize: "0.95rem" }}>pick a side to play</span>
+                            </span>
+                          ) : room.turnState.phase === "giving_clue" ? (() => {
+                            const activeSpymasters = room.players.filter((p) => p.team === room.turnState!.activeTeam && p.role === "spymaster");
                             return (
                               <span style={{ display: "inline-flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
                                 {activeSpymasters.length > 0 ? (
@@ -3965,10 +3962,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             </>
                           )}
                         </h3>
-                        {room.turnState.phase === "guessing" && (() => {
-                          const guessingTeam = room.gameMode === "coop"
-                            ? getCoopGuessingTeam(room.turnState.activeTeam, room.teams)
-                            : room.turnState.activeTeam;
+                        {room.turnState.phase === "guessing" && room.gameMode !== "coop" && (() => {
+                          const guessingTeam = room.turnState.activeTeam;
                           const operatives = room.players.filter((p) => p.team === guessingTeam && p.role === "operative");
                           const teamCol = typeColors[guessingTeam]!;
                           return operatives.length > 0 ? (
