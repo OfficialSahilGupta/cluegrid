@@ -168,6 +168,20 @@ const getWatermarkImage = (color: string, role: "operative" | "spymaster") => {
   return "";
 };
 
+/**
+ * In coop/duet mode the "guessing team" is whoever is NOT the active clue-giver.
+ * Hardcoding red↔blue breaks when there are 3-4 teams in the room.
+ * This helper picks the first non-active team that exists in room.teams.
+ */
+const getCoopGuessingTeam = (
+  activeTeam: string,
+  teams: Record<string, unknown>
+): string => {
+  const other = Object.keys(teams).find((t) => t !== activeTeam);
+  // Fallback: classic 2-team flip
+  return other ?? (activeTeam === "red" ? "blue" : "red");
+};
+
 const typeColors: Record<string, { bg: string; border: string; text: string; light: string }> = {
   red: teamColorPresets[0]!,
   blue: teamColorPresets[1]!,
@@ -3839,9 +3853,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 
                 <div style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "center", alignItems: "center", justifyContent: "center", flex: 1, minWidth: "280px", width: "100%" }}>
                   {room.phase === "playing" && room.turnState ? (() => {
-                    const activeCity = room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam === "red" ? "Belgrade" : "Paris");
-                    const otherTeam = room.turnState.activeTeam === "red" ? "blue" : "red";
-                    const otherCity = room.teams[otherTeam]?.name || (otherTeam === "red" ? "Belgrade" : "Paris");
+                    const activeCity = room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1));
+                    const otherTeam = getCoopGuessingTeam(room.turnState.activeTeam, room.teams);
+                    const otherCity = room.teams[otherTeam as TeamIdentifier]?.name || (otherTeam.charAt(0).toUpperCase() + otherTeam.slice(1));
                     return (
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", width: "100%" }}>
                         <span
@@ -3864,7 +3878,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           }
                         </span>
                         <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.6rem", fontWeight: 700, margin: 0 }}>
-                          {room.turnState.phase === "giving_clue" ? (
+                          {room.turnState.phase === "giving_clue" ? 
                             room.gameMode === "coop" ? (
                               <span style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "1.05rem", fontWeight: 600, color: "var(--color-text-muted)", letterSpacing: "0.02em", flexWrap: "wrap", justifyContent: "center" }}>
                                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6, flexShrink: 0 }}>
@@ -3875,48 +3889,53 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                 <span style={{ fontStyle: "italic", opacity: 0.55, fontWeight: 400, fontSize: "0.95rem" }}>pick a side to play</span>
                               </span>
                             ) : (() => {
-                              const activeSpymaster = room.players.find((p) => p.team === room.turnState!.activeTeam && p.role === "spymaster");
-                              return (
-                                <span style={{ display: "inline-flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
-                                  {activeSpymaster ? (
-                                    <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: "2px" }}>
-                                      <span style={{
-                                        display: "inline-flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        width: "38px",
-                                        height: "38px",
-                                        borderRadius: "50%",
-                                        border: `2px solid ${typeColors[room.turnState!.activeTeam]!.border}`,
-                                        background: typeColors[room.turnState!.activeTeam]!.bg,
-                                        overflow: "hidden",
-                                        flexShrink: 0,
-                                      }}>
-                                        {activeSpymaster.avatar
-                                          ? renderAvatar(activeSpymaster.avatar, 32)
-                                          : <span style={{ fontSize: "1rem" }}>{activeSpymaster.displayName.charAt(0).toUpperCase()}</span>
+                              const activeSpymasters = room.players.filter((p) => p.team === room.turnState!.activeTeam && p.role === "spymaster");
+                            return (
+                              <span style={{ display: "inline-flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
+                                {activeSpymasters.length > 0 ? (
+                                  <div style={{ display: "flex", alignItems: "center" }}>
+                                    {activeSpymasters.map((p, idx) => (
+                                      <span
+                                        key={p.id}
+                                        title={p.displayName}
+                                        style={{
+                                          display: "inline-flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          width: "38px",
+                                          height: "38px",
+                                          borderRadius: "50%",
+                                          border: `2px solid ${typeColors[room.turnState!.activeTeam]!.border}`,
+                                          background: typeColors[room.turnState!.activeTeam]!.bg,
+                                          overflow: "hidden",
+                                          marginLeft: idx === 0 ? 0 : "-12px",
+                                          zIndex: activeSpymasters.length - idx,
+                                          position: "relative",
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        {p.avatar
+                                          ? renderAvatar(p.avatar, 32)
+                                          : <span style={{ fontSize: "1rem", fontWeight: 700, color: typeColors[room.turnState!.activeTeam]!.text }}>{p.displayName.charAt(0).toUpperCase()}</span>
                                         }
                                       </span>
-                                      <span style={{ fontSize: "0.65rem", fontWeight: 700, color: typeColors[room.turnState!.activeTeam]!.light, textTransform: "uppercase", letterSpacing: "0.05em", maxWidth: "54px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                        {activeSpymaster.displayName}
-                                      </span>
-                                    </span>
-                                  ) : (
-                                    <span style={{
-                                      display: "inline-flex", alignItems: "center", justifyContent: "center",
-                                      width: "38px", height: "38px", borderRadius: "50%",
-                                      border: `2px dashed ${typeColors[room.turnState!.activeTeam]!.border}`,
-                                      background: typeColors[room.turnState!.activeTeam]!.bg,
-                                      opacity: 0.5, flexShrink: 0,
-                                    }}>
-                                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                                    </span>
-                                  )}
-                                  <span>is giving clue...</span>
-                                </span>
-                              );
-                            })()
-                          ) : (
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span style={{
+                                    display: "inline-flex", alignItems: "center", justifyContent: "center",
+                                    width: "38px", height: "38px", borderRadius: "50%",
+                                    border: `2px dashed ${typeColors[room.turnState!.activeTeam]!.border}`,
+                                    background: typeColors[room.turnState!.activeTeam]!.bg,
+                                    opacity: 0.5, flexShrink: 0,
+                                  }}>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                  </span>
+                                )}
+                                <span>{activeSpymasters.length > 1 ? "are giving clues..." : "is giving clue..."}</span>
+                              </span>
+                            );
+                          })() : (
                             <>
                               Clue:{" "}
                               <span style={{
@@ -3946,29 +3965,16 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             </>
                           )}
                         </h3>
-                        {room.turnState.phase === "guessing" && room.gameMode === "coop" && (
-                          <div style={{
-                            fontFamily: "var(--font-display)",
-                            fontSize: "1.4rem",
-                            color: typeColors[otherTeam]!.border,
-                            fontWeight: 800,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.06em",
-                            width: "100%",
-                            textAlign: "center",
-                            marginTop: "6px",
-                            textShadow: `0 0 8px ${typeColors[otherTeam]!.border}44`
-                          }}>
-                            {otherCity} is guessing grid...
-                          </div>
-                        )}
-                        {room.turnState.phase === "guessing" && room.gameMode !== "coop" && (() => {
-                          const operatives = room.players.filter((p) => p.team === room.turnState!.activeTeam && p.role === "operative");
-                          const teamCol = typeColors[room.turnState!.activeTeam]!;
+                        {room.turnState.phase === "guessing" && (() => {
+                          const guessingTeam = room.gameMode === "coop"
+                            ? getCoopGuessingTeam(room.turnState.activeTeam, room.teams)
+                            : room.turnState.activeTeam;
+                          const operatives = room.players.filter((p) => p.team === guessingTeam && p.role === "operative");
+                          const teamCol = typeColors[guessingTeam]!;
                           return operatives.length > 0 ? (
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", flexWrap: "wrap", marginTop: "6px", width: "100%" }}>
                               <div style={{ display: "flex", alignItems: "center" }}>
-                                {operatives.slice(0, 5).map((p, idx) => (
+                                {operatives.map((p, idx) => (
                                   <span
                                     key={p.id}
                                     title={p.displayName}
@@ -3986,15 +3992,26 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                     {p.avatar ? renderAvatar(p.avatar, 24) : <span style={{ fontSize: "0.75rem", fontWeight: 700, color: teamCol.text }}>{p.displayName.charAt(0).toUpperCase()}</span>}
                                   </span>
                                 ))}
-                                {operatives.length > 5 && (
-                                  <span style={{ marginLeft: "-8px", display: "inline-flex", alignItems: "center", justifyContent: "center", width: "30px", height: "30px", borderRadius: "50%", background: teamCol.bg, border: `2px solid ${teamCol.border}`, fontSize: "0.65rem", fontWeight: 700, color: teamCol.text, position: "relative", zIndex: 0 }}>
-                                    +{operatives.length - 5}
-                                  </span>
-                                )}
                               </div>
                               <span style={{ fontSize: "0.9rem", fontWeight: 600, color: teamCol.light }}>are guessing the grid...</span>
                             </div>
-                          ) : null;
+                          ) : (
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", flexWrap: "wrap", marginTop: "6px", width: "100%" }}>
+                              <span
+                                style={{
+                                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                                  width: "30px", height: "30px", borderRadius: "50%",
+                                  border: `2px dashed ${teamCol.border}`,
+                                  background: teamCol.bg,
+                                  overflow: "hidden",
+                                  position: "relative",
+                                }}
+                              >
+                                <span style={{ fontSize: "1rem" }}>🎩</span>
+                              </span>
+                              <span style={{ fontSize: "0.9rem", fontWeight: 600, color: teamCol.light }}>are guessing the grid...</span>
+                            </div>
+                          );
                         })()}
 
                       </div>
@@ -4226,7 +4243,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               {/* End Turn Button (moved here to be on same line) */}
               {(room.phase === "playing" && room.turnState && (
                 ((room.gameMode === "coop" &&
-                    localPlayer?.team === (room.turnState.activeTeam === "red" ? "blue" : "red")) ||
+                    localPlayer?.team === getCoopGuessingTeam(room.turnState.activeTeam, room.teams)) ||
                   (room.gameMode !== "coop" &&
                     localPlayer?.team === room.turnState.activeTeam &&
                     localPlayer?.role === "operative")) &&
@@ -4511,7 +4528,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
                     const isCoopActiveOp =
                       room.gameMode === "coop" &&
-                      localPlayer?.team === (room.turnState?.activeTeam === "red" ? "blue" : "red") &&
+                      room.turnState != null &&
+                      localPlayer?.team === getCoopGuessingTeam(room.turnState.activeTeam, room.teams) &&
                       room.turnState?.phase === "guessing";
 
                     const isActiveOperative =
@@ -4528,7 +4546,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       room.turnState?.phase === "giving_clue" &&
                       localPlayer?.team === room.turnState?.activeTeam &&
                       (room.gameMode === "coop"
-                        ? card.type === (localPlayer?.team === "red" ? "blue" : "red")
+                        ? card.type === getCoopGuessingTeam(room.turnState!.activeTeam, room.teams)
                         : localPlayer?.role === "spymaster" && card.type === localPlayer?.team);
 
                     const isInteractive = (isActiveOperative || isSpymasterClickable) && !card.revealed;
@@ -6753,7 +6771,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
           // In coop/duet mode, ANY guessing-team member (no role needed) can auto-end turn
           const isCoopActiveOp =
             room.gameMode === "coop" &&
-            localPlayer?.team === (room.turnState?.activeTeam === "red" ? "blue" : "red") &&
+            room.turnState != null &&
+            localPlayer?.team === getCoopGuessingTeam(room.turnState.activeTeam, room.teams) &&
             room.turnState?.phase === "guessing";
 
           const isActiveOp =
@@ -7105,7 +7124,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
       // In classic: spymaster selects from their own team's cards
       const targetType =
         room.gameMode === "coop"
-          ? (localPlayer?.team === "red" ? "blue" : "red")
+          ? getCoopGuessingTeam(room.turnState.activeTeam, room.teams)
           : localPlayer?.team;
       if (card && card.type === targetType) {
         playClueSelectionSound();
@@ -7127,7 +7146,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
     // 2. Operative voting selection
     const isCoopActiveOp =
       room.gameMode === "coop" &&
-      localPlayer?.team === (room.turnState.activeTeam === "red" ? "blue" : "red") &&
+      localPlayer?.team === getCoopGuessingTeam(room.turnState.activeTeam, room.teams) &&
       room.turnState.phase === "guessing";
 
     const isActiveOperative =
