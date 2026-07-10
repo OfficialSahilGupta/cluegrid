@@ -3866,7 +3866,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             fontSize: "0.8rem",
                             fontWeight: 700,
                             textTransform: "uppercase",
-                            backgroundColor: typeColors[room.turnState.activeTeam]!.border,
+                            backgroundColor: room.gameMode === "coop" ? "var(--color-border)" : typeColors[room.turnState.activeTeam]!.border,
                             color: "#fff",
                           }}
                         >
