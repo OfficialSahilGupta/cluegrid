@@ -4912,10 +4912,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             {/* Clue Submission Form */}
               {room.phase === "playing" &&
                 room.turnState &&
-                room.turnState.phase === "giving_clue" &&
                 (room.gameMode === "coop"
-                  ? !!localPlayer?.team  // In duet: any player on any team can give a clue
-                  : localPlayer?.team === room.turnState.activeTeam && localPlayer?.role === "spymaster"
+                  ? !!localPlayer?.team  // In duet: any player on any team can give a clue at any time
+                  : room.turnState.phase === "giving_clue" && localPlayer?.team === room.turnState.activeTeam && localPlayer?.role === "spymaster"
                 ) && (
                    <form
                     onSubmit={onSubmitClue}
