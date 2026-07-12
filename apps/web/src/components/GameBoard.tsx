@@ -1436,8 +1436,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     performSearch(word);
   };
 
-  const renderGroupedPlayersCard = (side?: "left" | "right") => {
-    const renderTeamSegment = (color: "red" | "blue" | "green" | "yellow", label: string) => {
+  const renderTeamSegment = (color: "red" | "blue" | "green" | "yellow", label: string) => {
       const teamObj = room.teams[color];
       const teamPlayers = room.players.filter((p) => p.team === color);
       const spymasters = teamPlayers.filter((p) => p.role === "spymaster");
@@ -2144,7 +2143,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           )}
         </div>
       );
-    };
+  };
+
+  const renderGroupedPlayersCard = (side?: "left" | "right") => {
 
 
     if (side) {
@@ -2161,7 +2162,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           }}
         >
           <h3 style={{ fontFamily: "var(--font-display)", fontSize: "1.5rem", fontWeight: 700, margin: "0 0 16px 0", color: isLeft ? "hsl(355,85%,58%)" : "var(--accent)" }}>
-            {isLeft ? `${t("teams.red", "Red")} ${t("teams.team", "Team")}` : `${t("teams.blue", "Blue")} & Other ${t("teams.team", "Teams")}`}
+            {isLeft 
+              ? `${t("teams.red", "Red")} ${t("teams.team", "Team")}` 
+              : room.teamCount > 2 
+                ? `${t("teams.blue", "Blue")} & Other ${t("teams.team", "Teams")}` 
+                : `${t("teams.blue", "Blue")} ${t("teams.team", "Team")}`
+            }
           </h3>
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
             {isLeft ? (
@@ -3770,15 +3776,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           )}
         </div>
 
-        {/* Room Players card rendered at the top, above Turn Banner */}
-        {room.phase !== "lobby" && (
-          <div style={{ width: "100%", boxSizing: "border-box", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1 }}>
-            {renderGroupedPlayersCard()}
-          </div>
-        )}
-
-              {/* Spymaster reaction bar */}
-              {room.phase === "playing" && localPlayer?.role === "spymaster" && (
+        {room.phase !== "lobby" && room.phase === "playing" && localPlayer?.role === "spymaster" && (
                 <div
                   style={{
                     background: "var(--bg-surface-raised)",
@@ -3833,9 +3831,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 </div>
               )}
 
-              {/* Turn Banner */}
-              <div
-                id="clue-display-panel"
+        {/* Turn Banner */}
+        {room.phase !== "lobby" && (
+          <div
+            id="clue-display-panel"
                 style={{
                   background: "var(--color-surface)",
                   border: "1px solid var(--color-border)",
@@ -4277,98 +4276,28 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   )}
                 </div>
               </div>
+            )}
 
-              {/* Left Side: Game Board & Action forms */}
-        <div className="game-main-col" style={{ width: "100%", display: "flex", flexDirection: "column", gap: "24px" }}>
-          {/* Lobby Preset Forms */}
-          {room.phase === "lobby" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-              {/* Game Settings Card */}
-              {renderSettingsCard()}
-
-              {/* Room Players Card */}
-              {renderGroupedPlayersCard()}
-
-
-
-              {/* Spectate Action Card (Rendered in its own separate container) */}
-              {localPlayer?.team && !room.settings.roomLocked && (
-                <div
-                  style={{
-                    background: "var(--color-surface)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "16px 20px",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <button
-                    onClick={() => handleJoinTeamRole(null, null)}
-                    style={{
-                      width: "100%",
-                      padding: "12px 20px",
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--bg-surface-raised)",
-                      border: "1px solid var(--border-default)",
-                      color: "var(--text-primary)",
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      textAlign: "center",
-                    }}
-                  >
-                    Spectate (Join Spectators)
-                  </button>
-                </div>
-              )}
-
-              {/* Start Game Action Card (Rendered in its own separate container) */}
+            {/* Three-Column Layout: Red Team (Left) | Game Board (Middle) | Blue Team (Right) */}
+            {room.phase !== "lobby" && (
               <div
                 style={{
-                  background: "var(--color-surface)",
-                  border: "1px solid var(--color-border)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "20px",
                   display: "flex",
-                  flexDirection: "column",
-                  alignItems: "stretch",
-                  gap: "12px",
+                  flexDirection: isMobileViewport ? "column" : "row",
+                  gap: "30px",
+                  width: "100%",
+                  alignItems: "flex-start",
+                  boxSizing: "border-box",
                 }}
               >
-                {isHost ? (
-                  <button
-                    onClick={handleStartGame}
-                    style={{
-                      width: "100%",
-                      padding: "12px 32px",
-                      borderRadius: "var(--radius-md)",
-                      background: "var(--accent)",
-                      color: "var(--accent-text-on)",
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 700,
-                      fontSize: "1.05rem",
-                      cursor: "pointer",
-                      border: "none",
-                      boxShadow: "0 4px 16px rgba(232, 163, 61, 0.2)",
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = "var(--accent-hover)";
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = "var(--accent)";
-                    }}
-                  >
-                    Start Game
-                  </button>
-                ) : (
-                  <div style={{ color: "var(--color-text-muted)", fontSize: "0.95rem", fontStyle: "italic", textAlign: "center", width: "100%" }}>
-                    Waiting for Host to start the game...
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+                {/* Left Side: Red Team */}
+                <div style={{ flex: isMobileViewport ? "1 1 auto" : "0 0 195px", minWidth: "170px", width: isMobileViewport ? "100%" : "auto", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1, marginLeft: isMobileViewport ? "0px" : "-20px" }}>
+                  {renderTeamSegment("red", `${t("teams.red")} ${t("teams.team")}`)}
+                </div>
+
+                {/* Middle Side: Game Board (Reduced Size, Centered) */}
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "24px", minWidth: 0, width: "100%" }}>
+
 
           {/* Active Game Layout */}
           {(room.phase === "playing" || room.phase === "ended") && (
@@ -4627,7 +4556,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           alignItems: "stretch",
                           justifyContent: "stretch",
                           cursor: (isInteractive || card.revealed) ? "pointer" : "default",
-                          minHeight: "clamp(80px, 18vw, 130px)",
+                          minHeight: "clamp(75px, 12vw, 110px)",
+                          containerType: "inline-size",
                           position: "relative",
                           perspective: "1000px",
                           transformStyle: "preserve-3d",
@@ -4885,10 +4815,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             style={{
                               fontFamily: "var(--font-display)",
                               fontSize: card.word.length > 9
-                                ? "clamp(0.6rem, 2.6vw, 0.95rem)"
+                                ? "clamp(9px, 11.5cqw, 0.85rem)"
                                 : card.word.length > 7
-                                  ? "clamp(0.75rem, 3.2vw, 1.1rem)"
-                                  : "clamp(0.9rem, 3.8vw, 1.25rem)",
+                                  ? "clamp(10px, 13.5cqw, 1.0rem)"
+                                  : "clamp(11px, 15.5cqw, 1.15rem)",
                               fontWeight: 900,
                               letterSpacing: "0.05em",
                               color: card.revealed
@@ -5074,7 +5004,14 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
             </div>
           )}
-        </div>
+            </div>
+
+            {/* Right Side: Blue Team */}
+            <div style={{ flex: isMobileViewport ? "1 1 auto" : "0 0 195px", minWidth: "170px", width: isMobileViewport ? "100%" : "auto", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1 }}>
+              {renderTeamSegment("blue", `${t("teams.blue")} ${t("teams.team")}`)}
+            </div>
+          </div>
+        )}
 
       </>
     );
