@@ -4096,32 +4096,35 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             return (
                               <span style={{ display: "inline-flex", alignItems: "center", gap: "10px", flexWrap: "wrap", justifyContent: "center" }}>
                                 {activeSpymasters.length > 0 ? (
-                                  <div style={{ display: "flex", alignItems: "center" }}>
+                                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                                     {activeSpymasters.map((p, idx) => (
-                                      <span
-                                        key={p.id}
-                                        title={p.displayName}
-                                        style={{
-                                          display: "inline-flex",
-                                          alignItems: "center",
-                                          justifyContent: "center",
-                                          width: "38px",
-                                          height: "38px",
-                                          borderRadius: "50%",
-                                          border: `2px solid ${typeColors[room.turnState!.activeTeam]!.border}`,
-                                          background: typeColors[room.turnState!.activeTeam]!.bg,
-                                          overflow: "hidden",
-                                          marginLeft: idx === 0 ? 0 : "-12px",
-                                          zIndex: activeSpymasters.length - idx,
-                                          position: "relative",
-                                          flexShrink: 0,
-                                        }}
-                                      >
-                                        {p.avatar
-                                          ? renderAvatar(p.avatar, 32)
-                                          : <span style={{ fontSize: "1rem", fontWeight: 700, color: typeColors[room.turnState!.activeTeam]!.text }}>{p.displayName.charAt(0).toUpperCase()}</span>
-                                        }
-                                      </span>
+                                      <div key={p.id} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                                        {idx > 0 && <span style={{ color: "var(--color-text-muted)" }}>&</span>}
+                                        <span
+                                          title={p.displayName}
+                                          style={{
+                                            display: "inline-flex",
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                            width: "38px",
+                                            height: "38px",
+                                            borderRadius: "50%",
+                                            border: `2px solid ${typeColors[room.turnState!.activeTeam]!.border}`,
+                                            background: typeColors[room.turnState!.activeTeam]!.bg,
+                                            overflow: "hidden",
+                                            position: "relative",
+                                            flexShrink: 0,
+                                          }}
+                                        >
+                                          {p.avatar
+                                            ? renderAvatar(p.avatar, 32)
+                                            : <span style={{ fontSize: "1rem", fontWeight: 700, color: typeColors[room.turnState!.activeTeam]!.text }}>{p.displayName.charAt(0).toUpperCase()}</span>
+                                          }
+                                        </span>
+                                        <span style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text-primary)" }}>
+                                          {p.displayName}
+                                        </span>
+                                      </div>
                                     ))}
                                   </div>
                                 ) : (
@@ -4135,10 +4138,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                   </span>
                                 )}
-                                <span>
+                                <span style={{ fontSize: "1.1rem", fontWeight: 700, letterSpacing: "0.02em" }}>
                                   {activeSpymasters.length === 0
-                                    ? "No Spymaster deployed"
-                                    : (activeSpymasters.length > 1 ? "are giving clue..." : "is giving clue...")
+                                    ? "NO SPYMASTER DEPLOYED"
+                                    : (activeSpymasters.length > 1 ? "ARE GIVING CLUE" : "IS GIVING CLUE")
                                   }
                                 </span>
                               </span>
