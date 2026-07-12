@@ -4993,65 +4993,107 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           {/* Real-time Voter Avatars Overlay (floats above divider inside top section) */}
                           {voters.length > 0 && (() => {
                             const count = voters.length;
-                            const gap = count > 4 ? "2px" : "4px";
-                            const padding = count > 4 ? "1px 4px 1px 1px" : "2px 6px 2px 2px";
-                            const avSize = count > 4 ? 12 : 16;
-                            const fSize = count > 4 ? "0.55rem" : "0.62rem";
-                            const maxW = count > 4 ? "48px" : "64px";
+                            const isMob = isMobileViewport;
+                            const avSize = isMob ? 12 : 16;
+                            const overlap = isMob ? -4 : -6;
+                            const fSize = isMob ? "0.52rem" : "0.62rem";
+                            const textMaxW = isMob ? "38px" : "80px";
+                            
+                            // Join voter names
+                            const namesText = voters.map(v => v.displayName).join(", ");
+                            
                             return (
                               <div
+                                className="voter-badge-overlay"
                                 style={{
                                   position: "absolute",
-                                  bottom: "6px",
-                                  left: "8px",
-                                  right: "8px",
-                                  display: "flex",
-                                  gap: gap,
-                                  flexWrap: "wrap",
-                                  zIndex: 4,
+                                  bottom: isMob ? "-2px" : "-10px",
+                                  left: "50%",
+                                  transform: "translateX(-50%)",
+                                  background: "rgba(0, 0, 0, 0.8)",
+                                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                                  borderRadius: "12px",
+                                  padding: isMob ? "1.5px 4px" : "2px 6px",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "4px",
+                                  boxShadow: "0 2px 6px rgba(0, 0, 0, 0.4)",
+                                  zIndex: 5,
+                                  pointerEvents: "none",
+                                  whiteSpace: "nowrap",
                                 }}
                               >
-                                {voters.map((v, index) => {
-                                  const delay = `${(index * 200) % 1000}ms`;
-                                  return (
-                                    <div
-                                      key={v.id}
-                                      title={v.displayName}
-                                      className="voter-badge-floating"
-                                      style={{
-                                        display: "inline-flex",
-                                        alignItems: "center",
-                                        gap: count > 4 ? "2px" : "4px",
-                                        padding: padding,
-                                        background: "rgba(0, 0, 0, 0.75)",
-                                        border: "1px solid rgba(255, 255, 255, 0.2)",
-                                        borderRadius: "12px",
-                                        cursor: "default",
-                                        animation: "voter-badge-entry 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, avatar-float 3s ease-in-out infinite alternate",
-                                        animationDelay: `0s, ${delay}`,
-                                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.4)",
-                                        pointerEvents: "none",
-                                      }}
-                                    >
-                                      <div style={{ display: "flex", borderRadius: "50%", overflow: "hidden", flexShrink: 0 }}>
-                                        {renderAvatar(v.avatar || v.displayName.charAt(0), avSize)}
-                                      </div>
-                                      <span style={{
-                                        fontFamily: "var(--font-sans)",
-                                        fontSize: fSize,
-                                        fontWeight: 700,
-                                        color: "#fff",
-                                        maxWidth: maxW,
-                                        whiteSpace: "nowrap",
-                                        overflow: "hidden",
-                                        textOverflow: "ellipsis",
-                                        lineHeight: 1,
-                                      }}>
-                                        {v.displayName}
+                                {/* Avatar Stack */}
+                                <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+                                  {voters.slice(0, 3).map((v, idx) => {
+                                    const borderCol = v.team ? typeColors[v.team]!.border : "var(--color-border)";
+                                    const bgCol = v.team ? typeColors[v.team]!.bg : "rgba(255,255,255,0.05)";
+                                    return (
+                                      <span
+                                        key={v.id}
+                                        title={v.displayName}
+                                        style={{
+                                          display: "inline-flex",
+                                          alignItems: "center",
+                                          justifyContent: "center",
+                                          width: `${avSize}px`,
+                                          height: `${avSize}px`,
+                                          borderRadius: "50%",
+                                          border: `0.8px solid ${borderCol}`,
+                                          background: bgCol,
+                                          marginLeft: idx === 0 ? 0 : `${overlap}px`,
+                                          zIndex: count - idx,
+                                          position: "relative",
+                                          flexShrink: 0,
+                                        }}
+                                      >
+                                        {v.avatar
+                                          ? renderAvatar(v.avatar, avSize - 2)
+                                          : <span style={{ fontSize: isMob ? "0.42rem" : "0.5rem", fontWeight: 900, color: v.team ? typeColors[v.team]!.text : "var(--color-text)" }}>{v.displayName.charAt(0).toUpperCase()}</span>
+                                        }
                                       </span>
-                                    </div>
-                                  );
-                                })}
+                                    );
+                                  })}
+                                  {count > 3 && (
+                                    <span style={{
+                                      display: "inline-flex",
+                                      alignItems: "center",
+                                      justifyContent: "center",
+                                      width: `${avSize}px`,
+                                      height: `${avSize}px`,
+                                      borderRadius: "50%",
+                                      background: "var(--color-border)",
+                                      color: "#fff",
+                                      fontSize: isMob ? "0.4rem" : "0.5rem",
+                                      fontWeight: 900,
+                                      marginLeft: `${overlap}px`,
+                                      zIndex: 0,
+                                      position: "relative",
+                                      flexShrink: 0,
+                                    }}>
+                                      +{count - 3}
+                                    </span>
+                                  )}
+                                </div>
+                                
+                                {/* Names Label */}
+                                <span
+                                  style={{
+                                    fontFamily: "var(--font-sans)",
+                                    fontSize: fSize,
+                                    fontWeight: 700,
+                                    color: "#fff",
+                                    maxWidth: textMaxW,
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    lineHeight: 1,
+                                    flexShrink: 1,
+                                  }}
+                                  title={namesText}
+                                >
+                                  {namesText}
+                                </span>
                               </div>
                             );
                           })()}
