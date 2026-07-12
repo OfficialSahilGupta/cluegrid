@@ -449,7 +449,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     const imagesToPreload = [
       "/game-board-card/black-card/assassin-card.webp",
       ...Array.from({ length: 10 }, (_, i) => `/game-board-card/teams-card/happy-${i + 1}.webp`),
-      ...Array.from({ length: 6 }, (_, i) => `/game-board-card/whilte-flips/sad-${i + 1}.webp`)
+      ...Array.from({ length: 6 }, (_, i) => `/game-board-card/whilte-flips/sad-${i + 1}.webp`),
+      ...Array.from({ length: 9 }, (_, i) => `/game-board-card/red-team-card/${i + 1}.webp`),
+      ...Array.from({ length: 9 }, (_, i) => `/game-board-card/blue-team-cards/blue-${i + 1}.webp`)
     ];
     imagesToPreload.forEach((src) => {
       const img = new Image();
@@ -4507,7 +4509,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     borderRadius: "var(--radius-lg)",
                   }}
                 >
-                  {board.map((card) => {
+                  {(() => {
+                    const redCards = board.filter(c => c.type === "red").sort((a, b) => a.id - b.id);
+                    const blueCards = board.filter(c => c.type === "blue").sort((a, b) => a.id - b.id);
+                    return board.map((card) => {
                     let cardType = "unknown";
                     if (room.gameMode === "coop") {
                       // Duet: show actual card type for all cards — same coloring as multi-team
@@ -4582,7 +4587,17 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
                     let revealedCharacterUrl = "";
                     if (card.revealed && card.type) {
-                      if (["red", "blue", "green", "yellow"].includes(card.type)) {
+                      if (card.type === "red") {
+                        const redImages = ["1.webp", "2.webp", "3.webp", "4.webp", "5.webp", "6.webp", "7.webp", "8.webp", "9.webp"];
+                        const redIdx = redCards.findIndex(c => c.id === card.id);
+                        const idx = redIdx !== -1 ? (redIdx % redImages.length) : 0;
+                        revealedCharacterUrl = `/game-board-card/red-team-card/${redImages[idx]}`;
+                      } else if (card.type === "blue") {
+                        const blueImages = ["blue-1.webp", "blue-2.webp", "blue-3.webp", "blue-4.webp", "blue-5.webp", "blue-6.webp", "blue-7.webp", "blue-8.webp", "blue-9.webp"];
+                        const blueIdx = blueCards.findIndex(c => c.id === card.id);
+                        const idx = blueIdx !== -1 ? (blueIdx % blueImages.length) : 0;
+                        revealedCharacterUrl = `/game-board-card/blue-team-cards/${blueImages[idx]}`;
+                      } else if (["green", "yellow"].includes(card.type)) {
                         const idx = getDeterministicIndex(card.word, happyImages.length);
                         revealedCharacterUrl = `/game-board-card/teams-card/${happyImages[idx]}`;
                       } else if (card.type === "neutral") {
@@ -4901,7 +4916,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         </div>
                       </button>
                     );
-                  })}
+                  });
+                })()}
                 </div>
               </div>
 
