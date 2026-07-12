@@ -3972,24 +3972,36 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             </span>
                           )}
 
-                          {/* 4. Timer */}
+                           {/* 4. Timer Badge */}
                           {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
                             <>
                               <span style={{ color: "var(--color-border)", flexShrink: 0 }}>·</span>
-                              <span style={{
+                              <div style={{
                                 display: "inline-flex",
                                 alignItems: "center",
-                                gap: "3px",
-                                color: timerCount <= 10 ? "hsl(355,85%,58%)" : "var(--text-primary)",
-                                fontWeight: 900,
+                                gap: "4px",
+                                background: "var(--color-surface)",
+                                border: `1px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "rgba(255, 255, 255, 0.15)"}`,
+                                padding: "2.5px 6px",
+                                borderRadius: "3px",
+                                boxShadow: "0 1px 4px rgba(0,0,0,0.15)",
+                                boxSizing: "border-box",
                                 flexShrink: 0,
                               }}>
-                                <svg className="premium-clock-shake" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transformOrigin: "center center" }}>
+                                <svg className="premium-clock-shake" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transformOrigin: "center center" }}>
                                   <circle cx="12" cy="12" r="10" />
                                   <polyline points="12 6 12 12 16 14" />
                                 </svg>
-                                {Math.floor(Math.max(0, timerCount) / 60)}:{(Math.max(0, timerCount) % 60) < 10 ? "0" : ""}{Math.max(0, timerCount) % 60}
-                              </span>
+                                <span style={{
+                                  fontFamily: "var(--font-display)",
+                                  fontSize: "0.72rem",
+                                  fontWeight: 900,
+                                  fontVariantNumeric: "tabular-nums",
+                                  color: timerCount <= 10 ? "hsl(355,85%,58%)" : "var(--text-primary)"
+                                }}>
+                                  {Math.floor(Math.max(0, timerCount) / 60)}:{(Math.max(0, timerCount) % 60) < 10 ? "0" : ""}{Math.max(0, timerCount) % 60}
+                                </span>
+                              </div>
                             </>
                           )}
 
