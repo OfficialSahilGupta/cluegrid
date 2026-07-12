@@ -4891,35 +4891,38 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             justifyContent: "center",
                             position: "relative",
                             padding: "8px",
-                            borderBottom: `1.5px solid ${colors.border}`,
-                            background: (card.revealed || canSeeKey) ? getTeamTranslucentBg(card.type) : "transparent",
+                            borderBottom: (card.revealed && !showWordCardIds.includes(card.id))
+                              ? "none"
+                              : `1.5px solid ${colors.border}`,
+                            background: (card.revealed && !showWordCardIds.includes(card.id))
+                              ? "transparent"
+                              : ((card.revealed || canSeeKey) ? getTeamTranslucentBg(card.type) : "transparent"),
                             boxSizing: "border-box",
                           }}
                         >
 
-
-                          {/* Reveal Status Badge (top right) */}
-                          {card.type === "assassin" && (card.revealed || canSeeKey) && !votedCardIds.includes(card.id) && (
-                            <span
-                              style={{
-                                position: "absolute",
-                                top: "6px",
-                                right: "8px",
-                                fontSize: "0.55rem",
-                                fontWeight: 800,
-                                textTransform: "uppercase",
-                                padding: "2px 6px",
-                                borderRadius: "4px",
-                                background: "rgba(0,0,0,0.45)",
-                                color: colors.text,
-                                border: "0.5px solid rgba(255,255,255,0.1)",
-                                letterSpacing: "0.06em",
-                                zIndex: 2,
-                              }}
-                            >
-                              black
-                            </span>
-                          )}
+                           {/* Reveal Status Badge (top right) */}
+                           {card.type === "assassin" && !card.revealed && canSeeKey && !votedCardIds.includes(card.id) && (
+                             <span
+                               style={{
+                                 position: "absolute",
+                                 top: isMobileViewport ? "4px" : "6px",
+                                 right: isMobileViewport ? "4px" : "8px",
+                                 fontSize: isMobileViewport ? "0.48rem" : "0.55rem",
+                                 fontWeight: 800,
+                                 textTransform: "uppercase",
+                                 padding: isMobileViewport ? "1.5px 4.5px" : "2px 6px",
+                                 borderRadius: "3px",
+                                 background: "rgba(0,0,0,0.65)",
+                                 color: "#fff",
+                                 border: "0.5px solid rgba(255,255,255,0.15)",
+                                 letterSpacing: "0.06em",
+                                 zIndex: 2,
+                               }}
+                             >
+                               black
+                             </span>
+                           )}
 
                           {/* Pointer Hand Icon in corner to Flip */}
                           {votedCardIds.includes(card.id) && isActiveOperative && (
@@ -5040,7 +5043,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           style={{
                             width: "100%",
                             padding: isMobileViewport ? "6px 4px" : "10px 10px",
-                            background: lightMode ? "rgba(0, 0, 0, 0.05)" : "rgba(0, 0, 0, 0.35)",
+                            background: (card.revealed && !showWordCardIds.includes(card.id))
+                              ? "transparent"
+                              : (lightMode ? "rgba(0, 0, 0, 0.05)" : "rgba(0, 0, 0, 0.35)"),
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
