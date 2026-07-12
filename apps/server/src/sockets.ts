@@ -1591,7 +1591,7 @@ function runStartGameLogic(room: any, io: SocketIOServer) {
       if (!room) return;
 
       const player = room.players.find((p) => p.id === playerId);
-      if (!player || player.role !== "spymaster") {
+      if (!player || (player.role !== "spymaster" && room.gameMode !== "coop")) {
         socket.emit("error_msg", "Only spymasters can send screen reactions.");
         return;
       }

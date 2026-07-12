@@ -8946,8 +8946,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
             {renderChatAndLogPanel()}
           </div>
 
-          {/* Vertical Reactions Column (only for playing Spymasters when chat is closed) */}
-          {room.phase === "playing" && localPlayer?.role === "spymaster" && !isChatFloatingOpen && (
+          {/* Vertical Reactions Column (only for playing Spymasters/Coop when chat is closed) */}
+          {room.phase === "playing" && (localPlayer?.role === "spymaster" || room.gameMode === "coop") && !isChatFloatingOpen && (
             <div
               style={{
                 position: "absolute",
