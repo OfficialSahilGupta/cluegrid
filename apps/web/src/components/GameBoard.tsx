@@ -4519,9 +4519,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   display: "flex",
                   flexDirection: "row",
                   gap: "20px",
-                  width: "calc(100% + 200px)",
-                  marginLeft: "-100px",
-                  marginRight: "-100px",
+                  width: isChatFloatingOpen ? "100%" : "calc(100% + 200px)",
+                  marginLeft: isChatFloatingOpen ? "0px" : "-100px",
+                  marginRight: isChatFloatingOpen ? "0px" : "-100px",
                   alignItems: "flex-start",
                   boxSizing: "border-box",
                 }}
@@ -4534,7 +4534,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   width: isMobileViewport ? "100%" : "auto", 
                   position: "relative", 
                   zIndex: activeSwitchPlayerId ? 100 : 1, 
-                  left: isMobileViewport ? "0px" : "-10px" 
+                  left: isMobileViewport ? "0px" : (isChatFloatingOpen ? "0px" : "-10px")
                 }}>
                   <div style={{
                     background: "var(--color-surface)",
@@ -4558,7 +4558,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   minWidth: 0, 
                   width: "100%",
                   position: "relative",
-                  left: isMobileViewport ? "0px" : "-20px"
+                  left: isMobileViewport ? "0px" : (isChatFloatingOpen ? "0px" : "-20px")
                 }}>
 
 
