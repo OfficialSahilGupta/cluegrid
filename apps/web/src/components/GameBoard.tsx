@@ -2080,7 +2080,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   {operatives.length > 0 ? (
                     renderOverlappingPlayers(operatives, isMobileViewport ? 44 : (operatives.length <= 4 ? 68 : (operatives.length === 5 ? 58 : (operatives.length === 6 ? 50 : 44))))
                   ) : (
-                    <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: isMobileViewport ? "6px 0" : "12px 0" }}>No Ops</div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: isMobileViewport ? "6px 0" : "12px 0" }}>No Operatives deployed</div>
                   )}
                 </div>
 
@@ -2162,7 +2162,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   {spymasters.length > 0 ? (
                     renderOverlappingPlayers(spymasters, isMobileViewport ? 44 : (spymasters.length <= 4 ? 68 : (spymasters.length === 5 ? 58 : (spymasters.length === 6 ? 50 : 44))))
                   ) : (
-                    <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: isMobileViewport ? "6px 0" : "12px 0" }}>No Spy</div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: isMobileViewport ? "6px 0" : "12px 0" }}>No Spymaster deployed</div>
                   )}
                 </div>
 
@@ -3983,8 +3983,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           {/* 3. Action Phrase */}
                           <span style={{ color: "#fff", fontWeight: 600, flexShrink: 0, whiteSpace: "nowrap" }}>
                             {room.turnState.phase === "giving_clue" 
-                              ? (activeSpymasters.length > 1 ? "are giving clue" : "is giving clue")
-                              : (activeOperatives.length > 1 ? "are guessing clue" : "is guessing clue")
+                              ? (activeSpymasters.length === 0
+                                ? "No Spymaster deployed"
+                                : (activeSpymasters.length > 1 ? "are giving clue" : "is giving clue"))
+                              : (activeOperatives.length === 0
+                                ? "No Operatives deployed"
+                                : (activeOperatives.length > 1 ? "are guessing clue" : "is guessing clue"))
                             }
                           </span>
 
@@ -4130,7 +4134,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                   </span>
                                 )}
-                                <span>{activeSpymasters.length > 1 ? "are giving clue..." : "is giving clue..."}</span>
+                                <span>
+                                  {activeSpymasters.length === 0
+                                    ? "No Spymaster deployed"
+                                    : (activeSpymasters.length > 1 ? "are giving clue..." : "is giving clue...")
+                                  }
+                                </span>
                               </span>
                             );
                           })() : (
@@ -4190,7 +4199,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                 ))}
                               </div>
                               <span style={{ fontSize: "0.9rem", fontWeight: 600, color: teamCol.light }}>
-                                {operatives.length > 1 ? "are guessing clue..." : "is guessing clue..."}
+                                {operatives.length === 0
+                                  ? "No Operatives deployed"
+                                  : (operatives.length > 1 ? "are guessing clue..." : "is guessing clue...")
+                                }
                               </span>
                             </div>
                           ) : (
@@ -4208,7 +4220,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                 <span style={{ fontSize: "1rem" }}>🎩</span>
                               </span>
                               <span style={{ fontSize: "0.9rem", fontWeight: 600, color: teamCol.light }}>
-                                {operatives.length > 1 ? "are guessing clue..." : "is guessing clue..."}
+                                {operatives.length === 0
+                                  ? "No Operatives deployed"
+                                  : (operatives.length > 1 ? "are guessing clue..." : "is guessing clue...")
+                                }
                               </span>
                             </div>
                           );
