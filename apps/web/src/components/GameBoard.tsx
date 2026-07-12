@@ -1955,6 +1955,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           {room.gameMode === "coop" ? (
             /* CO-OP Mode: Single card representing the whole City Team */
             <div
+              className="team-role-card coop-members-card"
               style={{
                 background: cardStyle.bg,
                 backdropFilter: "blur(8px)",
@@ -2004,6 +2005,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               {localPlayer?.team !== color && (
                 !room.settings.roomLocked ? (
                   <button
+                    className="team-join-button"
                     onClick={() => handleJoinTeamRole(color, "operative")}
                     style={absoluteButtonStyle}
                     onMouseOver={(e) => {
@@ -2018,7 +2020,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     Join {teamObj?.name || label}
                   </button>
                 ) : (
-                  <div style={lockedAbsoluteButtonStyle}>
+                  <div className="team-locked-button" style={lockedAbsoluteButtonStyle}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                       <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -2034,6 +2036,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
               {/* Operatives Card */}
               <div
+                className="team-role-card operatives-card"
                 style={{
                   background: cardStyle.bg,
                   backdropFilter: "blur(8px)",
@@ -2083,6 +2086,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 {!room.settings.roomLocked ? (
                   (!localPlayer || localPlayer.team !== color || localPlayer.role !== "operative") ? (
                     <button
+                      className="team-join-button"
                       onClick={() => handleJoinTeamRole(color, "operative")}
                       style={absoluteButtonStyle}
                       onMouseOver={(e) => {
@@ -2097,11 +2101,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       Join Operatives
                     </button>
                   ) : (
-                    isMobileViewport ? null : <button style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Operatives</button>
+                    isMobileViewport ? null : <button className="team-join-button" style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Operatives</button>
                   )
                 ) : (
                   operatives.length === 0 && (
-                    <div style={lockedAbsoluteButtonStyle}>
+                    <div className="team-locked-button" style={lockedAbsoluteButtonStyle}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -2114,6 +2118,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
               {/* Spymasters Card */}
               <div
+                className="team-role-card spymasters-card"
                 style={{
                   background: cardStyle.bg,
                   backdropFilter: "blur(8px)",
@@ -2163,6 +2168,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 {!room.settings.roomLocked ? (
                   (!localPlayer || localPlayer.team !== color || localPlayer.role !== "spymaster") ? (
                     <button
+                      className="team-join-button"
                       onClick={() => handleJoinTeamRole(color, "spymaster")}
                       style={absoluteButtonStyle}
                       onMouseOver={(e) => {
@@ -2177,11 +2183,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       Join Spymasters
                     </button>
                   ) : (
-                    isMobileViewport ? null : <button style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Spymasters</button>
+                    isMobileViewport ? null : <button className="team-join-button" style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Spymasters</button>
                   )
                 ) : (
                   spymasters.length === 0 && (
-                    <div style={lockedAbsoluteButtonStyle}>
+                    <div className="team-locked-button" style={lockedAbsoluteButtonStyle}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: "2px" }}>
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -5054,8 +5060,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 padding: isMobileViewport ? "8px" : "16px",
                 boxSizing: "border-box",
                 width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                gap: isMobileViewport ? "8px" : "16px",
               }}>
                 {renderTeamSegment("blue", `${t("teams.blue")} ${t("teams.team")}`)}
+                {room.teamCount > 2 && renderTeamSegment("green", `${t("teams.green")} ${t("teams.team")}`)}
+                {room.teamCount > 3 && renderTeamSegment("yellow", `${t("teams.yellow")} ${t("teams.team")}`)}
               </div>
             </div>
           </div>
@@ -6115,6 +6126,23 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
     return (
       <>
+        {/* Mobile Backdrop */}
+        <div
+          className="assign-popover-backdrop"
+          onClick={() => setActiveSwitchPlayerId(null)}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: "rgba(0, 0, 0, 0.5)",
+            backdropFilter: "blur(2px)",
+            zIndex: 9999,
+            display: "none",
+            touchAction: "none",
+          }}
+        />
         {/* Popover content positioned near the user's left or right */}
         <div
           style={{
@@ -6136,9 +6164,26 @@ const renderSettingsCard = (side?: "left" | "right") => {
           }}
           className="scale-up assign-popover-card"
         >
-          <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.3rem", fontWeight: 900, color: activeColor, textTransform: "uppercase", textAlign: "center", borderBottom: `1.5px solid ${activeBorderColor}`, paddingBottom: "10px", letterSpacing: "0.06em" }}>
-            {t("game.assign", "Assign")} {p.displayName}
-          </span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `1.5px solid ${activeBorderColor}`, paddingBottom: "10px" }}>
+            <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.3rem", fontWeight: 900, color: activeColor, textTransform: "uppercase", letterSpacing: "0.06em", flex: 1, textAlign: "left" }}>
+              {t("game.assign", "Assign")} {p.displayName}
+            </span>
+            <button
+              onClick={() => setActiveSwitchPlayerId(null)}
+              style={{
+                background: "transparent",
+                border: "none",
+                color: "var(--color-text-muted)",
+                cursor: "pointer",
+                fontSize: "1rem",
+                padding: "0 0 0 10px",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              ✕
+            </button>
+          </div>
           
           {room.gameMode === "coop" ? (
             <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -6366,6 +6411,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
       >
         {/* The Circle */}
         <div
+          className="player-avatar-circle"
           onClick={(e) => {
             if (canSwitch) {
               const rect = e.currentTarget.getBoundingClientRect();
@@ -6438,6 +6484,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
           {/* Connection dot (top right) */}
           <div
+            className="player-connection-dot"
             style={{
               position: "absolute",
               top: "1px",
@@ -6521,6 +6568,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
         {/* Username — tiny on mobile, normal on desktop */}
         <span
+          className="player-username-label"
           style={{
             fontSize: isMobileViewport ? "0.62rem" : `${Math.max(0.65, Math.min(0.9, size * 0.016))}rem`,
             fontWeight: isCurrent ? 700 : 500,

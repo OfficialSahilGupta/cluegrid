@@ -877,7 +877,7 @@ html.increased-fonts {
 
 /* ─── Game Play Page — Tablet & Mobile Responsive Layout ─────────────── */
 
-/* Tablet (769px – 1024px): side-by-side compact team panels + full-width board */
+/* Tablet & Mobile Responsive Layout (≤ 1024px) */
 @media (max-width: 1024px) {
   /* Tighten up the outer container on tablets */
   .fade-in {
@@ -905,6 +905,90 @@ html.increased-fonts {
     width: min(360px, 90vw) !important;
     max-height: 85vh !important;
     overflow-y: auto !important;
+  }
+
+  /* Enforce compact container height and prevent expansion when player joins */
+  .team-role-card {
+    height: 120px !important;
+    min-height: 120px !important;
+    max-height: 120px !important;
+    padding: 8px 10px !important;
+    padding-bottom: 34px !important;
+    overflow: hidden !important;
+  }
+
+  /* Compact button styling on mobile/lower screens */
+  .team-join-button {
+    position: absolute !important;
+    bottom: 6px !important;
+    left: 8px !important;
+    width: calc(100% - 16px) !important;
+    font-size: 0.68rem !important;
+    padding: 5px 8px !important;
+    letter-spacing: 0.04em !important;
+  }
+  
+  .team-locked-button {
+    position: absolute !important;
+    bottom: 6px !important;
+    left: 8px !important;
+    width: calc(100% - 16px) !important;
+    font-size: 0.68rem !important;
+    padding: 5px 8px !important;
+  }
+
+  /* Decrease avatar and username label sizes on mobile */
+  .player-row-wrapper {
+    width: 32px !important;
+    margin: 2px !important;
+  }
+  
+  .player-avatar-circle {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  .player-avatar-circle svg,
+  .player-avatar-circle img {
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  .player-connection-dot {
+    width: 6px !important;
+    height: 6px !important;
+    top: 1px !important;
+    right: 1px !important;
+  }
+
+  .premium-host-crown {
+    top: -8px !important;
+  }
+  
+  .premium-host-crown svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .player-username-label {
+    font-size: 0.58rem !important;
+    max-width: 44px !important;
+    margin-top: 2px !important;
+  }
+
+  /* Show assign popover backdrop on mobile and center popover */
+  .assign-popover-backdrop {
+    display: block !important;
+  }
+  .assign-popover-card {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(290px, 90vw) !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.85) !important;
   }
 }
 
