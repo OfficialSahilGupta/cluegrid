@@ -4249,8 +4249,17 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 }}
               >
                 {/* Left Side: Red Team */}
-                <div style={{ flex: isMobileViewport ? "1 1 auto" : "0 0 195px", minWidth: "170px", width: isMobileViewport ? "100%" : "auto", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1, left: isMobileViewport ? "0px" : "-24px" }}>
-                  {renderTeamSegment("red", `${t("teams.red")} ${t("teams.team")}`)}
+                <div style={{ flex: isMobileViewport ? "1 1 auto" : "0 0 195px", minWidth: "170px", width: isMobileViewport ? "100%" : "auto", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1, left: isMobileViewport ? "0px" : "-60px" }}>
+                  <div style={{
+                    background: "var(--color-surface)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "16px",
+                    boxSizing: "border-box",
+                    width: "max-content",
+                  }}>
+                    {renderTeamSegment("red", `${t("teams.red")} ${t("teams.team")}`)}
+                  </div>
                 </div>
 
                 {/* Middle Side: Game Board (Reduced Size, Centered) */}
@@ -4965,7 +4974,16 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
             {/* Right Side: Blue Team */}
             <div style={{ flex: isMobileViewport ? "1 1 auto" : "0 0 195px", minWidth: "170px", width: isMobileViewport ? "100%" : "auto", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1, left: isMobileViewport ? "0px" : "-20px" }}>
-              {renderTeamSegment("blue", `${t("teams.blue")} ${t("teams.team")}`)}
+              <div style={{
+                background: "var(--color-surface)",
+                border: "1px solid var(--color-border)",
+                borderRadius: "var(--radius-md)",
+                padding: "16px",
+                boxSizing: "border-box",
+                width: "max-content",
+              }}>
+                {renderTeamSegment("blue", `${t("teams.blue")} ${t("teams.team")}`)}
+              </div>
             </div>
           </div>
         )}
