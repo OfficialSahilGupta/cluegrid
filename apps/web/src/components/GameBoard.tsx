@@ -3983,8 +3983,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           {/* 3. Action Phrase */}
                           <span style={{ color: "#fff", fontWeight: 600, flexShrink: 0, whiteSpace: "nowrap" }}>
                             {room.turnState.phase === "giving_clue" 
-                              ? "is giving clue" 
-                              : "is guessing"
+                              ? (activeSpymasters.length > 1 ? "are giving clue" : "is giving clue")
+                              : (activeOperatives.length > 1 ? "are guessing clue" : "is guessing clue")
                             }
                           </span>
 
@@ -4130,7 +4130,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                   </span>
                                 )}
-                                <span>{activeSpymasters.length > 1 ? "are giving clues..." : "is giving clue..."}</span>
+                                <span>{activeSpymasters.length > 1 ? "are giving clue..." : "is giving clue..."}</span>
                               </span>
                             );
                           })() : (
@@ -4189,7 +4189,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                   </span>
                                 ))}
                               </div>
-                              <span style={{ fontSize: "0.9rem", fontWeight: 600, color: teamCol.light }}>are guessing the grid...</span>
+                              <span style={{ fontSize: "0.9rem", fontWeight: 600, color: teamCol.light }}>
+                                {operatives.length > 1 ? "are guessing clue..." : "is guessing clue..."}
+                              </span>
                             </div>
                           ) : (
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", flexWrap: "wrap", marginTop: "6px", width: "100%" }}>
@@ -4205,7 +4207,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                               >
                                 <span style={{ fontSize: "1rem" }}>🎩</span>
                               </span>
-                              <span style={{ fontSize: "0.9rem", fontWeight: 600, color: teamCol.light }}>are guessing the grid...</span>
+                              <span style={{ fontSize: "0.9rem", fontWeight: 600, color: teamCol.light }}>
+                                {operatives.length > 1 ? "are guessing clue..." : "is guessing clue..."}
+                              </span>
                             </div>
                           );
                         })()}
