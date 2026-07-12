@@ -3958,7 +3958,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           )}
 
                           {/* 3. Action Phrase */}
-                          <span style={{ color: "var(--color-text-muted)", fontWeight: 600, flexShrink: 0 }}>
+                          <span style={{ color: "#fff", fontWeight: 600, flexShrink: 0 }}>
                             {room.turnState.phase === "giving_clue" 
                               ? "is giving clue" 
                               : "is guessing"
