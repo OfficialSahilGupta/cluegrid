@@ -1814,7 +1814,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
       const cardStyle = {
         bg: color === "red"
-          ? "rgba(237, 81, 69, 0.15)"
+          ? "rgba(240, 115, 106, 0.2)"
           : color === "blue"
             ? "rgba(17, 38, 59, 0.75)"
             : "rgba(4, 11, 13, 0.75)",
