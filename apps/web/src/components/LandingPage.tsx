@@ -2124,22 +2124,36 @@ export function LandingPage({
                 <div style={{ marginBottom: "22px" }}>
                   <div style={{ fontSize: "11.5px", letterSpacing: "0.14em", textTransform: "uppercase", color: "#eef3ee", opacity: 0.85, marginBottom: "10px", fontWeight: 700 }}>Number of Teams</div>
                   <div style={{ display: "flex", gap: "10px" }}>
-                    {([2, 3, 4] as const).map((num) => (
-                      <button 
-                        key={num}
-                        onClick={() => setSelectedTeams(num)}
-                        style={{
-                          flex: 1, background: selectedTeams === num ? "rgba(0,240,255,0.08)" : "rgba(238,243,238,0.04)",
-                          border: selectedTeams === num ? "1.5px solid #00f0ff" : "1.5px solid rgba(238,243,238,0.14)",
-                          color: selectedTeams === num ? "#00f0ff" : "#eef3ee", padding: "13px 10px", borderRadius: "8px", cursor: "pointer", fontWeight: "bold"
-                        }}
-                      >
-                        {num} Teams
-                      </button>
-                    ))}
+                    {([2, 3, 4] as const).map((num) => {
+                      const isDisabled = num === 3 || num === 4;
+                      return (
+                        <button 
+                          key={num}
+                          disabled={isDisabled}
+                          onClick={() => !isDisabled && setSelectedTeams(num)}
+                          title={isDisabled ? "Working on this section..." : undefined}
+                          style={{
+                            flex: 1, 
+                            background: selectedTeams === num ? "rgba(0,240,255,0.08)" : "rgba(238,243,238,0.04)",
+                            border: selectedTeams === num ? "1.5px solid #00f0ff" : "1.5px solid rgba(238,243,238,0.14)",
+                            color: selectedTeams === num ? "#00f0ff" : "#eef3ee", 
+                            padding: "13px 10px", 
+                            borderRadius: "8px", 
+                            cursor: isDisabled ? "not-allowed" : "pointer", 
+                            fontWeight: "bold",
+                            opacity: isDisabled ? 0.45 : 1
+                          }}
+                        >
+                          {num} Teams {isDisabled && " (Soon)"}
+                        </button>
+                      );
+                    })}
                   </div>
                   <div style={{ fontSize: "11.5px", color: "#9AA29B", marginTop: "8px" }}>
                     {teamsInfo[selectedTeams]}
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#E8A33D", marginTop: "4px", fontStyle: "italic", fontWeight: 600 }}>
+                    * 3 Teams and 4 Teams configurations are currently under development.
                   </div>
                 </div>
               )}
