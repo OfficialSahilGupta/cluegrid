@@ -909,12 +909,23 @@ html.increased-fonts {
 
   /* Enforce compact container height and prevent expansion when player joins */
   .team-role-card {
-    height: 120px !important;
-    min-height: 120px !important;
-    max-height: 120px !important;
+    height: 126px !important;
+    min-height: 126px !important;
+    max-height: 126px !important;
     padding: 8px 10px !important;
-    padding-bottom: 34px !important;
+    padding-bottom: 30px !important;
     overflow: hidden !important;
+  }
+
+  .overlapping-players-scroll-container {
+    padding-top: 4px !important;
+    padding-bottom: 2px !important;
+  }
+
+  .portal-parent-container {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
   }
 
   /* Compact button styling on mobile/lower screens */
@@ -999,6 +1010,26 @@ html.increased-fonts {
     gap: 5px !important;
   }
 
+  .spy-reactions-container > div {
+    flex-shrink: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .spy-reactions-container button {
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
   .spy-reaction-icon-wrapper {
     width: 36px !important;
     height: 36px !important;
@@ -1021,6 +1052,24 @@ html.increased-fonts {
     padding: clamp(3px, 1.5vw, 8px) clamp(2px, 0.8vw, 4px) !important;
     min-height: clamp(42px, 17vw, 72px) !important;
     font-size: clamp(0.58rem, 1.8vw, 0.78rem) !important;
+  }
+}
+
+/* Extra small phones (≤ 360px): scale down reactions container to fit screen */
+@media (max-width: 360px) {
+  .spy-reactions-container {
+    right: 90px !important;
+    gap: 4px !important;
+  }
+  .spy-reactions-container > div,
+  .spy-reactions-container button,
+  .spy-reaction-icon-wrapper {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .spy-reaction-icon-wrapper svg {
+    width: 16px !important;
+    height: 16px !important;
   }
 }
 

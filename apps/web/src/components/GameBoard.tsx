@@ -6611,8 +6611,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
           overflowY: "hidden",
           paddingLeft: "0px",
           paddingRight: "0px",
-          paddingTop: isMobileViewport ? "10px" : "28px",
-          paddingBottom: isMobileViewport ? "4px" : "12px",
+          paddingTop: isMobileViewport ? "4px" : "28px",
+          paddingBottom: isMobileViewport ? "2px" : "12px",
           boxSizing: "border-box",
           scrollbarWidth: "thin",
           msOverflowStyle: "none",
@@ -9074,6 +9074,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
       {/* ─── Floating Chat & Game Log Panel ─── */}
       {room.phase !== "lobby" && createPortal(
         <div
+          className="portal-parent-container"
           style={{
             position: "fixed",
             bottom: 0,
