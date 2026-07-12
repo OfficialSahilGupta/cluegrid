@@ -1806,7 +1806,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       };
 
       const cardStyle = {
-        bg: themeCol.bg,
+        bg: color === "red"
+          ? "rgba(237, 81, 69, 0.15)"
+          : color === "blue"
+            ? "rgba(17, 38, 59, 0.75)"
+            : "rgba(4, 11, 13, 0.75)",
         border: `2.5px solid ${themeCol.border}`,
         watermarkSpy: "👁️‍🗨️",
         watermarkOp: "🕵️‍♂️",
@@ -1909,6 +1913,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             <div
               style={{
                 background: cardStyle.bg,
+                backdropFilter: "blur(8px)",
                 border: cardStyle.border,
                 borderRadius: "var(--radius-lg)",
                 padding: "16px",
@@ -1987,6 +1992,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               <div
                 style={{
                   background: cardStyle.bg,
+                  backdropFilter: "blur(8px)",
                   border: cardStyle.border,
                   borderRadius: "var(--radius-lg)",
                   padding: "16px",
@@ -2065,6 +2071,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               <div
                 style={{
                   background: cardStyle.bg,
+                  backdropFilter: "blur(8px)",
                   border: cardStyle.border,
                   borderRadius: "var(--radius-lg)",
                   padding: "16px",
