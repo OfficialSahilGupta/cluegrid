@@ -3843,12 +3843,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   background: "var(--color-surface)",
                   border: "1px solid var(--color-border)",
                   borderRadius: "var(--radius-md)",
-                  padding: "20px",
+                  padding: isMobileViewport ? "8px 10px" : "20px",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "center",
                   alignItems: "center",
-                  gap: "14px",
+                  gap: isMobileViewport ? "0px" : "14px",
                   position: "relative",
                   zIndex: 2,
                   width: "100%",
@@ -3856,7 +3856,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 }}
               >
                 
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px", textAlign: "center", alignItems: "center", justifyContent: "center", flex: 1, minWidth: "280px", width: "100%" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: isMobileViewport ? "0px" : "8px", textAlign: "center", alignItems: "center", justifyContent: "center", flex: 1, minWidth: "280px", width: "100%" }}>
                   {room.phase === "playing" && room.turnState ? (() => {
                     const activeCity = room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1));
                     const otherTeam = getCoopGuessingTeam(room.turnState.activeTeam, room.teams);
@@ -3901,8 +3901,16 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           letterSpacing: "0.03em",
                           whiteSpace: "nowrap",
                         }}>
-                          {/* 1. Team Name Turn */}
-                          <span style={{ color: teamColor.border, flexShrink: 0 }}>
+                          {/* 1. Team Name Turn Badge */}
+                          <span style={{
+                            display: "inline-block",
+                            padding: "2.5px 6px",
+                            borderRadius: "3px",
+                            backgroundColor: teamColor.border,
+                            color: "#fff",
+                            fontWeight: 900,
+                            flexShrink: 0,
+                          }}>
                             {activeCity.toUpperCase()}'S TEAM TURN
                           </span>
 
