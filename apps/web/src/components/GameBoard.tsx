@@ -7325,7 +7325,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
         className="scale-up"
         style={{
           position: "absolute",
-          right: isMobileViewport ? "12px" : "clamp(8px, 3vw, 20px)",
+          right: isMobileViewport ? "12px" : "24px",
           bottom: "92px",
           width: activeTab === "log"
             ? "min(280px, calc(100vw - 24px))"
@@ -8968,14 +8968,11 @@ const renderSettingsCard = (side?: "left" | "right") => {
           style={{
             position: "fixed",
             bottom: 0,
-            left: "50%",
-            transform: "translateX(-50%)",
-            width: "100%",
-            maxWidth: isChatFloatingOpen && !isMobileViewport ? "1600px" : "1200px",
+            right: 0,
+            width: "auto",
             height: 0,
             pointerEvents: "none",
             zIndex: 9999,
-            transition: "max-width 0.3s ease",
           }}
         >
           {/* Floating Panel (rendered always, visibility toggled to preserve scroll) */}
@@ -8987,7 +8984,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               position: "absolute",
               bottom: "24px",
-              right: isMobileViewport ? "24px" : "clamp(8px, 3vw, 20px)",
+              right: isMobileViewport ? "24px" : "24px",
               pointerEvents: "auto",
             }}
           >
