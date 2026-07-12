@@ -380,6 +380,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     activeTabRef.current = activeTab;
   }, [isChatFloatingOpen, activeTab]);
 
+  // Reset chat open state when returning to lobby
+  useEffect(() => {
+    if (room?.phase === "lobby") {
+      setIsChatFloatingOpen(false);
+    }
+  }, [room?.phase]);
+
   // Alternates the closed FAB label between LOG and CHAT every 5 seconds
   useEffect(() => {
     if (isChatFloatingOpen) return;
