@@ -874,3 +874,58 @@ html.increased-fonts {
   height: 1px;
   background: rgba(255,255,255,0.06);
 }
+
+/* ─── Game Play Page — Tablet & Mobile Responsive Layout ─────────────── */
+
+/* Tablet (769px – 1024px): side-by-side compact team panels + full-width board */
+@media (max-width: 1024px) {
+  /* Tighten up the outer container on tablets */
+  .fade-in {
+    max-width: 100% !important;
+  }
+
+  /* Keep the board cards 5-column grid but allow them to shrink */
+  .game-board-grid {
+    gap: clamp(4px, 1.2vw, 8px) !important;
+    padding: clamp(6px, 1.5vw, 12px) !important;
+  }
+
+  .game-board-card {
+    min-height: clamp(48px, 14vw, 90px) !important;
+    font-size: clamp(0.65rem, 1.6vw, 0.9rem) !important;
+  }
+
+  /* Profile popup on tablets — center it like mobile */
+  .profile-popup-card {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: min(360px, 90vw) !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* Phone (≤ 600px): very compact team panel cards */
+@media (max-width: 600px) {
+  .game-board-grid {
+    gap: clamp(2px, 0.8vw, 5px) !important;
+    padding: clamp(3px, 0.8vw, 6px) !important;
+  }
+
+  .game-board-card {
+    padding: clamp(3px, 1.5vw, 8px) clamp(2px, 0.8vw, 4px) !important;
+    min-height: clamp(42px, 17vw, 72px) !important;
+    font-size: clamp(0.58rem, 1.8vw, 0.78rem) !important;
+  }
+}
+
+/* Extra small phones (≤ 380px) */
+@media (max-width: 380px) {
+  .game-board-card {
+    min-height: clamp(38px, 16vw, 64px) !important;
+    font-size: clamp(0.52rem, 1.9vw, 0.7rem) !important;
+  }
+}

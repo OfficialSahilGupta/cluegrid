@@ -440,9 +440,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   // Active Switching Player State
   const [activeSwitchPlayerId, setActiveSwitchPlayerId] = useState<string | null>(null);
   const [popoverCoords, setPopoverCoords] = useState<{ top: number; left: number; transform: string } | null>(null);
-  const [isMobileViewport, setIsMobileViewport] = useState(typeof window !== "undefined" ? window.innerWidth <= 768 : false);
+  const [isMobileViewport, setIsMobileViewport] = useState(typeof window !== "undefined" ? window.innerWidth <= 1024 : false);
   useEffect(() => {
-    const handleResize = () => setIsMobileViewport(window.innerWidth <= 768);
+    const handleResize = () => setIsMobileViewport(window.innerWidth <= 1024);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -1796,7 +1796,16 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         zIndex: 2,
       };
 
-      const absoluteButtonStyle: React.CSSProperties = {
+      const absoluteButtonStyle: React.CSSProperties = isMobileViewport ? {
+        ...greenPillButtonStyle,
+        position: "absolute",
+        bottom: "6px",
+        left: "8px",
+        width: "calc(100% - 16px)",
+        fontSize: "0.68rem",
+        padding: "5px 8px",
+        letterSpacing: "0.04em",
+      } : {
         ...greenPillButtonStyle,
         position: "absolute",
         bottom: "16px",
@@ -1804,7 +1813,15 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         width: "calc(100% - 32px)",
       };
 
-      const lockedAbsoluteButtonStyle: React.CSSProperties = {
+      const lockedAbsoluteButtonStyle: React.CSSProperties = isMobileViewport ? {
+        ...lockedButtonStyle,
+        position: "absolute",
+        bottom: "6px",
+        left: "8px",
+        width: "calc(100% - 16px)",
+        fontSize: "0.68rem",
+        padding: "5px 8px",
+      } : {
         ...lockedButtonStyle,
         position: "absolute",
         bottom: "16px",
@@ -1831,15 +1848,20 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
       const hasActiveSpyPopover = spymasters.some((p) => p.id === activeSwitchPlayerId);
       const hasActiveOpPopover = operatives.some((p) => p.id === activeSwitchPlayerId);
 
+      const mobileCardHeight = "120px";
+      const mobileCardMinHeight = undefined;
+      const desktopCardHeight = "265px";
+      const desktopCardPaddingBottom = "68px";
+
       return (
         <div
           key={color}
           style={{
             display: "flex",
             flexDirection: "column",
-            gap: "12px",
+            gap: isMobileViewport ? "8px" : "12px",
             flex: 1,
-            minWidth: "240px",
+            minWidth: isMobileViewport ? "0px" : "240px",
             position: "relative",
           }}
         >
@@ -1848,7 +1870,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             style={{
               background: "linear-gradient(180deg, rgba(63, 63, 70, 0.95) 0%, rgba(39, 39, 42, 0.95) 100%)",
               border: `2.5px solid ${themeCol.border}`,
-              padding: "8px 24px",
+              padding: isMobileViewport ? "6px 12px" : "8px 24px",
               borderRadius: "9999px",
               display: "flex",
               justifyContent: "center",
@@ -1856,8 +1878,23 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               width: "100%",
               boxShadow: "0 4px 10px rgba(0,0,0,0.35)",
               boxSizing: "border-box",
+              gap: isMobileViewport ? "8px" : "0px",
             }}
           >
+            {/* Score badge visible on mobile during gameplay */}
+            {isMobileViewport && (room.teams[color]?.cardsRemaining !== undefined) && (
+              <span style={{
+                fontSize: "1.4rem",
+                fontWeight: 900,
+                color: themeCol.border,
+                fontFamily: "var(--font-display)",
+                lineHeight: 1,
+                textShadow: `0 0 12px ${themeCol.border}55`,
+                flexShrink: 0,
+              }}>
+                {room.teams[color]?.cardsRemaining ?? 0}
+              </span>
+            )}
             {isHost ? (
               <input
                 type="text"
@@ -1887,7 +1924,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   border: "none",
                   color: "#FFFFFF",
                   padding: "0",
-                  fontSize: "1.1rem",
+                  fontSize: isMobileViewport ? "0.85rem" : "1.1rem",
                   fontWeight: 900,
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
@@ -1900,7 +1937,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             ) : (
               <span
                 style={{
-                  fontSize: "1.1rem",
+                  fontSize: isMobileViewport ? "0.85rem" : "1.1rem",
                   fontWeight: 900,
                   textTransform: "uppercase",
                   letterSpacing: "0.08em",
@@ -2002,17 +2039,18 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   backdropFilter: "blur(8px)",
                   border: cardStyle.border,
                   borderRadius: "var(--radius-lg)",
-                  padding: "16px",
-                  paddingBottom: "68px",
-                  height: "265px",
+                  padding: isMobileViewport ? "8px 10px" : "16px",
+                  paddingBottom: isMobileViewport ? "38px" : desktopCardPaddingBottom,
+                  height: isMobileViewport ? mobileCardHeight : desktopCardHeight,
+                  minHeight: isMobileViewport ? mobileCardMinHeight : undefined,
+                  overflow: isMobileViewport ? "hidden" : "visible",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "flex-start",
                   position: "relative",
-                  overflow: "visible",
                   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
                   boxSizing: "border-box",
-                  gap: "12px",
+                  gap: isMobileViewport ? "6px" : "12px",
                   zIndex: hasActiveOpPopover ? 30 : 1,
                 }}
               >
@@ -2032,13 +2070,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 />
 
                 <div style={{ zIndex: 2 }}>
-                  <div style={{ fontSize: "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: "8px" }}>
-                    Operatives
+                  <div style={{ fontSize: isMobileViewport ? "0.75rem" : "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: isMobileViewport ? "4px" : "8px" }}>
+                    {isMobileViewport ? "OPS" : "Operatives"}
                   </div>
                   {operatives.length > 0 ? (
-                    renderOverlappingPlayers(operatives, operatives.length <= 4 ? 68 : (operatives.length === 5 ? 58 : (operatives.length === 6 ? 50 : 44)))
+                    renderOverlappingPlayers(operatives, isMobileViewport ? 44 : (operatives.length <= 4 ? 68 : (operatives.length === 5 ? 58 : (operatives.length === 6 ? 50 : 44))))
                   ) : (
-                    <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Operatives deployed</div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: isMobileViewport ? "6px 0" : "12px 0" }}>No Ops</div>
                   )}
                 </div>
 
@@ -2059,7 +2097,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       Join Operatives
                     </button>
                   ) : (
-                    <button style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Operatives</button>
+                    isMobileViewport ? null : <button style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Operatives</button>
                   )
                 ) : (
                   operatives.length === 0 && (
@@ -2081,17 +2119,18 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   backdropFilter: "blur(8px)",
                   border: cardStyle.border,
                   borderRadius: "var(--radius-lg)",
-                  padding: "16px",
-                  paddingBottom: "68px",
-                  height: "265px",
+                  padding: isMobileViewport ? "8px 10px" : "16px",
+                  paddingBottom: isMobileViewport ? "38px" : desktopCardPaddingBottom,
+                  height: isMobileViewport ? mobileCardHeight : desktopCardHeight,
+                  minHeight: isMobileViewport ? mobileCardMinHeight : undefined,
+                  overflow: isMobileViewport ? "hidden" : "visible",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "flex-start",
                   position: "relative",
-                  overflow: "visible",
                   boxShadow: "0 6px 16px rgba(0, 0, 0, 0.25)",
                   boxSizing: "border-box",
-                  gap: "12px",
+                  gap: isMobileViewport ? "6px" : "12px",
                   zIndex: hasActiveSpyPopover ? 30 : 1,
                 }}
               >
@@ -2111,13 +2150,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 />
 
                 <div style={{ zIndex: 2 }}>
-                  <div style={{ fontSize: "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: "8px" }}>
-                    Spymasters
+                  <div style={{ fontSize: isMobileViewport ? "0.75rem" : "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: isMobileViewport ? "4px" : "8px" }}>
+                    {isMobileViewport ? "SPY" : "Spymasters"}
                   </div>
                   {spymasters.length > 0 ? (
-                    renderOverlappingPlayers(spymasters, spymasters.length <= 4 ? 68 : (spymasters.length === 5 ? 58 : (spymasters.length === 6 ? 50 : 44)))
+                    renderOverlappingPlayers(spymasters, isMobileViewport ? 44 : (spymasters.length <= 4 ? 68 : (spymasters.length === 5 ? 58 : (spymasters.length === 6 ? 50 : 44))))
                   ) : (
-                    <div style={{ fontSize: "0.78rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: "12px 0" }}>No Spymaster deployed</div>
+                    <div style={{ fontSize: "0.72rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", margin: isMobileViewport ? "6px 0" : "12px 0" }}>No Spy</div>
                   )}
                 </div>
 
@@ -2138,7 +2177,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       Join Spymasters
                     </button>
                   ) : (
-                    <button style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Spymasters</button>
+                    isMobileViewport ? null : <button style={{ ...absoluteButtonStyle, visibility: "hidden" }}>Join Spymasters</button>
                   )
                 ) : (
                   spymasters.length === 0 && (
@@ -3092,13 +3131,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             background: "var(--color-surface)",
             border: "1px solid var(--color-border)",
             borderRadius: "var(--radius-md)",
-            padding: "24px",
+            padding: isMobileViewport ? "12px 14px" : "24px",
             display: "flex",
-            gap: "32px",
+            gap: isMobileViewport ? "14px" : "32px",
             width: "100%",
             flexWrap: "wrap",
             alignItems: "stretch",
-            marginBottom: "8px",
+            marginBottom: isMobileViewport ? "6px" : "8px",
             boxSizing: "border-box",
           }}
         >
@@ -4239,9 +4278,19 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             {/* Three-Column Layout: Red Team (Left) | Game Board (Middle) | Blue Team (Right) */}
             {room.phase !== "lobby" && (
               <div
-                style={{
+                style={isMobileViewport ? {
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gridTemplateAreas: `
+                    "red blue"
+                    "board board"
+                  `,
+                  gap: "10px",
+                  width: "100%",
+                  boxSizing: "border-box"
+                } : {
                   display: "flex",
-                  flexDirection: isMobileViewport ? "column" : "row",
+                  flexDirection: "row",
                   gap: "30px",
                   width: "100%",
                   alignItems: "flex-start",
@@ -4249,21 +4298,37 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 }}
               >
                 {/* Left Side: Red Team */}
-                <div style={{ flex: isMobileViewport ? "1 1 auto" : "0 0 195px", minWidth: "170px", width: isMobileViewport ? "100%" : "auto", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1, left: isMobileViewport ? "0px" : "-60px" }}>
+                <div style={{ 
+                  gridArea: isMobileViewport ? "red" : "auto",
+                  flex: isMobileViewport ? "none" : "0 0 195px", 
+                  minWidth: isMobileViewport ? "0px" : "170px", 
+                  width: isMobileViewport ? "100%" : "auto", 
+                  position: "relative", 
+                  zIndex: activeSwitchPlayerId ? 100 : 1, 
+                  left: isMobileViewport ? "0px" : "-60px" 
+                }}>
                   <div style={{
                     background: "var(--color-surface)",
                     border: "1px solid var(--color-border)",
                     borderRadius: "var(--radius-md)",
-                    padding: "16px",
+                    padding: isMobileViewport ? "8px" : "16px",
                     boxSizing: "border-box",
-                    width: "max-content",
+                    width: "100%",
                   }}>
                     {renderTeamSegment("red", `${t("teams.red")} ${t("teams.team")}`)}
                   </div>
                 </div>
 
                 {/* Middle Side: Game Board (Reduced Size, Centered) */}
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "24px", minWidth: 0, width: "100%" }}>
+                <div style={{ 
+                  gridArea: isMobileViewport ? "board" : "auto",
+                  flex: 1, 
+                  display: "flex", 
+                  flexDirection: "column", 
+                  gap: "24px", 
+                  minWidth: 0, 
+                  width: "100%" 
+                }}>
 
 
           {/* Active Game Layout */}
@@ -4973,14 +5038,22 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             </div>
 
             {/* Right Side: Blue Team */}
-            <div style={{ flex: isMobileViewport ? "1 1 auto" : "0 0 195px", minWidth: "170px", width: isMobileViewport ? "100%" : "auto", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1, left: isMobileViewport ? "0px" : "-20px" }}>
+            <div style={{ 
+              gridArea: isMobileViewport ? "blue" : "auto",
+              flex: isMobileViewport ? "none" : "0 0 195px", 
+              minWidth: isMobileViewport ? "0px" : "170px", 
+              width: isMobileViewport ? "100%" : "auto", 
+              position: "relative", 
+              zIndex: activeSwitchPlayerId ? 100 : 1, 
+              left: isMobileViewport ? "0px" : "-20px" 
+            }}>
               <div style={{
                 background: "var(--color-surface)",
                 border: "1px solid var(--color-border)",
                 borderRadius: "var(--radius-md)",
-                padding: "16px",
+                padding: isMobileViewport ? "8px" : "16px",
                 boxSizing: "border-box",
-                width: "max-content",
+                width: "100%",
               }}>
                 {renderTeamSegment("blue", `${t("teams.blue")} ${t("teams.team")}`)}
               </div>
@@ -6260,7 +6333,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
   };
 
     const renderPlayerRow = (p: Player, customSize?: number) => {
-    const size = Math.floor((customSize || 54) * 1.22);
+    const effectiveSize = isMobileViewport ? 32 : Math.floor((customSize || 54) * 1.22);
+    const size = effectiveSize;
     const avatarSize = Math.floor(size * 0.88);
     const border = p.team ? typeColors[p.team]!.border : "rgba(255,255,255,0.15)";
     const isCurrent = p.id === playerId;
@@ -6445,17 +6519,17 @@ const renderSettingsCard = (side?: "left" | "right") => {
           )}
         </div>
 
-        {/* Small name label (underneath) */}
+        {/* Username — tiny on mobile, normal on desktop */}
         <span
           style={{
-            fontSize: `${Math.max(0.65, Math.min(0.9, size * 0.016))}rem`,
+            fontSize: isMobileViewport ? "0.62rem" : `${Math.max(0.65, Math.min(0.9, size * 0.016))}rem`,
             fontWeight: isCurrent ? 700 : 500,
             color: p.team ? typeColors[p.team]!.border : (isCurrent ? "var(--accent)" : "var(--color-text-muted)"),
             maxWidth: `${size + 12}px`,
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
-            marginTop: "4px",
+            marginTop: isMobileViewport ? "2px" : "4px",
             textAlign: "center",
           }}
           title={p.displayName}
@@ -6486,8 +6560,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
           overflowY: "hidden",
           paddingLeft: "0px",
           paddingRight: "0px",
-          paddingTop: "28px", // prevent clipping the host crown at its highest floating animation peak
-          paddingBottom: "12px", // space for scrollbar/labels
+          paddingTop: isMobileViewport ? "10px" : "28px",
+          paddingBottom: isMobileViewport ? "4px" : "12px",
           boxSizing: "border-box",
           scrollbarWidth: "thin",
           msOverflowStyle: "none",
