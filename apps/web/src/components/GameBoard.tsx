@@ -4667,7 +4667,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
 
                           {/* Reveal Status Badge (top right) */}
-                          {(card.revealed || (canSeeKey && card.type === "assassin")) && !votedCardIds.includes(card.id) && (
+                          {card.type === "assassin" && (card.revealed || canSeeKey) && !votedCardIds.includes(card.id) && (
                             <span
                               style={{
                                 position: "absolute",
@@ -4685,8 +4685,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                 zIndex: 2,
                               }}
                             >
-                              {card.type === "assassin" ? "black" : ""}
-                              {card.revealed && (card.type === "assassin" ? " (REV)" : "REV")}
+                              black
                             </span>
                           )}
 
