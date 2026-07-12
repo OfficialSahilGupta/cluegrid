@@ -3790,62 +3790,6 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           )}
         </div>
 
-        {room.phase !== "lobby" && room.phase === "playing" && localPlayer?.role === "spymaster" && (
-                <div
-                  style={{
-                    background: "var(--bg-surface-raised)",
-                    border: "1px solid var(--border-default)",
-                    borderLeft: "4px solid var(--accent)",
-                    borderRadius: "var(--radius-md)",
-                    padding: "16px 20px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    flexWrap: "wrap",
-                    gap: "24px",
-                    textAlign: "left",
-                    marginTop: "20px",
-                    width: "100%",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <div>
-                    <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1rem", fontWeight: 700, margin: 0, color: "var(--text-primary)" }}>
-                      Spymaster Reactions Overlay
-                    </h4>
-                    <p style={{ margin: "2px 0 0 0", color: "var(--color-text-muted)", fontSize: "0.8rem" }}>
-                      {cooldownRemaining > 0 ? `Rate limited: wait ${cooldownRemaining}s` : "Trigger a full-screen reaction"}
-                    </p>
-                  </div>
-                  <div style={{ display: "flex", gap: "16px", flexWrap: "wrap" }}>
-                    {["facepalm", "fire", "skull", "party", "clap", "heart"].map((type) => (
-                      <button
-                        key={type}
-                        disabled={cooldownRemaining > 0}
-                        onClick={() => triggerReaction(type)}
-                        style={{
-                          border: "none",
-                          background: "none",
-                          padding: 0,
-                          cursor: cooldownRemaining > 0 ? "not-allowed" : "pointer",
-                          opacity: cooldownRemaining > 0 ? 0.5 : 1,
-                          transition: "transform 0.1s ease",
-                        }}
-                        onMouseOver={(e) => {
-                          if (cooldownRemaining === 0) e.currentTarget.style.transform = "scale(1.05)";
-                        }}
-                        onMouseOut={(e) => {
-                          e.currentTarget.style.transform = "scale(1)";
-                        }}
-                      >
-                        {renderCustomReaction(type, true)}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-        {/* Turn Banner */}
         {room.phase !== "lobby" && (
           <div
             id="clue-display-panel"
@@ -5368,7 +5312,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                   transition: "all 0.3s ease",
                 }}
               >
-                <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", margin: "0 0 4px 0", fontWeight: 700, color: "var(--accent)" }}>
+                <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.1rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
                   Timer Action
                 </h4>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", width: "100%" }}>
@@ -7525,7 +7469,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                     {/* Write channel indicator */}
                     <div className="chat-spy-banner">
                       <span style={{ display: "flex", alignItems: "center" }}>
-                        <svg xmlns="http://www.w3.org/w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                           <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
@@ -7549,7 +7493,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                       textTransform: "uppercase",
                     }}>
                       <span style={{ display: "flex", alignItems: "center", opacity: 0.8 }}>
-                        <svg xmlns="http://www.w3.org/w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                           <circle cx="12" cy="12" r="3"></circle>
                         </svg>
@@ -7647,6 +7591,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               {/* Input area */}
               {!chatDisabled && (
                 <div style={{ position: "relative", flexShrink: 0 }}>
+
                   {/* @mention dropdown */}
                   {mentionQuery !== null && filteredMentions.length > 0 && (
                     <div className="mention-dropdown">
@@ -7985,10 +7930,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
     );
   };
 
-  const renderCustomReaction = (type: string, isButton = false) => {
-    const size = isButton ? "20px" : "84px";
-    const padding = isButton ? "10px 18px" : "36px";
-    const borderRadius = isButton ? "var(--radius-sm)" : "50%";
+  const renderCustomReaction = (type: string, isButton = false, onlySvg = false) => {
+    const size = onlySvg ? "26px" : (isButton ? "20px" : "84px");
+    const padding = onlySvg ? "0" : (isButton ? "10px 18px" : "36px");
+    const borderRadius = onlySvg ? "50%" : (isButton ? "var(--radius-sm)" : "50%");
+    const width = onlySvg ? "54px" : "auto";
+    const height = onlySvg ? "54px" : "auto";
     
     switch (type) {
       case "facepalm":
@@ -7997,6 +7944,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
+              width,
+              height,
               background: "linear-gradient(135deg, hsl(355, 75%, 15%) 0%, hsl(355, 80%, 25%) 100%)",
               border: "1.5px solid hsl(355, 80%, 48%)",
               color: "#fff",
@@ -8013,7 +7962,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               <line x1="12" y1="9" x2="12" y2="13"/>
               <line x1="12" y1="17" x2="12.01" y2="17"/>
             </svg>
-            {isButton && (
+            {isButton && !onlySvg && (
               <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Misplay
               </span>
@@ -8026,6 +7975,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
+              width,
+              height,
               background: "linear-gradient(135deg, hsl(35, 85%, 18%) 0%, hsl(35, 90%, 30%) 100%)",
               border: "1.5px solid hsl(35, 90%, 55%)",
               color: "#fff",
@@ -8040,7 +7991,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
             <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/>
             </svg>
-            {isButton && (
+            {isButton && !onlySvg && (
               <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Firey
               </span>
@@ -8053,6 +8004,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
+              width,
+              height,
               background: "linear-gradient(135deg, #09090b 0%, #18181b 100%)",
               border: "1.5px solid #3f3f46",
               color: "#fafafa",
@@ -8070,7 +8023,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
               <circle cx="10" cy="8" r="1" fill="currentColor"/>
               <circle cx="14" cy="8" r="1" fill="currentColor"/>
             </svg>
-            {isButton && (
+            {isButton && !onlySvg && (
               <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Deadly
               </span>
@@ -8083,6 +8036,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
+              width,
+              height,
               background: "linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(0, 240, 255, 0.18) 100%)",
               border: "1.5px solid var(--accent)",
               color: "var(--accent)",
@@ -8097,7 +8052,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
             <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
             </svg>
-            {isButton && (
+            {isButton && !onlySvg && (
               <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Genius
               </span>
@@ -8110,6 +8065,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
+              width,
+              height,
               background: "linear-gradient(135deg, hsl(142, 75%, 12%) 0%, hsl(142, 80%, 22%) 100%)",
               border: "1.5px solid hsl(142, 70%, 45%)",
               color: "#fff",
@@ -8124,7 +8081,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
             <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
             </svg>
-            {isButton && (
+            {isButton && !onlySvg && (
               <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Bravo
               </span>
@@ -8137,6 +8094,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
             style={{
               padding,
               borderRadius,
+              width,
+              height,
               background: "linear-gradient(135deg, hsl(217, 85%, 15%) 0%, hsl(217, 80%, 25%) 100%)",
               border: "1.5px solid hsl(217, 91%, 60%)",
               color: "#fff",
@@ -8151,7 +8110,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
             <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2.5">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
-            {isButton && (
+            {isButton && !onlySvg && (
               <span style={{ fontSize: "1rem", fontWeight: 800, fontFamily: "var(--font-display)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 Heart
               </span>
@@ -8982,10 +8941,53 @@ const renderSettingsCard = (side?: "left" | "right") => {
             zIndex: 9999,
           }}
         >
-          {/* Floating Panel (rendered always, visibility toggled to preserve scroll) */}
+          {/* Floating Panel */}
           <div style={{ display: isChatFloatingOpen ? "block" : "none" }}>
             {renderChatAndLogPanel()}
           </div>
+
+          {/* Vertical Reactions Column (only for playing Spymasters) */}
+          {room.phase === "playing" && localPlayer?.role === "spymaster" && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: "200px",
+                right: "29px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+                pointerEvents: "auto",
+                zIndex: 9999,
+              }}
+            >
+              {["facepalm", "fire", "skull", "party", "clap", "heart"].map((type) => (
+                <button
+                  key={type}
+                  disabled={cooldownRemaining > 0}
+                  onClick={() => triggerReaction(type)}
+                  style={{
+                    border: "none",
+                    background: "none",
+                    padding: 0,
+                    cursor: cooldownRemaining > 0 ? "not-allowed" : "pointer",
+                    opacity: cooldownRemaining > 0 ? 0.5 : 1,
+                    transition: "transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+                    borderRadius: "50%",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                  }}
+                  onMouseOver={(e) => {
+                    if (cooldownRemaining === 0) e.currentTarget.style.transform = "scale(1.15)";
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                  }}
+                  title={cooldownRemaining > 0 ? `Wait ${cooldownRemaining}s` : `Trigger ${type} reaction`}
+                >
+                  {renderCustomReaction(type, true, true)}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div
             style={{
