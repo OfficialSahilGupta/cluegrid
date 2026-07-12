@@ -8960,31 +8960,48 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 zIndex: 9999,
               }}
             >
-              {["facepalm", "fire", "skull", "party", "clap", "heart"].map((type) => (
-                <button
+              <style>{`
+                @keyframes reaction-float {
+                  0%, 100% { transform: translateY(0); }
+                  50% { transform: translateY(-5px); }
+                }
+              `}</style>
+              {["facepalm", "fire", "skull", "party", "clap", "heart"].map((type, index) => (
+                <div
                   key={type}
-                  disabled={cooldownRemaining > 0}
-                  onClick={() => triggerReaction(type)}
                   style={{
-                    border: "none",
-                    background: "none",
-                    padding: 0,
-                    cursor: cooldownRemaining > 0 ? "not-allowed" : "pointer",
-                    opacity: cooldownRemaining > 0 ? 0.5 : 1,
-                    transition: "transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
-                    borderRadius: "50%",
-                    boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    animation: "reaction-float 4.2s ease-in-out infinite",
+                    animationDelay: `${index * 0.18}s`,
                   }}
-                  onMouseOver={(e) => {
-                    if (cooldownRemaining === 0) e.currentTarget.style.transform = "scale(1.15)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = "scale(1)";
-                  }}
-                  title={cooldownRemaining > 0 ? `Wait ${cooldownRemaining}s` : `Trigger ${type} reaction`}
                 >
-                  {renderCustomReaction(type, true, true)}
-                </button>
+                  <button
+                    disabled={cooldownRemaining > 0}
+                    onClick={() => triggerReaction(type)}
+                    style={{
+                      border: "none",
+                      background: "none",
+                      padding: 0,
+                      cursor: cooldownRemaining > 0 ? "not-allowed" : "pointer",
+                      opacity: cooldownRemaining > 0 ? 0.5 : 1,
+                      transition: "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease",
+                      borderRadius: "50%",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                    }}
+                    onMouseOver={(e) => {
+                      if (cooldownRemaining === 0) {
+                        e.currentTarget.style.transform = "scale(1.18) rotate(4deg)";
+                        e.currentTarget.style.filter = "brightness(1.15)";
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = "scale(1) rotate(0deg)";
+                      e.currentTarget.style.filter = "brightness(1)";
+                    }}
+                    title={cooldownRemaining > 0 ? `Wait ${cooldownRemaining}s` : `Trigger ${type} reaction`}
+                  >
+                    {renderCustomReaction(type, true, true)}
+                  </button>
+                </div>
               ))}
             </div>
           )}
