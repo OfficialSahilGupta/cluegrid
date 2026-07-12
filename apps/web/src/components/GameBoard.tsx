@@ -4841,7 +4841,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         <div
                           style={{
                             width: "100%",
-                            padding: "10px 10px",
+                            padding: isMobileViewport ? "6px 4px" : "10px 10px",
                             background: lightMode ? "rgba(0, 0, 0, 0.05)" : "rgba(0, 0, 0, 0.35)",
                             display: "flex",
                             alignItems: "center",
@@ -4854,11 +4854,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                             className="game-card-word"
                             style={{
                               fontFamily: "var(--font-display)",
-                              fontSize: card.word.length > 9
-                                ? "clamp(9px, 11.5cqw, 0.85rem)"
+                              fontSize: card.word.length > 10
+                                ? "clamp(9px, 12.5cqw, 0.95rem)"
                                 : card.word.length > 7
-                                  ? "clamp(10px, 13.5cqw, 1.0rem)"
-                                  : "clamp(11px, 15.5cqw, 1.15rem)",
+                                  ? "clamp(11px, 14.5cqw, 1.1rem)"
+                                  : card.word.length > 5
+                                    ? "clamp(12.5px, 16.5cqw, 1.25rem)"
+                                    : "clamp(14px, 18.5cqw, 1.35rem)",
                               fontWeight: 900,
                               letterSpacing: "0.05em",
                               color: card.revealed
