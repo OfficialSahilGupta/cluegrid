@@ -990,6 +990,24 @@ html.increased-fonts {
     overflow-y: auto !important;
     box-shadow: 0 20px 50px rgba(0,0,0,0.85) !important;
   }
+
+  /* Position the reaction buttons horizontally next to the chat trigger button on mobile/tablets */
+  .spy-reactions-container {
+    flex-direction: row !important;
+    bottom: 37px !important;
+    right: 100px !important;
+    gap: 5px !important;
+  }
+
+  .spy-reaction-icon-wrapper {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .spy-reaction-icon-wrapper svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
 }
 
 /* Phone (≤ 600px): very compact team panel cards */

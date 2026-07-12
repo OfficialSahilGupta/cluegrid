@@ -443,6 +443,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   const [isMobileViewport, setIsMobileViewport] = useState(typeof window !== "undefined" ? window.innerWidth <= 1024 : false);
   useEffect(() => {
     const handleResize = () => setIsMobileViewport(window.innerWidth <= 1024);
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -4181,62 +4182,64 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
                 </div>
               ) : (
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    gap: "16px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  {/* #8 Liquid Score Fill */}
-                  {activeTeams.map((team) => {
-                    const state = room.teams[team];
-                    const config = typeColors[team]!;
-                    if (!state) return null;
-                    const fillPct = state.totalCards > 0 ? (state.cardsRemaining / state.totalCards) * 100 : 0;
+                isMobileViewport ? null : (
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      gap: "16px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {/* #8 Liquid Score Fill */}
+                    {activeTeams.map((team) => {
+                      const state = room.teams[team];
+                      const config = typeColors[team]!;
+                      if (!state) return null;
+                      const fillPct = state.totalCards > 0 ? (state.cardsRemaining / state.totalCards) * 100 : 0;
 
-                    return (
-                      <div
-                        key={team}
-                        style={{
-                          background: state.eliminated ? "rgba(0,0,0,0.4)" : "var(--color-surface)",
-                          border: `2px solid ${state.eliminated ? "rgba(255,255,255,0.05)" : config.border}`,
-                          padding: "6px 12px",
-                          borderRadius: "var(--radius-md)",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "12px",
-                          opacity: state.eliminated ? 0.5 : 1,
-                          minWidth: "140px",
-                        }}
-                      >
-                        <div style={{ position: "relative", width: "10px", height: "28px", borderRadius: "5px", background: "rgba(255,255,255,0.08)", overflow: "hidden", flexShrink: 0 }}>
-                          <div
-                            className="score-liquid-fill"
-                            style={{
-                              position: "absolute", bottom: 0, left: 0, right: 0,
-                              height: `${fillPct}%`,
-                              background: `linear-gradient(to top, ${config.border}, ${config.light})`,
-                              borderRadius: "5px",
-                            }}
-                          />
+                      return (
+                        <div
+                          key={team}
+                          style={{
+                            background: state.eliminated ? "rgba(0,0,0,0.4)" : "var(--color-surface)",
+                            border: `2px solid ${state.eliminated ? "rgba(255,255,255,0.05)" : config.border}`,
+                            padding: "6px 12px",
+                            borderRadius: "var(--radius-md)",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "12px",
+                            opacity: state.eliminated ? 0.5 : 1,
+                            minWidth: "140px",
+                          }}
+                        >
+                          <div style={{ position: "relative", width: "10px", height: "28px", borderRadius: "5px", background: "rgba(255,255,255,0.08)", overflow: "hidden", flexShrink: 0 }}>
+                            <div
+                              className="score-liquid-fill"
+                              style={{
+                                position: "absolute", bottom: 0, left: 0, right: 0,
+                                height: `${fillPct}%`,
+                                background: `linear-gradient(to top, ${config.border}, ${config.light})`,
+                                borderRadius: "5px",
+                              }}
+                            />
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "8px" }}>
+                            <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.06em", color: config.light }}>
+                              {formatTeamName(team)}
+                            </span>
+                            <span style={{ fontWeight: 800, fontFamily: "var(--font-display)", fontSize: "1.1rem", color: state.eliminated ? "var(--color-text-muted)" : "var(--text-primary)", lineHeight: 1 }}>
+                              {state.cardsRemaining}
+                              <span style={{ fontWeight: 400, fontSize: "0.75rem", color: "var(--text-secondary)", marginLeft: "3px" }}>/ {state.totalCards}</span>
+                            </span>
+                            {state.eliminated && <span style={{ fontSize: "0.6rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Eliminated</span>}
+                          </div>
                         </div>
-                        <div style={{ display: "flex", flexDirection: "row", alignItems: "center", gap: "8px" }}>
-                          <span style={{ fontWeight: 700, fontFamily: "var(--font-display)", fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.06em", color: config.light }}>
-                            {formatTeamName(team)}
-                          </span>
-                          <span style={{ fontWeight: 800, fontFamily: "var(--font-display)", fontSize: "1.1rem", color: state.eliminated ? "var(--color-text-muted)" : "var(--text-primary)", lineHeight: 1 }}>
-                            {state.cardsRemaining}
-                            <span style={{ fontWeight: 400, fontSize: "0.75rem", color: "var(--text-secondary)", marginLeft: "3px" }}>/ {state.totalCards}</span>
-                          </span>
-                          {state.eliminated && <span style={{ fontSize: "0.6rem", color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Eliminated</span>}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
 
-                </div>
+                  </div>
+                )
               )}
 
               {/* End Turn Button (moved here to be on same line) */}
