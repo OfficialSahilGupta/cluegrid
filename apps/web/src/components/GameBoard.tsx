@@ -5007,7 +5007,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             </div>
 
             {/* Right Side: Blue Team */}
-            <div style={{ flex: isMobileViewport ? "1 1 auto" : "0 0 195px", minWidth: "170px", width: isMobileViewport ? "100%" : "auto", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1 }}>
+            <div style={{ flex: isMobileViewport ? "1 1 auto" : "0 0 195px", minWidth: "170px", width: isMobileViewport ? "100%" : "auto", position: "relative", zIndex: activeSwitchPlayerId ? 100 : 1, left: isMobileViewport ? "0px" : "-20px" }}>
               {renderTeamSegment("blue", `${t("teams.blue")} ${t("teams.team")}`)}
             </div>
           </div>
