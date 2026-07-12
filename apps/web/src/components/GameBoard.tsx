@@ -4958,19 +4958,19 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                               }}
                               style={{
                                 position: "absolute",
-                                top: "6px",
-                                right: "8px",
+                                top: isMobileViewport ? "4px" : "6px",
+                                right: isMobileViewport ? "4px" : "8px",
                                 background: "linear-gradient(135deg, var(--accent), #b87c24)",
                                 border: "1px solid var(--accent)",
                                 borderRadius: "50%",
-                                width: "28px",
-                                height: "28px",
+                                width: isMobileViewport ? "18px" : "28px",
+                                height: isMobileViewport ? "18px" : "28px",
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
                                 color: "var(--accent-text-on)",
                                 cursor: "pointer",
-                                boxShadow: "0 0 10px rgba(232,163,61,0.5)",
+                                boxShadow: isMobileViewport ? "0 0 5px rgba(232,163,61,0.4)" : "0 0 10px rgba(232,163,61,0.5)",
                                 zIndex: 10,
                                 transition: "all 0.15s ease",
                               }}
@@ -4980,11 +4980,11 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                               }}
                               onMouseOut={(e) => {
                                 e.currentTarget.style.transform = "none";
-                                e.currentTarget.style.boxShadow = "0 0 10px rgba(232,163,61,0.5)";
+                                e.currentTarget.style.boxShadow = isMobileViewport ? "0 0 5px rgba(232,163,61,0.4)" : "0 0 10px rgba(232,163,61,0.5)";
                               }}
                               title="Flip Card"
                             >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: "scaleX(-1)" }}>
+                              <svg width={isMobileViewport ? "10" : "14"} height={isMobileViewport ? "10" : "14"} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: "scaleX(-1)" }}>
                                 <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
                               </svg>
                             </button>
