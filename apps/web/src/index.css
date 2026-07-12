@@ -1002,7 +1002,10 @@ html.increased-fonts {
     box-shadow: 0 20px 50px rgba(0,0,0,0.85) !important;
   }
 
-  /* Position the reaction buttons horizontally next to the chat trigger button on mobile/tablets */
+}
+
+/* Position the reaction buttons horizontally next to the chat trigger button on laptops, tablets, and mobile (≤ 1280px) */
+@media (max-width: 1280px) {
   .spy-reactions-container {
     flex-direction: row !important;
     bottom: 37px !important;

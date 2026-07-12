@@ -8074,11 +8074,11 @@ const renderSettingsCard = (side?: "left" | "right") => {
   };
 
   const renderCustomReaction = (type: string, isButton = false, onlySvg = false) => {
-    const size = onlySvg ? "26px" : (isButton ? "20px" : "84px");
+    const size = onlySvg ? (isMobileViewport ? "18px" : "26px") : (isButton ? "20px" : "84px");
     const padding = onlySvg ? "0" : (isButton ? "10px 18px" : "36px");
     const borderRadius = onlySvg ? "50%" : (isButton ? "var(--radius-sm)" : "50%");
-    const width = onlySvg ? "54px" : "auto";
-    const height = onlySvg ? "54px" : "auto";
+    const width = onlySvg ? (isMobileViewport ? "36px" : "54px") : "auto";
+    const height = onlySvg ? (isMobileViewport ? "36px" : "54px") : "auto";
     
     switch (type) {
       case "facepalm":
@@ -9093,13 +9093,14 @@ const renderSettingsCard = (side?: "left" | "right") => {
           {/* Vertical Reactions Column (only for playing Spymasters/Coop when chat is closed) */}
           {room.phase === "playing" && (localPlayer?.role === "spymaster" || room.gameMode === "coop") && !isChatFloatingOpen && (
             <div
+              className="spy-reactions-container"
               style={{
                 position: "absolute",
-                bottom: "124px",
-                right: "29px",
+                bottom: isMobileViewport ? "37px" : "124px",
+                right: isMobileViewport ? "100px" : "29px",
                 display: "flex",
-                flexDirection: "column",
-                gap: "10px",
+                flexDirection: isMobileViewport ? "row" : "column",
+                gap: isMobileViewport ? "5px" : "10px",
                 pointerEvents: "auto",
                 zIndex: 9999,
               }}
@@ -9116,6 +9117,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
                   style={{
                     animation: "reaction-float 4.2s ease-in-out infinite",
                     animationDelay: `${index * 0.18}s`,
+                    flexShrink: 0,
+                    width: isMobileViewport ? "36px" : "auto",
+                    height: isMobileViewport ? "36px" : "auto",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   <button
@@ -9130,6 +9137,12 @@ const renderSettingsCard = (side?: "left" | "right") => {
                       transition: "transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease",
                       borderRadius: "50%",
                       boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                      width: isMobileViewport ? "36px" : "auto",
+                      height: isMobileViewport ? "36px" : "auto",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
                     }}
                     onMouseOver={(e) => {
                       if (cooldownRemaining === 0) {
