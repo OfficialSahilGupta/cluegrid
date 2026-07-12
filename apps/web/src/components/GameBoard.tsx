@@ -3861,6 +3861,159 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                     const activeCity = room.teams[room.turnState.activeTeam]?.name || (room.turnState.activeTeam.charAt(0).toUpperCase() + room.turnState.activeTeam.slice(1));
                     const otherTeam = getCoopGuessingTeam(room.turnState.activeTeam, room.teams);
                     const otherCity = room.teams[otherTeam as TeamIdentifier]?.name || (otherTeam.charAt(0).toUpperCase() + otherTeam.slice(1));
+                    if (isMobileViewport) {
+                      const teamColor = typeColors[room.turnState.activeTeam]!;
+                      const activeSpymasters = room.players.filter((p) => p.team === room.turnState!.activeTeam && p.role === "spymaster");
+                      const activeOperatives = room.players.filter((p) => p.team === room.turnState!.activeTeam && p.role === "operative");
+                      const currentPhasePlayers = room.turnState.phase === "giving_clue" ? activeSpymasters : activeOperatives;
+
+                      const canEndOwnTurn = (
+                        ((room.gameMode === "coop" &&
+                            localPlayer?.team === getCoopGuessingTeam(room.turnState.activeTeam, room.teams)) ||
+                          (room.gameMode !== "coop" &&
+                            localPlayer?.team === room.turnState.activeTeam &&
+                            localPlayer?.role === "operative")) &&
+                        room.turnState.phase === "guessing"
+                      );
+
+                      const canClaimOpponentTurn = (
+                        timerCount <= 0 &&
+                        localPlayer &&
+                        localPlayer.team !== room.turnState?.activeTeam &&
+                        room.settings.timerAction === "manual" &&
+                        room.gameMode !== "coop"
+                      );
+
+                      const showEndTurnButton = canEndOwnTurn || canClaimOpponentTurn;
+
+                      return (
+                        <div style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "5px",
+                          flexWrap: "nowrap",
+                          width: "100%",
+                          fontSize: "0.68rem",
+                          fontWeight: 800,
+                          fontFamily: "var(--font-display)",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.03em",
+                          whiteSpace: "nowrap",
+                        }}>
+                          {/* 1. Team Name Turn */}
+                          <span style={{ color: teamColor.border, flexShrink: 0 }}>
+                            {activeCity.toUpperCase()}'S TEAM TURN
+                          </span>
+
+                          {/* 2. Avatars */}
+                          {currentPhasePlayers.length > 0 ? (
+                            <div style={{ display: "inline-flex", alignItems: "center", flexShrink: 0, marginLeft: "2px", marginRight: "2px" }}>
+                              {currentPhasePlayers.map((p, idx) => (
+                                <span
+                                  key={p.id}
+                                  title={p.displayName}
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "20px",
+                                    height: "20px",
+                                    borderRadius: "50%",
+                                    border: `1.2px solid ${teamColor.border}`,
+                                    background: teamColor.bg,
+                                    overflow: "hidden",
+                                    marginLeft: idx === 0 ? 0 : "-6px",
+                                    zIndex: currentPhasePlayers.length - idx,
+                                    position: "relative",
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  {p.avatar
+                                    ? renderAvatar(p.avatar, 16)
+                                    : <span style={{ fontSize: "0.55rem", fontWeight: 900, color: teamColor.text }}>{p.displayName.charAt(0).toUpperCase()}</span>
+                                  }
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span style={{
+                              display: "inline-flex", alignItems: "center", justifyContent: "center",
+                              width: "20px", height: "20px", borderRadius: "50%",
+                              border: `1px dashed ${teamColor.border}`,
+                              background: teamColor.bg,
+                              opacity: 0.5, flexShrink: 0,
+                              marginLeft: "2px", marginRight: "2px"
+                            }}>
+                              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </span>
+                          )}
+
+                          {/* 3. Action Phrase */}
+                          <span style={{ color: "var(--color-text-muted)", fontWeight: 600, flexShrink: 0 }}>
+                            {room.turnState.phase === "giving_clue" 
+                              ? "is giving clue" 
+                              : "is guessing"
+                            }
+                          </span>
+
+                          {/* Clue Word if guessing */}
+                          {room.turnState.phase === "guessing" && (
+                            <span style={{ color: teamColor.light, fontWeight: 900, flexShrink: 0, marginLeft: "2px" }}>
+                              "{room.turnState.clueWord || "[Secret]"}" ({room.turnState.clueCount === -1 ? "∞" : room.turnState.clueCount})
+                            </span>
+                          )}
+
+                          {/* 4. Timer */}
+                          {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
+                            <>
+                              <span style={{ color: "var(--color-border)", flexShrink: 0 }}>·</span>
+                              <span style={{
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "3px",
+                                color: timerCount <= 10 ? "hsl(355,85%,58%)" : "var(--text-primary)",
+                                fontWeight: 900,
+                                flexShrink: 0,
+                              }}>
+                                <svg className="premium-clock-shake" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transformOrigin: "center center" }}>
+                                  <circle cx="12" cy="12" r="10" />
+                                  <polyline points="12 6 12 12 16 14" />
+                                </svg>
+                                {Math.floor(Math.max(0, timerCount) / 60)}:{(Math.max(0, timerCount) % 60) < 10 ? "0" : ""}{Math.max(0, timerCount) % 60}
+                              </span>
+                            </>
+                          )}
+
+                          {/* 5. End Turn Button */}
+                          {showEndTurnButton && (
+                            <>
+                              <span style={{ color: "var(--color-border)", flexShrink: 0 }}>·</span>
+                              <button
+                                onClick={handleEndTurn}
+                                style={{
+                                  padding: "3px 6px",
+                                  borderRadius: "3px",
+                                  background: canClaimOpponentTurn ? "hsl(355, 85%, 58%)" : "var(--accent)",
+                                  border: "none",
+                                  color: canClaimOpponentTurn ? "#fff" : "#1C1916",
+                                  fontFamily: "var(--font-display)",
+                                  fontWeight: 900,
+                                  fontSize: "0.6rem",
+                                  cursor: "pointer",
+                                  letterSpacing: "0.02em",
+                                  textTransform: "uppercase",
+                                  flexShrink: 0,
+                                }}
+                              >
+                                End Turn
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      );
+                    }
+
                     return (
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", width: "100%" }}>
                         <span
@@ -4044,7 +4197,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       {/* Inline Premium Shaking Timer badge at the end of Scores row with CLAIM OPPONENT TURN action */}
                       {room.phase === "playing" && (room.gameMode === "coop" || (room.settings.timerMode && room.settings.timerMode !== "off")) && (
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                          {timerCount <= 0 && localPlayer && localPlayer.team !== room.turnState?.activeTeam && room.settings.timerAction === "manual" && room.gameMode !== "coop" && (
+                          {timerCount <= 0 && localPlayer && localPlayer.team !== room.turnState?.activeTeam && room.settings.timerAction === "manual" && room.gameMode !== "coop" && !isMobileViewport && (
                             <button
                               onClick={() => {
                                 playNavClick();
@@ -4074,37 +4227,39 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                 e.currentTarget.style.transform = "none";
                               }}
                             >
-                              CLAIM OPPONENT TURN
+                              END TURN
                             </button>
                           )}
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "8px",
-                              background: "var(--color-surface)",
-                              border: `1.5px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "rgba(255, 255, 255, 0.15)"}`,
-                              padding: "6px 14px",
-                              borderRadius: "var(--radius-md)",
-                              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                              minHeight: "36px",
-                              boxSizing: "border-box"
-                            }}
-                          >
-                            <svg className="premium-clock-shake" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transformOrigin: "center center" }}>
-                              <circle cx="12" cy="12" r="10" />
-                              <polyline points="12 6 12 12 16 14" />
-                            </svg>
-                            <span style={{
-                              fontFamily: "var(--font-display)",
-                              fontSize: "1.05rem",
-                              fontWeight: 900,
-                              fontVariantNumeric: "tabular-nums",
-                              color: timerCount <= 10 ? "hsl(355,85%,58%)" : "var(--text-primary)"
-                            }}>
-                              {Math.floor(Math.max(0, timerCount) / 60)}:{(Math.max(0, timerCount) % 60) < 10 ? "0" : ""}{Math.max(0, timerCount) % 60}
-                            </span>
-                          </div>
+                          {!isMobileViewport && (
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "8px",
+                                background: "var(--color-surface)",
+                                border: `1.5px solid ${timerCount <= 10 ? "hsl(355,85%,58%)" : "rgba(255, 255, 255, 0.15)"}`,
+                                padding: "6px 14px",
+                                borderRadius: "var(--radius-md)",
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                                minHeight: "36px",
+                                boxSizing: "border-box"
+                              }}
+                            >
+                              <svg className="premium-clock-shake" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={timerCount <= 10 ? "hsl(355,85%,58%)" : "hsl(45, 85%, 55%)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transformOrigin: "center center" }}>
+                                <circle cx="12" cy="12" r="10" />
+                                <polyline points="12 6 12 12 16 14" />
+                              </svg>
+                              <span style={{
+                                fontFamily: "var(--font-display)",
+                                fontSize: "1.05rem",
+                                fontWeight: 900,
+                                fontVariantNumeric: "tabular-nums",
+                                color: timerCount <= 10 ? "hsl(355,85%,58%)" : "var(--text-primary)"
+                              }}>
+                                {Math.floor(Math.max(0, timerCount) / 60)}:{(Math.max(0, timerCount) % 60) < 10 ? "0" : ""}{Math.max(0, timerCount) % 60}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
 
