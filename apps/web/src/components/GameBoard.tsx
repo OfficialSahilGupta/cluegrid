@@ -3892,14 +3892,13 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           alignItems: "center",
                           justifyContent: "center",
                           gap: "5px",
-                          flexWrap: "nowrap",
+                          flexWrap: "wrap",
                           width: "100%",
                           fontSize: "0.68rem",
                           fontWeight: 800,
                           fontFamily: "var(--font-display)",
                           textTransform: "uppercase",
                           letterSpacing: "0.03em",
-                          whiteSpace: "nowrap",
                         }}>
                           {/* 1. Team Name Turn Badge */}
                           <span style={{
@@ -3917,7 +3916,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           {/* 2. Avatars */}
                           {currentPhasePlayers.length > 0 ? (
                             <div style={{ display: "inline-flex", alignItems: "center", flexShrink: 0, marginLeft: "2px", marginRight: "2px" }}>
-                              {currentPhasePlayers.map((p, idx) => (
+                              {currentPhasePlayers.slice(0, 3).map((p, idx) => (
                                 <span
                                   key={p.id}
                                   title={p.displayName}
@@ -3943,6 +3942,30 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                                   }
                                 </span>
                               ))}
+                              {currentPhasePlayers.length > 3 && (
+                                <span
+                                  title={`${currentPhasePlayers.length - 3} more players`}
+                                  style={{
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    width: "20px",
+                                    height: "20px",
+                                    borderRadius: "50%",
+                                    border: `1.2px solid ${teamColor.border}`,
+                                    background: teamColor.border,
+                                    color: "#fff",
+                                    fontSize: "0.55rem",
+                                    fontWeight: 900,
+                                    marginLeft: "-6px",
+                                    zIndex: 0,
+                                    position: "relative",
+                                    flexShrink: 0,
+                                  }}
+                                >
+                                  +{currentPhasePlayers.length - 3}
+                                </span>
+                              )}
                             </div>
                           ) : (
                             <span style={{
@@ -3958,7 +3981,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           )}
 
                           {/* 3. Action Phrase */}
-                          <span style={{ color: "#fff", fontWeight: 600, flexShrink: 0 }}>
+                          <span style={{ color: "#fff", fontWeight: 600, flexShrink: 0, whiteSpace: "nowrap" }}>
                             {room.turnState.phase === "giving_clue" 
                               ? "is giving clue" 
                               : "is guessing"
@@ -4418,7 +4441,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               )}
 
               {/* End Turn Button (moved here to be on same line) */}
-              {(room.phase === "playing" && room.turnState && (
+              {(room.phase === "playing" && room.turnState && !isMobileViewport && (
                 ((room.gameMode === "coop" &&
                     localPlayer?.team === getCoopGuessingTeam(room.turnState.activeTeam, room.teams)) ||
                   (room.gameMode !== "coop" &&
@@ -6771,8 +6794,8 @@ const renderSettingsCard = (side?: "left" | "right") => {
 
   const renderOverlappingPlayers = (players: Player[], size: number) => {
     const listLength = players.length;
-    const useOverlap = listLength > 3;
-    const overlapMargin = useOverlap ? "-18px" : "4px";
+    const useOverlap = isMobileViewport ? false : (listLength > 3);
+    const overlapMargin = useOverlap ? "-18px" : (isMobileViewport ? "6px" : "4px");
     const isPlayPage = room.phase !== "lobby";
 
     return (
@@ -6782,26 +6805,31 @@ const renderSettingsCard = (side?: "left" | "right") => {
           display: "flex", 
           flexDirection: "row", 
           flexWrap: "nowrap", 
-          justifyContent: isPlayPage ? "center" : "flex-start",
+          justifyContent: isMobileViewport ? "flex-start" : (isPlayPage ? "center" : "flex-start"),
           width: "100%",
           overflowX: "auto",
           overflowY: "hidden",
-          paddingLeft: "0px",
-          paddingRight: "0px",
+          paddingLeft: isMobileViewport ? "8px" : "0px",
+          paddingRight: isMobileViewport ? "8px" : "0px",
           paddingTop: isMobileViewport ? "4px" : "28px",
           paddingBottom: isMobileViewport ? "2px" : "12px",
           boxSizing: "border-box",
           scrollbarWidth: "thin",
           msOverflowStyle: "none",
+          WebkitOverflowScrolling: "touch",
         }}
       >
         {players.map((p, idx) => {
-          const leftMargin = isPlayPage
-            ? (idx === 0 ? "0px" : overlapMargin)
-            : (idx === 0 ? (useOverlap ? "20px" : "10px") : overlapMargin);
-          const rightMargin = isPlayPage
+          const leftMargin = isMobileViewport
             ? "0px"
-            : (idx === players.length - 1 ? "10px" : "4px");
+            : (isPlayPage
+              ? (idx === 0 ? "0px" : overlapMargin)
+              : (idx === 0 ? (useOverlap ? "20px" : "10px") : overlapMargin));
+          const rightMargin = isMobileViewport
+            ? (idx === players.length - 1 ? "0px" : "12px")
+            : (isPlayPage
+              ? "0px"
+              : (idx === players.length - 1 ? "10px" : "4px"));
 
           return (
             <div
