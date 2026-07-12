@@ -1862,7 +1862,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             flexDirection: "column",
             gap: isMobileViewport ? "8px" : "12px",
             flex: 1,
-            minWidth: isMobileViewport ? "0px" : "240px",
+            minWidth: "0px",
+            width: "100%",
             position: "relative",
           }}
         >
@@ -4517,8 +4518,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 } : {
                   display: "flex",
                   flexDirection: "row",
-                  gap: "30px",
-                  width: "100%",
+                  gap: "20px",
+                  width: "calc(100% + 200px)",
+                  marginLeft: "-100px",
+                  marginRight: "-100px",
                   alignItems: "flex-start",
                   boxSizing: "border-box",
                 }}
@@ -4526,12 +4529,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 {/* Left Side: Red Team */}
                 <div style={{ 
                   gridArea: isMobileViewport ? "red" : "auto",
-                  flex: isMobileViewport ? "none" : "0 0 195px", 
-                  minWidth: isMobileViewport ? "0px" : "170px", 
+                  flex: isMobileViewport ? "none" : "0 0 270px", 
+                  minWidth: isMobileViewport ? "0px" : "270px", 
                   width: isMobileViewport ? "100%" : "auto", 
                   position: "relative", 
                   zIndex: activeSwitchPlayerId ? 100 : 1, 
-                  left: isMobileViewport ? "0px" : "-60px" 
+                  left: isMobileViewport ? "0px" : "-10px" 
                 }}>
                   <div style={{
                     background: "var(--color-surface)",
@@ -4553,7 +4556,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   flexDirection: "column", 
                   gap: "24px", 
                   minWidth: 0, 
-                  width: "100%" 
+                  width: "100%",
+                  position: "relative",
+                  left: isMobileViewport ? "0px" : "-20px"
                 }}>
 
 
@@ -5315,12 +5320,12 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             {/* Right Side: Blue Team */}
             <div style={{ 
               gridArea: isMobileViewport ? "blue" : "auto",
-              flex: isMobileViewport ? "none" : "0 0 195px", 
-              minWidth: isMobileViewport ? "0px" : "170px", 
+              flex: isMobileViewport ? "none" : "0 0 240px", 
+              minWidth: isMobileViewport ? "0px" : "240px", 
               width: isMobileViewport ? "100%" : "auto", 
               position: "relative", 
               zIndex: activeSwitchPlayerId ? 100 : 1, 
-              left: isMobileViewport ? "0px" : "-20px" 
+              left: "-30px" 
             }}>
               <div style={{
                 background: "var(--color-surface)",
