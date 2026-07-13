@@ -3219,148 +3219,196 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   </span>
                 )}
               </div>
-              <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
-                {user ? "Online · Tap circle for stats" : "Gated · Tap circle to log in"}
-              </div>
+              {!user && (
+                <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
+                  Gated · Tap circle to log in
+                </div>
+              )}
             </div>
 
-            {/* Room Players section */}
-            <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "10px", minWidth: 0 }}>
-              <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "8px" }}>
-                Room Players ({room.players.length})
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "5px",
-                  maxHeight: "180px",
-                  overflowY: "auto",
-                  overflowX: "hidden",
-                  paddingRight: "2px",
-                  scrollbarWidth: "thin",
-                  scrollbarColor: "var(--color-border) transparent",
-                  minWidth: 0,
-                }}
-              >
-                {room.players.map((p) => {
-                  const teamColor = p.team ? typeColors[p.team] : null;
-                  const isSelf = p.id === playerId;
-                  const canAssign = isHost || isSelf;
-                  const isActive = activeSwitchPlayerId === p.id;
-
-                  return (
-                    <div
-                      key={p.id}
-                      onClick={(e) => {
-                        if (!canAssign) return;
-                        if (isActive) {
-                          setActiveSwitchPlayerId(null);
-                          return;
-                        }
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const popoverWidth = 290;
-                        const margin = 10;
-                        const screenWidth = window.innerWidth;
-                        const centerX = rect.left + rect.width / 2;
-                        let leftVal: number, topVal: number, transformVal: string;
-
-                        topVal = rect.top + rect.height / 2 + window.scrollY;
-                        if (centerX < screenWidth / 2) {
-                          leftVal = rect.right + margin + window.scrollX;
-                          transformVal = "translateY(-50%)";
-                          if (leftVal + popoverWidth > screenWidth) {
-                            leftVal = centerX + window.scrollX;
-                            topVal = rect.bottom + margin + window.scrollY;
-                            transformVal = "translateX(-50%)";
-                          }
-                        } else {
-                          leftVal = rect.left - margin - popoverWidth + window.scrollX;
-                          transformVal = "translateY(-50%)";
-                          if (leftVal < 0) {
-                            leftVal = centerX + window.scrollX;
-                            topVal = rect.bottom + margin + window.scrollY;
-                            transformVal = "translateX(-50%)";
-                          }
-                        }
-                        setPopoverCoords({ top: topVal, left: leftVal, transform: transformVal });
-                        setActiveSwitchPlayerId(p.id);
+            {/* Host Controls section */}
+            {isHost && (
+              <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "10px", minWidth: 0 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "12px",
+                    width: "100%",
+                  }}
+                >
+                  <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
+                    Host Controls
+                  </h4>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <button
+                      disabled={room.settings.roomLocked}
+                      onClick={() => {
+                        triggerHaptics([250, 50, 250]);
+                        playNavClick();
+                        if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
                       }}
                       style={{
+                        width: "100%",
+                        padding: "10px 14px",
+                        borderRadius: "var(--radius-sm)",
+                        background: "transparent",
+                        border: "1px solid var(--border-default)",
+                        color: "var(--text-primary)",
+                        fontWeight: 700,
+                        cursor: !room.settings.roomLocked ? "pointer" : "not-allowed",
+                        opacity: !room.settings.roomLocked ? 1 : 0.4,
+                        fontFamily: "var(--font-display)",
+                        fontSize: "0.85rem",
+                        transition: "all 0.2s ease",
                         display: "flex",
                         alignItems: "center",
+                        justifyContent: "center",
                         gap: "8px",
-                        padding: "6px 8px",
-                        borderRadius: "10px",
-                        border: isActive
-                          ? `1.5px solid var(--accent)`
-                          : teamColor
-                            ? `1.5px solid ${teamColor.border}`
-                            : "1px solid rgba(255,255,255,0.07)",
-                        background: isActive
-                          ? "rgba(232,163,61,0.10)"
-                          : teamColor
-                            ? `rgba(${p.team === "red" ? "196,69,54" : p.team === "blue" ? "45,110,142" : p.team === "green" ? "122,140,92" : "176,122,31"}, 0.08)`
-                            : "rgba(255,255,255,0.02)",
-                        cursor: canAssign ? "pointer" : "default",
-                        transition: "all 0.15s ease",
-                        flexShrink: 0,
-                        minWidth: 0,
                       }}
                       onMouseOver={(e) => {
-                        if (canAssign && !isActive) e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                        if (!room.settings.roomLocked) {
+                          e.currentTarget.style.background = "var(--border-subtle)";
+                        }
                       }}
                       onMouseOut={(e) => {
-                        if (canAssign && !isActive) e.currentTarget.style.background = teamColor
-                          ? `rgba(${p.team === "red" ? "196,69,54" : p.team === "blue" ? "45,110,142" : p.team === "green" ? "122,140,92" : "176,122,31"}, 0.08)`
-                          : "rgba(255,255,255,0.02)";
+                        e.currentTarget.style.background = "transparent";
                       }}
                     >
-                      {/* Avatar + status dot */}
-                      <div style={{ position: "relative", flexShrink: 0 }}>
-                        <div style={{
-                          width: "30px", height: "30px", borderRadius: "50%",
-                          border: `2px solid ${teamColor ? teamColor.border : "rgba(255,255,255,0.15)"}`,
-                          display: "flex", alignItems: "center", justifyContent: "center",
-                          background: "rgba(0,0,0,0.2)", overflow: "hidden",
-                        }}>
-                          {p.avatar ? renderAvatar(p.avatar, 26) : <Identicon username={p.displayName} size={26} />}
-                        </div>
-                        <div style={{
-                          position: "absolute", bottom: "0px", right: "0px",
-                          width: "8px", height: "8px", borderRadius: "50%",
-                          background: p.connected !== false ? "hsl(142,75%,45%)" : "hsl(355,85%,58%)",
-                          border: "1.5px solid var(--color-surface)",
-                        }} />
-                      </div>
-
-                      {/* Name + team badge */}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <div style={{
-                          fontSize: "0.78rem", fontWeight: 600,
-                          color: "var(--text-primary)",
-                          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                        }}>
-                          {p.displayName}
-                          {isSelf && <span style={{ marginLeft: "4px", fontSize: "0.58rem", color: "var(--accent)", fontWeight: 700 }}>YOU</span>}
-                          {(p.isHost || p.id === room.players[0]?.id) && <span style={{ marginLeft: "3px", fontSize: "0.6rem" }}>👑</span>}
-                        </div>
-                        <div style={{ fontSize: "0.62rem", color: teamColor?.text || "var(--color-text-muted)", marginTop: "1px", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.03em" }}>
-                          {p.team ? `${p.team}${p.role ? ` · ${p.role}` : ""}` : "Spectator"}
-                        </div>
-                      </div>
-
-                      {/* Click hint chevron for assignable players */}
-                      {canAssign && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0, opacity: 0.35, color: "var(--text-primary)" }}>
-                          <polyline points="9 18 15 12 9 6" />
-                        </svg>
-                      )}
-                    </div>
-                  );
-                })}
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="16 3 21 3 21 8" />
+                        <line x1="4" y1="20" x2="21" y2="3" />
+                        <polyline points="21 16 21 21 16 21" />
+                        <line x1="15" y1="15" x2="21" y2="21" />
+                        <line x1="4" y1="4" x2="9" y2="9" />
+                      </svg>
+                      <span>{t("settings.randomize", "Randomize Teams")}</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        triggerHaptics([250, 50, 250]);
+                        playSettingsToggle();
+                        if (socket) {
+                          socket.emit("update_settings", {
+                            roomCode: room.roomCode,
+                            settings: { roomLocked: !room.settings.roomLocked },
+                          });
+                        }
+                      }}
+                      style={{
+                        width: "100%",
+                        padding: "10px 14px",
+                        borderRadius: "var(--radius-sm)",
+                        background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
+                        border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
+                        color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        fontFamily: "var(--font-display)",
+                        fontSize: "0.85rem",
+                        transition: "all 0.2s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        {room.settings.roomLocked ? (
+                          <>
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                          </>
+                        ) : (
+                          <>
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                          </>
+                        )}
+                      </svg>
+                      <span>{room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}</span>
+                    </button>
+                    <button
+                      onClick={handleStartGame}
+                      style={{
+                        width: "100%",
+                        padding: "10px 14px",
+                        borderRadius: "var(--radius-sm)",
+                        background: "transparent",
+                        border: "1px solid var(--border-default)",
+                        color: "var(--text-secondary)",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        fontFamily: "var(--font-display)",
+                        fontSize: "0.85rem",
+                        transition: "all 0.2s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.borderColor = "var(--accent)";
+                        e.currentTarget.style.color = "var(--text-primary)";
+                        e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.borderColor = "var(--border-default)";
+                        e.currentTarget.style.color = "var(--text-secondary)";
+                        e.currentTarget.style.background = "transparent";
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                      </svg>
+                      <span>Reset Game</span>
+                    </button>
+                    <button
+                      onClick={handleReturnToLobby}
+                      style={{
+                        width: "100%",
+                        padding: "10px 14px",
+                        borderRadius: "var(--radius-sm)",
+                        background: "transparent",
+                        border: "1px solid var(--border-default)",
+                        color: "var(--text-secondary)",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        fontFamily: "var(--font-display)",
+                        fontSize: "0.85rem",
+                        transition: "all 0.2s ease",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "8px",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.borderColor = "var(--accent)";
+                        e.currentTarget.style.color = "var(--text-primary)";
+                        e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.borderColor = "var(--border-default)";
+                        e.currentTarget.style.color = "var(--text-secondary)";
+                        e.currentTarget.style.background = "transparent";
+                      }}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <polyline points="9 22 9 12 15 12 15 22" />
+                      </svg>
+                      <span>Return to Lobby</span>
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Stats list expands below */}
             {statsExpanded && (
@@ -3788,193 +3836,149 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           </div>
           
           {/* Music Player */}
-          <div style={{ flex: "1 2 340px", display: "flex", flexDirection: "column", borderLeft: "1px solid var(--color-border)", borderRight: isHost ? "1px solid var(--color-border)" : "none", paddingLeft: "24px", paddingRight: isHost ? "24px" : "0" }}>
+          <div style={{ flex: "1 2 340px", display: "flex", flexDirection: "column", borderLeft: "1px solid var(--color-border)", borderRight: "1px solid var(--color-border)", paddingLeft: "24px", paddingRight: "24px" }}>
             <MusicPlayer onShowGatedUpsell={() => setGatedFeature("Personal Music Player Widget")} noBorder={true} />
           </div>
 
-          {/* Host Controls */}
-          {isHost && (
-            <div style={{ flex: "1 1 250px", display: "flex", flexDirection: "column" }}>
+          {/* Room Players section */}
+          <div style={{ flex: "1 1 250px", display: "flex", flexDirection: "column", minWidth: 0 }}>
+            <div style={{ width: "100%", minWidth: 0 }}>
+              <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "8px" }}>
+                Room Players ({room.players.length})
+              </div>
               <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "12px",
-                width: "100%",
-              }}
-            >
-              <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
-                Host Controls
-              </h4>
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <button
-                  disabled={room.settings.roomLocked}
-                  onClick={() => {
-                    triggerHaptics([250, 50, 250]);
-                    playNavClick();
-                    if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    background: "transparent",
-                    border: "1px solid var(--border-default)",
-                    color: "var(--text-primary)",
-                    fontWeight: 700,
-                    cursor: !room.settings.roomLocked ? "pointer" : "not-allowed",
-                    opacity: !room.settings.roomLocked ? 1 : 0.4,
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.85rem",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                  onMouseOver={(e) => {
-                    if (!room.settings.roomLocked) {
-                      e.currentTarget.style.background = "var(--border-subtle)";
-                    }
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="16 3 21 3 21 8" />
-                    <line x1="4" y1="20" x2="21" y2="3" />
-                    <polyline points="21 16 21 21 16 21" />
-                    <line x1="15" y1="15" x2="21" y2="21" />
-                    <line x1="4" y1="4" x2="9" y2="9" />
-                  </svg>
-                  <span>{t("settings.randomize", "Randomize Teams")}</span>
-                </button>
-                <button
-                  onClick={() => {
-                    triggerHaptics([250, 50, 250]);
-                    playSettingsToggle();
-                    if (socket) {
-                      socket.emit("update_settings", {
-                        roomCode: room.roomCode,
-                        settings: { roomLocked: !room.settings.roomLocked },
-                      });
-                    }
-                  }}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
-                    border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
-                    color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.85rem",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    {room.settings.roomLocked ? (
-                      <>
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                      </>
-                    ) : (
-                      <>
-                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                        <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                      </>
-                    )}
-                  </svg>
-                  <span>{room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}</span>
-                </button>
-                <button
-                  onClick={handleStartGame}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    background: "transparent",
-                    border: "1px solid var(--border-default)",
-                    color: "var(--text-secondary)",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.85rem",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor = "var(--accent)";
-                    e.currentTarget.style.color = "var(--text-primary)";
-                    e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor = "var(--border-default)";
-                    e.currentTarget.style.color = "var(--text-secondary)";
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-                  </svg>
-                  <span>Reset Game</span>
-                </button>
-                <button
-                  onClick={handleReturnToLobby}
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    borderRadius: "var(--radius-sm)",
-                    background: "transparent",
-                    border: "1px solid var(--border-default)",
-                    color: "var(--text-secondary)",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-display)",
-                    fontSize: "0.85rem",
-                    transition: "all 0.2s ease",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor = "var(--accent)";
-                    e.currentTarget.style.color = "var(--text-primary)";
-                    e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor = "var(--border-default)";
-                    e.currentTarget.style.color = "var(--text-secondary)";
-                    e.currentTarget.style.background = "transparent";
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <polyline points="9 22 9 12 15 12 15 22" />
-                  </svg>
-                  <span>Return to Lobby</span>
-                </button>
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "5px",
+                  maxHeight: "180px",
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  paddingRight: "2px",
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "var(--color-border) transparent",
+                  minWidth: 0,
+                }}
+              >
+                {room.players.map((p) => {
+                  const teamColor = p.team ? typeColors[p.team] : null;
+                  const isSelf = p.id === playerId;
+                  const canAssign = isHost || isSelf;
+                  const isActive = activeSwitchPlayerId === p.id;
+
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={(e) => {
+                        if (!canAssign) return;
+                        if (isActive) {
+                          setActiveSwitchPlayerId(null);
+                          return;
+                        }
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const popoverWidth = 290;
+                        const margin = 10;
+                        const screenWidth = window.innerWidth;
+                        const centerX = rect.left + rect.width / 2;
+                        let leftVal: number, topVal: number, transformVal: string;
+
+                        topVal = rect.top + rect.height / 2 + window.scrollY;
+                        if (centerX < screenWidth / 2) {
+                          leftVal = rect.right + margin + window.scrollX;
+                          transformVal = "translateY(-50%)";
+                          if (leftVal + popoverWidth > screenWidth) {
+                            leftVal = centerX + window.scrollX;
+                            topVal = rect.bottom + margin + window.scrollY;
+                            transformVal = "translateX(-50%)";
+                          }
+                        } else {
+                          leftVal = rect.left - margin - popoverWidth + window.scrollX;
+                          transformVal = "translateY(-50%)";
+                          if (leftVal < 0) {
+                            leftVal = centerX + window.scrollX;
+                            topVal = rect.bottom + margin + window.scrollY;
+                            transformVal = "translateX(-50%)";
+                          }
+                        }
+                        setPopoverCoords({ top: topVal, left: leftVal, transform: transformVal });
+                        setActiveSwitchPlayerId(p.id);
+                      }}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "6px 8px",
+                        borderRadius: "10px",
+                        border: isActive
+                          ? `1.5px solid var(--accent)`
+                          : teamColor
+                            ? `1.5px solid ${teamColor.border}`
+                            : "1px solid rgba(255,255,255,0.07)",
+                        background: isActive
+                          ? "rgba(232,163,61,0.10)"
+                          : teamColor
+                            ? `rgba(${p.team === "red" ? "196,69,54" : p.team === "blue" ? "45,110,142" : p.team === "green" ? "122,140,92" : "176,122,31"}, 0.08)`
+                            : "rgba(255,255,255,0.02)",
+                        cursor: canAssign ? "pointer" : "default",
+                        transition: "all 0.15s ease",
+                        flexShrink: 0,
+                        minWidth: 0,
+                      }}
+                      onMouseOver={(e) => {
+                        if (canAssign && !isActive) e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                      }}
+                      onMouseOut={(e) => {
+                        if (canAssign && !isActive) e.currentTarget.style.background = teamColor
+                          ? `rgba(${p.team === "red" ? "196,69,54" : p.team === "blue" ? "45,110,142" : p.team === "green" ? "122,140,92" : "176,122,31"}, 0.08)`
+                          : "rgba(255,255,255,0.02)";
+                      }}
+                    >
+                      {/* Avatar + status dot */}
+                      <div style={{ position: "relative", flexShrink: 0 }}>
+                        <div style={{
+                          width: "30px", height: "30px", borderRadius: "50%",
+                          border: `2px solid ${teamColor ? teamColor.border : "rgba(255,255,255,0.15)"}`,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          background: "rgba(0,0,0,0.2)", overflow: "hidden",
+                        }}>
+                          {p.avatar ? renderAvatar(p.avatar, 26) : <Identicon username={p.displayName} size={26} />}
+                        </div>
+                        <div style={{
+                          position: "absolute", bottom: "0px", right: "0px",
+                          width: "8px", height: "8px", borderRadius: "50%",
+                          background: p.connected !== false ? "hsl(142,75%,45%)" : "hsl(355,85%,58%)",
+                          border: "1.5px solid var(--color-surface)",
+                        }} />
+                      </div>
+
+                      {/* Name + team badge */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          fontSize: "0.78rem", fontWeight: 600,
+                          color: "var(--text-primary)",
+                          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                        }}>
+                          {p.displayName}
+                          {isSelf && <span style={{ marginLeft: "4px", fontSize: "0.58rem", color: "var(--accent)", fontWeight: 700 }}>YOU</span>}
+                          {(p.isHost || p.id === room.players[0]?.id) && <span style={{ marginLeft: "3px", fontSize: "0.6rem" }}>👑</span>}
+                        </div>
+                        <div style={{ fontSize: "0.62rem", color: teamColor?.text || "var(--color-text-muted)", marginTop: "1px", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.03em" }}>
+                          {p.team ? `${p.team}${p.role ? ` · ${p.role}` : ""}` : "Spectator"}
+                        </div>
+                      </div>
+
+                      {/* Click hint chevron for assignable players */}
+                      {canAssign && (
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0, opacity: 0.35, color: "var(--text-primary)" }}>
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
-          )}
         </div>
 
         {room.phase !== "lobby" && (
