@@ -99,44 +99,46 @@ export function MusicPlayer({ noBorder }: MusicPlayerProps) {
       </p>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: "8px", marginBottom: "12px" }}>
-        <button
-          onClick={() => handleTabChange("youtube")}
-          style={{
-            flex: 1,
-            background: activeTab === "youtube" ? "var(--accent-bg-subtle)" : "transparent",
-            border: activeTab === "youtube" ? "1px solid var(--accent)" : "1px solid transparent",
-            color: activeTab === "youtube" ? "var(--accent)" : "var(--color-text-muted)",
-            padding: "8px 12px",
-            borderRadius: "var(--radius-md)",
-            cursor: "pointer",
-            fontSize: "0.8rem",
-            fontWeight: 700,
-            fontFamily: "var(--font-display)",
-            transition: "all 0.15s ease",
-          }}
-        >
-          YouTube
-        </button>
-        <button
-          onClick={() => handleTabChange("spotify")}
-          style={{
-            flex: 1,
-            background: activeTab === "spotify" ? "var(--accent-bg-subtle)" : "transparent",
-            border: activeTab === "spotify" ? "1px solid var(--accent)" : "1px solid transparent",
-            color: activeTab === "spotify" ? "var(--accent)" : "var(--color-text-muted)",
-            padding: "8px 12px",
-            borderRadius: "var(--radius-md)",
-            cursor: "pointer",
-            fontSize: "0.8rem",
-            fontWeight: 700,
-            fontFamily: "var(--font-display)",
-            transition: "all 0.15s ease",
-          }}
-        >
-          Spotify
-        </button>
-      </div>
+      {!(activeTab === "youtube" && ytEmbed) && !(activeTab === "spotify" && spotifyEmbed) && (
+        <div style={{ display: "flex", gap: "8px", borderBottom: "1px solid rgba(255,255,255,0.06)", paddingBottom: "8px", marginBottom: "12px" }}>
+          <button
+            onClick={() => handleTabChange("youtube")}
+            style={{
+              flex: 1,
+              background: activeTab === "youtube" ? "var(--accent-bg-subtle)" : "transparent",
+              border: activeTab === "youtube" ? "1px solid var(--accent)" : "1px solid transparent",
+              color: activeTab === "youtube" ? "var(--accent)" : "var(--color-text-muted)",
+              padding: "8px 12px",
+              borderRadius: "var(--radius-md)",
+              cursor: "pointer",
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              fontFamily: "var(--font-display)",
+              transition: "all 0.15s ease",
+            }}
+          >
+            YouTube
+          </button>
+          <button
+            onClick={() => handleTabChange("spotify")}
+            style={{
+              flex: 1,
+              background: activeTab === "spotify" ? "var(--accent-bg-subtle)" : "transparent",
+              border: activeTab === "spotify" ? "1px solid var(--accent)" : "1px solid transparent",
+              color: activeTab === "spotify" ? "var(--accent)" : "var(--color-text-muted)",
+              padding: "8px 12px",
+              borderRadius: "var(--radius-md)",
+              cursor: "pointer",
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              fontFamily: "var(--font-display)",
+              transition: "all 0.15s ease",
+            }}
+          >
+            Spotify
+          </button>
+        </div>
+      )}
 
       {error && (
         <div style={{ color: "hsl(355,85%,65%)", fontSize: "0.78rem", marginBottom: "10px", fontWeight: 500 }}>
