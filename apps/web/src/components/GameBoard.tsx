@@ -3151,7 +3151,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
           }}
         >
           {/* User Profile */}
-          <div style={{ flex: "1 1 250px", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
+          <div style={{ flex: "1 1 250px", minWidth: 0, display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
             {/* User Profile Card / Statistics */}
           {/* User Profile Circular Widget */}
           <div
@@ -3161,6 +3161,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               alignItems: "center",
               gap: "8px",
               width: "100%",
+              minWidth: 0,
             }}
           >
             {/* Clickable Circle Container */}
@@ -3168,8 +3169,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               onClick={() => setStatsExpanded(!statsExpanded)}
               style={{
                 position: "relative",
-                width: "80px",
-                height: "80px",
+                width: "56px",
+                height: "56px",
                 borderRadius: "50%",
                 background: "rgba(0, 0, 0, 0.2)",
                 border: `2px solid ${statsExpanded ? "var(--accent)" : "var(--color-border)"}`,
@@ -3177,7 +3178,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                 alignItems: "center",
                 justifyContent: "center",
                 cursor: "pointer",
-                boxShadow: statsExpanded ? "0 0 12px rgba(232, 163, 61, 0.3)" : "0 4px 10px rgba(0,0,0,0.3)",
+                boxShadow: statsExpanded ? "0 0 10px rgba(232, 163, 61, 0.3)" : "0 3px 8px rgba(0,0,0,0.3)",
                 transition: "all 0.2s ease",
               }}
               onMouseOver={(e) => {
@@ -3188,17 +3189,17 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               }}
             >
               {/* Avatar Image or Fallback */}
-              {renderAvatar(user ? user.avatar : (localPlayer?.avatar || "s1_0_0"), 52)}
+              {renderAvatar(user ? user.avatar : (localPlayer?.avatar || "s1_0_0"), 36)}
               
               {/* Online indicator dot at bottom right */}
               {user && (
                 <div
                   style={{
                     position: "absolute",
-                    bottom: "2px",
-                    right: "2px",
-                    width: "16px",
-                    height: "16px",
+                    bottom: "0px",
+                    right: "0px",
+                    width: "12px",
+                    height: "12px",
                     borderRadius: "50%",
                     background: (localPlayer?.connected !== false) ? "hsl(142,75%,45%)" : "hsl(355,85%,58%)",
                     border: "2px solid var(--color-surface)",
@@ -3220,6 +3221,89 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               </div>
               <div style={{ fontSize: "0.75rem", color: "var(--color-text-muted)", marginTop: "2px" }}>
                 {user ? "Online · Tap circle for stats" : "Gated · Tap circle to log in"}
+              </div>
+            </div>
+
+            {/* Room Players section */}
+            <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "12px" }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px", textAlign: "center" }}>
+                {t("game.roomPlayers", "Room Players")} ({room.players.length})
+              </div>
+              <div 
+                className="overlapping-players-scroll-container"
+                style={{ 
+                  display: "flex", 
+                  flexDirection: "row", 
+                  flexWrap: "nowrap", 
+                  gap: "6px", 
+                  justifyContent: "flex-start", 
+                  width: "100%", 
+                  overflowX: "auto", 
+                  overflowY: "hidden", 
+                  padding: "4px 2px", 
+                  boxSizing: "border-box",
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
+              >
+                {room.players.map((p) => {
+                  const hasTeam = p.team ? typeColors[p.team] : null;
+                  const pillBorder = hasTeam 
+                    ? `1.5px solid ${hasTeam.border}` 
+                    : "1px solid rgba(255, 255, 255, 0.08)";
+                  const pillBg = hasTeam
+                    ? `rgba(${p.team === "red" ? "196, 69, 54" : p.team === "blue" ? "45, 110, 142" : p.team === "green" ? "122, 140, 92" : "176, 122, 31"}, 0.12)`
+                    : "rgba(255, 255, 255, 0.03)";
+                  return (
+                    <div
+                      key={p.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                        background: pillBg,
+                        border: pillBorder,
+                        borderRadius: "16px",
+                        padding: "4px 8px",
+                        maxWidth: "110px",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <div style={{ position: "relative", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        {p.avatar ? (
+                          renderAvatar(p.avatar, 20)
+                        ) : (
+                          <Identicon username={p.displayName} size={20} />
+                        )}
+                        <div
+                          style={{
+                            position: "absolute",
+                            bottom: "-1px",
+                            right: "-1px",
+                            width: "6px",
+                            height: "6px",
+                            borderRadius: "50%",
+                            background: (p.connected !== false) ? "hsl(142,75%,45%)" : "hsl(355,85%,58%)",
+                            border: "1px solid var(--color-surface)",
+                          }}
+                        />
+                      </div>
+                      <span
+                        style={{
+                          fontSize: "0.72rem",
+                          fontWeight: 500,
+                          color: "var(--text-primary)",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                        title={p.displayName}
+                      >
+                        {p.displayName}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
