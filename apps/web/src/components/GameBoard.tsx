@@ -6655,7 +6655,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
                       }
                     }}
                   >
-                    {t("game.joinAs", { role: teamState.name || t(`teams.${color}`) })}
+                    {t("game.joinTeam", "Join {{team}}", { team: teamState.name || t(`teams.${color}`, color.toUpperCase()) })}
                   </button>
                 );
               })}
