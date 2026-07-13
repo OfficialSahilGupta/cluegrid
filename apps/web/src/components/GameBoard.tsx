@@ -3240,171 +3240,178 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   <h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.0rem", margin: 0, fontWeight: 700, color: "var(--accent)" }}>
                     Host Controls
                   </h4>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                    <button
-                      disabled={room.settings.roomLocked}
-                      onClick={() => {
-                        triggerHaptics([250, 50, 250]);
-                        playNavClick();
-                        if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        borderRadius: "var(--radius-sm)",
-                        background: "transparent",
-                        border: "1px solid var(--border-default)",
-                        color: "var(--text-primary)",
-                        fontWeight: 700,
-                        cursor: !room.settings.roomLocked ? "pointer" : "not-allowed",
-                        opacity: !room.settings.roomLocked ? 1 : 0.4,
-                        fontFamily: "var(--font-display)",
-                        fontSize: "0.85rem",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                      }}
-                      onMouseOver={(e) => {
-                        if (!room.settings.roomLocked) {
-                          e.currentTarget.style.background = "var(--border-subtle)";
-                        }
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.background = "transparent";
-                      }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="16 3 21 3 21 8" />
-                        <line x1="4" y1="20" x2="21" y2="3" />
-                        <polyline points="21 16 21 21 16 21" />
-                        <line x1="15" y1="15" x2="21" y2="21" />
-                        <line x1="4" y1="4" x2="9" y2="9" />
-                      </svg>
-                      <span>{t("settings.randomize", "Randomize Teams")}</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        triggerHaptics([250, 50, 250]);
-                        playSettingsToggle();
-                        if (socket) {
-                          socket.emit("update_settings", {
-                            roomCode: room.roomCode,
-                            settings: { roomLocked: !room.settings.roomLocked },
-                          });
-                        }
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        borderRadius: "var(--radius-sm)",
-                        background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
-                        border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
-                        color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        fontFamily: "var(--font-display)",
-                        fontSize: "0.85rem",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
-                      }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        {room.settings.roomLocked ? (
-                          <>
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                          </>
-                        ) : (
-                          <>
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                            <path d="M7 11V7a5 5 0 0 1 9.9-1" />
-                          </>
-                        )}
-                      </svg>
-                      <span>{room.settings.roomLocked ? t("settings.unlockRoom", "Unlock Room") : t("settings.lockRoom", "Lock Room")}</span>
-                    </button>
-                    <button
-                      onClick={handleStartGame}
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        borderRadius: "var(--radius-sm)",
-                        background: "transparent",
-                        border: "1px solid var(--border-default)",
-                        color: "var(--text-secondary)",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        fontFamily: "var(--font-display)",
-                        fontSize: "0.85rem",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.borderColor = "var(--accent)";
-                        e.currentTarget.style.color = "var(--text-primary)";
-                        e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.borderColor = "var(--border-default)";
-                        e.currentTarget.style.color = "var(--text-secondary)";
-                        e.currentTarget.style.background = "transparent";
-                      }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-                      </svg>
-                      <span>Reset Game</span>
-                    </button>
-                    <button
-                      onClick={handleReturnToLobby}
-                      style={{
-                        width: "100%",
-                        padding: "10px 14px",
-                        borderRadius: "var(--radius-sm)",
-                        background: "transparent",
-                        border: "1px solid var(--border-default)",
-                        color: "var(--text-secondary)",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                        fontFamily: "var(--font-display)",
-                        fontSize: "0.85rem",
-                        transition: "all 0.2s ease",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "8px",
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.borderColor = "var(--accent)";
-                        e.currentTarget.style.color = "var(--text-primary)";
-                        e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.borderColor = "var(--border-default)";
-                        e.currentTarget.style.color = "var(--text-secondary)";
-                        e.currentTarget.style.background = "transparent";
-                      }}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                        <polyline points="9 22 9 12 15 12 15 22" />
-                      </svg>
-                      <span>Return to Lobby</span>
-                    </button>
+                  <div style={{ display: "flex", gap: "8px", width: "100%" }}>
+                    {/* Left Column: Randomize & Lock */}
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <button
+                        disabled={room.settings.roomLocked}
+                        onClick={() => {
+                          triggerHaptics([250, 50, 250]);
+                          playNavClick();
+                          if (socket) socket.emit("randomize_teams", { roomCode: room.roomCode });
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          borderRadius: "var(--radius-sm)",
+                          background: "transparent",
+                          border: "1px solid var(--border-default)",
+                          color: "var(--text-primary)",
+                          fontWeight: 700,
+                          cursor: !room.settings.roomLocked ? "pointer" : "not-allowed",
+                          opacity: !room.settings.roomLocked ? 1 : 0.4,
+                          fontFamily: "var(--font-display)",
+                          fontSize: "0.72rem",
+                          transition: "all 0.2s ease",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "6px",
+                        }}
+                        onMouseOver={(e) => {
+                          if (!room.settings.roomLocked) {
+                            e.currentTarget.style.background = "var(--border-subtle)";
+                          }
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="16 3 21 3 21 8" />
+                          <line x1="4" y1="20" x2="21" y2="3" />
+                          <polyline points="21 16 21 21 16 21" />
+                          <line x1="15" y1="15" x2="21" y2="21" />
+                          <line x1="4" y1="4" x2="9" y2="9" />
+                        </svg>
+                        <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Randomize</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          triggerHaptics([250, 50, 250]);
+                          playSettingsToggle();
+                          if (socket) {
+                            socket.emit("update_settings", {
+                              roomCode: room.roomCode,
+                              settings: { roomLocked: !room.settings.roomLocked },
+                            });
+                          }
+                        }}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          borderRadius: "var(--radius-sm)",
+                          background: room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent",
+                          border: `1px solid ${room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)"}`,
+                          color: room.settings.roomLocked ? "rgb(239, 68, 68)" : "var(--accent)",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-display)",
+                          fontSize: "0.72rem",
+                          transition: "all 0.2s ease",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "6px",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.2)" : "rgba(232, 163, 61, 0.08)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.background = room.settings.roomLocked ? "rgba(239, 68, 68, 0.12)" : "transparent";
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          {room.settings.roomLocked ? (
+                            <>
+                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </>
+                          ) : (
+                            <>
+                              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                              <path d="M7 11V7a5 5 0 0 1 9.9-1" />
+                            </>
+                          )}
+                        </svg>
+                        <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{room.settings.roomLocked ? "Unlock" : "Lock Room"}</span>
+                      </button>
+                    </div>
+
+                    {/* Right Column: Reset & Return */}
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <button
+                        onClick={handleStartGame}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          borderRadius: "var(--radius-sm)",
+                          background: "transparent",
+                          border: "1px solid var(--border-default)",
+                          color: "var(--text-secondary)",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-display)",
+                          fontSize: "0.72rem",
+                          transition: "all 0.2s ease",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "6px",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.borderColor = "var(--accent)";
+                          e.currentTarget.style.color = "var(--text-primary)";
+                          e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.borderColor = "var(--border-default)";
+                          e.currentTarget.style.color = "var(--text-secondary)";
+                          e.currentTarget.style.background = "transparent";
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                        </svg>
+                        <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Reset Game</span>
+                      </button>
+                      <button
+                        onClick={handleReturnToLobby}
+                        style={{
+                          width: "100%",
+                          padding: "6px 8px",
+                          borderRadius: "var(--radius-sm)",
+                          background: "transparent",
+                          border: "1px solid var(--border-default)",
+                          color: "var(--text-secondary)",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-display)",
+                          fontSize: "0.72rem",
+                          transition: "all 0.2s ease",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: "6px",
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.borderColor = "var(--accent)";
+                          e.currentTarget.style.color = "var(--text-primary)";
+                          e.currentTarget.style.background = "rgba(232, 163, 61, 0.08)";
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.borderColor = "var(--border-default)";
+                          e.currentTarget.style.color = "var(--text-secondary)";
+                          e.currentTarget.style.background = "transparent";
+                        }}
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                          <polyline points="9 22 9 12 15 12 15 22" />
+                        </svg>
+                        <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Lobby</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
