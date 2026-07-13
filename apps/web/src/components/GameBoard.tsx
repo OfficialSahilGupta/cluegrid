@@ -649,7 +649,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     let timer: NodeJS.Timeout | number | null = null;
     let endTimer: NodeJS.Timeout | number | null = null;
 
-    const isTransitionToPlaying = prevPhaseRef.current === "lobby" && room.phase === "playing";
+    const isTransitionToPlaying = (prevPhaseRef.current === "lobby" || prevPhaseRef.current === "ended") && room.phase === "playing";
     const currentWords = room.board ? room.board.map((c) => c.word) : [];
 
     const isBoardReset =
@@ -668,8 +668,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
         const viewportEl = document.getElementById("game-board-viewport");
         const boardEl = document.getElementById("game-board-container");
         if (viewportEl && boardEl) {
+          const targetScrollTop = boardEl.getBoundingClientRect().top - viewportEl.getBoundingClientRect().top + viewportEl.scrollTop;
           viewportEl.scrollTo({
-            top: boardEl.offsetTop - 30, // offset a bit for a clean spacing margin
+            top: targetScrollTop - 30, // offset a bit for a clean spacing margin
             behavior: "smooth",
           });
         } else if (boardEl) {
@@ -5328,7 +5329,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               width: isMobileViewport ? "100%" : "auto", 
               position: "relative", 
               zIndex: activeSwitchPlayerId ? 100 : 1, 
-              left: "-30px" 
+              left: isMobileViewport ? "0px" : "-30px" 
             }}>
               <div style={{
                 background: "var(--color-surface)",
@@ -7271,6 +7272,19 @@ const renderSettingsCard = (side?: "left" | "right") => {
         setIsDealingAnimationActive(true);
         const cardCount = roomBoardRef.current && roomBoardRef.current.length ? roomBoardRef.current.length : 25;
         playCardDealCascade(cardCount);
+
+        // Smoothly scroll down to the card deck grid container
+        const viewportEl = document.getElementById("game-board-viewport");
+        const boardEl = document.getElementById("game-board-container");
+        if (viewportEl && boardEl) {
+          const targetScrollTop = boardEl.getBoundingClientRect().top - viewportEl.getBoundingClientRect().top + viewportEl.scrollTop;
+          viewportEl.scrollTo({
+            top: targetScrollTop - 30, // offset a bit for a clean spacing margin
+            behavior: "smooth",
+          });
+        } else if (boardEl) {
+          boardEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       }, 50);
 
       setTimeout(() => {
