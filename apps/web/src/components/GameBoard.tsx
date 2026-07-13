@@ -6880,7 +6880,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           display: "flex", 
           flexDirection: "row", 
           flexWrap: "nowrap", 
-          justifyContent: isMobileViewport ? "flex-start" : (isPlayPage ? "center" : "flex-start"),
+          justifyContent: isMobileViewport ? "flex-start" : (isPlayPage ? (listLength > 2 ? "flex-start" : "safe center") : "flex-start"),
           width: "100%",
           overflowX: "auto",
           overflowY: "hidden",
@@ -6914,14 +6914,14 @@ const renderSettingsCard = (side?: "left" | "right") => {
                 marginRight: rightMargin,
                 transition: "all 0.2s ease",
                 position: "relative",
-                zIndex: idx + 1,
+                zIndex: listLength - idx,
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.zIndex = "100";
                 e.currentTarget.style.transform = "scale(1.08)";
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.zIndex = String(idx + 1);
+                e.currentTarget.style.zIndex = String(listLength - idx);
                 e.currentTarget.style.transform = "none";
               }}
             >
