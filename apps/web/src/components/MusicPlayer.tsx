@@ -150,7 +150,7 @@ export function MusicPlayer({ noBorder }: MusicPlayerProps) {
       {activeTab === "youtube" && (
         <div>
           {!ytEmbed ? (
-            <form onSubmit={handleYtSubmit} style={{ display: "flex", gap: "6px" }}>
+            <form onSubmit={handleYtSubmit} style={{ display: "flex", gap: "6px", marginTop: "20px" }}>
               <input
                 type="text"
                 placeholder="Paste video/playlist URL..."
@@ -158,7 +158,7 @@ export function MusicPlayer({ noBorder }: MusicPlayerProps) {
                 onChange={(e) => setYtUrl(e.target.value)}
                 style={{
                   flex: 1,
-                  padding: "10px 12px",
+                  padding: "10px 15px",
                   fontSize: "0.85rem",
                   borderRadius: "var(--radius-md)",
                   border: "1px solid var(--border-default)",
@@ -247,7 +247,7 @@ export function MusicPlayer({ noBorder }: MusicPlayerProps) {
       {activeTab === "spotify" && (
         <div>
           {!spotifyEmbed ? (
-            <form onSubmit={handleSpotifySubmit} style={{ display: "flex", gap: "6px" }}>
+            <form onSubmit={handleSpotifySubmit} style={{ display: "flex", gap: "6px", marginTop: "20px" }}>
               <input
                 type="text"
                 placeholder="Paste track/playlist URL..."
