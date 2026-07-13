@@ -3876,6 +3876,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   return (
                     <div
                       key={p.id}
+                      className="player-row-wrapper"
                       onClick={(e) => {
                         if (!canAssign) return;
                         if (isActive) {
