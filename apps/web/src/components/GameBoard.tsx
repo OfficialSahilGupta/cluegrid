@@ -3225,82 +3225,137 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
             </div>
 
             {/* Room Players section */}
-            <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "12px" }}>
-              <div style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "8px", textAlign: "center" }}>
-                {t("game.roomPlayers", "Room Players")} ({room.players.length})
+            <div style={{ width: "100%", marginTop: "12px", borderTop: "1px solid var(--color-border)", paddingTop: "10px", minWidth: 0 }}>
+              <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: "8px" }}>
+                Room Players ({room.players.length})
               </div>
-              <div 
-                className="overlapping-players-scroll-container"
-                style={{ 
-                  display: "flex", 
-                  flexDirection: "row", 
-                  flexWrap: "nowrap", 
-                  gap: "6px", 
-                  justifyContent: "flex-start", 
-                  width: "100%", 
-                  overflowX: "auto", 
-                  overflowY: "hidden", 
-                  padding: "4px 2px", 
-                  boxSizing: "border-box",
-                  scrollbarWidth: "none",
-                  msOverflowStyle: "none",
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "5px",
+                  maxHeight: "180px",
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  paddingRight: "2px",
+                  scrollbarWidth: "thin",
+                  scrollbarColor: "var(--color-border) transparent",
+                  minWidth: 0,
                 }}
               >
                 {room.players.map((p) => {
-                  const hasTeam = p.team ? typeColors[p.team] : null;
-                  const pillBorder = hasTeam 
-                    ? `1.5px solid ${hasTeam.border}` 
-                    : "1px solid rgba(255, 255, 255, 0.08)";
-                  const pillBg = hasTeam
-                    ? `rgba(${p.team === "red" ? "196, 69, 54" : p.team === "blue" ? "45, 110, 142" : p.team === "green" ? "122, 140, 92" : "176, 122, 31"}, 0.12)`
-                    : "rgba(255, 255, 255, 0.03)";
+                  const teamColor = p.team ? typeColors[p.team] : null;
+                  const isSelf = p.id === playerId;
+                  const canAssign = isHost || isSelf;
+                  const isActive = activeSwitchPlayerId === p.id;
+
                   return (
                     <div
                       key={p.id}
+                      onClick={(e) => {
+                        if (!canAssign) return;
+                        if (isActive) {
+                          setActiveSwitchPlayerId(null);
+                          return;
+                        }
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        const popoverWidth = 290;
+                        const margin = 10;
+                        const screenWidth = window.innerWidth;
+                        const centerX = rect.left + rect.width / 2;
+                        let leftVal: number, topVal: number, transformVal: string;
+
+                        topVal = rect.top + rect.height / 2 + window.scrollY;
+                        if (centerX < screenWidth / 2) {
+                          leftVal = rect.right + margin + window.scrollX;
+                          transformVal = "translateY(-50%)";
+                          if (leftVal + popoverWidth > screenWidth) {
+                            leftVal = centerX + window.scrollX;
+                            topVal = rect.bottom + margin + window.scrollY;
+                            transformVal = "translateX(-50%)";
+                          }
+                        } else {
+                          leftVal = rect.left - margin - popoverWidth + window.scrollX;
+                          transformVal = "translateY(-50%)";
+                          if (leftVal < 0) {
+                            leftVal = centerX + window.scrollX;
+                            topVal = rect.bottom + margin + window.scrollY;
+                            transformVal = "translateX(-50%)";
+                          }
+                        }
+                        setPopoverCoords({ top: topVal, left: leftVal, transform: transformVal });
+                        setActiveSwitchPlayerId(p.id);
+                      }}
                       style={{
                         display: "flex",
                         alignItems: "center",
-                        gap: "6px",
-                        background: pillBg,
-                        border: pillBorder,
-                        borderRadius: "16px",
-                        padding: "4px 8px",
-                        maxWidth: "110px",
+                        gap: "8px",
+                        padding: "6px 8px",
+                        borderRadius: "10px",
+                        border: isActive
+                          ? `1.5px solid var(--accent)`
+                          : teamColor
+                            ? `1.5px solid ${teamColor.border}`
+                            : "1px solid rgba(255,255,255,0.07)",
+                        background: isActive
+                          ? "rgba(232,163,61,0.10)"
+                          : teamColor
+                            ? `rgba(${p.team === "red" ? "196,69,54" : p.team === "blue" ? "45,110,142" : p.team === "green" ? "122,140,92" : "176,122,31"}, 0.08)`
+                            : "rgba(255,255,255,0.02)",
+                        cursor: canAssign ? "pointer" : "default",
+                        transition: "all 0.15s ease",
                         flexShrink: 0,
+                        minWidth: 0,
+                      }}
+                      onMouseOver={(e) => {
+                        if (canAssign && !isActive) e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                      }}
+                      onMouseOut={(e) => {
+                        if (canAssign && !isActive) e.currentTarget.style.background = teamColor
+                          ? `rgba(${p.team === "red" ? "196,69,54" : p.team === "blue" ? "45,110,142" : p.team === "green" ? "122,140,92" : "176,122,31"}, 0.08)`
+                          : "rgba(255,255,255,0.02)";
                       }}
                     >
-                      <div style={{ position: "relative", width: "20px", height: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        {p.avatar ? (
-                          renderAvatar(p.avatar, 20)
-                        ) : (
-                          <Identicon username={p.displayName} size={20} />
-                        )}
-                        <div
-                          style={{
-                            position: "absolute",
-                            bottom: "-1px",
-                            right: "-1px",
-                            width: "6px",
-                            height: "6px",
-                            borderRadius: "50%",
-                            background: (p.connected !== false) ? "hsl(142,75%,45%)" : "hsl(355,85%,58%)",
-                            border: "1px solid var(--color-surface)",
-                          }}
-                        />
+                      {/* Avatar + status dot */}
+                      <div style={{ position: "relative", flexShrink: 0 }}>
+                        <div style={{
+                          width: "30px", height: "30px", borderRadius: "50%",
+                          border: `2px solid ${teamColor ? teamColor.border : "rgba(255,255,255,0.15)"}`,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          background: "rgba(0,0,0,0.2)", overflow: "hidden",
+                        }}>
+                          {p.avatar ? renderAvatar(p.avatar, 26) : <Identicon username={p.displayName} size={26} />}
+                        </div>
+                        <div style={{
+                          position: "absolute", bottom: "0px", right: "0px",
+                          width: "8px", height: "8px", borderRadius: "50%",
+                          background: p.connected !== false ? "hsl(142,75%,45%)" : "hsl(355,85%,58%)",
+                          border: "1.5px solid var(--color-surface)",
+                        }} />
                       </div>
-                      <span
-                        style={{
-                          fontSize: "0.72rem",
-                          fontWeight: 500,
+
+                      {/* Name + team badge */}
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          fontSize: "0.78rem", fontWeight: 600,
                           color: "var(--text-primary)",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                        title={p.displayName}
-                      >
-                        {p.displayName}
-                      </span>
+                          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                        }}>
+                          {p.displayName}
+                          {isSelf && <span style={{ marginLeft: "4px", fontSize: "0.58rem", color: "var(--accent)", fontWeight: 700 }}>YOU</span>}
+                          {(p.isHost || p.id === room.players[0]?.id) && <span style={{ marginLeft: "3px", fontSize: "0.6rem" }}>👑</span>}
+                        </div>
+                        <div style={{ fontSize: "0.62rem", color: teamColor?.text || "var(--color-text-muted)", marginTop: "1px", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.03em" }}>
+                          {p.team ? `${p.team}${p.role ? ` · ${p.role}` : ""}` : "Spectator"}
+                        </div>
+                      </div>
+
+                      {/* Click hint chevron for assignable players */}
+                      {canAssign && (
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ flexShrink: 0, opacity: 0.35, color: "var(--text-primary)" }}>
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      )}
                     </div>
                   );
                 })}
