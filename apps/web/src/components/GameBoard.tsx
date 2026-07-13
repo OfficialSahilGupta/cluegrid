@@ -4677,7 +4677,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   width: isChatFloatingOpen ? "100%" : "calc(100% + 200px)",
                   marginLeft: isChatFloatingOpen ? "0px" : "-100px",
                   marginRight: isChatFloatingOpen ? "0px" : "-100px",
-                  alignItems: "flex-start",
+                  alignItems: room.gameMode === "coop" ? "center" : "flex-start",
                   boxSizing: "border-box",
                 }}
               >
