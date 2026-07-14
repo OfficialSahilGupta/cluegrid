@@ -181,6 +181,53 @@ router.get("/profile", async (req, res) => {
 });
 
 /**
+ * Fetch public profile details and stats for any user
+ */
+router.get("/profile/public/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      res.status(400).json({ success: false, error: "Missing user ID" });
+      return;
+    }
+
+    // Fetch user details
+    const userRes = await db.query("SELECT id, username, avatar, is_supporter FROM users WHERE id = $1", [userId]);
+    if (userRes.rows.length === 0) {
+      res.status(404).json({ success: false, error: "User not found" });
+      return;
+    }
+    const user = userRes.rows[0];
+
+    // Fetch stats
+    const statsRes = await db.query(
+      "SELECT games_played, games_won, total_guesses, correct_guesses FROM user_stats WHERE user_id = $1",
+      [userId]
+    );
+    const stats = statsRes.rows[0] || { games_played: 0, games_won: 0, total_guesses: 0, correct_guesses: 0 };
+
+    res.json({
+      success: true,
+      profile: {
+        id: user.id,
+        username: user.username,
+        avatar: user.avatar,
+        isSupporter: !!user.is_supporter,
+        stats: {
+          gamesPlayed: stats.games_played,
+          gamesWon: stats.games_won,
+          totalGuesses: stats.total_guesses,
+          correctGuesses: stats.correct_guesses,
+        },
+      },
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message || "Failed to fetch public profile." });
+  }
+});
+
+/**
  * Update user settings (username and avatar selection)
  */
 router.post("/settings", async (req, res) => {

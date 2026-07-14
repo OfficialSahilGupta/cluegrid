@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { GatedUpsellModal } from "./GatedUpsellModal.js";
 import { MusicPlayer } from "./MusicPlayer.js";
 import { ProfileSettingsModal } from "./ProfileSettingsModal.js";
+import { PlayerPublicStatsModal } from "./PlayerPublicStatsModal.js";
 import { ChatMessageBubble } from "./ChatMessageBubble.js";
 import { renderAvatar } from "../utils/avatar";
 
@@ -400,6 +401,29 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
   // Collapsible Stats Card state
   const [statsExpanded, setStatsExpanded] = useState(false);
   const [profileSettingsOpen, setProfileSettingsOpen] = useState(false);
+  const [inspectedUser, setInspectedUser] = useState<any | null>(null);
+  const [loadingInspectedUser, setLoadingInspectedUser] = useState(false);
+  const [assignPlayerStats, setAssignPlayerStats] = useState<any | null>(null);
+  const [loadingAssignPlayerStats, setLoadingAssignPlayerStats] = useState(false);
+  const [popoverTab, setPopoverTab] = useState<"assign" | "stats">("assign");
+
+  const inspectPlayerStats = async (targetPlayer: Player) => {
+    if (!targetPlayer.userId) return;
+    setLoadingInspectedUser(true);
+    try {
+      const res = await fetch(`/api/user/profile/public/${targetPlayer.userId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.profile) {
+          setInspectedUser(data.profile);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch public profile stats:", err);
+    } finally {
+      setLoadingInspectedUser(false);
+    }
+  };
   const [spyWarningConfig, setSpyWarningConfig] = useState<{
     spyName: string;
     team: TeamIdentifier;
@@ -447,6 +471,8 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+
   const [votedCardIds, setVotedCardIds] = useState<number[]>([]);
   const [showWordCardIds, setShowWordCardIds] = useState<number[]>([]);
   const [clueSelectedCardIds, setClueSelectedCardIds] = useState<number[]>([]);
@@ -586,6 +612,34 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
 
   const localPlayer = room.players.find((p) => p.id === playerId);
   const isHost = !!localPlayer?.isHost || (room.players.length > 0 && playerId === room.players[0]?.id);
+
+  useEffect(() => {
+    if (!activeSwitchPlayerId) {
+      setAssignPlayerStats(null);
+      return;
+    }
+    const p = room?.players.find(player => player.id === activeSwitchPlayerId);
+    if (p) {
+      const isSelf = p.id === playerId;
+      const canModify = isHost || isSelf;
+      setPopoverTab(canModify ? "assign" : "stats");
+
+      if (p.userId) {
+        setLoadingAssignPlayerStats(true);
+        fetch(`/api/user/profile/public/${p.userId}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.profile) {
+              setAssignPlayerStats(data.profile.stats);
+            }
+          })
+          .catch(err => console.error("Error fetching stats for assign popover:", err))
+          .finally(() => setLoadingAssignPlayerStats(false));
+      } else {
+        setAssignPlayerStats(null);
+      }
+    }
+  }, [activeSwitchPlayerId, room?.players, isHost, playerId]);
 
   // Keep client local votedCardIds state in sync with server broadcasted voter status
   useEffect(() => {
@@ -3880,7 +3934,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                       key={p.id}
                       className="player-row-wrapper"
                       onClick={(e) => {
-                        if (!canAssign) return;
+                        if (!canAssign && !p.userId) return;
                         if (isActive) {
                           setActiveSwitchPlayerId(null);
                           return;
@@ -3929,17 +3983,17 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           : teamColor
                             ? `rgba(${p.team === "red" ? "196,69,54" : p.team === "blue" ? "45,110,142" : p.team === "green" ? "122,140,92" : "176,122,31"}, 0.08)`
                             : "rgba(255,255,255,0.02)",
-                        cursor: canAssign ? "pointer" : "default",
+                        cursor: (canAssign || p.userId) ? "pointer" : "default",
                         transition: "all 0.15s ease",
                         flexShrink: 0,
                         minWidth: 0,
                         boxSizing: "border-box",
                       }}
                       onMouseOver={(e) => {
-                        if (canAssign && !isActive) e.currentTarget.style.background = "rgba(255,255,255,0.05)";
+                        if ((canAssign || p.userId) && !isActive) e.currentTarget.style.background = "rgba(255,255,255,0.05)";
                       }}
                       onMouseOut={(e) => {
-                        if (canAssign && !isActive) e.currentTarget.style.background = teamColor
+                        if ((canAssign || p.userId) && !isActive) e.currentTarget.style.background = teamColor
                           ? `rgba(${p.team === "red" ? "196,69,54" : p.team === "blue" ? "45,110,142" : p.team === "green" ? "122,140,92" : "176,122,31"}, 0.08)`
                           : "rgba(255,255,255,0.02)";
                       }}
@@ -6556,6 +6610,9 @@ const renderSettingsCard = (side?: "left" | "right") => {
     const activeBorderColor = p.team ? `rgba(${p.team === 'red' ? '239,149,156' : p.team === 'blue' ? '0,240,255' : p.team === 'green' ? '178,239,155' : '243,211,91'}, 0.45)` : "rgba(0, 240, 255, 0.35)";
     const activeGlowColor = p.team ? `rgba(${p.team === 'red' ? '239,149,156' : p.team === 'blue' ? '0,240,255' : p.team === 'green' ? '178,239,155' : '243,211,91'}, 0.15)` : "rgba(0, 240, 255, 0.1)";
 
+    const isSelf = p.id === playerId;
+    const canModify = isHost || isSelf;
+
     return (
       <>
         {/* Mobile Backdrop */}
@@ -6598,7 +6655,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: `1.5px solid ${activeBorderColor}`, paddingBottom: "10px" }}>
             <span style={{ fontFamily: "'Big Shoulders Display', sans-serif", fontSize: "1.3rem", fontWeight: 900, color: activeColor, textTransform: "uppercase", letterSpacing: "0.06em", flex: 1, textAlign: "left" }}>
-              {t("game.assign", "Assign")} {p.displayName}
+              {canModify ? t("game.assign", "Assign") : t("game.profile", "Profile")} {p.displayName}
             </span>
             <button
               onClick={() => setActiveSwitchPlayerId(null)}
@@ -6616,125 +6673,223 @@ const renderSettingsCard = (side?: "left" | "right") => {
               ✕
             </button>
           </div>
-          
-          {room.gameMode === "coop" ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              {Object.entries(room.teams).map(([color, teamState]) => {
-                const isSelected = p.team === color;
-                const themeCol = typeColors[color]!;
-                return (
-                  <button
-                    key={color}
-                    onClick={() => {
-                      handleJoinTeamRole(color as any, null, p.id);
-                      setActiveSwitchPlayerId(null);
-                    }}
-                    style={{
-                      padding: "10px 12px",
-                      fontSize: "0.8rem",
-                      background: isSelected ? `rgba(${color === 'red' ? '239,149,156' : '0,240,255'}, 0.12)` : "rgba(255,255,255,0.03)",
-                      border: isSelected ? `1.5px solid ${themeCol.border}` : "1px solid rgba(255,255,255,0.12)",
-                      borderRadius: "6px",
-                      color: isSelected ? themeCol.border : "#9AA29B",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      fontFamily: "var(--font-display)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      width: "100%",
-                      boxShadow: isSelected ? `0 0 10px rgba(${color === 'red' ? '239,149,156' : '0,240,255'}, 0.15)` : "none",
-                      transition: "all 0.2s ease",
-                    }}
-                    onMouseOver={(e) => {
-                      if (!isSelected) {
-                        e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                        e.currentTarget.style.color = "#eef3ee";
-                      }
-                    }}
-                    onMouseOut={(e) => {
-                      if (!isSelected) {
-                        e.currentTarget.style.background = "rgba(255,255,255,0.03)";
-                        e.currentTarget.style.color = "#9AA29B";
-                      }
-                    }}
-                  >
-                    {t("game.joinTeam", "Join {{team}}", { team: teamState.name || t(`teams.${color}`, color.toUpperCase()) })}
-                  </button>
-                );
-              })}
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              {/* Red Team */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                {renderRoleButton("red", "spymaster", "Red Spy")}
-                {renderRoleButton("red", "operative", "Red Op")}
-              </div>
 
-              {/* Blue Team */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                {renderRoleButton("blue", "spymaster", "Blue Spy")}
-                {renderRoleButton("blue", "operative", "Blue Op")}
-              </div>
-
-              {/* Green Team */}
-              {room.teamCount > 2 && (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                  {renderRoleButton("green", "spymaster", "Green Spy")}
-                  {renderRoleButton("green", "operative", "Green Op")}
-                </div>
-              )}
-
-              {/* Yellow Team */}
-              {room.teamCount > 3 && (
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px" }}>
-                  {renderRoleButton("yellow", "spymaster", "Yellow Spy")}
-                  {renderRoleButton("yellow", "operative", "Yellow Op")}
-                </div>
-              )}
+          {/* Tabs selector bar */}
+          {canModify && p.userId && (
+            <div style={{ display: "flex", gap: "4px", background: "rgba(0,0,0,0.3)", padding: "2px", borderRadius: "6px" }}>
+              <button
+                onClick={() => setPopoverTab("assign")}
+                style={{
+                  flex: 1,
+                  padding: "6px",
+                  borderRadius: "4px",
+                  border: "none",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  background: popoverTab === "assign" ? "rgba(255,255,255,0.08)" : "transparent",
+                  color: popoverTab === "assign" ? "#fff" : "var(--color-text-muted)",
+                  fontFamily: "var(--font-display)",
+                  textTransform: "uppercase",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                Assign
+              </button>
+              <button
+                onClick={() => setPopoverTab("stats")}
+                style={{
+                  flex: 1,
+                  padding: "6px",
+                  borderRadius: "4px",
+                  border: "none",
+                  fontSize: "0.75rem",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  background: popoverTab === "stats" ? "rgba(255,255,255,0.08)" : "transparent",
+                  color: popoverTab === "stats" ? "#fff" : "var(--color-text-muted)",
+                  fontFamily: "var(--font-display)",
+                  textTransform: "uppercase",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                Stats
+              </button>
             </div>
           )}
 
-          {/* Spectate Button */}
-          <button
-            onClick={() => {
-              handleJoinTeamRole(null, null, p.id);
-              setActiveSwitchPlayerId(null);
-            }}
-            style={{
-              padding: "10px",
-              background: !p.team ? "rgba(0, 240, 255, 0.12)" : "rgba(255,255,255,0.03)",
-              border: !p.team ? "1.5px solid #00f0ff" : "1px solid rgba(255,255,255,0.12)",
-              borderRadius: "6px",
-              color: !p.team ? "#00f0ff" : "#9AA29B",
-              fontWeight: 700,
-              fontSize: "0.8rem",
-              cursor: "pointer",
-              width: "100%",
-              fontFamily: "var(--font-display)",
-              textTransform: "uppercase",
-              letterSpacing: "0.04em",
-              boxShadow: !p.team ? "0 0 10px rgba(0, 240, 255, 0.15)" : "none",
-              transition: "all 0.2s ease",
-            }}
-            onMouseOver={(e) => {
-              if (p.team) {
-                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                e.currentTarget.style.color = "#eef3ee";
-              }
-            }}
-            onMouseOut={(e) => {
-              if (p.team) {
-                e.currentTarget.style.background = "rgba(255,255,255,0.03)";
-                e.currentTarget.style.color = "#9AA29B";
-              }
-            }}
-          >
-            {t("roles.spectator", "Spectate")}
-          </button>
+          {/* Stats Tab Content */}
+          {popoverTab === "stats" && (
+            p.userId ? (
+              <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "8px", padding: "10px", fontSize: "0.78rem" }}>
+                <div style={{ fontWeight: 700, color: "var(--accent)", textTransform: "uppercase", fontSize: "0.7rem", letterSpacing: "0.05em", marginBottom: "8px" }}>
+                  Player Stats
+                </div>
+                {loadingAssignPlayerStats ? (
+                  <div style={{ color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", padding: "6px" }}>Loading stats...</div>
+                ) : assignPlayerStats ? (
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                    <div style={{ background: "rgba(0,0,0,0.2)", padding: "6px", borderRadius: "4px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                      <div style={{ fontSize: "0.68rem", color: "var(--color-text-muted)" }}>Played</div>
+                      <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "#fff" }}>{assignPlayerStats.gamesPlayed}</div>
+                    </div>
+                    <div style={{ background: "rgba(0,0,0,0.2)", padding: "6px", borderRadius: "4px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                      <div style={{ fontSize: "0.68rem", color: "var(--color-text-muted)" }}>Won</div>
+                      <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "#fff" }}>{assignPlayerStats.gamesWon}</div>
+                    </div>
+                    <div style={{ background: "rgba(0,0,0,0.2)", padding: "6px", borderRadius: "4px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                      <div style={{ fontSize: "0.68rem", color: "var(--color-text-muted)" }}>Win Rate</div>
+                      <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--accent)" }}>
+                        {assignPlayerStats.gamesPlayed > 0 ? ((assignPlayerStats.gamesWon / assignPlayerStats.gamesPlayed) * 100).toFixed(0) : 0}%
+                      </div>
+                    </div>
+                    <div style={{ background: "rgba(0,0,0,0.2)", padding: "6px", borderRadius: "4px", border: "1px solid rgba(255,255,255,0.05)" }}>
+                      <div style={{ fontSize: "0.68rem", color: "var(--color-text-muted)" }}>Accuracy</div>
+                      <div style={{ fontSize: "1.05rem", fontWeight: 800, color: "var(--accent)" }}>
+                        {assignPlayerStats.totalGuesses > 0 ? ((assignPlayerStats.correctGuesses / assignPlayerStats.totalGuesses) * 100).toFixed(0) : 0}%
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center", padding: "6px" }}>No stats available</div>
+                )}
+              </div>
+            ) : (
+              <div style={{ background: "rgba(255, 255, 255, 0.03)", border: "1px solid rgba(255, 255, 255, 0.08)", borderRadius: "8px", padding: "10px", fontSize: "0.75rem", color: "var(--color-text-muted)", fontStyle: "italic", textAlign: "center" }}>
+                Guest Player (No stats saved)
+              </div>
+            )
+          )}
+
+          {/* Assign Tab Content */}
+          {canModify && popoverTab === "assign" && (
+            <>
+              {room.gameMode === "coop" ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {Object.entries(room.teams).map(([color, teamState]) => {
+                    const isSelected = p.team === color;
+                    const themeCol = typeColors[color]!;
+                    return (
+                      <button
+                        key={color}
+                        onClick={() => {
+                          handleJoinTeamRole(color as any, null, p.id);
+                          setActiveSwitchPlayerId(null);
+                        }}
+                        style={{
+                          padding: "10px 12px",
+                          fontSize: "0.8rem",
+                          background: isSelected ? `rgba(${color === 'red' ? '239,149,156' : '0,240,255'}, 0.12)` : "rgba(255,255,255,0.03)",
+                          border: isSelected ? `1.5px solid ${themeCol.border}` : "1px solid rgba(255,255,255,0.12)",
+                          borderRadius: "6px",
+                          color: isSelected ? themeCol.border : "#9AA29B",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          fontFamily: "var(--font-display)",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.05em",
+                          width: "100%",
+                          boxShadow: isSelected ? `0 0 10px rgba(${color === 'red' ? '239,149,156' : '0,240,255'}, 0.15)` : "none",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseOver={(e) => {
+                          if (!isSelected) {
+                            e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                            e.currentTarget.style.color = "#eef3ee";
+                          }
+                        }}
+                        onMouseOut={(e) => {
+                          if (!isSelected) {
+                            e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                            e.currentTarget.style.color = "#9AA29B";
+                          }
+                        }}
+                      >
+                        {t("game.joinTeam", "Join {{team}}", { team: teamState.name || t(`teams.${color}`, color.toUpperCase()) })}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {/* Row 1: Red and Blue Teams side by side */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                    {/* Column 1: Red Team (Spymaster & Operative stacked vertically) */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      {renderRoleButton("red", "spymaster", "Red Spy")}
+                      {renderRoleButton("red", "operative", "Red Op")}
+                    </div>
+                    {/* Column 2: Blue Team (Spymaster & Operative stacked vertically) */}
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      {renderRoleButton("blue", "spymaster", "Blue Spy")}
+                      {renderRoleButton("blue", "operative", "Blue Op")}
+                    </div>
+                  </div>
+
+                  {/* Row 2: Green and Yellow Teams side by side (if active) */}
+                  {(room.teamCount > 2 || room.teamCount > 3) && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+                      {/* Column 1: Green Team (Spymaster & Operative) */}
+                      {room.teamCount > 2 ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                          {renderRoleButton("green", "spymaster", "Green Spy")}
+                          {renderRoleButton("green", "operative", "Green Op")}
+                        </div>
+                      ) : <div />}
+                      {/* Column 2: Yellow Team (Spymaster & Operative) */}
+                      {room.teamCount > 3 ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                          {renderRoleButton("yellow", "spymaster", "Yellow Spy")}
+                          {renderRoleButton("yellow", "operative", "Yellow Op")}
+                        </div>
+                      ) : <div />}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Spectate Button */}
+              <button
+                onClick={() => {
+                  handleJoinTeamRole(null, null, p.id);
+                  setActiveSwitchPlayerId(null);
+                }}
+                style={{
+                  padding: "10px",
+                  background: !p.team ? "rgba(0, 240, 255, 0.12)" : "rgba(255,255,255,0.03)",
+                  border: !p.team ? "1.5px solid #00f0ff" : "1px solid rgba(255,255,255,0.12)",
+                  borderRadius: "6px",
+                  color: !p.team ? "#00f0ff" : "#9AA29B",
+                  fontWeight: 700,
+                  fontSize: "0.8rem",
+                  cursor: "pointer",
+                  width: "100%",
+                  fontFamily: "var(--font-display)",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                  boxShadow: !p.team ? "0 0 10px rgba(0, 240, 255, 0.15)" : "none",
+                  transition: "all 0.2s ease",
+                }}
+                onMouseOver={(e) => {
+                  if (p.team) {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                    e.currentTarget.style.color = "#eef3ee";
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (p.team) {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                    e.currentTarget.style.color = "#9AA29B";
+                  }
+                }}
+              >
+                {t("roles.spectator", "Spectate")}
+              </button>
+            </>
+          )}
 
           {/* Host Actions: Kick / Promote */}
-          {isHost && p.id !== playerId && (
+          {canModify && popoverTab === "assign" && isHost && p.id !== playerId && (
             <div style={{ display: "flex", flexDirection: "column", gap: "8px", borderTop: "1.5px solid rgba(255,255,255,0.1)", paddingTop: "12px", marginTop: "4px" }}>
               {!p.isHost && p.id !== room.players[0]?.id && (
                 <button
@@ -6835,7 +6990,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           display: "inline-flex",
           flexDirection: "column",
           alignItems: "center",
-          cursor: canSwitch ? "pointer" : "default",
+          cursor: (canSwitch || p.userId) ? "pointer" : "default",
           margin: size > 46 ? "4px" : "2px",
           width: `${size}px`,
           zIndex: activeSwitchPlayerId === p.id ? 50 : 1,
@@ -6845,44 +7000,43 @@ const renderSettingsCard = (side?: "left" | "right") => {
         <div
           className="player-avatar-circle"
           onClick={(e) => {
-            if (canSwitch) {
-              const rect = e.currentTarget.getBoundingClientRect();
-              const avatarCenterX = rect.left + rect.width / 2;
-              const screenWidth = window.innerWidth;
-              const popoverWidth = 290;
-              const margin = 12;
+            if (!canSwitch && !p.userId) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const avatarCenterX = rect.left + rect.width / 2;
+            const screenWidth = window.innerWidth;
+            const popoverWidth = 290;
+            const margin = 12;
 
-              let leftVal = 0;
-              let topVal = rect.top + rect.height / 2 + window.scrollY;
-              let transformVal = "";
+            let leftVal = 0;
+            let topVal = rect.top + rect.height / 2 + window.scrollY;
+            let transformVal = "";
 
-              if (avatarCenterX < screenWidth / 2) {
-                leftVal = rect.right + margin + window.scrollX;
-                transformVal = "translateY(-50%)";
-                
-                if (leftVal + popoverWidth > screenWidth + window.scrollX) {
-                  leftVal = rect.left + rect.width / 2 + window.scrollX;
-                  topVal = rect.bottom + margin + window.scrollY;
-                  transformVal = "translateX(-50%)";
-                }
-              } else {
-                leftVal = rect.left - margin - popoverWidth + window.scrollX;
-                transformVal = "translateY(-50%)";
-
-                if (leftVal < window.scrollX) {
-                  leftVal = rect.left + rect.width / 2 + window.scrollX;
-                  topVal = rect.bottom + margin + window.scrollY;
-                  transformVal = "translateX(-50%)";
-                }
+            if (avatarCenterX < screenWidth / 2) {
+              leftVal = rect.right + margin + window.scrollX;
+              transformVal = "translateY(-50%)";
+              
+              if (leftVal + popoverWidth > screenWidth + window.scrollX) {
+                leftVal = rect.left + rect.width / 2 + window.scrollX;
+                topVal = rect.bottom + margin + window.scrollY;
+                transformVal = "translateX(-50%)";
               }
+            } else {
+              leftVal = rect.left - margin - popoverWidth + window.scrollX;
+              transformVal = "translateY(-50%)";
 
-              setPopoverCoords({
-                top: topVal,
-                left: leftVal,
-                transform: transformVal
-              });
-              setActiveSwitchPlayerId(activeSwitchPlayerId === p.id ? null : p.id);
+              if (leftVal < window.scrollX) {
+                leftVal = rect.left + rect.width / 2 + window.scrollX;
+                topVal = rect.bottom + margin + window.scrollY;
+                transformVal = "translateX(-50%)";
+              }
             }
+
+            setPopoverCoords({
+              top: topVal,
+              left: leftVal,
+              transform: transformVal
+            });
+            setActiveSwitchPlayerId(activeSwitchPlayerId === p.id ? null : p.id);
           }}
           title={`${p.displayName}${p.id === playerId ? " (You)" : ""} - ${p.status || "ACTIVE"} (${p.connected ? "Online" : "Offline"})`}
           style={{
@@ -6899,8 +7053,10 @@ const renderSettingsCard = (side?: "left" | "right") => {
             transition: "all 0.2s ease",
           }}
           onMouseOver={(e) => {
-            e.currentTarget.style.borderColor = p.team ? typeColors[p.team]!.light : "var(--accent)";
-            if (isCurrent) e.currentTarget.style.boxShadow = `0 0 14px ${glowColor}`;
+            if (canSwitch || p.userId) {
+              e.currentTarget.style.borderColor = p.team ? typeColors[p.team]!.light : "var(--accent)";
+              if (isCurrent) e.currentTarget.style.boxShadow = `0 0 14px ${glowColor}`;
+            }
           }}
           onMouseOut={(e) => {
             e.currentTarget.style.borderColor = finalBorderColor;
@@ -9702,6 +9858,21 @@ const renderSettingsCard = (side?: "left" | "right") => {
           playerId={playerId}
           roomCode={room?.roomCode}
         />
+      )}
+
+      {inspectedUser && (
+        <PlayerPublicStatsModal 
+          profile={inspectedUser}
+          onClose={() => setInspectedUser(null)} 
+        />
+      )}
+
+      {loadingInspectedUser && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh", backgroundColor: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 11000 }}>
+          <div style={{ background: "var(--color-surface)", padding: "20px", borderRadius: "10px", border: "1px solid var(--color-border)", color: "#fff", fontWeight: 700 }}>
+            Loading stats...
+          </div>
+        </div>
       )}
 
       {activeSwitchPlayerId && (() => {
