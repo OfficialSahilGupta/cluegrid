@@ -2046,10 +2046,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   border: cardStyle.border,
                   borderRadius: "var(--radius-lg)",
                   padding: isMobileViewport ? "8px 10px" : "16px",
-                  paddingBottom: isMobileViewport ? "38px" : desktopCardPaddingBottom,
+                  paddingBottom: isMobileViewport ? "44px" : desktopCardPaddingBottom,
                   height: isMobileViewport ? mobileCardHeight : desktopCardHeight,
                   minHeight: isMobileViewport ? mobileCardMinHeight : undefined,
-                  overflow: isMobileViewport ? "hidden" : "visible",
+                  overflow: "visible",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "flex-start",
@@ -2075,7 +2075,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   }}
                 />
 
-                <div style={{ zIndex: 2 }}>
+                <div style={{ zIndex: 2, overflow: "visible" }}>
                   <div style={{ fontSize: isMobileViewport ? "0.75rem" : "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: isMobileViewport ? "4px" : "8px" }}>
                     {isMobileViewport ? "OPS" : "Operatives"}
                   </div>
@@ -2128,10 +2128,10 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   border: cardStyle.border,
                   borderRadius: "var(--radius-lg)",
                   padding: isMobileViewport ? "8px 10px" : "16px",
-                  paddingBottom: isMobileViewport ? "38px" : desktopCardPaddingBottom,
+                  paddingBottom: isMobileViewport ? "44px" : desktopCardPaddingBottom,
                   height: isMobileViewport ? mobileCardHeight : desktopCardHeight,
                   minHeight: isMobileViewport ? mobileCardMinHeight : undefined,
-                  overflow: isMobileViewport ? "hidden" : "visible",
+                  overflow: "visible",
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "flex-start",
@@ -2157,7 +2157,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                   }}
                 />
 
-                <div style={{ zIndex: 2 }}>
+                <div style={{ zIndex: 2, overflow: "visible" }}>
                   <div style={{ fontSize: isMobileViewport ? "0.75rem" : "1.05rem", color: themeCol.text, textTransform: "uppercase", fontWeight: 800, fontFamily: "var(--font-display)", letterSpacing: "0.05em", textAlign: "center", marginBottom: isMobileViewport ? "4px" : "8px" }}>
                     {isMobileViewport ? "SPY" : "Spymasters"}
                   </div>
@@ -3855,13 +3855,15 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
               </div>
               <div
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "5px",
-                  maxHeight: "180px",
+                  display: isMobileViewport ? "grid" : "flex",
+                  gridTemplateColumns: isMobileViewport ? "repeat(2, minmax(0, 1fr))" : undefined,
+                  flexDirection: isMobileViewport ? undefined : "column",
+                  gap: isMobileViewport ? "8px" : "5px",
+                  maxHeight: isMobileViewport ? "280px" : "180px",
                   overflowY: "auto",
                   overflowX: "hidden",
-                  paddingRight: "2px",
+                  padding: "2px",
+                  boxSizing: "border-box",
                   scrollbarWidth: "thin",
                   scrollbarColor: "var(--color-border) transparent",
                   minWidth: 0,
@@ -3918,9 +3920,9 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         padding: "6px 8px",
                         borderRadius: "10px",
                         border: isActive
-                          ? `1.5px solid var(--accent)`
+                          ? "1px solid var(--accent)"
                           : teamColor
-                            ? `1.5px solid ${teamColor.border}`
+                            ? `1px solid ${teamColor.border}`
                             : "1px solid rgba(255,255,255,0.07)",
                         background: isActive
                           ? "rgba(232,163,61,0.10)"
@@ -3931,6 +3933,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                         transition: "all 0.15s ease",
                         flexShrink: 0,
                         minWidth: 0,
+                        boxSizing: "border-box",
                       }}
                       onMouseOver={(e) => {
                         if (canAssign && !isActive) e.currentTarget.style.background = "rgba(255,255,255,0.05)";
@@ -3971,7 +3974,7 @@ export function GameBoard({ room, playerId, socket, lightMode, setLightMode, set
                           {(p.isHost || p.id === room.players[0]?.id) && <span style={{ marginLeft: "3px", fontSize: "0.6rem" }}>👑</span>}
                         </div>
                         <div style={{ fontSize: "0.62rem", color: teamColor?.text || "var(--color-text-muted)", marginTop: "1px", textTransform: "uppercase", fontWeight: 600, letterSpacing: "0.03em" }}>
-                          {p.team ? `${p.team}${p.role ? ` · ${p.role}` : ""}` : "Spectator"}
+                          {p.team ? `${p.team}${p.role ? ` ${p.role}` : ""}` : "Spectator"}
                         </div>
                       </div>
 
@@ -7034,7 +7037,7 @@ const renderSettingsCard = (side?: "left" | "right") => {
           justifyContent: isMobileViewport ? "flex-start" : (isPlayPage ? (listLength > 2 ? "flex-start" : "safe center") : "flex-start"),
           width: "100%",
           overflowX: "auto",
-          overflowY: "hidden",
+          overflowY: "visible",
           paddingLeft: isMobileViewport ? "8px" : "0px",
           paddingRight: isMobileViewport ? "8px" : "0px",
           paddingTop: isMobileViewport ? "4px" : "28px",

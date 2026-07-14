@@ -909,12 +909,11 @@ html.increased-fonts {
 
   /* Enforce compact container height and prevent expansion when player joins */
   .team-role-card {
-    height: 126px !important;
+    height: auto !important;
     min-height: 126px !important;
-    max-height: 126px !important;
     padding: 8px 10px !important;
     padding-bottom: 30px !important;
-    overflow: hidden !important;
+    overflow: visible !important;
   }
 
   .overlapping-players-scroll-container {
@@ -954,13 +953,16 @@ html.increased-fonts {
 
   /* Decrease avatar and username label sizes on mobile */
   .player-row-wrapper {
-    width: 32px !important;
+    width: auto !important;
+    min-width: 32px !important;
     margin: 2px !important;
+    box-sizing: border-box !important;
   }
   
   .player-avatar-circle {
     width: 32px !important;
     height: 32px !important;
+    box-sizing: border-box !important;
   }
   
   .player-avatar-circle svg,
