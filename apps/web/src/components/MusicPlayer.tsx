@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export function parseYouTubeUrl(url: string): { type: "video" | "playlist"; id: string } | null {
   const playlistMatch = url.match(/[?&]list=([^"&?/\s]+)/i);
@@ -28,12 +28,19 @@ interface MusicPlayerProps {
 }
 
 export function MusicPlayer({ noBorder }: MusicPlayerProps) {
+  const [isMobileViewport, setIsMobileViewport] = useState(typeof window !== "undefined" ? window.innerWidth <= 1024 : false);
   const [activeTab, setActiveTab] = useState<"youtube" | "spotify">("youtube");
   const [ytUrl, setYtUrl] = useState("");
   const [spotifyUrl, setSpotifyUrl] = useState("");
   const [ytEmbed, setYtEmbed] = useState<{ type: "video" | "playlist"; id: string } | null>(null);
   const [spotifyEmbed, setSpotifyEmbed] = useState<{ type: "track" | "playlist" | "album"; id: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobileViewport(window.innerWidth <= 1024);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleYtSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,7 +157,7 @@ export function MusicPlayer({ noBorder }: MusicPlayerProps) {
       {activeTab === "youtube" && (
         <div>
           {!ytEmbed ? (
-            <form onSubmit={handleYtSubmit} style={{ display: "flex", gap: "6px", marginTop: "20px" }}>
+            <form onSubmit={handleYtSubmit} style={{ display: "flex", gap: "6px", marginTop: isMobileViewport ? "8px" : "20px" }}>
               <input
                 type="text"
                 placeholder="Paste video/playlist URL..."
@@ -247,7 +254,7 @@ export function MusicPlayer({ noBorder }: MusicPlayerProps) {
       {activeTab === "spotify" && (
         <div>
           {!spotifyEmbed ? (
-            <form onSubmit={handleSpotifySubmit} style={{ display: "flex", gap: "6px", marginTop: "20px" }}>
+            <form onSubmit={handleSpotifySubmit} style={{ display: "flex", gap: "6px", marginTop: isMobileViewport ? "8px" : "20px" }}>
               <input
                 type="text"
                 placeholder="Paste track/playlist URL..."
